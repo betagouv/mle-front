@@ -1,15 +1,52 @@
 {
     "metadata": {
-        "title": "Je Deviens Etudiant",
-        "description": "Je Deviens Etudiant - Your guide to student housing"
-    },
-    "languages": {
-        "title": "Select language",
-        "fr": "French",
-        "en": "English"
+        "title": "Mon logement étudiant",
+        "description": "Mon logement étudiant - Votre guide à l'accès au logement étudiant",
+        "homeLinkTitle": "Accueil - Mon logement étudiant"
     },
     "header": {
-        "home": "Home",
-        "faq": "FAQ"
+        "title": "Mon logement étudiant",
+        "description": "Simplifier l'accès aux droits et logements étudiants",
+        "alerts": "Alertes logements"
+    },
+    "footer": {
+        "linkList": {
+            "departmentsCategoryName": "Départements",
+            "citiesCategoryName": "Villes"
+        }
+    },
+    "languages": {
+        "title": "Sélectionner la langue",
+        "fr": "Français",
+        "en": "Anglais"
+    },
+    "navigation": {
+        "home": "Simuler mes aides au logement",
+        "prepareBudget": "Préparer mon budget",
+        "findAccommodation": "Trouver un logement étudiant",
+        "byAcademies": "Par académies",
+        "faq": "Foire aux questions"
+    },
+    "findAccomodation": {
+        "currentPageLabel": "Trouver un logement étudiants",
+        "header": {
+            "inputLabel": "Académie, ville ou département",
+            "checkboxes": {
+                "label": "Type de logement",
+                "individual": "Individuel",
+                "shared": "Colocation"
+            },
+            "rangeLabel": "Budget maximum",
+            "filtersCta": "Filtres",
+            "accessbility": "Accessible"
+        },
+        "filters": {
+            "grid": "Grille",
+            "map": "Carte",
+            "sortByPrice": "Triés par prix"
+        },
+        "card": {
+            "priceFrom": "À partir de"
+        }
     }
 }

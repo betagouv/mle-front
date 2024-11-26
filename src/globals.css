@@ -1,0 +1,4 @@
+[class^=ri-]::before, [class^=fr-]::before {
+  --icon-size: 1rem;
+  margin-right: 0.5rem;
+}

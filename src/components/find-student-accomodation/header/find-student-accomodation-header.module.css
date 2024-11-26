@@ -1,0 +1,13 @@
+.container {
+  align-items: center;
+  border-bottom: 1px solid var(--border-default-grey);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  padding: 1rem;
+}
+
+.checkboxRoot {
+  margin: 0rem !important;
+}

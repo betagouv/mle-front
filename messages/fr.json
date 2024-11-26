@@ -1,16 +1,59 @@
 {
     "metadata": {
-        "title": "Je Deviens Etudiant",
-        "description": "Je Deviens Etudiant - Votre guide à l'accès au logement étudiant",
-        "homeLinkTitle": "Accueil - Je Deviens Etudiant"
+        "title": "Mon logement étudiant",
+        "description": "Mon logement étudiant - Votre guide à l'accès au logement étudiant",
+        "homeLinkTitle": "Accueil - Mon logement étudiant"
+    },
+    "header": {
+        "title": "Mon logement étudiant",
+        "description": "Simplifier l'accès aux droits et logements étudiants",
+        "alerts": "Alertes logements"
+    },
+    "footer": {
+        "linkList": {
+            "departmentsCategoryName": "Départements",
+            "citiesCategoryName": "Villes étudiantes"
+        }
     },
     "languages": {
         "title": "Sélectionner la langue",
         "fr": "Français",
         "en": "Anglais"
     },
-    "header": {
-        "home": "Accueil",
+    "navigation": {
+        "home": "Simuler mes aides au logement",
+        "prepareBudget": "Préparer mon budget",
+        "findAccommodation": "Trouver un logement étudiant",
+        "byAcademies": "Par académies",
         "faq": "Foire aux questions"
+    },
+    "findAccomodation": {
+        "autocomplete": {
+            "categories": {
+                "academies": "Académies",
+                "cities": "Villes",
+                "departments": "Départements"
+            }
+        },
+        "currentPageLabel": "Trouver un logement étudiants",
+        "header": {
+            "inputLabel": "Académie, ville ou département",
+            "checkboxes": {
+                "label": "Type de logement",
+                "individual": "Individuel",
+                "shared": "Colocation"
+            },
+            "rangeLabel": "Budget maximum",
+            "filtersCta": "Filtres",
+            "accessbility": "Accessible"
+        },
+        "filters": {
+            "grid": "Grille",
+            "map": "Carte",
+            "sortByPrice": "Triés par prix"
+        },
+        "card": {
+            "priceFrom": "À partir de"
+        }
     }
 }
