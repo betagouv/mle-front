@@ -1,0 +1,16 @@
+{
+    "metadata": {
+        "title": "Je Deviens Etudiant",
+        "description": "Je Deviens Etudiant - Votre guide à l'accès au logement étudiant",
+        "homeLinkTitle": "Accueil - Je Deviens Etudiant"
+    },
+    "languages": {
+        "title": "Sélectionner la langue",
+        "fr": "Français",
+        "en": "Anglais"
+    },
+    "header": {
+        "home": "Accueil",
+        "faq": "Foire aux questions"
+    }
+}

@@ -3,22 +3,36 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "react-dsfr update-icons",
+    "prebuild": "react-dsfr update-icons",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "react": "19.0.0-rc-66855b96-20241106",
-    "react-dom": "19.0.0-rc-66855b96-20241106",
-    "next": "15.0.3"
+    "@codegouvfr/react-dsfr": "^1.14.7",
+    "next": "^14.2.18",
+    "next-intl": "^3.25.2",
+    "react": "^18",
+    "react-dom": "^18"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
-    "eslint-config-next": "15.0.3"
+    "eslint-config-next": "15.0.3",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-prettier": "^5.1.2",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-sort-destructure-keys": "^1.5.0",
+    "eslint-plugin-sort-keys-fix": "^1.1.2",
+    "eslint-plugin-typescript-sort-keys": "^3.1.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
+    "sass": "^1.81.0",
+    "typescript": "^5"
   }
 }

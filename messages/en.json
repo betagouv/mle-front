@@ -1,0 +1,15 @@
+{
+    "metadata": {
+        "title": "Je Deviens Etudiant",
+        "description": "Je Deviens Etudiant - Your guide to student housing"
+    },
+    "languages": {
+        "title": "Select language",
+        "fr": "French",
+        "en": "English"
+    },
+    "header": {
+        "home": "Home",
+        "faq": "FAQ"
+    }
+}
