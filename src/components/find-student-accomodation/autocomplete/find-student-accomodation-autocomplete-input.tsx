@@ -19,6 +19,7 @@ export const FindStudentAccomodationAutocompleteInput = () => {
   const handleInputClick = (item: TTerritory) => {
     setSearchQuery(item.name)
   }
+
   return (
     <div className={classes.container}>
       <Input
