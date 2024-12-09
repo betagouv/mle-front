@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import { fr, FrCxArg } from '@codegouvfr/react-dsfr'
@@ -8,23 +7,21 @@ import { tss } from 'tss-react'
 import { TTerritories, TTerritory } from '~/schemas/territories'
 
 interface AutocompleteResultsProps {
-  data: TTerritories[]
+  data: TTerritories
   onClick: (item: TTerritory) => void
 }
-
-type CategoryKey = keyof TTerritories
 
 export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsProps> = ({ data, onClick }) => {
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()
 
-  const categories: CategoryKey[] = ['academies', 'cities', 'departments']
+  const categories = ['academies', 'cities', 'departments']
 
-  const getCategoryLabelAndIcon = (category: CategoryKey): { label: string; icon: FrCxArg } => {
+  const getCategoryLabelAndIcon = (category: keyof TTerritories): { icon: FrCxArg; label: string } => {
     const labels = {
-      academies: { label: t('autocomplete.categories.academies'), icon: 'ri-bank-fill' as FrCxArg },
-      cities: { label: t('autocomplete.categories.cities'), icon: 'ri-community-line' as FrCxArg },
-      departments: { label: t('autocomplete.categories.departments'), icon: 'fr-icon-france-line' as FrCxArg },
+      academies: { icon: 'ri-bank-fill' as FrCxArg, label: t('autocomplete.categories.academies') },
+      cities: { icon: 'ri-community-line' as FrCxArg, label: t('autocomplete.categories.cities') },
+      departments: { icon: 'fr-icon-france-line' as FrCxArg, label: t('autocomplete.categories.departments') },
     }
     return labels[category]
   }
@@ -36,10 +33,11 @@ export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsP
   return (
     <div className={classes.container}>
       <ul className={classes.list}>
-        {categories.map((category: any) => {
-          const items = data[category] as any
+        {categories.map((category) => {
+          const categoryKey = category as keyof TTerritories
+          const items = data[categoryKey] as TTerritory[]
           if (!items?.length) return null
-          const { label, icon } = getCategoryLabelAndIcon(category)
+          const { icon, label } = getCategoryLabelAndIcon(categoryKey)
 
           return (
             <div className={classes.category} key={category}>
@@ -62,15 +60,6 @@ export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsP
 }
 
 const useStyles = tss.create({
-  container: {
-    backgroundColor: 'white',
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    width: '100%',
-    zIndex: 10,
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-  },
   category: {
     backgroundColor: fr.colors.decisions.background.alt.beigeGrisGalet.default,
     display: 'flex',
@@ -78,24 +67,33 @@ const useStyles = tss.create({
     justifyContent: 'center',
   },
   categoryItem: {
-    paddingTop: '0.5rem',
     paddingBottom: '0.5rem',
     paddingLeft: '0.5rem',
+    paddingTop: '0.5rem',
   },
-  list: {
-    listStyle: 'none',
-    padding: 0,
-    margin: 0,
+  container: {
     backgroundColor: 'white',
-    borderBottom: '1px solid #e0e0e0',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    left: 0,
+    position: 'absolute',
+    top: '100%',
+    width: '100%',
+    zIndex: 10,
   },
   item: {
-    cursor: 'pointer',
-    padding: '8px',
-    borderBottom: '1px solid #e0e0e0',
-    borderTop: '1px solid #e0e0e0',
     '&:hover': {
       backgroundColor: '#f0f0f0',
     },
+    borderBottom: '1px solid #e0e0e0',
+    borderTop: '1px solid #e0e0e0',
+    cursor: 'pointer',
+    padding: '8px',
+  },
+  list: {
+    backgroundColor: 'white',
+    borderBottom: '1px solid #e0e0e0',
+    listStyle: 'none',
+    margin: 0,
+    padding: 0,
   },
 })

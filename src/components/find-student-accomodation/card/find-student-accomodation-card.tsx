@@ -3,7 +3,7 @@ import { Badge } from '@codegouvfr/react-dsfr/Badge'
 import { Card } from '@codegouvfr/react-dsfr/Card'
 import { Tag } from '@codegouvfr/react-dsfr/Tag'
 import { useTranslations } from 'next-intl'
-import { fr, FrCxArg } from '@codegouvfr/react-dsfr'
+import { fr } from '@codegouvfr/react-dsfr'
 
 interface AccomodationCardProps {
   imageUri: string
