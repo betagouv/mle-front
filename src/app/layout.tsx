@@ -1,14 +1,17 @@
 import { DsfrHead } from '@codegouvfr/react-dsfr/next-appdir/DsfrHead'
 import { DsfrProvider } from '@codegouvfr/react-dsfr/next-appdir/DsfrProvider'
 import { getHtmlAttributes } from '@codegouvfr/react-dsfr/next-appdir/getHtmlAttributes'
-import { Footer } from '@codegouvfr/react-dsfr/Footer'
 import Link from 'next/link'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages, getTranslations } from 'next-intl/server'
 
 import { defaultColorScheme, StartDsfr } from '~/app/start-dsfr'
-import { HeaderComponent } from '~/components/header/header'
-
+import { FooterComponent } from '~/components/ui/footer/footer'
+import styles from './layout.module.css'
+import { HeaderComponent } from '~/components/ui/header/header'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { TanstackQueryClientProvider } from '~/providers/tanstack-client'
+import '~/globals.css'
 export const generateMetadata = async () => {
   const t = await getTranslations('metadata')
   return {
@@ -24,7 +27,6 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale()
   const messages = await getMessages()
-  const t = await getTranslations('header')
 
   return (
     <html {...getHtmlAttributes({ defaultColorScheme, lang: locale })}>
@@ -35,16 +37,13 @@ export default async function RootLayout({
       <body>
         <NextIntlClientProvider messages={messages}>
           <DsfrProvider lang={locale}>
-            <HeaderComponent />
-            {children}
-            <Footer
-              accessibility="fully compliant"
-              homeLinkProps={{
-                href: '/',
-                title: t('home'),
-              }}
-              brandTop="République Française"
-            />
+            <TanstackQueryClientProvider>
+              <NuqsAdapter>
+                <HeaderComponent />
+                <main className={styles.container}>{children}</main>
+                <FooterComponent />
+              </NuqsAdapter>
+            </TanstackQueryClientProvider>
           </DsfrProvider>
         </NextIntlClientProvider>
       </body>

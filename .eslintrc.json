@@ -47,5 +47,13 @@
       }
     ],
     "unused-imports/no-unused-imports": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/route.ts"],
+      "rules": {
+        "func-style": "off"
+      }
+    }
+  ]
 }

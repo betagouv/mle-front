@@ -1,0 +1,23 @@
+.breadcrumb {
+  margin-top: 0;
+  padding-top: 1rem;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.accommodationGrid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 2rem;
+}
+
+.paginationContainer {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 2rem;
+  padding-top: 2rem;
+}

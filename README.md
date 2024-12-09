@@ -1,6 +1,6 @@
 # Description
 
-This project is a client for the JDE (Je Deviens Etudiant) startup. It's a platform that helps students to find their housing.
+This project is a client for the Mon logement étudiant startup. It's a platform that helps students to find their housing.
 
 ## Stack
 
