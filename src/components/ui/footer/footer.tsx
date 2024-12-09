@@ -1,9 +1,10 @@
 import Footer, { type FooterProps } from '@codegouvfr/react-dsfr/Footer'
 import { getTranslations } from 'next-intl/server'
 import styles from './footer.module.css'
+import { BrandTop } from '~/components/brand-top'
 
 export const FooterComponent = async () => {
-  const t = await getTranslations('footer')
+  const t = await getTranslations()
 
   const operatorLogo: NonNullable<FooterProps['operatorLogo']> = {
     alt: 'Mon logement étudiant - logo',
@@ -42,7 +43,7 @@ export const FooterComponent = async () => {
 
   const linkList: NonNullable<FooterProps['linkList']> = [
     {
-      categoryName: t('linkList.departmentsCategoryName'),
+      categoryName: t('footer.linkList.departmentsCategoryName'),
       links: [
         {
           linkProps: {
@@ -53,7 +54,7 @@ export const FooterComponent = async () => {
       ],
     },
     {
-      categoryName: t('linkList.citiesCategoryName'),
+      categoryName: t('footer.linkList.citiesCategoryName'),
       links: [
         {
           linkProps: {
@@ -70,8 +71,13 @@ export const FooterComponent = async () => {
       classes={{
         logo: styles.logo,
       }}
+      brandTop={<BrandTop />}
       accessibility="fully compliant"
       linkList={linkList}
+      homeLinkProps={{
+        href: '/',
+        title: t('metadata.homeLinkTitle'),
+      }}
       contentDescription={
         <>
           Mon logement étudiant

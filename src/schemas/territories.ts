@@ -11,7 +11,9 @@ const ZCity = z.object({
   postal_codes: z.array(z.string()),
 })
 
-export type TTerritory = z.infer<typeof ZCity> | z.infer<typeof ZAcademyOrDepartment>
+export type TAcademyOrDepartment = z.infer<typeof ZAcademyOrDepartment>
+export type TCity = z.infer<typeof ZCity>
+export type TTerritory = TAcademyOrDepartment | TCity
 
 export const ZTerritories = z.object({
   academies: z.array(ZAcademyOrDepartment),

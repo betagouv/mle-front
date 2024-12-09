@@ -6,9 +6,12 @@ import { Button } from '@codegouvfr/react-dsfr/Button'
 import { BrandTop } from '~/components/brand-top'
 import logo from '~/images/logo.svg'
 import { HeaderNavigation } from '~/components/ui/header/navigation'
+import { getAcademies } from '~/server-only/get-academies'
 
 export const HeaderComponent: FC = async () => {
   const t = await getTranslations()
+  const academies = await getAcademies()
+
   return (
     <Header
       homeLinkProps={{
@@ -26,7 +29,7 @@ export const HeaderComponent: FC = async () => {
       brandTop={<BrandTop />}
       serviceTagline={t('header.description')}
       serviceTitle={t('header.title')}
-      navigation={<HeaderNavigation />}
+      navigation={<HeaderNavigation academies={academies} />}
       className={fr.cx('fr-header')}
       operatorLogo={{
         alt: 'Mon logement étudiant - logo',
