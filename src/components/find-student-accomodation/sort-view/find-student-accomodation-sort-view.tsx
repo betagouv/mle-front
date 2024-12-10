@@ -7,6 +7,7 @@ import { FC } from 'react'
 import { useQueryState } from 'nuqs'
 import { tss } from 'tss-react'
 import { fr } from '@codegouvfr/react-dsfr'
+import { useAccomodations } from '~/hooks/use-accomodations'
 
 export const FindStudentAccomodationSortView: FC = () => {
   const { classes } = useStyles()
@@ -14,34 +15,39 @@ export const FindStudentAccomodationSortView: FC = () => {
     defaultValue: 'grille',
   })
   const t = useTranslations('findAccomodation.filters')
+  const { data } = useAccomodations()
   return (
-    <div className={classes.container}>
-      <Select label="" nativeSelectProps={{}}>
-        <option disabled hidden selected>
-          {t('sortByPrice')}
-        </option>
-      </Select>
-      <div className={fr.cx('fr-hidden', 'fr-unhidden-md')}>
-        <div>
-          <Button
-            iconId="ri-layout-grid-2-line"
-            priority={viewQuery === 'grille' ? 'secondary' : 'tertiary'}
-            className={classes.button}
-            onClick={() => setViewQuery('grille')}
-          >
-            {t('grid')}
-          </Button>
-          <Button
-            iconId="ri-road-map-fill"
-            priority={viewQuery === 'carte' ? 'secondary' : 'tertiary'}
-            className={classes.button}
-            onClick={() => setViewQuery('carte')}
-          >
-            {t('map')}
-          </Button>
+    <>
+      <h4>{data?.count} logements</h4>
+
+      <div className={classes.container}>
+        <Select label="" nativeSelectProps={{}}>
+          <option disabled hidden selected>
+            {t('sortByPrice')}
+          </option>
+        </Select>
+        <div className={fr.cx('fr-hidden', 'fr-unhidden-md')}>
+          <div>
+            <Button
+              iconId="ri-layout-grid-2-line"
+              priority={viewQuery === 'grille' ? 'secondary' : 'tertiary'}
+              className={classes.button}
+              onClick={() => setViewQuery('grille')}
+            >
+              {t('grid')}
+            </Button>
+            <Button
+              iconId="ri-road-map-fill"
+              priority={viewQuery === 'carte' ? 'secondary' : 'tertiary'}
+              className={classes.button}
+              onClick={() => setViewQuery('carte')}
+            >
+              {t('map')}
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   )
 }
 

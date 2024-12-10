@@ -1,26 +1,43 @@
 import React, { FC } from 'react'
-import { Badge } from '@codegouvfr/react-dsfr/Badge'
+import { EResidence } from '~/schemas/accommodations/accommodations'
 import { Card } from '@codegouvfr/react-dsfr/Card'
+import { Badge } from '@codegouvfr/react-dsfr/Badge'
 import { Tag } from '@codegouvfr/react-dsfr/Tag'
 import { useTranslations } from 'next-intl'
 import { fr } from '@codegouvfr/react-dsfr'
 
-interface AccomodationCardProps {
-  imageUri: string
-  localisation: string
-  nbAccomodations: number
-  price: string
-  surface: string
-  title: string
-  type: string
+type AccomodationCardProps = {
+  id: number
+  properties: {
+    address: string
+    city: string
+    name: string
+    nb_accessible_apartments: number | null
+    nb_coliving_apartments: number | null
+    nb_t1: number | null
+    nb_t1_bis: number | null
+    nb_t2: number | null
+    nb_t3: number | null
+    nb_t4_more: number | null
+    nb_total_apartments: number | null
+    owner_name: string | null
+    owner_url: string | null
+    postal_code: string
+    residence_type: EResidence
+  }
 }
 
-export const AccomodationCard: FC<AccomodationCardProps> = ({ localisation, nbAccomodations, price, surface, title, type }) => {
+export const AccomodationCard: FC<AccomodationCardProps> = ({ ...props }) => {
   const t = useTranslations('findAccomodation.card')
+  const { city, name, nb_total_apartments, postal_code } = props.properties
+  const price = '100000'
+  const surface = '100m2'
+  const type = 'T1'
+
   return (
     <Card
       background
-      badge={<Badge severity="new">{`${t('priceFrom')} ${price}`}</Badge>}
+      badge={<Badge severity="new">{`${t('priceFrom')} ${price}e`}</Badge>}
       border
       desc={
         <>
@@ -28,7 +45,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ localisation, nbAc
           <br />
           <span className={fr.cx('ri-group-line')}>{type}</span>
           <br />
-          <span className={fr.cx('ri-community-line')}>{`${nbAccomodations} logements`}</span>
+          {nb_total_apartments && <span className={fr.cx('ri-community-line')}>{`${nb_total_apartments} logements`}</span>}
         </>
       }
       enlargeLink
@@ -40,12 +57,12 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ localisation, nbAc
       start={
         <ul className="fr-tags-group">
           <li>
-            <Tag>{localisation}</Tag>
+            <Tag>{`${city} (${postal_code})`}</Tag>
           </li>
         </ul>
       }
       size="medium"
-      title={title}
+      title={name}
       titleAs="h3"
     />
   )

@@ -1,46 +1,73 @@
 'use client'
 
 import { tss } from 'tss-react'
-import { AccomodationCard } from '~/components/find-student-accomodation/card/find-student-accomodation-card'
-import { Pagination } from '@codegouvfr/react-dsfr/Pagination'
-import { FC, useMemo } from 'react'
+import { FC, Suspense, useMemo } from 'react'
 import { useQueryState } from 'nuqs'
 import { fr } from '@codegouvfr/react-dsfr'
 import dynamic from 'next/dynamic'
-import { mockAccomodationCards } from '~/app/mocks/mock-accomodations'
-import { useTranslations } from 'next-intl'
+import { useAccomodations } from '~/hooks/use-accomodations'
+import { AccomodationCard } from '~/components/find-student-accomodation/card/find-student-accomodation-card'
+import { Pagination } from '@codegouvfr/react-dsfr/Pagination'
+import { AccomodationCardSkeleton } from '~/components/find-student-accomodation/card/find-student-accomodation-card-skeleton'
+
+const MapSkeleton: FC = () => {
+  const { classes } = useStyles({ view: 'carte' })
+  return <div className={classes.mapSkeleton} />
+}
 
 export const FindStudentAccomodationResults: FC = () => {
-  const t = useTranslations()
+  const [view] = useQueryState('vue')
+  const { classes, cx } = useStyles({ view })
+  const { data, isLoading } = useAccomodations()
+
   const AccomodationsMap = useMemo(
     () =>
       dynamic(() => import('~/components/map/accomodations-map').then((mod) => mod.AccomodationsMap), {
-        loading: () => <p>{t('loading.card')}</p>,
+        loading: () => <MapSkeleton />,
         ssr: false,
       }),
     [],
   )
-
-  const [view] = useQueryState('vue')
-
-  const { classes, cx } = useStyles({ view })
+  const skeletons = (
+    <div className={classes.accomodationsContainer}>
+      <div className={classes.accommodationGrid}>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <AccomodationCardSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  )
 
   return (
     <div className={classes.container}>
-      <div className={classes.accomodationsContainer}>
-        <div className={classes.accommodationGrid}>
-          {mockAccomodationCards.map((card) => (
-            <AccomodationCard key={card.title} {...card} />
-          ))}
-        </div>
+      {isLoading ? (
+        skeletons
+      ) : (
+        <div className={classes.accomodationsContainer}>
+          <div className={classes.accommodationGrid}>
+            {(data?.results.features || []).map((accommodation) => (
+              <AccomodationCard key={accommodation.id} {...accommodation} />
+            ))}
+          </div>
 
-        <div className={classes.paginationContainer}>
-          <Pagination showFirstLast={false} count={10} defaultPage={1} getPageLinkProps={() => ({ href: '/' })} />
+          {data && data.count > data.page_size && (
+            <div className={classes.paginationContainer}>
+              <Pagination
+                showFirstLast={false}
+                count={Math.ceil(data.count / data.page_size)}
+                defaultPage={1}
+                getPageLinkProps={() => ({ href: '/' })}
+              />
+            </div>
+          )}
         </div>
-      </div>
+      )}
+
       {view === 'carte' && (
         <div className={cx(fr.cx('fr-col-md-5', 'fr-pl-5v'), classes.mapContainer)}>
-          <AccomodationsMap center={[46.227638, 2.213749]} />
+          <Suspense fallback={<MapSkeleton />}>
+            <AccomodationsMap center={[46.227638, 2.213749]} />
+          </Suspense>
         </div>
       )}
     </div>
@@ -48,6 +75,14 @@ export const FindStudentAccomodationResults: FC = () => {
 }
 
 const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) => ({
+  '@keyframes pulse': {
+    '0%, 100%': {
+      opacity: 1,
+    },
+    '50%': {
+      opacity: 0.5,
+    },
+  },
   accommodationGrid: {
     [fr.breakpoints.up('md')]: {
       gridTemplateColumns: view === 'carte' ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
@@ -70,6 +105,12 @@ const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) =>
     height: 'calc(100vh - 700px)',
     position: 'sticky',
     top: '1rem',
+  },
+  mapSkeleton: {
+    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+    backgroundColor: '#e5e7eb',
+    height: '700px',
+    width: '100%',
   },
   paginationContainer: {
     display: 'flex',
