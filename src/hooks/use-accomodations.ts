@@ -11,7 +11,7 @@ export const fetchAccomodations = async (bbox: string): Promise<TGetAccomodation
   return response.json()
 }
 
-export const useAccomodations = () => {
+export const useAccomodations = (initialData: TGetAccomodationsResponse) => {
   const [bbox] = useQueryStates({
     xmax: parseAsFloat,
     xmin: parseAsFloat,
@@ -21,14 +21,10 @@ export const useAccomodations = () => {
   const { xmax, xmin, ymax, ymin } = bbox
   const bboxQuery = xmin && ymin && xmax && ymax ? `${xmin},${ymin},${xmax},${ymax}` : ''
 
-  const { data, isError, isLoading } = useQuery<TGetAccomodationsResponse>({
+  return useQuery<TGetAccomodationsResponse>({
+    initialData: bboxQuery ? undefined : initialData,
     queryFn: () => fetchAccomodations(bboxQuery),
     queryKey: ['accomodations', bboxQuery],
+    staleTime: 1000 * 60,
   })
-
-  return {
-    data,
-    isError,
-    isLoading,
-  }
 }

@@ -8,18 +8,21 @@ import { useQueryState } from 'nuqs'
 import { tss } from 'tss-react'
 import { fr } from '@codegouvfr/react-dsfr'
 import { useAccomodations } from '~/hooks/use-accomodations'
+import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 
-export const FindStudentAccomodationSortView: FC = () => {
+type FindStudentAccomodationSortViewProps = {
+  initialData: TGetAccomodationsResponse
+}
+export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortViewProps> = ({ initialData }) => {
   const { classes } = useStyles()
   const [viewQuery, setViewQuery] = useQueryState('vue', {
     defaultValue: 'grille',
   })
   const t = useTranslations('findAccomodation.filters')
-  const { data } = useAccomodations()
+  const { data, isPending } = useAccomodations(initialData)
   return (
     <>
-      <h4>{data?.count} logements</h4>
-
+      {isPending ? <div className={classes.title} /> : <h4>{data?.count} logements</h4>}
       <div className={classes.container}>
         <Select label="" nativeSelectProps={{}}>
           <option disabled hidden selected>
@@ -52,11 +55,26 @@ export const FindStudentAccomodationSortView: FC = () => {
 }
 
 const useStyles = tss.create({
+  '@keyframes pulse': {
+    '0%, 100%': {
+      opacity: 1,
+    },
+    '50%': {
+      opacity: 0.5,
+    },
+  },
   button: {
     borderRadius: '0.25rem',
   },
   container: {
     display: 'flex',
     gap: '1rem',
+  },
+  title: {
+    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+    backgroundColor: '#e5e7eb',
+    borderRadius: '0.25rem',
+    height: '2.5rem',
+    width: '10.5rem',
   },
 })
