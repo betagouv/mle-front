@@ -1,18 +1,50 @@
 'use client'
 
 import { FC, useMemo } from 'react'
-import { MapContainer, TileLayer } from 'react-leaflet'
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet'
 import { tss } from 'tss-react'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import 'leaflet-defaulticon-compatibility'
+import { parseAsFloat, useQueryStates } from 'nuqs'
+import { useAccomodations } from '~/hooks/use-accomodations'
 
-type AccomodationsMapProps = {
+interface AccomodationsMapProps {
   center: [number, number]
+}
+
+const BoundsHandler: FC = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, setBbox] = useQueryStates({
+    xmax: parseAsFloat,
+    xmin: parseAsFloat,
+    ymax: parseAsFloat,
+    ymin: parseAsFloat,
+  })
+  useMapEvents({
+    moveend: (e) => {
+      const bounds = e.target.getBounds()
+      setBbox({
+        xmax: bounds.getEast(),
+        xmin: bounds.getWest(),
+        ymax: bounds.getNorth(),
+        ymin: bounds.getSouth(),
+      })
+    },
+  })
+
+  return null
 }
 
 export const AccomodationsMap: FC<AccomodationsMapProps> = ({ center }) => {
   const { classes } = useStyles()
+  const { data } = useAccomodations()
+
+  const markers = useMemo(() => {
+    return data?.results.features.map((accommodation) => (
+      <Marker key={accommodation.id} position={[accommodation.geometry.coordinates[1], accommodation.geometry.coordinates[0]]} />
+    ))
+  }, [data])
 
   const memoizedMap = useMemo(() => {
     return (
@@ -21,9 +53,11 @@ export const AccomodationsMap: FC<AccomodationsMapProps> = ({ center }) => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
+        <BoundsHandler />
+        {markers}
       </MapContainer>
     )
-  }, [center])
+  }, [markers])
 
   return memoizedMap
 }
