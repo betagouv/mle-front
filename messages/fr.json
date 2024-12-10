@@ -1,4 +1,7 @@
 {
+    "loading": {
+        "card": "Chargement de la carte..."
+    },
     "metadata": {
         "title": "Mon logement étudiant",
         "description": "Mon logement étudiant - Votre guide à l'accès au logement étudiant",

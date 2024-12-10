@@ -1,4 +1,7 @@
 {
+    "loading": {
+        "card": "Loading map..."
+    },
     "metadata": {
         "title": "Mon logement étudiant",
         "description": "Mon logement étudiant - Votre guide à l'accès au logement étudiant",

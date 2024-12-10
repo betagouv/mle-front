@@ -21,6 +21,7 @@ export default async function FindStudentAccommodationPage() {
       />
       <h1>{t('currentPageLabel')}</h1>
       <FindStudentAccomodationHeader />
+
       <div className={styles.headerContainer}>
         <h4>{mockAccomodationCards.length} logements</h4>
         <FindStudentAccomodationSortView />

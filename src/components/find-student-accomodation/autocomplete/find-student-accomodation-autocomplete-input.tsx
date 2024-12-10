@@ -1,5 +1,6 @@
 'use client'
 
+import { fr } from '@codegouvfr/react-dsfr'
 import Input from '@codegouvfr/react-dsfr/Input'
 import { useTranslations } from 'next-intl'
 import { tss } from 'tss-react'
@@ -29,6 +30,7 @@ export const FindStudentAccomodationAutocompleteInput = () => {
         nativeInputProps={{ onChange: handleInputChange, value: searchQuery }}
         state={isError ? 'error' : 'default'}
       />
+
       {data && <FindStudentAccomodationAutocompleteResults onClick={handleInputClick} data={data} />}
     </div>
   )
@@ -36,9 +38,10 @@ export const FindStudentAccomodationAutocompleteInput = () => {
 
 const useStyles = tss.create({
   container: {
-    display: 'flex',
-    flexDirection: 'column',
     position: 'relative',
+    [fr.breakpoints.down('sm')]: {
+      width: '100%',
+    },
   },
   input: {
     marginBottom: '0 !important',

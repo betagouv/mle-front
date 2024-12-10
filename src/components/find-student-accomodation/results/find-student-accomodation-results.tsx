@@ -8,12 +8,14 @@ import { useQueryState } from 'nuqs'
 import { fr } from '@codegouvfr/react-dsfr'
 import dynamic from 'next/dynamic'
 import { mockAccomodationCards } from '~/app/mocks/mock-accomodations'
+import { useTranslations } from 'next-intl'
 
 export const FindStudentAccomodationResults: FC = () => {
+  const t = useTranslations()
   const AccomodationsMap = useMemo(
     () =>
       dynamic(() => import('~/components/map/accomodations-map').then((mod) => mod.AccomodationsMap), {
-        loading: () => <p>Loading map...</p>,
+        loading: () => <p>{t('loading.card')}</p>,
         ssr: false,
       }),
     [],
@@ -47,9 +49,12 @@ export const FindStudentAccomodationResults: FC = () => {
 
 const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) => ({
   accommodationGrid: {
+    [fr.breakpoints.up('md')]: {
+      gridTemplateColumns: view === 'carte' ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+    },
     display: 'grid',
     gap: '2rem',
-    gridTemplateColumns: view === 'carte' ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+    gridTemplateColumns: '1fr',
   },
   accomodationsContainer: {
     flex: view === 'carte' ? '0 0 60%' : '0 0 100%',
