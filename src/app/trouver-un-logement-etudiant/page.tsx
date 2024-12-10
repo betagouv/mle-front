@@ -5,9 +5,11 @@ import { FindStudentAccomodationHeader } from '~/components/find-student-accomod
 import { FindStudentAccomodationSortView } from '~/components/find-student-accomodation/sort-view/find-student-accomodation-sort-view'
 import styles from './find-student-accomodation-page.module.css'
 import { FindStudentAccomodationResults } from '~/components/find-student-accomodation/results/find-student-accomodation-results'
+import { getAccommodations } from '~/server-only/get-accommodations'
 
 export default async function FindStudentAccommodationPage() {
   const t = await getTranslations('findAccomodation')
+  const accommodations = await getAccommodations()
 
   return (
     <div className={fr.cx('fr-container')}>
@@ -23,9 +25,9 @@ export default async function FindStudentAccommodationPage() {
       <FindStudentAccomodationHeader />
 
       <div className={styles.headerContainer}>
-        <FindStudentAccomodationSortView />
+        <FindStudentAccomodationSortView initialData={accommodations} />
       </div>
-      <FindStudentAccomodationResults />
+      <FindStudentAccomodationResults initialData={accommodations} />
     </div>
   )
 }
