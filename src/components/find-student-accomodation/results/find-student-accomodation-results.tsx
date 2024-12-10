@@ -38,12 +38,19 @@ export const FindStudentAccomodationResults: FC = () => {
     </div>
   )
 
+  const card = (
+    <Suspense fallback={<MapSkeleton />}>
+      <AccomodationsMap center={[46.227638, 2.213749]} />
+    </Suspense>
+  )
+
   return (
     <div className={classes.container}>
       {isLoading ? (
         skeletons
       ) : (
         <div className={classes.accomodationsContainer}>
+          <div className={fr.cx('fr-hidden-sm')}>{card}</div>
           <div className={classes.accommodationGrid}>
             {(data?.results.features || []).map((accommodation) => (
               <AccomodationCard key={accommodation.id} {...accommodation} />
@@ -64,11 +71,7 @@ export const FindStudentAccomodationResults: FC = () => {
       )}
 
       {view === 'carte' && (
-        <div className={cx(fr.cx('fr-col-md-5', 'fr-pl-5v'), classes.mapContainer)}>
-          <Suspense fallback={<MapSkeleton />}>
-            <AccomodationsMap center={[46.227638, 2.213749]} />
-          </Suspense>
-        </div>
+        <div className={cx(fr.cx('fr-col-md-5', 'fr-pl-5v', 'fr-hidden', 'fr-unhidden-sm'), classes.mapContainer)}>{card}</div>
       )}
     </div>
   )
