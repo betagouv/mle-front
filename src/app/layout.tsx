@@ -12,6 +12,7 @@ import { HeaderComponent } from '~/components/ui/header/header'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { TanstackQueryClientProvider } from '~/providers/tanstack-client'
 import '~/globals.css'
+import { NextAppDirEmotionCacheProvider } from 'tss-react/next'
 export const generateMetadata = async () => {
   const t = await getTranslations('metadata')
   return {
@@ -35,17 +36,19 @@ export default async function RootLayout({
         <DsfrHead Link={Link} preloadFonts={['Marianne-Regular', 'Marianne-Medium', 'Marianne-Bold']} />
       </head>
       <body>
-        <NextIntlClientProvider messages={messages}>
-          <DsfrProvider lang={locale}>
-            <TanstackQueryClientProvider>
-              <NuqsAdapter>
-                <HeaderComponent />
-                <main className={styles.container}>{children}</main>
-                <FooterComponent />
-              </NuqsAdapter>
-            </TanstackQueryClientProvider>
-          </DsfrProvider>
-        </NextIntlClientProvider>
+        <NextAppDirEmotionCacheProvider options={{ key: 'css' }}>
+          <NextIntlClientProvider messages={messages}>
+            <DsfrProvider lang={locale}>
+              <TanstackQueryClientProvider>
+                <NuqsAdapter>
+                  <HeaderComponent />
+                  <main className={styles.container}>{children}</main>
+                  <FooterComponent />
+                </NuqsAdapter>
+              </TanstackQueryClientProvider>
+            </DsfrProvider>
+          </NextIntlClientProvider>
+        </NextAppDirEmotionCacheProvider>
       </body>
     </html>
   )
