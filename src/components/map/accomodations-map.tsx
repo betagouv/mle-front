@@ -8,6 +8,7 @@ import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import 'leaflet-defaulticon-compatibility'
 import { parseAsFloat, useQueryStates } from 'nuqs'
 import { useAccomodations } from '~/hooks/use-accomodations'
+import { fr } from '@codegouvfr/react-dsfr'
 
 interface AccomodationsMapProps {
   center: [number, number]
@@ -66,6 +67,9 @@ const useStyles = tss.create({
   mapContainer: {
     '[href]': {
       backgroundImage: 'unset !important',
+    },
+    [fr.breakpoints.down('sm')]: {
+      height: '400px',
     },
     height: '700px',
     width: '100%',
