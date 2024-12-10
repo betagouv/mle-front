@@ -5,9 +5,19 @@
   gap: 1rem;
   justify-content: space-between;
   margin-bottom: 2rem;
-  padding: 1rem;
+  padding-bottom: 1rem;
 }
 
 .checkboxRoot {
   margin: 0rem !important;
 }
+
+.mobileContainer {
+  border-bottom: 1px solid var(--border-default-grey);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+}
+

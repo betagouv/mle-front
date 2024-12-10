@@ -13,7 +13,7 @@ export const FindStudentAccomodationResults: FC = () => {
   const AccomodationsMap = useMemo(
     () =>
       dynamic(() => import('~/components/map/accomodations-map').then((mod) => mod.AccomodationsMap), {
-        loading: () => <p>Loading map...</p>,
+        loading: () => <p>Chargement de la carte...</p>,
         ssr: false,
       }),
     [],
@@ -47,9 +47,12 @@ export const FindStudentAccomodationResults: FC = () => {
 
 const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) => ({
   accommodationGrid: {
+    [fr.breakpoints.up('md')]: {
+      gridTemplateColumns: view === 'carte' ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+    },
     display: 'grid',
     gap: '2rem',
-    gridTemplateColumns: view === 'carte' ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
+    gridTemplateColumns: '1fr',
   },
   accomodationsContainer: {
     flex: view === 'carte' ? '0 0 60%' : '0 0 100%',

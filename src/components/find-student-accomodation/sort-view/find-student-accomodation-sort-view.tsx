@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { FC } from 'react'
 import { useQueryState } from 'nuqs'
 import { tss } from 'tss-react'
+import { fr } from '@codegouvfr/react-dsfr'
 
 export const FindStudentAccomodationSortView: FC = () => {
   const { classes } = useStyles()
@@ -20,23 +21,25 @@ export const FindStudentAccomodationSortView: FC = () => {
           {t('sortByPrice')}
         </option>
       </Select>
-      <div>
-        <Button
-          iconId="ri-layout-grid-2-line"
-          priority={viewQuery === 'grille' ? 'secondary' : 'tertiary'}
-          className={classes.button}
-          onClick={() => setViewQuery('grille')}
-        >
-          {t('grid')}
-        </Button>
-        <Button
-          iconId="ri-road-map-fill"
-          priority={viewQuery === 'carte' ? 'secondary' : 'tertiary'}
-          className={classes.button}
-          onClick={() => setViewQuery('carte')}
-        >
-          {t('map')}
-        </Button>
+      <div className={fr.cx('fr-hidden', 'fr-unhidden-md')}>
+        <div>
+          <Button
+            iconId="ri-layout-grid-2-line"
+            priority={viewQuery === 'grille' ? 'secondary' : 'tertiary'}
+            className={classes.button}
+            onClick={() => setViewQuery('grille')}
+          >
+            {t('grid')}
+          </Button>
+          <Button
+            iconId="ri-road-map-fill"
+            priority={viewQuery === 'carte' ? 'secondary' : 'tertiary'}
+            className={classes.button}
+            onClick={() => setViewQuery('carte')}
+          >
+            {t('map')}
+          </Button>
+        </div>
       </div>
     </div>
   )
