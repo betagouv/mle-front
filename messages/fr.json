@@ -1,4 +1,9 @@
 {
+    "breadcrumbs": {
+        "home": "Accueil",
+        "findAccomodation": "Trouver un logement étudiant",
+        "logement": "Logement étudiant {title}"
+    },
     "loading": {
         "card": "Chargement de la carte..."
     },
@@ -30,6 +35,36 @@
         "byAcademies": "Par académies",
         "faq": "Foire aux questions"
     },
+    "accomodation": {
+        "title": "Logement étudiant {title} à {city}",
+        "tags": {
+            "studio": "Studio",
+            "shared": "Colocation",
+            "accessible": "Accessible"
+        },
+        "availableAccommodations": "Logements disponibles",
+        "location": {
+            "title": "Localisation",
+            "accessibility": "Accessibilité"
+        },
+        "sidebar": {
+            "accommodationsCount": "{count} logements",
+            "share": "Partager le logement",
+            "buttons": {
+                "link": "Copier le lien",
+                "email": "Envoyer par email",
+                "print": "Imprimer"
+            }
+        },
+        "nearby": {
+            "title": "Autres logements à proximité",
+            "buttons": {
+                "previous": "Précédent",
+                "next": "Suivant"
+            },
+            "count": "{count} logements"
+        }
+    },
     "findAccomodation": {
         "autocomplete": {
             "categories": {
@@ -38,7 +73,7 @@
                 "departments": "Départements"
             }
         },
-        "currentPageLabel": "Trouver un logement étudiant",
+        "title": "Trouver un logement étudiant",
         "header": {
             "inputLabel": "Académie, ville ou département",
             "checkboxes": {

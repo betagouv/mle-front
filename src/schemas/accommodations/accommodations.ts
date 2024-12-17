@@ -16,11 +16,13 @@ export enum EResidence {
   'universitaire-conventionnee' = 'Résidence Universitaire conventionnée',
 }
 
+export const ZGeometry = z.object({
+  coordinates: z.array(z.number()),
+  type: z.string(),
+})
+
 export const ZAccomodation = z.object({
-  geometry: z.object({
-    coordinates: z.array(z.number()),
-    type: z.string(),
-  }),
+  geometry: ZGeometry,
   id: z.number(),
   properties: z.object({
     address: z.string().max(255),
@@ -38,7 +40,32 @@ export const ZAccomodation = z.object({
     owner_url: z.string().max(500).nullable(),
     postal_code: z.string().max(5),
     residence_type: z.nativeEnum(EResidence),
+    slug: z.string().max(250),
   }),
 })
 
 export type TAccomodation = z.infer<typeof ZAccomodation>
+
+export const ZAccomodationCard = ZAccomodation.pick({ id: true, properties: true })
+export type TAccomodationCard = z.infer<typeof ZAccomodationCard>
+
+export const ZAccomodationDetails = z.object({
+  address: z.string().max(255),
+  city: z.string().max(150),
+  geom: ZGeometry,
+  name: z.string().max(250),
+  nb_accessible_apartments: z.number().nullable(),
+  nb_coliving_apartments: z.number().nullable(),
+  nb_t1: z.number().nullable(),
+  nb_t1_bis: z.number().nullable(),
+  nb_t2: z.number().nullable(),
+  nb_t3: z.number().nullable(),
+  nb_t4_more: z.number().nullable(),
+  nb_total_apartments: z.number().nullable(),
+  owner_name: z.string().max(150).nullable(),
+  owner_url: z.string().max(500).nullable(),
+  postal_code: z.string().max(5),
+  residence_type: z.nativeEnum(EResidence),
+  slug: z.string().max(250),
+})
+export type TAccomodationDetails = z.infer<typeof ZAccomodationDetails>
