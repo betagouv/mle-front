@@ -7,9 +7,9 @@ import { FindStudentAccomodationResults } from '~/components/find-student-accomo
 import { getAccommodations } from '~/server-only/get-accommodations'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 
-export default async function FindStudentAccommodationPage() {
+export default async function FindStudentAccommodationPage({ searchParams }: { searchParams: { bbox?: string; page?: string } }) {
   const t = await getTranslations('findAccomodation')
-  const accommodations = await getAccommodations()
+  const accommodations = await getAccommodations(searchParams)
 
   return (
     <div className={fr.cx('fr-container')}>
