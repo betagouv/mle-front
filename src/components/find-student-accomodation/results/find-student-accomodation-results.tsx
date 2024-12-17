@@ -9,11 +9,8 @@ import { useAccomodations } from '~/hooks/use-accomodations'
 import { AccomodationCard } from '~/components/find-student-accomodation/card/find-student-accomodation-card'
 import { Pagination } from '@codegouvfr/react-dsfr/Pagination'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
+import { MapSkeleton } from '~/components/map/map-skeleton'
 
-const MapSkeleton: FC = () => {
-  const { classes } = useStyles({ view: 'carte' })
-  return <div className={classes.mapSkeleton} />
-}
 type FindStudentAccomodationResultsProps = {
   initialData: TGetAccomodationsResponse
 }
@@ -26,14 +23,14 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
   const AccomodationsMap = useMemo(
     () =>
       dynamic(() => import('~/components/map/accomodations-map').then((mod) => mod.AccomodationsMap), {
-        loading: () => <MapSkeleton />,
+        loading: () => <MapSkeleton height={700} />,
         ssr: false,
       }),
     [],
   )
 
   const card = (
-    <Suspense fallback={<MapSkeleton />}>
+    <Suspense fallback={<MapSkeleton height={700} />}>
       <AccomodationsMap center={[46.227638, 2.213749]} />
     </Suspense>
   )
@@ -43,7 +40,7 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
         <div className={fr.cx('fr-hidden-sm')}>{card}</div>
         <div className={classes.accommodationGrid}>
           {(data?.results.features || initialData.results.features).map((accommodation) => (
-            <AccomodationCard key={accommodation.id} {...accommodation} />
+            <AccomodationCard key={accommodation.id} accomodation={accommodation} />
           ))}
         </div>
 
@@ -97,12 +94,6 @@ const useStyles = tss.withParams<{ hasResults?: boolean; view: string | null }>(
     height: hasResults ? 'calc(100vh - 700px)' : 'auto',
     position: 'sticky',
     top: '1rem',
-  },
-  mapSkeleton: {
-    animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-    backgroundColor: '#e5e7eb',
-    height: '700px',
-    width: '100%',
   },
   paginationContainer: {
     display: 'flex',
