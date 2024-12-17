@@ -35,7 +35,6 @@ export default async function LogementPage({ params }: { params: { slug: string 
           style={{
             backgroundColor: 'white',
             border: '1px solid var(--border-default-grey)',
-            borderRadius: '0.5rem',
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
           }}
           className={fr.cx('fr-col-sm-8')}
@@ -57,7 +56,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
           <div className={styles.headerSection}>
             <h4>{t('availableAccommodations')}</h4>
           </div>
-          <div className={styles.locationSection}>
+          <div>
             <div className={styles.locationContent}>
               <div className={styles.locationInfo}>
                 <h4>{t('location.title')}</h4>
@@ -69,13 +68,14 @@ export default async function LogementPage({ params }: { params: { slug: string 
                   {t('location.accessibility')}
                 </Button>
               </div>
-              <div className={styles.mapContainer}>
+              <div style={{ width: '50%' }} className={fr.cx('fr-hidden', 'fr-unhidden-sm')}>
                 <AccomodationMap center={[latitude, longitude]} />
               </div>
             </div>
           </div>
+          <div className={fr.cx('fr-hidden-sm')}>{<AccomodationMap center={[latitude, longitude]} />}</div>
         </div>
-        <div className={fr.cx('fr-col-sm-4')}>
+        <div style={{ flexDirection: 'column' }} className={fr.cx('fr-col-sm-4')}>
           <div className={styles.sidebarCard}>
             <h3 className={styles.sidebarTitle}>
               {owner_name ? `${owner_name} - ` : ''} {t('sidebar.accommodationsCount', { count: nb_total_apartments })}
