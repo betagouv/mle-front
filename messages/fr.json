@@ -66,6 +66,10 @@
         }
     },
     "findAccomodation": {
+        "faq": {
+            "title": "Parmi les questions fréquentes sur les logements étudiants",
+            "cta": "Foire aux questions"
+        },
         "autocomplete": {
             "categories": {
                 "academies": "Académies",
@@ -83,7 +87,7 @@
             },
             "rangeLabel": "Budget maximum",
             "filtersCta": "Filtres",
-            "accessbility": "Accessible"
+            "accessbility": "Adapté PMR"
         },
         "filters": {
             "grid": "Grille",

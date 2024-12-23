@@ -13,14 +13,14 @@ type AccomodationCardProps = {
 export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation }) => {
   const t = useTranslations('findAccomodation.card')
   const { city, name, nb_total_apartments, postal_code } = accomodation.properties
-  const price = '100000'
+  const price = '153'
   const surface = '100m2'
   const type = 'T1'
 
   return (
     <Card
       background
-      badge={<Badge severity="new">{`${t('priceFrom')} ${price}e`}</Badge>}
+      badge={<Badge severity="new">{`${t('priceFrom')} ${price}€`}</Badge>}
       border
       desc={
         <>

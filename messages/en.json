@@ -31,6 +31,10 @@
         "faq": "Foire aux questions"
     },
     "findAccomodation": {
+        "faq": {
+            "title": "Parmi les questions fréquentes sur les logements étudiants",
+            "cta": "Foire aux questions"
+        },
         "currentPageLabel": "Trouver un logement étudiants",
         "header": {
             "inputLabel": "Académie, ville ou département",
