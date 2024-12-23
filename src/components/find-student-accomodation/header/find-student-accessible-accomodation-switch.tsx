@@ -8,7 +8,7 @@ import { FC } from 'react'
 import { tss } from 'tss-react'
 
 export const FindStudentAccessibleAccomodationSwitch: FC = () => {
-  const [isAccessible, setIsAccessible] = useQueryState('isAccessible')
+  const [isAccessible, setIsAccessible] = useQueryState('accessible')
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()
 

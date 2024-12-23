@@ -13,7 +13,7 @@ import { getQuestionsAnswers } from '~/server-only/get-questions-answers'
 export default async function FindStudentAccommodationPage({
   searchParams,
 }: {
-  searchParams: { bbox?: string; isAccessible: string; page?: string }
+  searchParams: { bbox?: string; accessible: string; page?: string }
 }) {
   const t = await getTranslations('findAccomodation')
   const accommodations = await getAccommodations(searchParams)

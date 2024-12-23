@@ -1,6 +1,6 @@
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 
-export const getAccommodations = async (searchParams: { bbox?: string; center?: string; isAccessible: string; page?: string }) => {
+export const getAccommodations = async (searchParams: { bbox?: string; center?: string; accessible: string; page?: string }) => {
   const params = new URLSearchParams()
   if (searchParams.page) params.append('page', searchParams.page)
   if (searchParams.bbox) params.append('bbox', searchParams.bbox)
@@ -8,7 +8,7 @@ export const getAccommodations = async (searchParams: { bbox?: string; center?: 
     params.append('center', searchParams.center)
     params.append('radius', '5')
   }
-  params.append('is_accessible', searchParams.isAccessible)
+  params.append('is_accessible', searchParams.accessible)
   const response = await fetch(`${process.env.API_URL}/accommodations${params.size > 0 ? `?${params.toString()}` : ''}`)
 
   if (!response.ok) {

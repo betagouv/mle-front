@@ -21,19 +21,19 @@ export const fetchAccomodations = async (
 
 export const useAccomodations = (initialData?: TGetAccomodationsResponse) => {
   const [queryStates] = useQueryStates({
-    isAccessible: parseAsString,
+    accessible: parseAsString,
     page: parseAsInteger,
     xmax: parseAsFloat,
     xmin: parseAsFloat,
     ymax: parseAsFloat,
     ymin: parseAsFloat,
   })
-  const { isAccessible, page, xmax, xmin, ymax, ymin } = queryStates
+  const { accessible, page, xmax, xmin, ymax, ymin } = queryStates
   const bboxQuery = xmin && ymin && xmax && ymax ? `${xmin},${ymin},${xmax},${ymax}` : ''
 
   return useQuery<TGetAccomodationsResponse>({
-    initialData: bboxQuery || isAccessible ? undefined : initialData,
-    queryFn: () => fetchAccomodations(bboxQuery, page, isAccessible),
-    queryKey: ['accomodations', { bbox: bboxQuery, isAccessible, page }],
+    initialData: bboxQuery || accessible ? undefined : initialData,
+    queryFn: () => fetchAccomodations(bboxQuery, page, accessible),
+    queryKey: ['accomodations', { bbox: bboxQuery, accessible, page }],
   })
 }
