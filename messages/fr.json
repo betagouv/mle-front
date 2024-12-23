@@ -85,6 +85,9 @@
                 "individual": "Individuel",
                 "shared": "Colocation"
             },
+            "tooltip": {
+                "accessible": "Etablissements en capacité d'accueillir des personnes en situation de handicap"
+            },
             "rangeLabel": "Budget maximum",
             "filtersCta": "Filtres",
             "accessbility": "Adapté PMR"
