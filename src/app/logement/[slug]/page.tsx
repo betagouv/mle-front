@@ -7,6 +7,8 @@ import { MapSkeleton } from '~/components/map/map-skeleton'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import { getAccommodationById } from '~/server-only/get-accommodation-by-id'
 import styles from './logement.module.css'
+import { getAccommodations } from '~/server-only/get-accommodations'
+import { NearbyAccommodations } from '~/components/accommodation/nearby-accommodations'
 
 const AccomodationMap = dynamic(() => import('~/components/map/accomodation-map').then((mod) => mod.AccomodationMap), {
   loading: () => <MapSkeleton height={400} />,
@@ -19,6 +21,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
   const { address, city, geom, name, nb_total_apartments, owner_name, postal_code } = accommodation
   const { coordinates } = geom
   const [longitude, latitude] = coordinates
+  const nearbyAccommodations = await getAccommodations({ center: `${longitude},${latitude}` })
 
   const tags: Array<{ iconId?: FrIconClassName | RiIconClassName; label: string }> = [
     { iconId: 'ri-user-line', label: t('tags.studio') },
@@ -87,22 +90,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
               <Button size="small" iconId="ri-printer-line" priority="tertiary" title={t('sidebar.buttons.print')} />
             </div>
           </div>
-          <div className={styles.nearbySection}>
-            <p className={styles.nearbyTitle}>{t('nearby.title')}</p>
-            <div className={styles.buttonGroup}>
-              <Button size="small" iconId="ri-arrow-left-s-line" priority="tertiary" title={t('nearby.buttons.previous')} />
-              <Button size="small" iconId="ri-arrow-right-s-line" priority="tertiary" title={t('nearby.buttons.next')} />
-            </div>
-          </div>
-          <div className={styles.nearbyCard}>
-            <div>
-              <h5 className={styles.nearbyCardTitle}>Résidence du Pavé neuf</h5>
-              <div className={styles.nearbyCardInfo}>
-                <span className="ri-group-line">Individuel • Colocation</span>
-                <span className="ri-community-line">{t('nearby.count', { count: 24 })}</span>
-              </div>
-            </div>
-          </div>
+          <NearbyAccommodations nearbyAccommodations={nearbyAccommodations} />
         </div>
       </div>
     </div>
