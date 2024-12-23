@@ -9,7 +9,7 @@ import { AccomodationCard } from '~/components/find-student-accomodation/card/fi
 import { Pagination } from '@codegouvfr/react-dsfr/Pagination'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 import { MapSkeleton } from '~/components/map/map-skeleton'
-import { parseAsFloat, parseAsInteger, parseAsString, useQueryState, useQueryStates } from 'nuqs'
+import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 
 type FindStudentAccomodationResultsProps = {
   initialData: TGetAccomodationsResponse
@@ -17,12 +17,7 @@ type FindStudentAccomodationResultsProps = {
 export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsProps> = ({ initialData }) => {
   const [view] = useQueryState('vue', parseAsString)
   const [page] = useQueryState('page', parseAsInteger)
-  const [bbox] = useQueryStates({
-    xmax: parseAsFloat,
-    xmin: parseAsFloat,
-    ymax: parseAsFloat,
-    ymin: parseAsFloat,
-  })
+  const [bbox] = useQueryState('bbox', parseAsString)
 
   const { data = initialData } = useAccomodations(initialData)
   const hasResults = useMemo(() => data.results.features.length > 0, [data])
@@ -61,8 +56,8 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
               getPageLinkProps={(page: number) => {
                 const params = new URLSearchParams()
                 if (view) params.set('vue', view)
-                if (bbox?.xmin && bbox?.ymin && bbox?.xmax && bbox?.ymax) {
-                  params.set('bbox', `${bbox.xmin},${bbox.ymin},${bbox.xmax},${bbox.ymax}`)
+                if (bbox) {
+                  params.set('bbox', `${bbox}`)
                 }
                 params.set('page', page.toString())
                 return { href: `/trouver-un-logement-etudiant?${params.toString()}` }

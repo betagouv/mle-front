@@ -25,7 +25,7 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
       {isPending ? <div className={classes.title} /> : <h4>{data?.count} logements</h4>}
       <div className={classes.container}>
         <Select label="" nativeSelectProps={{}}>
-          <option disabled hidden selected>
+          <option disabled hidden defaultValue={t('sortByPrice')} selected>
             {t('sortByPrice')}
           </option>
         </Select>
