@@ -23,7 +23,6 @@ export const useTerritories = (debounceTime = 200) => {
     queryFn: () => fetchTerritories(debouncedSearchQuery),
     queryKey: ['territories', debouncedSearchQuery],
   })
-
   return {
     data,
     isError,

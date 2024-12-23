@@ -9,9 +9,10 @@ import { TTerritories, TTerritory } from '~/schemas/territories'
 interface AutocompleteResultsProps {
   data: TTerritories
   onClick: (item: TTerritory) => void
+  open: boolean
 }
 
-export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsProps> = ({ data, onClick }) => {
+export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsProps> = ({ data, onClick, open }) => {
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()
 
@@ -29,6 +30,8 @@ export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsP
   if (!Object.keys(data).length) {
     return null
   }
+
+  if (!open) return null
 
   return (
     <div className={classes.container}>

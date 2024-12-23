@@ -1,36 +1,39 @@
 'use client'
 
-import { FC, useMemo } from 'react'
-import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet'
+import { FC, useEffect, useMemo } from 'react'
+import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { tss } from 'tss-react'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import 'leaflet-defaulticon-compatibility'
-import { parseAsFloat, useQueryStates } from 'nuqs'
 import { useAccomodations } from '~/hooks/use-accomodations'
 import { fr } from '@codegouvfr/react-dsfr'
+import { useQueryState } from 'nuqs'
 
 interface AccomodationsMapProps {
   center: [number, number]
 }
 
 const BoundsHandler: FC = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [_, setBbox] = useQueryStates({
-    xmax: parseAsFloat,
-    xmin: parseAsFloat,
-    ymax: parseAsFloat,
-    ymin: parseAsFloat,
-  })
+  const map = useMap()
+  const [bbox, setBbox] = useQueryState('bbox')
+
+  useEffect(() => {
+    if (bbox) {
+      const [west, south, east, north] = bbox.split(',').map(Number)
+      if (map) {
+        map.fitBounds([
+          [south, west],
+          [north, east],
+        ])
+      }
+    }
+  }, [bbox])
+
   useMapEvents({
     moveend: (e) => {
       const bounds = e.target.getBounds()
-      setBbox({
-        xmax: bounds.getEast(),
-        xmin: bounds.getWest(),
-        ymax: bounds.getNorth(),
-        ymin: bounds.getSouth(),
-      })
+      setBbox(`${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`)
     },
   })
 

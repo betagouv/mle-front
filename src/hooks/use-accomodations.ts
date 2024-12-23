@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useQuery } from '@tanstack/react-query'
-import { parseAsFloat, parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
+import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 
 export const fetchAccomodations = async (
-  bbox: string,
+  bbox: string | null,
   page: number | null,
   isAccessible: string | null,
 ): Promise<TGetAccomodationsResponse> => {
@@ -22,18 +22,14 @@ export const fetchAccomodations = async (
 export const useAccomodations = (initialData?: TGetAccomodationsResponse) => {
   const [queryStates] = useQueryStates({
     accessible: parseAsString,
+    bbox: parseAsString,
     page: parseAsInteger,
-    xmax: parseAsFloat,
-    xmin: parseAsFloat,
-    ymax: parseAsFloat,
-    ymin: parseAsFloat,
   })
-  const { accessible, page, xmax, xmin, ymax, ymin } = queryStates
-  const bboxQuery = xmin && ymin && xmax && ymax ? `${xmin},${ymin},${xmax},${ymax}` : ''
+  const { accessible, bbox, page } = queryStates
 
   return useQuery<TGetAccomodationsResponse>({
-    initialData: bboxQuery || accessible ? undefined : initialData,
-    queryFn: () => fetchAccomodations(bboxQuery, page, accessible),
-    queryKey: ['accomodations', { bbox: bboxQuery, accessible, page }],
+    initialData: bbox || accessible ? undefined : initialData,
+    queryFn: () => fetchAccomodations(bbox, page, accessible),
+    queryKey: ['accomodations', { accessible, bbox, page }],
   })
 }

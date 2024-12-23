@@ -1,15 +1,28 @@
 import { z } from 'zod'
 
-const ZAcademyOrDepartment = z.object({
-  id: z.number(),
-  name: z.string(),
+const ZBbox = z.object({
+  bbox: z.object({
+    xmax: z.number(),
+    xmin: z.number(),
+    ymax: z.number(),
+    ymin: z.number(),
+  }),
 })
 
-const ZCity = z.object({
-  id: z.number(),
-  name: z.string(),
-  postal_codes: z.array(z.string()),
-})
+const ZAcademyOrDepartment = z
+  .object({
+    id: z.number(),
+    name: z.string(),
+  })
+  .merge(ZBbox)
+
+const ZCity = z
+  .object({
+    id: z.number(),
+    name: z.string(),
+    postal_codes: z.array(z.string()),
+  })
+  .merge(ZBbox)
 
 export type TAcademyOrDepartment = z.infer<typeof ZAcademyOrDepartment>
 export type TCity = z.infer<typeof ZCity>
