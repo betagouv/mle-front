@@ -10,7 +10,11 @@ import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { getQuestionsAnswers } from '~/server-only/get-questions-answers'
 
-export default async function FindStudentAccommodationPage({ searchParams }: { searchParams: { bbox?: string; page?: string } }) {
+export default async function FindStudentAccommodationPage({
+  searchParams,
+}: {
+  searchParams: { bbox?: string; isAccessible: string; page?: string }
+}) {
   const t = await getTranslations('findAccomodation')
   const accommodations = await getAccommodations(searchParams)
   const qa = await getQuestionsAnswers()

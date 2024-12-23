@@ -13,13 +13,10 @@ export const NearbyAccommodations = ({ nearbyAccommodations }: { nearbyAccommoda
   const nearbyFeatures = nearbyAccommodations.results.features
   const maxIndex = nearbyFeatures.length - 1
 
-  const handlePrevious = () => {
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : maxIndex))
-  }
+  const handlePrevious = () => setCurrentIndex((prev) => (prev > 0 ? prev - 1 : maxIndex))
 
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev < maxIndex ? prev + 1 : 0))
-  }
+  const handleNext = () => setCurrentIndex((prev) => (prev < maxIndex ? prev + 1 : 0))
+
   return (
     <>
       <div className={classes.nearbySection}>

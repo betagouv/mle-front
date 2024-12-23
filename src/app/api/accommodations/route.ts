@@ -4,11 +4,13 @@ export async function GET(request: Request) {
   const url = new URL(request.url)
   const params = new URLSearchParams()
 
+  const isAccessible = url.searchParams.get('is_accessible')
   const bbox = url.searchParams.get('bbox')
   const page = url.searchParams.get('page')
 
   if (bbox) params.append('bbox', bbox)
   if (page) params.append('page', page)
+  params.append('is_accessible', isAccessible === 'true' ? 'true' : 'false')
 
   const response = await fetch(`${process.env.API_URL}/accommodations${params.size > 0 ? `?${params.toString()}` : ''}`)
   if (!response.ok) {
