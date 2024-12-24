@@ -9,26 +9,34 @@ import 'leaflet-defaulticon-compatibility'
 import { useAccomodations } from '~/hooks/use-accomodations'
 import { fr } from '@codegouvfr/react-dsfr'
 import { useQueryState } from 'nuqs'
+import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 
 interface AccomodationsMapProps {
-  center: [number, number]
+  bbox: { xmax: number; xmin: number; ymax: number; ymin: number } | undefined
+  data: TGetAccomodationsResponse
 }
 
-const BoundsHandler: FC = () => {
+const BoundsHandler: FC<{ bbox: { xmax: number; xmin: number; ymax: number; ymin: number } | undefined }> = ({ bbox }) => {
   const map = useMap()
-  const [bbox, setBbox] = useQueryState('bbox')
+  const [queryBbox, setBbox] = useQueryState('bbox')
 
   useEffect(() => {
-    if (bbox) {
-      const [west, south, east, north] = bbox.split(',').map(Number)
-      if (map) {
+    if (map) {
+      if (queryBbox) {
+        const [west, south, east, north] = queryBbox.split(',').map(Number)
         map.fitBounds([
           [south, west],
           [north, east],
         ])
       }
+      if (bbox) {
+        map.fitBounds([
+          [bbox.ymin, bbox.xmin],
+          [bbox.ymax, bbox.xmax],
+        ])
+      }
     }
-  }, [bbox])
+  }, [queryBbox, bbox])
 
   useMapEvents({
     moveend: (e) => {
@@ -40,24 +48,24 @@ const BoundsHandler: FC = () => {
   return null
 }
 
-export const AccomodationsMap: FC<AccomodationsMapProps> = ({ center }) => {
+export const AccomodationsMap: FC<AccomodationsMapProps> = ({ bbox, data }) => {
   const { classes } = useStyles()
-  const { data } = useAccomodations()
+  const { data: accommodations } = useAccomodations()
 
   const markers = useMemo(() => {
-    return data?.results.features.map((accommodation) => (
+    return (accommodations?.results.features || data.results.features).map((accommodation) => (
       <Marker key={accommodation.id} position={[accommodation.geometry.coordinates[1], accommodation.geometry.coordinates[0]]} />
     ))
-  }, [data])
+  }, [data, accommodations])
 
   const memoizedMap = useMemo(() => {
     return (
-      <MapContainer center={center} zoom={6} className={classes.mapContainer}>
+      <MapContainer center={[46.5, 2.4]} zoom={6} className={classes.mapContainer}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <BoundsHandler />
+        <BoundsHandler bbox={bbox} />
         {markers}
       </MapContainer>
     )

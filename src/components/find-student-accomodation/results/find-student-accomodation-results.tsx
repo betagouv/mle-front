@@ -12,14 +12,16 @@ import { MapSkeleton } from '~/components/map/map-skeleton'
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 
 type FindStudentAccomodationResultsProps = {
-  initialData: TGetAccomodationsResponse
+  bbox: { xmax: number; xmin: number; ymax: number; ymin: number } | undefined
+  data: TGetAccomodationsResponse
 }
-export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsProps> = ({ initialData }) => {
+export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsProps> = ({ bbox, data }) => {
   const [view] = useQueryState('vue', parseAsString)
   const [page] = useQueryState('page', parseAsInteger)
-  const [bbox] = useQueryState('bbox', parseAsString)
+  const [bboxQuery] = useQueryState('bbox', parseAsString)
 
-  const { data = initialData } = useAccomodations(initialData)
+  const { data: accommodations } = useAccomodations()
+
   const hasResults = useMemo(() => data.results.features.length > 0, [data])
   const { classes, cx } = useStyles({ hasResults, view })
 
@@ -34,7 +36,7 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
 
   const card = (
     <Suspense fallback={<MapSkeleton height={700} />}>
-      <AccomodationsMap center={[46.227638, 2.213749]} />
+      <AccomodationsMap data={data} bbox={bbox} />
     </Suspense>
   )
   return (
@@ -42,7 +44,7 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
       <div className={classes.accomodationsContainer}>
         <div className={fr.cx('fr-hidden-sm')}>{card}</div>
         <div className={classes.accommodationGrid}>
-          {(data?.results.features || initialData.results.features).map((accommodation) => (
+          {(accommodations?.results.features || data.results.features).map((accommodation) => (
             <AccomodationCard key={accommodation.id} accomodation={accommodation} />
           ))}
         </div>
@@ -56,8 +58,8 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
               getPageLinkProps={(page: number) => {
                 const params = new URLSearchParams()
                 if (view) params.set('vue', view)
-                if (bbox) {
-                  params.set('bbox', `${bbox}`)
+                if (bboxQuery) {
+                  params.set('bbox', `${bboxQuery}`)
                 }
                 params.set('page', page.toString())
                 return { href: `/trouver-un-logement-etudiant?${params.toString()}` }
