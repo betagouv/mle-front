@@ -2,17 +2,18 @@
 
 import { fr, FrCxArg } from '@codegouvfr/react-dsfr'
 import { useTranslations } from 'next-intl'
+import Link from 'next/link'
+import { parseAsString, useQueryState } from 'nuqs'
 import { FC } from 'react'
 import { tss } from 'tss-react'
 import { TTerritories, TTerritory } from '~/schemas/territories'
 
 interface AutocompleteResultsProps {
   data: TTerritories
-  onClick: (item: TTerritory) => void
-  open: boolean
 }
 
-export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsProps> = ({ data, onClick, open }) => {
+export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsProps> = ({ data }) => {
+  const [viewState] = useQueryState('vue', parseAsString)
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()
 
@@ -33,6 +34,15 @@ export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsP
 
   if (!open) return null
 
+  const getCategoryKeySingular = (categoryKey: keyof TTerritories) => {
+    const singular = {
+      academies: 'academie',
+      cities: 'ville',
+      departments: 'departement',
+    }
+    return singular[categoryKey]
+  }
+
   return (
     <div className={classes.container}>
       <ul className={classes.list}>
@@ -49,9 +59,19 @@ export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsP
               </li>
               <ul className={classes.list}>
                 {items.map((item: TTerritory) => (
-                  <li className={classes.item} key={item.id} onClick={() => onClick(item)} tabIndex={0}>
-                    {item.name}
-                  </li>
+                  <Link
+                    key={item.id}
+                    href={{
+                      pathname: `/trouver-un-logement-etudiant/${getCategoryKeySingular(categoryKey)}/${item.name}`,
+                      query: {
+                        vue: viewState,
+                      },
+                    }}
+                  >
+                    <li className={classes.item} key={item.id} tabIndex={0}>
+                      {item.name}
+                    </li>
+                  </Link>
                 ))}
               </ul>
             </div>

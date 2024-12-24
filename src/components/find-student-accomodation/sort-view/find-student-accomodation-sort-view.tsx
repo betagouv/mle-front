@@ -11,18 +11,18 @@ import { useAccomodations } from '~/hooks/use-accomodations'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 
 type FindStudentAccomodationSortViewProps = {
-  initialData: TGetAccomodationsResponse
+  data: TGetAccomodationsResponse
 }
-export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortViewProps> = ({ initialData }) => {
+export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortViewProps> = ({ data }) => {
   const { classes } = useStyles()
   const [viewQuery, setViewQuery] = useQueryState('vue', {
     defaultValue: 'grille',
   })
   const t = useTranslations('findAccomodation.filters')
-  const { data, isPending } = useAccomodations(initialData)
+  const { data: accomodations } = useAccomodations()
   return (
     <>
-      {isPending ? <div className={classes.title} /> : <h4>{data?.count} logements</h4>}
+      <h4>{accomodations?.count ?? data.count} logements</h4>
       <div className={classes.container}>
         <Select label="" nativeSelectProps={{}}>
           <option disabled hidden defaultValue={t('sortByPrice')} selected>
