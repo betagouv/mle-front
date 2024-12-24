@@ -60,7 +60,7 @@ export default async function FindStudentAccommodationPage({
   const territoryBbox = territory?.bbox
     ? `${territory.bbox.xmin},${territory.bbox.ymin},${territory.bbox.xmax},${territory.bbox.ymax}`
     : undefined
-  const accommodations = await getAccommodations({ ...searchParams, bbox: searchParams.bbox || territoryBbox })
+  const accommodations = await getAccommodations({ ...searchParams, bbox: territoryBbox })
   const qa = await getQuestionsAnswers({
     content_type: getQACategoryKey(routeCategoryKey as 'ville' | 'academie' | 'departement'),
     object_id: territory?.id,
@@ -76,7 +76,7 @@ export default async function FindStudentAccommodationPage({
         <div className={styles.headerContainer}>
           <FindStudentAccomodationSortView data={accommodations} />
         </div>
-        <FindStudentAccomodationResults data={accommodations} bbox={territory?.bbox} />
+        <FindStudentAccomodationResults data={accommodations} territory={territory} />
         <div className={styles.mainQaFaqContainer}>
           <div className={fr.cx('fr-container')}>
             <div className={styles.faqQaContainer}>

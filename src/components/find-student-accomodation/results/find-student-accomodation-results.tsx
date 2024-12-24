@@ -1,7 +1,7 @@
 'use client'
 
 import { tss } from 'tss-react'
-import { FC, Suspense, useMemo } from 'react'
+import { FC, Suspense, useEffect, useMemo } from 'react'
 import { fr } from '@codegouvfr/react-dsfr'
 import dynamic from 'next/dynamic'
 import { useAccomodations } from '~/hooks/use-accomodations'
@@ -10,15 +10,22 @@ import { Pagination } from '@codegouvfr/react-dsfr/Pagination'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 import { MapSkeleton } from '~/components/map/map-skeleton'
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
+import { TTerritory } from '~/schemas/territories'
 
 type FindStudentAccomodationResultsProps = {
-  bbox: { xmax: number; xmin: number; ymax: number; ymin: number } | undefined
   data: TGetAccomodationsResponse
+  territory?: TTerritory
 }
-export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsProps> = ({ bbox, data }) => {
+export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsProps> = ({ data, territory }) => {
   const [view] = useQueryState('vue', parseAsString)
   const [page] = useQueryState('page', parseAsInteger)
-  const [bboxQuery] = useQueryState('bbox', parseAsString)
+  const [bboxQuery, setBboxQuery] = useQueryState('bbox', parseAsString)
+
+  useEffect(() => {
+    if (territory && territory.bbox) {
+      setBboxQuery(`${territory.bbox.xmin},${territory.bbox.ymin},${territory.bbox.xmax},${territory.bbox.ymax}`)
+    }
+  }, [])
 
   const { data: accommodations } = useAccomodations()
 
@@ -36,7 +43,7 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
 
   const card = (
     <Suspense fallback={<MapSkeleton height={700} />}>
-      <AccomodationsMap data={data} bbox={bbox} />
+      <AccomodationsMap data={data} />
     </Suspense>
   )
   return (

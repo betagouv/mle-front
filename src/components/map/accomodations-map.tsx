@@ -12,11 +12,10 @@ import { useQueryState } from 'nuqs'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 
 interface AccomodationsMapProps {
-  bbox: { xmax: number; xmin: number; ymax: number; ymin: number } | undefined
   data: TGetAccomodationsResponse
 }
 
-const BoundsHandler: FC<{ bbox: { xmax: number; xmin: number; ymax: number; ymin: number } | undefined }> = ({ bbox }) => {
+const BoundsHandler: FC = () => {
   const map = useMap()
   const [queryBbox, setBbox] = useQueryState('bbox')
 
@@ -29,14 +28,8 @@ const BoundsHandler: FC<{ bbox: { xmax: number; xmin: number; ymax: number; ymin
           [north, east],
         ])
       }
-      if (bbox) {
-        map.fitBounds([
-          [bbox.ymin, bbox.xmin],
-          [bbox.ymax, bbox.xmax],
-        ])
-      }
     }
-  }, [queryBbox, bbox])
+  }, [queryBbox])
 
   useMapEvents({
     moveend: (e) => {
@@ -48,7 +41,7 @@ const BoundsHandler: FC<{ bbox: { xmax: number; xmin: number; ymax: number; ymin
   return null
 }
 
-export const AccomodationsMap: FC<AccomodationsMapProps> = ({ bbox, data }) => {
+export const AccomodationsMap: FC<AccomodationsMapProps> = ({ data }) => {
   const { classes } = useStyles()
   const { data: accommodations } = useAccomodations()
 
@@ -59,13 +52,14 @@ export const AccomodationsMap: FC<AccomodationsMapProps> = ({ bbox, data }) => {
   }, [data, accommodations])
 
   const memoizedMap = useMemo(() => {
+    if (markers.length === 0) return null
     return (
-      <MapContainer center={[46.5, 2.4]} zoom={6} className={classes.mapContainer}>
+      <MapContainer center={[46.5, 2.4]} className={classes.mapContainer}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <BoundsHandler bbox={bbox} />
+        <BoundsHandler />
         {markers}
       </MapContainer>
     )
