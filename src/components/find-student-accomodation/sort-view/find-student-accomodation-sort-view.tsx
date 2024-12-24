@@ -4,7 +4,7 @@ import Button from '@codegouvfr/react-dsfr/Button'
 import Select from '@codegouvfr/react-dsfr/Select'
 import { useTranslations } from 'next-intl'
 import { FC } from 'react'
-import { useQueryState } from 'nuqs'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { tss } from 'tss-react'
 import { fr } from '@codegouvfr/react-dsfr'
 import { useAccomodations } from '~/hooks/use-accomodations'
@@ -15,8 +15,8 @@ type FindStudentAccomodationSortViewProps = {
 }
 export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortViewProps> = ({ data }) => {
   const { classes } = useStyles()
-  const [viewQuery, setViewQuery] = useQueryState('vue', {
-    defaultValue: 'grille',
+  const [queryStates, setQueryStates] = useQueryStates({
+    vue: parseAsString,
   })
   const t = useTranslations('findAccomodation.filters')
   const { data: accomodations } = useAccomodations()
@@ -33,17 +33,17 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
           <div>
             <Button
               iconId="ri-layout-grid-2-line"
-              priority={viewQuery === 'grille' ? 'secondary' : 'tertiary'}
+              priority={queryStates.vue === 'grille' ? 'secondary' : 'tertiary'}
               className={classes.button}
-              onClick={() => setViewQuery('grille')}
+              onClick={() => setQueryStates({ vue: 'grille' })}
             >
               {t('grid')}
             </Button>
             <Button
               iconId="ri-road-map-fill"
-              priority={viewQuery === 'carte' ? 'secondary' : 'tertiary'}
+              priority={queryStates.vue === 'carte' ? 'secondary' : 'tertiary'}
               className={classes.button}
-              onClick={() => setViewQuery('carte')}
+              onClick={() => setQueryStates({ vue: 'carte' })}
             >
               {t('map')}
             </Button>

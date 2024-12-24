@@ -3,7 +3,6 @@
 import { fr, FrCxArg } from '@codegouvfr/react-dsfr'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { parseAsString, useQueryState } from 'nuqs'
 import { FC } from 'react'
 import { tss } from 'tss-react'
 import { TTerritories, TTerritory } from '~/schemas/territories'
@@ -13,7 +12,6 @@ interface AutocompleteResultsProps {
 }
 
 export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsProps> = ({ data }) => {
-  const [viewState] = useQueryState('vue', parseAsString)
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()
 
@@ -63,9 +61,6 @@ export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsP
                     key={item.id}
                     href={{
                       pathname: `/trouver-un-logement-etudiant/${getCategoryKeySingular(categoryKey)}/${item.name}`,
-                      query: {
-                        vue: viewState,
-                      },
                     }}
                   >
                     <li className={classes.item} key={item.id} tabIndex={0}>
