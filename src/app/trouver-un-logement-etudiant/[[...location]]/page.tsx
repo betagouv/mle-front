@@ -90,7 +90,7 @@ export default async function FindStudentAccommodationPage({
                 <div style={{ background: 'white', padding: '2rem' }} className={fr.cx('fr-accordions-group')}>
                   {qa.map((qa, index) => (
                     <Accordion key={index} label={qa.title_fr}>
-                      {qa.content_fr}
+                      <div dangerouslySetInnerHTML={{ __html: qa.content_fr }} />
                     </Accordion>
                   ))}
                 </div>
