@@ -11,6 +11,11 @@
   margin-top: auto;
 }
 
+.heroCustomFont {
+  font-size: 3.5rem;
+  line-height: 4rem;
+}
+
 .heroTitle {
   color: white;
 }

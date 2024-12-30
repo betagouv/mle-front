@@ -87,7 +87,7 @@ export default async function PrepareYourStudentLife() {
           </div>
           <div className={styles.heroContent}>
             <div>
-              <h1>
+              <h1 className={styles.heroCustomFont}>
                 <span className={styles.heroTitle}>{t('titlePart1')}</span>
                 <br />
                 <span className={styles.heroTitle}>{t('titlePart2')}</span>
