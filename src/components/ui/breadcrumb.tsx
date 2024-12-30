@@ -53,7 +53,7 @@ export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, title }) 
 const useStyles = tss.withParams<{ color?: string }>().create(({ color }) => ({
   breadcrumb: {
     '& .fr-breadcrumb__link': {
-      color: `${color} !important` ?? undefined,
+      color: color ? `${color} !important` : undefined,
     },
     color: color ?? undefined,
     marginTop: 0,
