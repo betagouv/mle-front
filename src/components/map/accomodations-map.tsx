@@ -20,14 +20,12 @@ const BoundsHandler: FC = () => {
   const [queryBbox, setBbox] = useQueryState('bbox')
 
   useEffect(() => {
-    if (map) {
-      if (queryBbox) {
-        const [west, south, east, north] = queryBbox.split(',').map(Number)
-        map.fitBounds([
-          [south, west],
-          [north, east],
-        ])
-      }
+    if (queryBbox) {
+      const [west, south, east, north] = queryBbox.split(',').map(Number)
+      map.fitBounds([
+        [south, west],
+        [north, east],
+      ])
     }
   }, [queryBbox])
 
@@ -54,7 +52,7 @@ export const AccomodationsMap: FC<AccomodationsMapProps> = ({ data }) => {
   const memoizedMap = useMemo(() => {
     if (markers.length === 0) return null
     return (
-      <MapContainer center={[46.5, 2.4]} className={classes.mapContainer}>
+      <MapContainer center={[46.5, 2.4]} zoom={6} className={classes.mapContainer}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -76,7 +74,7 @@ const useStyles = tss.create({
     [fr.breakpoints.down('sm')]: {
       height: '400px',
     },
-    height: '700px',
+    height: '600px',
     width: '100%',
   },
 })
