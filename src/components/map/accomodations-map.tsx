@@ -50,7 +50,6 @@ export const AccomodationsMap: FC<AccomodationsMapProps> = ({ data }) => {
   }, [data, accommodations])
 
   const memoizedMap = useMemo(() => {
-    if (markers.length === 0) return null
     return (
       <MapContainer center={[46.5, 2.4]} zoom={6} className={classes.mapContainer}>
         <TileLayer

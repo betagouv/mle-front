@@ -56,11 +56,11 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
           ))}
         </div>
 
-        {data && data.count > data.page_size && (
+        {accommodations && accommodations.count > accommodations.page_size && (
           <div className={classes.paginationContainer}>
             <Pagination
               showFirstLast={false}
-              count={Math.ceil(data.count / data.page_size)}
+              count={Math.ceil(accommodations.count / accommodations.page_size)}
               defaultPage={page ?? 1}
               getPageLinkProps={(page: number) => {
                 const params = new URLSearchParams()
@@ -104,7 +104,6 @@ const useStyles = tss.withParams<{ hasResults?: boolean; view: string | null }>(
     flex: view === 'carte' ? '0 0 60%' : '0 0 100%',
     marginBottom: '2rem',
     maxWidth: view === 'carte' ? '60%' : '100%',
-    paddingRight: view === 'carte' ? '5v' : '0',
     width: view === 'carte' ? '60%' : '100%',
   },
   container: {
@@ -112,7 +111,10 @@ const useStyles = tss.withParams<{ hasResults?: boolean; view: string | null }>(
     justifyContent: 'space-between',
   },
   mapContainer: {
-    height: hasResults ? 'calc(100vh - 700px)' : 'auto',
+    [fr.breakpoints.up('md')]: {
+      height: hasResults ? 'calc(100vh - 400px)' : 'auto',
+    },
+    height: hasResults ? 'calc(100vh - 600px)' : 'auto',
     position: 'sticky',
     top: '1rem',
   },
