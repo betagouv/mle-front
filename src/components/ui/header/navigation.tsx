@@ -35,9 +35,9 @@ export const HeaderNavigation: FC<{ academies: TAcademyOrDepartment[] }> = ({ ac
       text: t('home'),
     },
     {
-      isActive: pathname === '/preparer-mon-budget',
+      isActive: pathname === '/preparer-sa-vie-etudiante',
       linkProps: {
-        href: '/preparer-mon-budget',
+        href: '/preparer-sa-vie-etudiante',
         target: '_self',
       },
       text: t('prepareBudget'),

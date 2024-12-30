@@ -1,5 +1,6 @@
 'use client'
 
+import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
@@ -37,7 +38,7 @@ export const NearbyAccommodations = ({ nearbyAccommodations }: { nearbyAccommoda
           <div key={nearbyAccommodations.results.features[currentIndex].properties.slug}>
             <h5 className={classes.nearbyCardTitle}>{nearbyAccommodations.results.features[currentIndex].properties.name}</h5>
             <div className={classes.nearbyCardInfo}>
-              <span className="ri-community-line">
+              <span className={fr.cx('ri-community-line')}>
                 {t('nearby.count', { count: nearbyAccommodations.results.features[currentIndex].properties.nb_total_apartments })}
               </span>
             </div>
