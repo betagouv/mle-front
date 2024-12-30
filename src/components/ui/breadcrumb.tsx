@@ -1,10 +1,11 @@
 'use client'
 
 import { tss } from 'tss-react'
-import { FC } from 'react'
+import { FC, ReactNode } from 'react'
 import { useTranslations } from 'next-intl'
 import { Breadcrumb } from '@codegouvfr/react-dsfr/Breadcrumb'
 import { usePathname } from 'next/navigation'
+import { RegisteredLinkProps } from '@codegouvfr/react-dsfr/link'
 
 type DynamicBreadcrumbProps = {
   color?: string
@@ -16,8 +17,12 @@ export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, title }) 
   const t = useTranslations()
   const { classes } = useStyles({ color })
 
-  const getCurrentPageLabel = () => {
+  const getCurrentPageDetails = () => {
     let currentPageLabel = t('breadcrumbs.home')
+    const segments: {
+      label: ReactNode
+      linkProps: RegisteredLinkProps
+    }[] = []
     switch (pathname) {
       case '/trouver-un-logement-etudiant':
         currentPageLabel = t('breadcrumbs.findAccomodation')
@@ -25,17 +30,23 @@ export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, title }) 
       case '/preparer-sa-vie-etudiante':
         currentPageLabel = t('breadcrumbs.prepareStudentLife')
         break
-      case pathname.match(/^\/vie-etudiante\/[a-zA-Z0-9-]+$/)?.input:
+      case pathname.match(/^\/preparer-sa-vie-etudiante\/[a-zA-Z0-9-]+$/)?.input:
         currentPageLabel = t('breadcrumbs.prepareStudentLifeTitle', { title })
+        segments.push({
+          label: t('breadcrumbs.prepareStudentLife'),
+          linkProps: {
+            href: `/preparer-sa-vie-etudiante/`,
+          },
+        })
         break
       case pathname.match(/^\/logement\/[a-zA-Z0-9-]+$/)?.input:
         currentPageLabel = t('breadcrumbs.logement', { title })
         break
     }
-    return currentPageLabel
+    return { currentPageLabel, segments }
   }
 
-  const currentPageLabel = getCurrentPageLabel()
+  const { currentPageLabel, segments } = getCurrentPageDetails()
 
   return (
     <div className={classes.breadcrumb}>
@@ -45,7 +56,7 @@ export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, title }) 
         homeLinkProps={{
           href: '/',
         }}
-        segments={[]}
+        segments={segments}
       />
     </div>
   )

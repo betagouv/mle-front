@@ -11,7 +11,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@codegouvfr/react-dsfr": "^1.13.8",
+    "@codegouvfr/react-dsfr": "^1.14.2",
     "@emotion/server": "^11.11.0",
     "@tanstack/react-query": "^5.62.3",
     "leaflet": "^1.9.4",

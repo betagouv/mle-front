@@ -103,7 +103,7 @@ export default async function PrepareYourStudentLife() {
               </div>
             </div>
           </div>
-          <Image src={image} alt="Student life" />
+          <Image src={image} priority alt="Préparer sa vie étudiante" />
         </div>
       </div>
       <div style={{ marginTop: '-4rem', position: 'relative', zIndex: 1 }} className={fr.cx('fr-container')}>

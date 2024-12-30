@@ -2,7 +2,9 @@
     "breadcrumbs": {
         "home": "Accueil",
         "findAccomodation": "Trouver un logement étudiant",
-        "logement": "Logement étudiant {title}"
+        "logement": "Logement étudiant {title}",
+        "prepareStudentLife": "Préparer sa vie étudiante",
+        "prepareStudentLifeTitle": "Préparer sa vie étudiante à {title}"
     },
     "loading": {
         "card": "Chargement de la carte..."
@@ -109,6 +111,9 @@
         "city": "Ville",
         "searchTitlePart1": "Tout ce qu'il faut savoir",
         "searchTitlePart2": "sur sa prochaine ville étudiante",
-        "popularCities": "Villes étudiantes populaires"
+        "popularCities": "Villes étudiantes populaires",
+        "title": "Préparer sa vie étudiante à {title}",
+        "subTitle": "Être étudiant à {title}",
+        "nearbyCities": "Villes à proximité de {title}"
     }
 }
