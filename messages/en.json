@@ -30,7 +30,7 @@
     },
     "navigation": {
         "home": "Simuler mes aides au logement",
-        "prepareBudget": "Préparer mon budget",
+        "prepareBudget": "Préparer sa vie étudiante",
         "findAccommodation": "Trouver un logement étudiant",
         "byAcademies": "Par académies",
         "faq": "Foire aux questions"
@@ -100,5 +100,15 @@
         "card": {
             "priceFrom": "À partir de"
         }
+    },
+    "prepareStudentLife": {
+        "titlePart1": "Le guide pratique",
+        "titlePart2": "pour bien préparer",
+        "titlePart3": "sa vie étudiante",
+        "department": "Département",
+        "city": "Ville",
+        "searchTitlePart1": "Tout ce qu'il faut savoir",
+        "searchTitlePart2": "sur sa prochaine ville étudiante",
+        "popularCities": "Villes étudiantes populaires"
     }
 }

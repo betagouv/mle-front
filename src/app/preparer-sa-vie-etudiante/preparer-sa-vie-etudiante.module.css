@@ -1,0 +1,65 @@
+.heroSection {
+  background-color: #5858AD;
+}
+
+.breadcrumbWrapper {
+  position: absolute;
+}
+
+.heroContent {
+  margin-bottom: auto;
+  margin-top: auto;
+}
+
+.heroTitle {
+  color: white;
+}
+
+.heroTitleHighlight {
+  color: var(--yellow-moutarde-850-200);
+}
+
+.informationGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.informationItem {
+  color: white;
+  flex: 1;
+}
+
+.searchCard {
+  background-color: white;
+  box-shadow: 0 6px 18px 0 rgba(0, 0, 18, 0.16);
+  padding: 1rem 3.5rem;
+}
+
+.searchCardContent {
+  display: flex;
+  flex-direction: row;
+}
+
+.searchTitle {
+  margin: 0;
+}
+
+.popularCitiesSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.popularCitiesTitle {
+  color: #666666;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.tilesGrid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, 1fr);
+}
