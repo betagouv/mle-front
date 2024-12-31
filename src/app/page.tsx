@@ -1,11 +1,5 @@
-'use client'
-
-import { fr } from '@codegouvfr/react-dsfr'
+import { redirect } from 'next/navigation'
 
 export default function Home() {
-  return (
-    <div className={fr.cx('fr-container', 'fr-py-10v')} style={{ height: '50vh' }}>
-      <h1>Hello</h1>
-    </div>
-  )
+  redirect('/simuler-mes-aides-au-logement')
 }

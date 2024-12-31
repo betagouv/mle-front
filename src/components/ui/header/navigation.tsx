@@ -27,7 +27,7 @@ export const HeaderNavigation: FC<{ academies: TAcademyOrDepartment[] }> = ({ ac
   const academiesColumns = splitAcademies(academies)
   const items: MainNavigationProps.Item[] = [
     {
-      isActive: pathname === '/',
+      isActive: pathname === '/simuler-mes-aides-au-logement',
       linkProps: {
         href: '/',
         target: '_self',

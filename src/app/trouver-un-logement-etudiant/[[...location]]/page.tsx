@@ -80,7 +80,7 @@ export default async function FindStudentAccommodationPage({
             <div className={styles.faqQaContainer}>
               <div className={styles.faqTitleCtaContainer}>
                 <h2 className={styles.whiteColor}>{t('faq.title')}</h2>
-                <Button iconId="ri-question-line" style={{ boxShadow: 'inset 0 0 0 1px white', color: 'white' }} priority="secondary">
+                <Button iconId="ri-question-line" className={styles.whiteButton} priority="secondary">
                   {t('faq.cta')}
                 </Button>
               </div>
