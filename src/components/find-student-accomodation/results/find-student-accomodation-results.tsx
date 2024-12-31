@@ -28,9 +28,9 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
   }, [])
 
   const { data: accommodations } = useAccomodations()
-
   const hasResults = useMemo(() => data.results.features.length > 0, [data])
   const { classes, cx } = useStyles({ hasResults, view })
+  const accomodationsData = useMemo(() => (bboxQuery ? accommodations : data), [accommodations, data, bboxQuery])
 
   const AccomodationsMap = useMemo(
     () =>
@@ -46,21 +46,30 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
       <AccomodationsMap data={data} />
     </Suspense>
   )
+
   return (
     <div className={classes.container}>
       <div className={classes.accomodationsContainer}>
         <div className={fr.cx('fr-hidden-sm')}>{card}</div>
         <div className={classes.accommodationGrid}>
-          {(accommodations?.results.features || data.results.features).map((accommodation) => (
+          {(accomodationsData?.results.features || []).map((accommodation) => (
             <AccomodationCard key={accommodation.id} accomodation={accommodation} />
           ))}
         </div>
+        <div>
+          {accomodationsData?.count === 0 && (
+            <div>
+              <h3>Aucun résultat pour votre recherche</h3>
+              <p>Vous pouvez modifier votre recherche ou consulter les questions fréquemment posées sur la page d&apos;informations.</p>
+            </div>
+          )}
+        </div>
 
-        {accommodations && accommodations.count > accommodations.page_size && (
+        {accomodationsData && accomodationsData.count > accomodationsData.page_size && (
           <div className={classes.paginationContainer}>
             <Pagination
               showFirstLast={false}
-              count={Math.ceil(accommodations.count / accommodations.page_size)}
+              count={Math.ceil(accomodationsData.count / accomodationsData.page_size)}
               defaultPage={page ?? 1}
               getPageLinkProps={(page: number) => {
                 const params = new URLSearchParams()

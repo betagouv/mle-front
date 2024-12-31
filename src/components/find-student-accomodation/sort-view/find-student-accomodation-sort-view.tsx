@@ -3,7 +3,7 @@
 import Button from '@codegouvfr/react-dsfr/Button'
 import Select from '@codegouvfr/react-dsfr/Select'
 import { useTranslations } from 'next-intl'
-import { FC } from 'react'
+import { FC, useMemo } from 'react'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { tss } from 'tss-react'
 import { fr } from '@codegouvfr/react-dsfr'
@@ -14,15 +14,18 @@ type FindStudentAccomodationSortViewProps = {
   data: TGetAccomodationsResponse
 }
 export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortViewProps> = ({ data }) => {
-  const { classes } = useStyles()
   const [queryStates, setQueryStates] = useQueryStates({
+    bbox: parseAsString,
     vue: parseAsString,
   })
   const t = useTranslations('findAccomodation.filters')
   const { data: accomodations } = useAccomodations()
+  const accomodationsData = useMemo(() => (queryStates.bbox ? accomodations : data), [accomodations, data, queryStates.bbox])
+  const { classes } = useStyles({ hasResults: accomodationsData && accomodationsData.count > 0 })
+
   return (
-    <>
-      <h4>{accomodations?.count ?? data.count} logements</h4>
+    <div className={classes.headerContainer}>
+      {accomodationsData && accomodationsData.count > 0 && <h4>{accomodationsData.count} logements</h4>}
       <div className={classes.container}>
         <Select label="" nativeSelectProps={{}}>
           <option disabled hidden defaultValue={t('sortByPrice')} selected>
@@ -50,11 +53,11 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
-const useStyles = tss.create({
+const useStyles = tss.withParams<{ hasResults?: boolean }>().create(({ hasResults }) => ({
   '@keyframes pulse': {
     '0%, 100%': {
       opacity: 1,
@@ -70,6 +73,10 @@ const useStyles = tss.create({
     display: 'flex',
     gap: '1rem',
   },
+  headerContainer: {
+    display: 'flex',
+    justifyContent: hasResults ? 'space-between' : 'flex-end',
+  },
   title: {
     animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
     backgroundColor: '#e5e7eb',
@@ -77,4 +84,4 @@ const useStyles = tss.create({
     height: '2.5rem',
     width: '10.5rem',
   },
-})
+}))

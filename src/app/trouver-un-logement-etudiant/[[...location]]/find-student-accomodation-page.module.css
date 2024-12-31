@@ -3,11 +3,6 @@
   padding-top: 1rem;
 }
 
-.headerContainer {
-  display: flex;
-  justify-content: space-between;
-}
-
 .whiteColor {
   color: white;
 }

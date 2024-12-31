@@ -73,9 +73,7 @@ export default async function FindStudentAccommodationPage({
 
         <h1>{t('title')}</h1>
         <FindStudentAccomodationHeader />
-        <div className={styles.headerContainer}>
-          <FindStudentAccomodationSortView data={accommodations} />
-        </div>
+        <FindStudentAccomodationSortView data={accommodations} />
         <FindStudentAccomodationResults data={accommodations} territory={territory} />
         <div className={styles.mainQaFaqContainer}>
           <div className={fr.cx('fr-container')}>
