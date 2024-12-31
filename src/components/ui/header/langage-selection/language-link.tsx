@@ -16,7 +16,7 @@ export const LanguageLink: FC<LanguageLinkProps> = ({ activeLocale, fullNameByLa
   const router = useRouter()
 
   const handleLocale = (locale: AvailableLocales) => {
-    document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000` // 1 year
+    document.cookie = `NEXT_LOCALE=${locale}; path=/; max-age=31536000`
     router.refresh()
   }
 

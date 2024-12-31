@@ -4,8 +4,8 @@ import { cookies } from 'next/headers'
 import { useTranslations } from 'next-intl'
 import { FC } from 'react'
 
-import { LanguageLink } from '~/components/header/langage-selection/language-link'
 import { AvailableLocales } from '~/i18n/request'
+import { LanguageLink } from '~/components/ui/header/langage-selection/language-link'
 
 export const LanguageSelect: FC = () => {
   const lang = cookies().get('NEXT_LOCALE')?.value as AvailableLocales
