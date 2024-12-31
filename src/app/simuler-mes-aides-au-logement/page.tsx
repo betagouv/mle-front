@@ -78,6 +78,7 @@ export default function SimulateAccommodationAids() {
             width={1000}
             height={600}
             style={{
+              height: 'auto',
               objectFit: 'cover',
               width: '100%',
             }}
