@@ -8,12 +8,12 @@ import { FindStudentAccomodationResults } from '~/components/find-student-accomo
 import { Accordion } from '@codegouvfr/react-dsfr/Accordion'
 import { getAccommodations } from '~/server-only/get-accommodations'
 import Button from '@codegouvfr/react-dsfr/Button'
-import { getQuestionsAnswers } from '~/server-only/get-questions-answers'
 import { getTerritories } from '~/server-only/get-territories'
 import { TTerritories } from '~/schemas/territories'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import { FindStudentAccomodationHeader } from '~/components/find-student-accomodation/header/find-student-accomodation-header'
 import { redirect } from 'next/navigation'
+import { getTerritoryQuestionsAnswers } from '~/server-only/get-territory-questions-answers'
 
 const getTerritoriesCategoryKey = (categoryKey: 'ville' | 'academie' | 'departement') => {
   const keys = {
@@ -38,7 +38,7 @@ export default async function FindStudentAccommodationPage({
   searchParams,
 }: {
   params: { location: string }
-  searchParams: { accessible: string; bbox?: string; content_type?: string; object_id?: string; page?: string }
+  searchParams: { accessible: string; bbox?: string; content_type?: string; hasColiving?: string; object_id?: string; page?: string }
 }) {
   const t = await getTranslations('findAccomodation')
   const routeCategoryKey = params?.location?.[0] || ''
@@ -61,7 +61,7 @@ export default async function FindStudentAccommodationPage({
     ? `${territory.bbox.xmin},${territory.bbox.ymin},${territory.bbox.xmax},${territory.bbox.ymax}`
     : undefined
   const accommodations = await getAccommodations({ ...searchParams, bbox: territoryBbox })
-  const qa = await getQuestionsAnswers({
+  const qa = await getTerritoryQuestionsAnswers({
     content_type: getQACategoryKey(routeCategoryKey as 'ville' | 'academie' | 'departement'),
     object_id: territory?.id,
   })

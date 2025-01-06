@@ -1,11 +1,13 @@
 import { TGetQuestionsAnswersResponse } from '~/schemas/questions-answers/question-answers'
 
-export const getQuestionsAnswers = async (searchParams?: { content_type?: string; object_id?: number }) => {
+export const getTerritoryQuestionsAnswers = async (searchParams?: { content_type?: string; object_id?: number }) => {
   const params = new URLSearchParams()
-  const franceQaPromise = fetch(`${process.env.API_URL}/questions-answers/?content_type=country&object_id=1`, { next: { tags: ['qa'] } })
+  const franceQaPromise = fetch(`${process.env.API_URL}/questions-answers/by-territory?content_type=country&object_id=1`, {
+    next: { tags: ['qa'] },
+  })
   if (searchParams?.object_id) params.append('object_id', String(searchParams.object_id))
   if (searchParams?.content_type) params.append('content_type', searchParams.content_type)
-  const specificQaPromise = fetch(`${process.env.API_URL}/questions-answers/?${params.toString()}`, { next: { tags: ['qa'] } })
+  const specificQaPromise = fetch(`${process.env.API_URL}/questions-answers/by-territory?${params.toString()}`, { next: { tags: ['qa'] } })
 
   const [franceQa, specificQa] = await Promise.all([franceQaPromise, specificQaPromise])
 

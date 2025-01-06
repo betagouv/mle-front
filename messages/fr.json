@@ -82,11 +82,7 @@
         "title": "Trouver un logement étudiant",
         "header": {
             "inputLabel": "Académie, ville ou département",
-            "checkboxes": {
-                "label": "Type de logement",
-                "individual": "Individuel",
-                "shared": "Colocation"
-            },
+            "shared": "Colocation",
             "tooltip": {
                 "accessible": "Etablissements en capacité d'accueillir des personnes en situation de handicap"
             },

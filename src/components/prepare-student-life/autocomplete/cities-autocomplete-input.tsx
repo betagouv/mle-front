@@ -7,12 +7,12 @@ import { useTranslations } from 'next-intl'
 import { FC } from 'react'
 import { tss } from 'tss-react'
 import { CitiesAutocompleteResults } from '~/components/prepare-student-life/autocomplete/cities-autocomplete-results'
-import { useCities } from '~/hooks/use-cities'
+import { useSearchCities } from '~/hooks/use-search-cities'
 
 export const CitiesAutocompleteInput: FC = () => {
   const t = useTranslations('prepareStudentLife')
   const { classes } = useStyles()
-  const { data, isError, searchQuery, setSearchQuery } = useCities()
+  const { data, isError, searchQuery, setSearchQuery } = useSearchCities()
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value)
   }
