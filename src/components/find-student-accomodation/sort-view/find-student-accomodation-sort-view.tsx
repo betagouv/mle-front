@@ -19,8 +19,8 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
     vue: parseAsString,
   })
   const t = useTranslations('findAccomodation.filters')
-  const { data: accomodations } = useAccomodations()
-  const accomodationsData = useMemo(() => (queryStates.bbox ? accomodations : data), [accomodations, data, queryStates.bbox])
+  const { data: accommodations } = useAccomodations()
+  const accomodationsData = useMemo(() => (accommodations ? accommodations : data), [accommodations, data])
   const { classes } = useStyles({ hasResults: accomodationsData && accomodationsData.count > 0 })
 
   return (

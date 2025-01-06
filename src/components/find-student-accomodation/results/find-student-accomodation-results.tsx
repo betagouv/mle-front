@@ -30,7 +30,7 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
   const { data: accommodations } = useAccomodations()
   const hasResults = useMemo(() => data.results.features.length > 0, [data])
   const { classes, cx } = useStyles({ hasResults, view })
-  const accomodationsData = useMemo(() => (bboxQuery ? accommodations : data), [accommodations, data, bboxQuery])
+  const accomodationsData = useMemo(() => (accommodations ? accommodations : data), [accommodations, data])
 
   const AccomodationsMap = useMemo(
     () =>
