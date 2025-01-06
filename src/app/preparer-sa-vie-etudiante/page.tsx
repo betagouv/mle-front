@@ -3,13 +3,15 @@ import image from '~/images/preparer-sa-vie-etudiante.svg'
 import { fr, FrIconClassName } from '@codegouvfr/react-dsfr'
 import { Select } from '@codegouvfr/react-dsfr/Select'
 import { Tile } from '@codegouvfr/react-dsfr/Tile'
-import Input from '@codegouvfr/react-dsfr/Input'
 import { getTranslations } from 'next-intl/server'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import styles from './preparer-sa-vie-etudiante.module.css'
+import { getDepartments } from '~/server-only/get-departments'
+import { CitiesAutocompleteInput } from '~/components/prepare-student-life/autocomplete/cities-autocomplete-input'
 
 export default async function PrepareYourStudentLife() {
   const t = await getTranslations('prepareStudentLife')
+  const departments = await getDepartments()
   const tilesData = [
     {
       city: 'Paris',
@@ -117,13 +119,15 @@ export default async function PrepareYourStudentLife() {
               </h3>
             </div>
             <div style={{ display: 'flex', gap: '1rem' }} className={fr.cx('fr-col-md-6')}>
-              <Select style={{ flex: '1' }} label={t('department')} nativeSelectProps={{}}>
-                <option value="1">Tous</option>
-                <option value="2">Tous</option>
-                <option value="3">Tous </option>
-                <option value="4">Tous</option>
+              <Select style={{ flex: '1', margin: 0 }} label={t('department')} nativeSelectProps={{}}>
+                <option value="Tous">Tous</option>
+                {departments.map((department) => (
+                  <option key={department.id} value={department.id}>
+                    {department.name}
+                  </option>
+                ))}
               </Select>
-              <Input label={t('city')} className={fr.cx('fr-col-md-6')} iconId="ri-search-line" />
+              <CitiesAutocompleteInput />
             </div>
           </div>
         </div>
