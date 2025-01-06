@@ -30,8 +30,6 @@ export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsP
     return null
   }
 
-  if (!open) return null
-
   const getCategoryKeySingular = (categoryKey: keyof TTerritories) => {
     const singular = {
       academies: 'academie',

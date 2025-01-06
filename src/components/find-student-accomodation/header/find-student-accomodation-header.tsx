@@ -1,4 +1,3 @@
-import { Checkbox } from '@codegouvfr/react-dsfr/Checkbox'
 import { Range } from '@codegouvfr/react-dsfr/Range'
 import { FC } from 'react'
 import { Button } from '@codegouvfr/react-dsfr/Button'
@@ -7,6 +6,7 @@ import { FindStudentAccomodationAutocompleteInput } from '~/components/find-stud
 import { getTranslations } from 'next-intl/server'
 import { FindStudentAccessibleAccomodationSwitch } from '~/components/find-student-accomodation/header/find-student-accessible-accomodation-switch'
 import { fr } from '@codegouvfr/react-dsfr'
+import { FindStudentColivingAccomodationSwitch } from '~/components/find-student-accomodation/header/find-student-coliving-accomodation'
 
 export const FindStudentAccomodationHeader: FC = async () => {
   const t = await getTranslations('findAccomodation')
@@ -18,22 +18,7 @@ export const FindStudentAccomodationHeader: FC = async () => {
           <FindStudentAccomodationAutocompleteInput />
 
           <Range label={t('header.rangeLabel')} max={1000} min={350} hideMinMax step={50} />
-          <Checkbox
-            classes={{ root: styles.checkboxRoot }}
-            legend={t('header.checkboxes.label')}
-            orientation="horizontal"
-            small
-            options={[
-              {
-                label: t('header.checkboxes.individual'),
-                nativeInputProps: { name: 'individual', value: 'individual' },
-              },
-              {
-                label: t('header.checkboxes.shared'),
-                nativeInputProps: { name: 'shared', value: 'shared' },
-              },
-            ]}
-          />
+          <FindStudentColivingAccomodationSwitch />
           <FindStudentAccessibleAccomodationSwitch />
           <Button priority="secondary" iconId="ri-equalizer-line">
             {t('header.filtersCta')}

@@ -6,35 +6,10 @@ import homeHero from '~/images/home-bg.svg'
 import styles from './simuler-mes-aides-au-logement.module.css'
 import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import Stepper from '@codegouvfr/react-dsfr/Stepper'
+import { getGlobalQuestionsAnswers } from '~/server-only/get-global-questions-answers'
 
-export default function SimulateAccommodationAids() {
-  const qa = [
-    {
-      answer:
-        "Le simulateur d'aides au logement pour étudiants est un outil en ligne qui vous permet de simuler le montant de vos aides au logement en fonction de vos revenus, de votre situation familiale et de votre situation géographique.",
-      question: "Comment fonctionne le simulateur d'aides au logement pour étudiants ?",
-    },
-    {
-      answer:
-        'Sit ea Lorem officia enim ut veniam exercitation aliqua tempor aliqua laborum. Quis elit nostrud tempor occaecat proident nisi irure consequat minim qui aute elit officia. Duis deserunt officia dolor duis nulla amet adipisicing velit nostrud anim culpa. Occaecat occaecat exercitation culpa velit quis reprehenderit amet excepteur tempor elit. Enim quis aliqua duis eu pariatur excepteur voluptate fugiat sint aliquip minim eiusmod Lorem qui. Consectetur in anim veniam mollit occaecat ullamco anim deserunt do do.',
-      question: "Quelles informations dois-je fournir pour utiliser le simulateur d'aides au logement ?",
-    },
-    {
-      answer:
-        'Sit ea Lorem officia enim ut veniam exercitation aliqua tempor aliqua laborum. Quis elit nostrud tempor occaecat proident nisi irure consequat minim qui aute elit officia. Duis deserunt officia dolor duis nulla amet adipisicing velit nostrud anim culpa. Occaecat occaecat exercitation culpa velit quis reprehenderit amet excepteur tempor elit. Enim quis aliqua duis eu pariatur excepteur voluptate fugiat sint aliquip minim eiusmod Lorem qui. Consectetur in anim veniam mollit occaecat ullamco anim deserunt do do.',
-      question: 'Qui est éligible aux aides au logement étudiant en France ?',
-    },
-    {
-      answer:
-        'Sit ea Lorem officia enim ut veniam exercitation aliqua tempor aliqua laborum. Quis elit nostrud tempor occaecat proident nisi irure consequat minim qui aute elit officia. Duis deserunt officia dolor duis nulla amet adipisicing velit nostrud anim culpa. Occaecat occaecat exercitation culpa velit quis reprehenderit amet excepteur tempor elit. Enim quis aliqua duis eu pariatur excepteur voluptate fugiat sint aliquip minim eiusmod Lorem qui. Consectetur in anim veniam mollit occaecat ullamco anim deserunt do do.',
-      question: 'Puis-je utiliser le simulateur pour tous les types de logements étudiants ?',
-    },
-    {
-      answer:
-        'Sit ea Lorem officia enim ut veniam exercitation aliqua tempor aliqua laborum. Quis elit nostrud tempor occaecat proident nisi irure consequat minim qui aute elit officia. Duis deserunt officia dolor duis nulla amet adipisicing velit nostrud anim culpa. Occaecat occaecat exercitation culpa velit quis reprehenderit amet excepteur tempor elit. Enim quis aliqua duis eu pariatur excepteur voluptate fugiat sint aliquip minim eiusmod Lorem qui. Consectetur in anim veniam mollit occaecat ullamco anim deserunt do do.',
-      question: 'Que faire si les résultats du simulateur semblent incorrects ?',
-    },
-  ]
+export default async function SimulateAccommodationAids() {
+  const qa = await getGlobalQuestionsAnswers()
   return (
     <>
       <div style={{ position: 'relative' }}>
@@ -139,8 +114,8 @@ export default function SimulateAccommodationAids() {
             <div className={fr.cx('fr-col-md-8')}>
               <div style={{ background: 'white', padding: '2rem' }} className={fr.cx('fr-accordions-group')}>
                 {qa.map((qa, index) => (
-                  <Accordion key={index} label={qa.question}>
-                    <p>{qa.answer}</p>
+                  <Accordion key={index} label={qa.title_fr}>
+                    <div dangerouslySetInnerHTML={{ __html: qa.content_fr }} />
                   </Accordion>
                 ))}
               </div>
