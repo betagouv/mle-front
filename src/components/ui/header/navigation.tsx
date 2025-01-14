@@ -25,7 +25,8 @@ export const HeaderNavigation: FC<{ academies: TAcademyOrDepartment[] }> = ({ ac
   }
 
   const academiesColumns = splitAcademies(academies)
-  const items: MainNavigationProps.Item[] = [
+
+  let items: MainNavigationProps.Item[] = [
     {
       isActive: pathname === '/simuler-mes-aides-au-logement',
       linkProps: {
@@ -67,5 +68,8 @@ export const HeaderNavigation: FC<{ academies: TAcademyOrDepartment[] }> = ({ ac
       text: t('byAcademies'),
     },
   ]
+  if (pathname.includes('landing')) {
+    items = []
+  }
   return <MainNavigation classes={{ megaMenuCategory: styles.megaMenuCategory }} items={items} />
 }

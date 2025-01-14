@@ -1,7 +1,7 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
-import Image from 'next/image'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
+import Image from 'next/image'
 import homeHero from '~/images/home-bg.svg'
 import styles from './simuler-mes-aides-au-logement.module.css'
 import Accordion from '@codegouvfr/react-dsfr/Accordion'
