@@ -42,7 +42,9 @@ export default function LandingPage() {
                   </div>
                   <div className={styles.contactButton}>
                     <Button className={'whiteButton'} priority="secondary">
-                      Contacter
+                      <a href="https://calendly.com/cecilia-foret-beta/30min" target="_blank">
+                        Contacter
+                      </a>
                     </Button>
                   </div>
                 </div>
@@ -246,8 +248,10 @@ export default function LandingPage() {
               On vous intègre ?
             </h2>
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Button iconPosition="right" iconId="ri-arrow-right-fill">
-                Prendre rendez-vous
+              <Button>
+                <a href="https://calendly.com/cecilia-foret-beta/30min" target="_blank">
+                  Prendre rendez-vous
+                </a>
               </Button>
             </div>
             <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
