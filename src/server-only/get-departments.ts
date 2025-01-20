@@ -1,7 +1,7 @@
 import { TDepartments } from '~/schemas/departments'
 
 export const getDepartments = async () => {
-  const response = await fetch(`${process.env.API_URL}/territories/departments`)
+  const response = await fetch(`${process.env.API_URL}/territories/departments`, { next: { revalidate: 60 * 60 * 24 } })
 
   if (!response.ok) {
     throw new Error('Error occurred calling API while retrieving departments')

@@ -1,7 +1,7 @@
 import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
 
 export const getAccommodationById = async (slug: string) => {
-  const response = await fetch(`${process.env.API_URL}/accommodations/${slug}/`)
+  const response = await fetch(`${process.env.API_URL}/accommodations/${slug}/`, { next: { revalidate: 60 * 60 * 24 } })
 
   if (!response.ok) {
     throw new Error(`Error occurred calling API while retrieving accommodation with slug: ${slug}`)
