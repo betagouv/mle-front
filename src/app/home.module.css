@@ -83,16 +83,15 @@
 
 @media (min-width: 768px) {
   .simulatorCard {
-    padding: 2.5rem 3rem;
     right: 0;
+    position: absolute;
   }
 }
 
 .simulatorCard {
   background: white;
-  padding: 1.5rem 2rem;
+  padding: 3rem 4rem;
   text-align: center;
-  right: 0;
 }
 
 @media (min-width: 768px) {
