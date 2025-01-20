@@ -30,7 +30,7 @@ export const HeaderNavigation: FC<{ academies: TAcademyOrDepartment[] }> = ({ ac
     {
       isActive: pathname === '/simuler-mes-aides-au-logement',
       linkProps: {
-        href: '/',
+        href: '/simuler-mes-aides-au-logement',
         target: '_self',
       },
       text: t('home'),
