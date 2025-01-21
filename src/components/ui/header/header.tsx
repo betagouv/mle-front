@@ -19,7 +19,7 @@ export const HeaderComponent: FC = async () => {
         title: t('metadata.homeLinkTitle'),
       }}
       quickAccessItems={[
-        <Button key="faq-cta" priority="tertiary no outline" iconId="ri-question-line">
+        <Button key="faq-cta" priority="tertiary no outline" iconId="ri-question-line" linkProps={{ href: '/faq', target: '_self' }}>
           {t('navigation.faq')}
         </Button>,
         <Button

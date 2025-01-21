@@ -1,0 +1,32 @@
+.faqContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .descriptionContainer {
+        width: 60%;
+    }
+}
+
+.tilesContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .tilesContainer {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+}
+
+
+.accordionContainer {
+    background-color: white;
+    padding: 2.5rem;
+}

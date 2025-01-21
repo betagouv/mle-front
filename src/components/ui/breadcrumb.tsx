@@ -9,13 +9,14 @@ import { RegisteredLinkProps } from '@codegouvfr/react-dsfr/link'
 
 type DynamicBreadcrumbProps = {
   color?: string
+  margin?: boolean
   title?: string
 }
 
-export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, title }) => {
+export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, margin = true, title }) => {
   const pathname = usePathname()
   const t = useTranslations()
-  const { classes } = useStyles({ color })
+  const { classes } = useStyles({ color, margin })
 
   const getCurrentPageDetails = () => {
     let currentPageLabel = t('breadcrumbs.home')
@@ -24,6 +25,9 @@ export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, title }) 
       linkProps: RegisteredLinkProps
     }[] = []
     switch (pathname) {
+      case '/faq':
+        currentPageLabel = t('breadcrumbs.faq')
+        break
       case '/trouver-un-logement-etudiant':
         currentPageLabel = t('breadcrumbs.findAccomodation')
         break
@@ -61,8 +65,15 @@ export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, title }) 
     </div>
   )
 }
-const useStyles = tss.withParams<{ color?: string }>().create(({ color }) => ({
+const useStyles = tss.withParams<{ color?: string; margin?: boolean }>().create(({ color, margin }) => ({
   breadcrumb: {
+    ...(!margin
+      ? {
+          '& .fr-breadcrumb': {
+            margin: 0,
+          },
+        }
+      : {}),
     '& .fr-breadcrumb__link': {
       color: color ? `${color} !important` : undefined,
     },
