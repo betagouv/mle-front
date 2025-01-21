@@ -5,6 +5,7 @@ import avatarCecilia from '~/images/avatar-cecilia.svg'
 import landingHero from '~/images/landing.svg'
 import landingStep1 from '~/images/landing-step-1.svg'
 import landingStep2 from '~/images/landing-step-2.svg'
+import landingStep3 from '~/images/landing-step-3.svg'
 import visibilityAvatar from '~/images/visibility.svg'
 import logo from '~/images/logo.svg'
 import apl from '~/images/apl.svg'
@@ -74,7 +75,7 @@ export default function LandingPage() {
             <div className={styles.rightFeatures}>
               <div className={styles.topFeatureCard}>
                 <div className={styles.featureContent}>
-                  <h4>Un étudiant, un logement.</h4>
+                  <h4>Notre priorité, les étudiants boursiers.</h4>
                   <span>
                     La plateforme accompagne les étudiants à identifier les aides disponibles et à évaluer le coût de la vie des différentes
                     villes étudiantes. Le service simplifie également la recherche de studios ou colocations disponibles.
@@ -154,11 +155,11 @@ export default function LandingPage() {
               </div>
               <div style={{ backgroundColor: '#5858AD', height: '450px', overflowY: 'hidden' }}>
                 <Image
-                  src={landingStep1.src}
+                  src={landingStep3.src}
                   style={{ width: '100%' }}
                   width={574}
                   height={450}
-                  alt="Étape 2 - Je simule mes aides au logement"
+                  alt="Étape 3 - Je trouve un logement étudiant"
                 ></Image>
               </div>
             </div>
