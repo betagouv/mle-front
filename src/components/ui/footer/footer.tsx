@@ -2,9 +2,11 @@ import Footer, { type FooterProps } from '@codegouvfr/react-dsfr/Footer'
 import { getTranslations } from 'next-intl/server'
 import styles from './footer.module.css'
 import { BrandTop } from '~/components/brand-top'
+import { getPopularCities } from '~/server-only/get-popular-cities'
 
 export const FooterComponent = async () => {
   const t = await getTranslations()
+  const popularCities = await getPopularCities()
 
   const operatorLogo: NonNullable<FooterProps['operatorLogo']> = {
     alt: 'Mon logement étudiant - logo',
@@ -55,15 +57,13 @@ export const FooterComponent = async () => {
     },
     {
       categoryName: t('footer.linkList.citiesCategoryName'),
-      links: [
-        {
-          linkProps: {
-            href: '#',
-          },
-          text: 'Lien de navigation',
+      links: popularCities.map((city) => ({
+        linkProps: {
+          href: `/trouver-un-logement-etudiant/ville/${city.name}`,
         },
-      ],
-    },
+        text: `Logement étudiants ${city.name}`,
+      })),
+    } as NonNullable<FooterProps['linkList']>[1],
   ]
 
   return (
@@ -72,7 +72,7 @@ export const FooterComponent = async () => {
         logo: styles.logo,
       }}
       brandTop={<BrandTop />}
-      accessibility="fully compliant"
+      accessibility="partially compliant"
       linkList={linkList}
       homeLinkProps={{
         href: '/',
@@ -80,13 +80,19 @@ export const FooterComponent = async () => {
       }}
       contentDescription={
         <>
-          Mon logement étudiant
+          <span style={{ fontWeight: 'bold' }}>Mon Logement Étudiant</span>
           <br />
-          Simplifier l&apos;accès aux droits et logements étudiants
+          {t('header.description')}
         </>
       }
       operatorLogo={operatorLogo}
       partnersLogos={partnersLogos}
+      termsLinkProps={{
+        href: '/mentions-legales',
+      }}
+      websiteMapLinkProps={{
+        href: '/plan-du-site',
+      }}
     />
   )
 }
