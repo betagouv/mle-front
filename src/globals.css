@@ -1,7 +1,9 @@
-[class^=ri-]::before, [class^=fr-]::before {
+/* todo - check where i used that and scope it */
+
+/* [class^=ri-]::before, [class^=fr-]::before {
   --icon-size: 1rem;
   margin-right: 0.5rem;
-}
+} */
 
 .whiteButton {
   color: white;
@@ -11,3 +13,7 @@
 .whiteButton:hover {
   color: initial;
 } 
+
+.boxShadow {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}

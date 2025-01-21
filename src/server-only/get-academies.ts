@@ -1,8 +1,9 @@
 import { TAcademyOrDepartment } from '~/schemas/territories'
 
 export const getAcademies = async () => {
-  return []
-  const response = await fetch(`${process.env.API_URL}/territories/academies/`)
+  const response = await fetch(`${process.env.API_URL}/territories/academies/`, {
+    next: { revalidate: 60 * 60 * 24 },
+  })
 
   if (!response.ok) {
     throw new Error('Error occurred calling API while retrieving academies')
