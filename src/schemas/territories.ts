@@ -18,8 +18,13 @@ const ZAcademyOrDepartment = z
 
 const ZCity = z
   .object({
+    average_income: z.number(),
+    epci_code: z.string(),
     id: z.number(),
+    insee_code: z.string(),
     name: z.string(),
+    nb_students: z.number(),
+    popular: z.boolean(),
     postal_codes: z.array(z.string()),
   })
   .merge(ZBbox)
