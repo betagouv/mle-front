@@ -9,7 +9,6 @@ import styles from './navigation.module.css'
 
 export const HeaderNavigation: FC<{ academies: TAcademyOrDepartment[] }> = ({ academies }) => {
   const t = useTranslations('navigation')
-
   const pathname = usePathname()
 
   const splitAcademies = (academies: TAcademyOrDepartment[]) => {
@@ -56,7 +55,7 @@ export const HeaderNavigation: FC<{ academies: TAcademyOrDepartment[] }> = ({ ac
         categories: academiesColumns.map((academyColumn) => ({
           categoryMainLink: { linkProps: { href: '/par-academies', target: '_self' }, text: '' },
           links: academyColumn.map((academy) => ({
-            linkProps: { href: `/${academy.name.toLowerCase()}`, target: '_self' },
+            linkProps: { href: `/trouver-un-logement-etudiant/academie/${academy.name}`, target: '_self' },
             text: academy.name,
           })),
         })),
