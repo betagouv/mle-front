@@ -22,7 +22,12 @@ export const HeaderComponent: FC = async () => {
         <Button key="faq-cta" priority="tertiary no outline" iconId="ri-question-line">
           {t('navigation.faq')}
         </Button>,
-        <Button priority="tertiary" key="alerts-cta" iconId="ri-notification-3-line">
+        <Button
+          priority="tertiary"
+          key="alerts-cta"
+          iconId="ri-notification-3-line"
+          linkProps={{ href: '/alerte-logement', target: '_self' }}
+        >
           {t('header.alerts')}
         </Button>,
       ]}

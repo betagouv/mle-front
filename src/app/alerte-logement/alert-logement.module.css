@@ -1,0 +1,36 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+}
+
+@media (min-width: 768px) {
+    .container {
+        flex-direction: row;
+    }
+}
+
+.image {
+    height: 100%;
+    width: 100%;
+}
+
+.cardContainer {
+    padding: 2rem 2rem;
+}
+
+@media (min-width: 768px) {
+    .cardContainer {
+        padding: 4rem 4rem;
+    }
+}
+
+.disclaimer {
+    font-size: 12px;
+}
+
+.title {
+    margin-bottom: 0.5rem;
+}
