@@ -4,7 +4,8 @@
         "findAccomodation": "Trouver un logement étudiant",
         "logement": "Logement étudiant {title}",
         "prepareStudentLife": "Préparer sa vie étudiante",
-        "prepareStudentLifeTitle": "Préparer sa vie étudiante à {title}"
+        "prepareStudentLifeTitle": "Préparer sa vie étudiante à {title}",
+        "faq": "Foire aux questions"
     },
     "loading": {
         "card": "Chargement de la carte..."
