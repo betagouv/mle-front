@@ -1,0 +1,12 @@
+.itemsContainer {
+    background-color: white;
+    padding: 3rem 3rem;
+}
+
+.borderBottom {
+    border-bottom: 1px solid #dddddd;
+}
+
+.titleMargin {
+    margin-top: 2rem;
+}

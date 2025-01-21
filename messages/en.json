@@ -5,7 +5,12 @@
         "logement": "Logement étudiant {title}",
         "prepareStudentLife": "Préparer sa vie étudiante",
         "prepareStudentLifeTitle": "Préparer sa vie étudiante à {title}",
-        "faq": "Foire aux questions"
+        "faq": "Foire aux questions",
+        "accessibilite": "Accessibilité",
+        "legalMentions": "Mentions légales",
+        "personalData": "Données personnelles",
+        "cookies": "Gestion des cookies",
+        "sitemap": "Plan du site"
     },
     "loading": {
         "card": "Chargement de la carte..."

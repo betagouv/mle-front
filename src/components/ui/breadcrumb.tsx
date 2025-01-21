@@ -25,6 +25,18 @@ export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, margin = 
       linkProps: RegisteredLinkProps
     }[] = []
     switch (pathname) {
+      case '/accessibilite':
+        currentPageLabel = t('breadcrumbs.accessibilite')
+        break
+      case '/mentions-legales':
+        currentPageLabel = t('breadcrumbs.legalMentions')
+        break
+      case '/donnees-personnelles':
+        currentPageLabel = t('breadcrumbs.personalData')
+        break
+      case '/cookies':
+        currentPageLabel = t('breadcrumbs.cookies')
+        break
       case '/faq':
         currentPageLabel = t('breadcrumbs.faq')
         break
