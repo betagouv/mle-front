@@ -44,7 +44,6 @@
 
 .heroSection {
   background-color: #5858AD;
-  padding: 1rem 1rem;
 }
 
 .heroContent {
@@ -85,7 +84,6 @@
   display: none;
 }
 
-
 @media (max-width: 768px) {
   .contactButton {
     margin-top: 1rem;
@@ -95,6 +93,7 @@
   }
   .heroContent {
     flex-direction: column;
+    padding: 1rem 0rem;
   }
   .heroTitle {
     text-align: center;
@@ -151,6 +150,9 @@
   .callToActionTitle {
     margin-top: 6rem;
   }
+  .featureCard {
+    padding: 1rem 1.5rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -175,8 +177,6 @@
   }
   .heroSection {
     background-color: #5858AD;
-    padding-left: 3.5rem;
-    padding-right: 3.5rem;
   }
   .impactCard {
     width: 50%;
@@ -210,6 +210,12 @@
   .callToActionTitle {
     margin-top: 4rem;
   }
+  .mainTitle { 
+    width: 60%;
+  }
+  .featureCard {
+    padding: 2.5rem 3rem;
+  }
 }
 
 .profileInfo {
@@ -237,7 +243,6 @@
 .featureCard {
   background-color: white;
   box-shadow: 0 4px 12px 0px rgba(0, 0, 18, 0.16);
-  padding: 2.5rem 3rem;
 }
 
 .mainContainer {
@@ -296,12 +301,6 @@
   gap: 2rem;
     padding-bottom: 3rem;
   padding-top: 3rem;
-}
-
-.featureCard {
-  background-color: white;
-  box-shadow: 0 4px 12px 0px rgba(0, 0, 18, 0.16);
-  padding: 2.5rem 3rem;
 }
 
 .featureImageContainer {
