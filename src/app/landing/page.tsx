@@ -3,18 +3,19 @@ import Button from '@codegouvfr/react-dsfr/Button'
 import Image from 'next/image'
 import avatarCecilia from '~/images/avatar-cecilia.svg'
 import landingHero from '~/images/landing.svg'
+import visibilityAvatar from '~/images/visibility.svg'
+import logo from '~/images/logo.svg'
+import poingFerme from '~/images/poing-ferme.svg'
+import enseignementSup from '~/images/ministere-enseignement-sup.svg'
+import al from '~/images/al.svg'
 import landingStep1 from '~/images/landing-step-1.svg'
 import landingStep2 from '~/images/landing-step-2.svg'
 import landingStep3 from '~/images/landing-step-3.svg'
-import visibilityAvatar from '~/images/visibility.svg'
-import logo from '~/images/logo.svg'
 import apl from '~/images/apl.svg'
 import caf from '~/images/caf.svg'
 import crous from '~/images/logo-crous.svg'
-import al from '~/images/al.svg'
-import enseignementSup from '~/images/ministere-enseignement-sup.svg'
-import poingFerme from '~/images/poing-ferme.svg'
 import styles from './landing.module.css'
+import clsx from 'clsx'
 
 export default function LandingPage() {
   return (
@@ -23,13 +24,13 @@ export default function LandingPage() {
         <div className={styles.heroSection}>
           <div className={fr.cx('fr-container')}>
             <div className={styles.heroContent}>
-              <div className={`${fr.cx('fr-col-md-8')} ${styles.heroTextContent}`}>
+              <div className={clsx(fr.cx('fr-col-md-8'), styles.heroTextContent)}>
                 <h1 className={styles.heroTitle}>
                   Connectons les acteurs <br /> du
                   <span className={styles.highlight}> logement étudiant</span>
                 </h1>
                 <p className={styles.heroDescription}>
-                  <span className={styles.bold}>Mon logement étudiant</span> centralise les offres de logements sociaux des différents
+                  <span className={styles.bold}>Mon Logement Étudiant</span> centralise les offres de logements sociaux des différents
                   bailleurs. La plateforme intègre également un <span className={styles.bold}>simulateur d&apos;aides financières</span>,
                   permettant à chaque étudiant d&apos;estimer son futur budget selon son prochain lieu de vie.
                 </p>
@@ -37,8 +38,8 @@ export default function LandingPage() {
                   <div className={styles.profileInfo}>
                     <Image src={avatarCecilia.src} alt="Chargée de déploiement - Cécilia Foret" width={56} height={56} />
                     <div className={styles.profileText}>
-                      <p>Cécilia Foret</p>
-                      <p>Chargée de déploiement de Mon Logement Etudiant</p>
+                      <p className={styles.profileName}>Cécilia Foret</p>
+                      <p className={styles.profileRole}>Chargée de déploiement de Mon Logement Etudiant</p>
                     </div>
                   </div>
                   <div className={styles.contactButton}>
@@ -50,7 +51,9 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              <Image src={landingHero.src} width={720} height={560} quality={100} priority alt="Image de la landing page" />
+              <div className={styles.heroImage}>
+                <Image src={landingHero.src} width={720} height={560} quality={100} priority alt="Image de la landing page" />
+              </div>
             </div>
           </div>
         </div>
@@ -101,98 +104,64 @@ export default function LandingPage() {
                     <h4>Une initiative soutenue et encouragée</h4>
                     <span>Mon Logement Etudiant est déployé dans le cadre de la lutte contre la précarité étudiante.</span>
                   </div>
-                  <Image src={enseignementSup.src} width={178} height={120} alt="Logo de l'enseignement supérieur" />
+                  <div className={styles.enseignementSup}>
+                    <Image src={enseignementSup.src} width={178} height={120} alt="Logo de l'enseignement supérieur" />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-        <h2 style={{ margin: 0, marginBottom: '8rem', textAlign: 'center' }}>
+        <h2 className={styles.missionTitle}>
           Notre mission: <br />
           faciliter la recherche de <br />
           logement d&apos;un étudiant
         </h2>
 
-        <div className={fr.cx('fr-container')} style={{ marginTop: '4rem' }}>
-          <div style={{ display: 'flex', position: 'relative' }}>
+        <div className={fr.cx('fr-container')}>
+          <div className={styles.stepsContainer}>
             <div className={styles.verticalLine}>
               <div className={styles.circleTop}></div>
               <div className={styles.circleBottom}></div>
             </div>
-            <div className={fr.cx('fr-col-md-6')} style={{ display: 'flex', flexDirection: 'column' }}>
-              <div style={{ backgroundColor: '#5858AD', height: '450px' }}>
-                <Image src={landingStep1.src} width={574} height={450} alt="Étape 1 - Je simule mes aides au logement"></Image>
+            <div className={`${fr.cx('fr-col-md-6')} ${styles.stepColumn}`}>
+              <div className={styles.purpleBox}>
+                <Image
+                  src={landingStep1.src}
+                  className={clsx(styles.stepsImage, styles.firstStepImage)}
+                  width={574}
+                  height={450}
+                  alt="Étape 1 - Je simule mes aides au logement"
+                />
               </div>
-              <div
-                style={{
-                  backgroundColor: 'white',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '1rem',
-                  height: '450px',
-                  justifyContent: 'center',
-                  padding: '4.5rem 4rem',
-                }}
-              >
-                <div
-                  style={{
-                    backgroundColor: '#5757AD',
-                    borderRadius: '0.25rem',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    padding: '0px 0.5rem',
-                    width: 'fit-content',
-                  }}
-                >
-                  Étape 2
-                </div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepBadge}>Étape 2</div>
                 <h2>Je prépare ma vie étudiante</h2>
-                <p style={{ margin: 0 }}>Tout ce qu’il faut savoir sur sa prochaine ville étudiante et son marché locatif.</p>
+                <p className={styles.noMargin}>Tout ce qu&apos;il faut savoir sur sa prochaine ville étudiante et son marché locatif.</p>
                 <span className={fr.cx('ri-community-line')}>Informations pratiques</span>
                 <span className={fr.cx('ri-line-chart-line')}>Pression locative</span>
                 <span className={fr.cx('ri-money-dollar-circle-line')}>Prix moyen des loyers</span>
                 <span className={fr.cx('ri-shopping-bag-line')}>Coût de la vie étudiante</span>
               </div>
-              <div style={{ backgroundColor: '#5858AD', height: '450px', overflowY: 'hidden' }}>
+              <div className={clsx(styles.purpleBox, styles.secondStepImage)}>
                 <Image
                   src={landingStep3.src}
-                  style={{ width: '100%' }}
+                  className={clsx(styles.stepsImage, styles.secondStepImage)}
                   width={574}
                   height={450}
                   alt="Étape 3 - Je trouve un logement étudiant"
-                ></Image>
+                />
               </div>
             </div>
-            <div className={fr.cx('fr-col-md-6')} style={{ display: 'flex', flexDirection: 'column' }}>
-              <div
-                style={{
-                  backgroundColor: 'white',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '1rem',
-                  height: '450px',
-                  justifyContent: 'center',
-                  padding: '4.5rem 7.5rem',
-                }}
-              >
-                <div
-                  style={{
-                    backgroundColor: '#5757AD',
-                    borderRadius: '0.25rem',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    padding: '0px 0.5rem',
-                    width: 'fit-content',
-                  }}
-                >
-                  Étape 1
-                </div>
+            <div className={clsx(fr.cx('fr-col-md-6'), styles.stepColumn)}>
+              <div className={styles.stepContent}>
+                <div className={styles.stepBadge}>Étape 1</div>
                 <h2>Je simule mes aides au logement</h2>
                 <p>
                   En quelques clics, l&apos;étudiant identifie ses droits aux différentes aides disponibles et obtient des informations
                   claires sur les démarches à réaliser.
                 </p>
-                <div style={{ display: 'flex', gap: '1rem' }}>
+                <div className={styles.logoContainer}>
                   <Image src={apl.src} width={30} height={30} alt="Logo APL" />
                   <Image src={caf.src} width={30} height={30} alt="Logo CAF" />
                   <Image src={crous.src} width={30} height={30} alt="Logo Crous" />
@@ -201,38 +170,17 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div style={{ backgroundColor: '#5858AD', height: '450px' }}>
+              <div className={styles.purpleBox}>
                 <Image
                   src={landingStep2.src}
                   width={574}
                   height={450}
-                  style={{ width: '100%' }}
+                  className={clsx(styles.stepsImage, styles.secondStepImage)}
                   alt="Étape 2 - Je prépare ma vie étudiante"
-                ></Image>
+                />
               </div>
-              <div
-                style={{
-                  backgroundColor: 'white',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '1rem',
-                  height: '450px',
-                  justifyContent: 'center',
-                  padding: '4.5rem 7.5rem',
-                }}
-              >
-                <div
-                  style={{
-                    backgroundColor: '#5757AD',
-                    borderRadius: '0.25rem',
-                    color: 'white',
-                    fontWeight: 'bold',
-                    padding: '0px 0.5rem',
-                    width: 'fit-content',
-                  }}
-                >
-                  Étape 3
-                </div>
+              <div className={styles.stepContent}>
+                <div className={styles.stepBadge}>Étape 3</div>
                 <h2>Je trouve un logement étudiant</h2>
                 <p>
                   Une recherche efficace grâce aux filtres personnalisés (localisation, budget, type de logement, accès PMR, etc.). La fiche
@@ -242,24 +190,24 @@ export default function LandingPage() {
             </div>
           </div>
 
-          <div className={fr.cx('fr-container')} style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '4rem 0rem' }}>
-            <h2 style={{ margin: 0, marginTop: '4rem', textAlign: 'center' }}>
+          <div className={styles.callToAction}>
+            <h2 className={styles.callToActionTitle}>
               C&apos;est aussi simple que ça.
               <br />
               On vous intègre ?
             </h2>
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div className={styles.buttonContainer}>
               <Button>
                 <a href="https://calendly.com/cecilia-foret-beta/30min" target="_blank">
                   Prendre rendez-vous
                 </a>
               </Button>
             </div>
-            <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div className={styles.profileContainer}>
               <Image src={avatarCecilia.src} alt="Chargée de déploiement - Cécilia Foret" width={56} height={56} />
-              <div style={{ textAlign: 'center' }}>
-                <p style={{ fontWeight: 'bold', margin: 0 }}>Cécilia Foret</p>
-                <p style={{ margin: 0 }}>Chargée de déploiement</p>
+              <div className={styles.profileDetails}>
+                <p className={styles.profileName}>Cécilia Foret</p>
+                <p className={styles.profileRole}>Chargée de déploiement</p>
               </div>
             </div>
           </div>

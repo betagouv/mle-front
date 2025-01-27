@@ -6,7 +6,6 @@
   bottom: -3rem;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 2;
 }
 
 .circleTop,
@@ -45,8 +44,7 @@
 
 .heroSection {
   background-color: #5858AD;
-  padding-left: 3.5rem;
-  padding-right: 3.5rem;
+  padding: 1rem 1rem;
 }
 
 .heroContent {
@@ -63,8 +61,8 @@
 
 .heroTitle {
   color: white;
-  font-size: 3.5rem;
-  line-height: 4rem;
+  font-size: 1.75rem;
+  line-height: 2.25rem;
   margin: 0;
 }
 
@@ -83,14 +81,141 @@
   font-weight: bold;
 }
 
-.contactSection {
-  display: flex;
-  justify-content: space-between;
+.landingHero {
+  display: none;
+}
+
+
+@media (max-width: 768px) {
+  .contactButton {
+    margin-top: 1rem;
+  }
+  .heroImage {
+    display: none;
+  }
+  .heroContent {
+    flex-direction: column;
+  }
+  .heroTitle {
+    text-align: center;
+  }
+  .heroDescription {
+    text-align: center;
+  }
+  .profileText {
+    text-align: center;
+  }
+  .featuresContainer {
+    flex-direction: column;
+    text-align: center;
+  }
+  .heroDescription {
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+  }
+  .bottomFeatures {
+    flex-direction: column;
+  }
+  .impactCard {
+    height: 350px;
+    width: 100%;
+  }
+  .initiativeCard {
+    width: 100%;
+  }
+  .topFeatureCard {
+    flex-direction: column;
+  }
+  .stepsImage {
+    width: 100%;
+  }
+  .purpleBox {
+    height: 260px;
+  }
+  .stepContent {
+    padding: 2rem 2rem;
+  }
+  .secondStepImage {
+    height: 260px;
+  }
+  .firstStepImage {
+    height: 300px;
+  }
+  .stepsContainer {
+    position: relative;
+    z-index: 1;
+  }
+  .verticalLine {
+    z-index: -1;
+  }
+  .callToActionTitle {
+    margin-top: 6rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .heroImage {
+    display: flex;
+    width: 100%;
+  }
+  .heroTitle {
+    font-size: 3.5rem;
+    line-height: 4rem;
+  }
+  .contactSection {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+  }
+  .profileInfo {
+    flex-direction: row !important;
+  }
+  .landingHero {
+    display: block;
+  }
+  .heroSection {
+    background-color: #5858AD;
+    padding-left: 3.5rem;
+    padding-right: 3.5rem;
+  }
+  .impactCard {
+    width: 50%;
+  }
+  .initiativeCard {
+    width: 50%;
+  }
+  .topFeatureCard {
+    flex-direction: row;
+  }
+  .stepsContainer {
+    display: flex;
+    position: relative;
+    margin-top: 4rem;
+  }
+  .callToAction {
+    padding: 4rem 0;
+  }
+  .stepsImage {
+    width: 100%;
+  }
+  .purpleBox {
+    height: 450px;
+  }
+  .stepContent {
+    padding: 4.5rem 4rem;
+  }
+  .verticalLine {
+    z-index: 2;
+  }
+  .callToActionTitle {
+    margin-top: 4rem;
+  }
 }
 
 .profileInfo {
   align-items: center;
   display: flex;
+  flex-direction: column;
   font-weight: bold;
   gap: 1rem;
 }
@@ -169,8 +294,8 @@
 .featuresContainer {
   display: flex;
   gap: 2rem;
-  padding-bottom: 5rem;
-  padding-top: 5rem;
+    padding-bottom: 3rem;
+  padding-top: 3rem;
 }
 
 .featureCard {
@@ -217,7 +342,6 @@
   gap: 1rem;
   padding: 2.5rem 3rem;
   position: relative;
-  width: 50%;
 }
 
 .impactCard h4 {
@@ -232,5 +356,78 @@
   flex-direction: column;
   gap: 1.5rem;
   padding: 2.5rem 3rem;
-  width: 50%;
 }
+
+.missionTitle {
+  text-align: center;
+  margin-bottom: 8rem;
+}
+
+.stepColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.purpleBox {
+  background-color: #5858AD;
+}
+
+.stepContent {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 450px;
+  justify-content: center;
+}
+
+.stepBadge {
+  background-color: #5757AD;
+  border-radius: 0.25rem;
+  color: white;
+  font-weight: bold;
+  padding: 0 0.5rem;
+  width: fit-content;
+}
+
+.noMargin {
+  margin: 0;
+}
+
+.logoContainer {
+  display: flex;
+  gap: 1rem;
+}
+
+.callToAction {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.callToActionTitle {
+  text-align: center;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+}
+
+.profileContainer {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.profileDetails {
+  text-align: center;
+}
+
+.profileName {
+  font-weight: bold;
+  font-size: 1.25rem;
+  line-height: 2rem;
+  margin: 0;
+}
+
