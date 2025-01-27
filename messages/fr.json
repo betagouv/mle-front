@@ -140,5 +140,76 @@
     },
     "cookies": {
         "title": "Gestion des cookies"
+    },
+    "landing": {
+        "hero": {
+            "title": "Connectons les acteurs du",
+            "highlight": "logement étudiant",
+            "description": " centralise les offres de logements sociaux des différents bailleurs. La plateforme intègre également un simulateur d'aides financières, permettant à chaque étudiant d'estimer son futur budget selon son prochain lieu de vie.",
+            "contact": {
+                "name": "Cécilia Foret",
+                "role": "Chargée de déploiement de Mon Logement Etudiant",
+                "button": "Contacter"
+            }
+        },
+        "features": {
+            "mainTitle": "Accéder à un logement ne devrait jamais être un obstacle à la réussite.",
+            "visibility": {
+                "title": "Gagnez en visibilité",
+                "description": "Centralisez vos offres sur une plateforme officielle, soutenue par des relais de communication ciblés pour toucher un maximum d'étudiants. Une intégration rapide de vos données, permettant de rediriger les étudiants directement sur votre site. ",
+                "free": "Et c'est gratuit."
+            },
+            "priority": {
+                "title": "Notre priorité, les étudiants boursiers.",
+                "description": "La plateforme accompagne les étudiants à identifier les aides disponibles et à évaluer le coût de la vie des différentes villes étudiantes. Le service simplifie également la recherche de studios ou colocations disponibles."
+            },
+            "impact": {
+                "title": "Impact social renforcé",
+                "description": "En rejoignant ce projet, vous affirmez votre engagement pour faciliter l'accès au logement et soutenir les étudiants précaires dans leur parcours."
+            },
+            "initiative": {
+                "title": "Une initiative soutenue et encouragée",
+                "description": "Mon Logement Etudiant est déployé dans le cadre de la lutte contre la précarité étudiante."
+            }
+        },
+        "mission": {
+            "title": {
+                "part1": "Notre mission:",
+                "part2": "faciliter la recherche",
+                "part3": "de logement d'un étudiant"
+            }
+        },
+        "steps": {
+            "step1": {
+                "title": "Je simule mes aides au logement",
+                "description": "En quelques clics, l'étudiant identifie ses droits aux différentes aides disponibles et obtient des informations claires sur les démarches à réaliser.",
+                "organismsCount": "Plus de 50 organismes"
+            },
+            "step2": {
+                "title": "Je prépare ma vie étudiante",
+                "description": "Tout ce qu'il faut savoir sur sa prochaine ville étudiante et son marché locatif.",
+                "features": {
+                    "info": "Informations pratiques",
+                    "pressure": "Pression locative",
+                    "price": "Prix moyen des loyers",
+                    "cost": "Coût de la vie étudiante"
+                }
+            },
+            "step3": {
+                "title": "Je trouve un logement étudiant",
+                "description": "Une recherche efficace grâce aux filtres personnalisés (localisation, budget, type de logement, accès PMR, etc.). La fiche détaillée présente la résidence en détails en incitant à consulter la page de destination de votre choix."
+            }
+        },
+        "callToAction": {
+            "title": {
+                "part1": "C'est aussi simple que ça.",
+                "part2": "On vous intègre ?"
+            },
+            "button": "Prendre rendez-vous",
+            "contact": {
+                "name": "Cécilia Foret",
+                "role": "Chargée de déploiement"
+            }
+        }
     }
 }
