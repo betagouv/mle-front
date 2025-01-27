@@ -24,6 +24,12 @@ const ZCity = z
     insee_code: z.string(),
     name: z.string(),
     nb_students: z.number(),
+    nearby_cities: z.array(
+      z.object({
+        name: z.string(),
+        slug: z.string(),
+      }),
+    ),
     popular: z.boolean(),
     postal_codes: z.array(z.string()),
   })

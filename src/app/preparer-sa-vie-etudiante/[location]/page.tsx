@@ -30,7 +30,6 @@ export default async function PrepareStudentLifeCityPage({ params }: { params: {
   const accommodations = await getAccommodations({ bbox: formattedBbox })
   const accommodationsList = accommodations.results.features.slice(0, 6)
 
-  const nearbyCities = ['Paris', 'Créteil', 'Nanterre', 'Boulogne-Billancourt', 'Levallois-Perret', 'Puteaux', 'Issy-les-Moulineaux']
   const locationAids = ['Aides nationales', 'Aides régionales', 'Aides départementales', 'Aides de la ville']
   const universities = [
     'Université Paris-Est Créteil (UPEC)',
@@ -150,8 +149,8 @@ export default async function PrepareStudentLifeCityPage({ params }: { params: {
                   gap: '0.5rem',
                 }}
               >
-                {nearbyCities.map((city) => (
-                  <Tag key={city}>{city}</Tag>
+                {cityDetails.nearby_cities.map((city) => (
+                  <Tag key={city.slug}>{city.name}</Tag>
                 ))}
               </div>
             </div>
