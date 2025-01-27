@@ -8,10 +8,13 @@ import { getDepartments } from '~/server-only/get-departments'
 import { CitiesAutocompleteInput } from '~/components/prepare-student-life/autocomplete/cities-autocomplete-input'
 import { PrepareStudentLifeSelectDepartment } from '~/components/prepare-student-life/select-department'
 import { PopularCities } from '~/components/prepare-student-life/popular-cities'
+import { getPopularCities } from '~/server-only/get-popular-cities'
 
 export default async function PrepareYourStudentLife() {
   const t = await getTranslations('prepareStudentLife')
   const departments = await getDepartments()
+  const popularCities = await getPopularCities()
+
   const informations = [
     { iconId: 'ri-community-line' as FrIconClassName, title: 'Informations pratiques' },
     { iconId: 'ri-line-chart-line' as FrIconClassName, title: 'Tendance du marché locatif' },
@@ -68,7 +71,8 @@ export default async function PrepareYourStudentLife() {
           <div className={styles.popularCitiesTitle}>
             <h3>{t('popularCities')}</h3>
           </div>
-          <PopularCities />
+
+          <PopularCities cities={popularCities} />
         </div>
       </div>
     </>

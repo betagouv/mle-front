@@ -4,8 +4,13 @@ import Tile from '@codegouvfr/react-dsfr/Tile'
 import { FC } from 'react'
 import { tss } from 'tss-react'
 import { useCities } from '~/hooks/use-cities'
+import { TCity } from '~/schemas/territories'
 
-export const PopularCities: FC = () => {
+interface PopularCitiesProps {
+  cities: TCity[]
+}
+
+export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
   const { classes } = useStyles()
   const { data } = useCities()
   const mockDescription = '9 802 logements étudiants'
@@ -13,7 +18,7 @@ export const PopularCities: FC = () => {
 
   return (
     <div className={classes.tilesGrid}>
-      {(data || []).map((city) => (
+      {(data || cities).map((city) => (
         <Tile
           noIcon
           key={city.id}
