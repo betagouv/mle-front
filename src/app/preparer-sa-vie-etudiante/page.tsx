@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import image from '~/images/preparer-sa-vie-etudiante.svg'
+import image from '~/images/preparer-sa-vie-etudiante.webp'
 import { fr, FrIconClassName } from '@codegouvfr/react-dsfr'
 import { getTranslations } from 'next-intl/server'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
@@ -46,7 +46,7 @@ export default async function PrepareYourStudentLife() {
               </div>
             </div>
           </div>
-          <Image src={image} priority alt="Préparer sa vie étudiante" />
+          <Image src={image} quality={100} priority alt="Préparer sa vie étudiante" />
         </div>
       </div>
       <div style={{ marginTop: '-4rem', position: 'relative', zIndex: 1 }} className={fr.cx('fr-container')}>

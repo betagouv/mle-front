@@ -2,7 +2,7 @@ import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import Image from 'next/image'
-import homeHero from '~/images/home-bg.svg'
+import homeHero from '~/images/home-bg.webp'
 import styles from './simuler-mes-aides-au-logement.module.css'
 import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import Stepper from '@codegouvfr/react-dsfr/Stepper'
@@ -47,11 +47,10 @@ export default async function SimulateAccommodationAids() {
 
         <div style={{ lineHeight: 0 }}>
           <Image
-            src={homeHero.src}
+            src={homeHero}
             priority
             alt="Image de la page d'accueil"
-            width={1000}
-            height={600}
+            quality={100}
             style={{
               height: 'auto',
               objectFit: 'cover',

@@ -5,10 +5,10 @@ import apl from '~/images/apl.svg'
 import caf from '~/images/caf.svg'
 import crous from '~/images/logo-crous.svg'
 import al from '~/images/al.svg'
-import home from '~/images/home.svg'
 import logo from '~/images/logo.svg'
-import exploreCities from '~/images/explore-cities.svg'
-import findNextAccommodation from '~/images/find-next-accommodation.svg'
+import home from '~/images/landing.webp'
+import exploreCities from '~/images/explore-cities.webp'
+import findNextAccommodation from '~/images/find-next-accommodation.webp'
 import styles from './home.module.css'
 import Input from '@codegouvfr/react-dsfr/Input'
 import Range from '@codegouvfr/react-dsfr/Range'
@@ -18,27 +18,11 @@ import { FindStudentAccessibleAccomodationSwitch } from '~/components/find-stude
 import Tabs from '@codegouvfr/react-dsfr/Tabs'
 import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import clsx from 'clsx'
+import { getPopularCities } from '~/server-only/get-popular-cities'
 
 export default async function Home() {
   const t = await getTranslations('findAccomodation')
-  // TODO - get popular cities
-  const cities = [
-    'Paris',
-    'Lyon',
-    'Toulouse',
-    'Montpellier',
-    'Lille',
-    'Nice',
-    'Bordeaux',
-    'Grenoble',
-    'Nantes',
-    'Strasbourg',
-    'Rennes',
-    'Marseille',
-    'Angers',
-    'Créteil',
-    'Clermont-Ferrand',
-  ]
+  const popularCities = await getPopularCities()
   return (
     <>
       <div className={styles.heroSection}>
@@ -68,7 +52,7 @@ export default async function Home() {
           </div>
         </div>
         <div className={styles.heroImageContainer}>
-          <Image className={styles.heroImage} src={home.src} alt="Hero" width={1449} height={459} />
+          <Image className={styles.heroImage} priority quality={100} src={home} alt="Hero" />
         </div>
       </div>
       <div className={clsx(fr.cx('fr-container'), styles.mainContainer)}>
@@ -85,9 +69,9 @@ export default async function Home() {
             <div className={styles.cardContent}>
               <h1 className={styles.cardTitle}>Explorer les villes étudiantes</h1>
               <div className={styles.citiesGrid}>
-                {cities.map((city) => (
-                  <Button className={styles.cityButton} key={city} priority="secondary">
-                    {city}
+                {popularCities.map((city) => (
+                  <Button className={styles.cityButton} key={city.id} priority="secondary">
+                    {city.name}
                   </Button>
                 ))}
                 <div className={styles.moreContainer}>
@@ -98,23 +82,16 @@ export default async function Home() {
               </div>
             </div>
             <div className={fr.cx('fr-col-md-6')}>
-              <Image
-                src={exploreCities.src}
-                className={styles.featureImage}
-                alt="Explorer les villes étudiantes"
-                width={300}
-                height={540}
-              />
+              <Image src={exploreCities} className={styles.featureImage} alt="Explorer les villes étudiantes" priority quality={100} />
             </div>
           </div>
           <div className={clsx('boxShadow', styles.featureCard)}>
             <div className={fr.cx('fr-col-md-6')}>
               <Image
-                src={findNextAccommodation.src}
+                src={findNextAccommodation}
                 className={styles.featureImage}
+                quality={100}
                 alt="Trouver votre prochain logement étudiant"
-                width={300}
-                height={540}
               />
             </div>
             <div className={styles.cardContent}>
