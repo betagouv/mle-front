@@ -2,8 +2,8 @@ import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import Image from 'next/image'
 import avatarCecilia from '~/images/avatar-cecilia.svg'
-import landingHero from '~/images/landing.svg'
-import visibilityAvatar from '~/images/visibility.svg'
+import landingHero from '~/images/landing.webp'
+import visibilityAvatar from '~/images/visibility.webp'
 import logo from '~/images/logo.svg'
 import poingFerme from '~/images/poing-ferme.svg'
 import enseignementSup from '~/images/ministere-enseignement-sup.svg'
@@ -37,7 +37,7 @@ export default async function LandingPage() {
                 </p>
                 <div className={styles.contactSection}>
                   <div className={styles.profileInfo}>
-                    <Image src={avatarCecilia.src} alt={t('hero.contact.role')} width={56} height={56} />
+                    <Image src={avatarCecilia.src} alt={t('callToAction.contact.role')} priority quality={100} width={56} height={56} />
                     <div className={styles.profileText}>
                       <p className={styles.profileName}>{t('hero.contact.name')}</p>
                       <p className={styles.profileRole}>{t('hero.contact.role')}</p>
@@ -52,8 +52,8 @@ export default async function LandingPage() {
                   </div>
                 </div>
               </div>
-              <div className={styles.heroImage}>
-                <Image src={landingHero.src} width={720} height={560} quality={100} priority alt="Image de la landing page" />
+              <div className={clsx(styles.heroImage, fr.cx('fr-col-md-4'))}>
+                <Image src={landingHero} quality={100} priority alt="Image de la landing page" />
               </div>
             </div>
           </div>
@@ -64,7 +64,7 @@ export default async function LandingPage() {
           <div className={styles.featuresContainer}>
             <div className={`${fr.cx('fr-col-md-4')} ${styles.featureCard}`}>
               <div className={styles.featureImageContainer}>
-                <Image src={visibilityAvatar.src} width={288} height={268} quality={100} priority alt="Gagnez en visibilité" />
+                <Image src={visibilityAvatar} quality={100} priority alt="Gagnez en visibilité" />
               </div>
               <h4>{t('features.visibility.title')}</h4>
               <span>
@@ -127,7 +127,7 @@ export default async function LandingPage() {
                 />
               </div>
               <div className={styles.stepContent}>
-                <div className={styles.stepBadge}>{t('features.steps.step2.badge')}</div>
+                <div className={styles.stepBadge}>{t('steps.step2.badge')}</div>
                 <h2>{t('steps.step2.title')}</h2>
                 <p className={styles.noMargin}>{t('steps.step2.description')}</p>
                 <span className={fr.cx('ri-community-line')}>{t('steps.step2.features.info')}</span>
@@ -147,7 +147,7 @@ export default async function LandingPage() {
             </div>
             <div className={clsx(fr.cx('fr-col-md-6'), styles.stepColumn)}>
               <div className={styles.stepContent}>
-                <div className={styles.stepBadge}>{t('features.steps.step1.badge')}</div>
+                <div className={styles.stepBadge}>{t('steps.step1.badge')}</div>
                 <h2>{t('steps.step1.title')}</h2>
                 <p>{t('steps.step1.description')}</p>
                 <div className={styles.logoContainer}>
@@ -169,7 +169,7 @@ export default async function LandingPage() {
                 />
               </div>
               <div className={styles.stepContent}>
-                <div className={styles.stepBadge}>{t('features.steps.step3.badge')}</div>
+                <div className={styles.stepBadge}>{t('steps.step3.badge')}</div>
                 <h2>{t('steps.step3.title')}</h2>
                 <p>{t('steps.step3.description')}</p>
               </div>
@@ -190,7 +190,7 @@ export default async function LandingPage() {
               </Button>
             </div>
             <div className={styles.profileContainer}>
-              <Image src={avatarCecilia.src} alt={t('callToAction.contact.role')} width={56} height={56} />
+              <Image src={avatarCecilia.src} alt={t('callToAction.contact.role')} quality={100} width={56} height={56} />
               <div className={styles.profileDetails}>
                 <p className={styles.profileName}>{t('callToAction.contact.name')}</p>
                 <p className={styles.profileRole}>{t('callToAction.contact.role')}</p>

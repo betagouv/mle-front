@@ -109,14 +109,14 @@
   padding: 1.5rem 2rem;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 768px) {
   .cardTitle {
-    text-align: start;
+    text-align: center;
   }
 }
+
 .cardTitle {
   margin: 0;
-  text-align: center;
 }
 .noMargin {
   margin: 0;
@@ -179,6 +179,8 @@
 .featureCard {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  background-color: white;
 }
 
 @media (min-width: 768px) {

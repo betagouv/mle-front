@@ -159,6 +159,8 @@
   .heroImage {
     display: flex;
     width: 100%;
+    overflow: hidden;
+    
   }
   .heroTitle {
     font-size: 3.5rem;
