@@ -44,7 +44,7 @@ export default async function LandingPage() {
                     </div>
                   </div>
                   <div className={styles.contactButton}>
-                    <Button className={'whiteButton'} priority="secondary">
+                    <Button className="whiteButton" priority="secondary">
                       <a href="https://calendly.com/cecilia-foret-beta/30min" target="_blank">
                         {t('hero.contact.button')}
                       </a>
@@ -127,7 +127,7 @@ export default async function LandingPage() {
                 />
               </div>
               <div className={styles.stepContent}>
-                <div className={styles.stepBadge}>Étape 2</div>
+                <div className={styles.stepBadge}>{t('features.steps.step2.badge')}</div>
                 <h2>{t('steps.step2.title')}</h2>
                 <p className={styles.noMargin}>{t('steps.step2.description')}</p>
                 <span className={fr.cx('ri-community-line')}>{t('steps.step2.features.info')}</span>
@@ -147,7 +147,7 @@ export default async function LandingPage() {
             </div>
             <div className={clsx(fr.cx('fr-col-md-6'), styles.stepColumn)}>
               <div className={styles.stepContent}>
-                <div className={styles.stepBadge}>Étape 1</div>
+                <div className={styles.stepBadge}>{t('features.steps.step1.badge')}</div>
                 <h2>{t('steps.step1.title')}</h2>
                 <p>{t('steps.step1.description')}</p>
                 <div className={styles.logoContainer}>
@@ -169,7 +169,7 @@ export default async function LandingPage() {
                 />
               </div>
               <div className={styles.stepContent}>
-                <div className={styles.stepBadge}>Étape 3</div>
+                <div className={styles.stepBadge}>{t('features.steps.step3.badge')}</div>
                 <h2>{t('steps.step3.title')}</h2>
                 <p>{t('steps.step3.description')}</p>
               </div>

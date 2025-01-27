@@ -181,11 +181,13 @@
         },
         "steps": {
             "step1": {
+                "badge": "Étape 1",
                 "title": "Je simule mes aides au logement",
                 "description": "En quelques clics, l'étudiant identifie ses droits aux différentes aides disponibles et obtient des informations claires sur les démarches à réaliser.",
                 "organismsCount": "Plus de 50 organismes"
             },
             "step2": {
+                "badge": "Étape 2",
                 "title": "Je prépare ma vie étudiante",
                 "description": "Tout ce qu'il faut savoir sur sa prochaine ville étudiante et son marché locatif.",
                 "features": {
@@ -196,6 +198,7 @@
                 }
             },
             "step3": {
+                "badge": "Étape 3",
                 "title": "Je trouve un logement étudiant",
                 "description": "Une recherche efficace grâce aux filtres personnalisés (localisation, budget, type de logement, accès PMR, etc.). La fiche détaillée présente la résidence en détails en incitant à consulter la page de destination de votre choix."
             }
