@@ -22,7 +22,7 @@
     },
     "header": {
         "title": "Mon logement étudiant",
-        "description": "Simplifier l'accès aux droits et logements étudiants",
+        "description": "Faciliter l'accès au logement pour les étudiants boursiers",
         "alerts": "Alertes logements"
     },
     "footer": {
@@ -124,6 +124,25 @@
         "disclaimer": "En renseignant votre adresse électronique, vous acceptez de recevoir nos alertes par courriel. Vous pouvez vous désinscrire à tout moment à l'aide des liens de désinscription ou en nous contactant.",
         "emailPlaceholder": "Entrer votre email",
         "subscribe": "S'abonner"
+    },
+    "faq": {
+        "title": "Foire aux questions",
+        "subTitle": "Vous avez des questions ? Nous avons des réponses ! Cette section est dédiée à vous fournir les informations les plus complètes et précises pour vous aider à bien préparer votre vie étudiante. Nous avons regroupé les questions les plus fréquemment posées pour faciliter votre recherche."
+    },
+    "siteMap": {
+        "title": "Plan du site"
+    },
+    "accessibilite": {
+        "title": "Accessibilité"
+    },
+    "legalMentions": {
+        "title": "Mentions légales"
+    },
+    "personalData": {
+        "title": "Données personnelles"
+    },
+    "cookies": {
+        "title": "Gestion des cookies"
     },
     "landing": {
         "hero": {
