@@ -43,18 +43,7 @@ export const FooterComponent = async () => {
     ],
   }
 
-  const linkList: NonNullable<FooterProps['linkList']> = [
-    {
-      categoryName: t('footer.linkList.departmentsCategoryName'),
-      links: [
-        {
-          linkProps: {
-            href: '#',
-          },
-          text: 'Lien de navigation',
-        },
-      ],
-    },
+  const linkList = [
     {
       categoryName: t('footer.linkList.citiesCategoryName'),
       links: popularCities.map((city) => ({
@@ -63,7 +52,7 @@ export const FooterComponent = async () => {
         },
         text: `Logement étudiants ${city.name}`,
       })),
-    } as NonNullable<FooterProps['linkList']>[1],
+    },
   ]
 
   return (
@@ -73,7 +62,7 @@ export const FooterComponent = async () => {
       }}
       brandTop={<BrandTop />}
       accessibility="partially compliant"
-      linkList={linkList}
+      linkList={linkList as NonNullable<FooterProps['linkList']>}
       homeLinkProps={{
         href: '/',
         title: t('metadata.homeLinkTitle'),
@@ -89,6 +78,9 @@ export const FooterComponent = async () => {
       partnersLogos={partnersLogos}
       termsLinkProps={{
         href: '/mentions-legales',
+      }}
+      accessibilityLinkProps={{
+        href: '/accessibilite',
       }}
       websiteMapLinkProps={{
         href: '/plan-du-site',
