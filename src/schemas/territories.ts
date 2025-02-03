@@ -21,7 +21,7 @@ const ZCity = z
     average_income: z.number(),
     epci_code: z.string(),
     id: z.number(),
-    insee_code: z.string(),
+    insee_codes: z.array(z.string()),
     name: z.string(),
     nb_students: z.number(),
     nearby_cities: z.array(
