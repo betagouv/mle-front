@@ -45,16 +45,15 @@ export default async function FindStudentAccommodationPage({
   const routeLocation = params?.location?.[1] || ''
 
   if (params && (params?.location?.length < 2 || params?.location?.length > 2)) {
-    redirect(`/trouver-un-logement-etudiant`)
+    redirect(`/trouver-un-logement-etudiant?vue=carte`)
   }
 
   const territories = await getTerritories(routeLocation)
-
   const territory = (territories[getTerritoriesCategoryKey(routeCategoryKey as 'ville' | 'academie' | 'departement')] || []).find(
     (territory) => territory.name === routeLocation,
   )
   if (routeCategoryKey && routeLocation && !territory) {
-    redirect(`/trouver-un-logement-etudiant`)
+    redirect(`/trouver-un-logement-etudiant?vue=carte`)
   }
 
   const territoryBbox = territory?.bbox
@@ -66,14 +65,15 @@ export default async function FindStudentAccommodationPage({
     object_id: territory?.id,
   })
 
+  const title = territory?.name ? t('titleWithLocation', { location: territory?.name }) : t('title')
   return (
     <>
       <div className={fr.cx('fr-container')}>
         <DynamicBreadcrumb />
 
-        <h1>{t('title')}</h1>
+        <h1>{title}</h1>
         <FindStudentAccomodationHeader />
-        <FindStudentAccomodationSortView data={accommodations} />
+        <FindStudentAccomodationSortView data={accommodations} territory={territory} />
         <FindStudentAccomodationResults data={accommodations} territory={territory} />
         <div className={styles.mainQaFaqContainer}>
           <div className={fr.cx('fr-container')}>

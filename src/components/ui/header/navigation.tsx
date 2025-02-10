@@ -45,7 +45,7 @@ export const HeaderNavigation: FC<{ academies: TAcademyOrDepartment[] }> = ({ ac
     {
       isActive: pathname === '/trouver-un-logement-etudiant',
       linkProps: {
-        href: '/trouver-un-logement-etudiant',
+        href: '/trouver-un-logement-etudiant?vue=carte',
         target: '_self',
       },
       text: t('findAccommodation'),

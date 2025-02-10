@@ -23,6 +23,8 @@ import { getPopularCities } from '~/server-only/get-popular-cities'
 export default async function Home() {
   const t = await getTranslations('findAccomodation')
   const popularCities = await getPopularCities()
+  const sortedPopularCities = popularCities.sort((a, b) => b.nb_accommodations - a.nb_accommodations).slice(0, 18)
+
   return (
     <>
       <div className={styles.heroSection}>
@@ -32,13 +34,13 @@ export default async function Home() {
               <h1 className={styles.heroTitle}>Trouver votre prochain</h1>
               <h1 className={styles.heroHighlight}>logement étudiant</h1>
               <h3 className={styles.heroSubtitle}>
-                et découvrez les <span className={fr.cx('fr-text--bold')}>aides financières </span>
-                auxquelles vous avez droit.
+                et découvrez les <span className={fr.cx('fr-text--bold')}>aides </span>
+                auxquelles vous avez droit en tant qu&apos;étudiant boursier.
               </h3>
             </div>
             <div className={clsx(fr.cx('fr-col-md-5'), 'boxShadow', styles.simulatorCard)}>
               <h2>Simulez le montant de vos aides au logement</h2>
-              <p className={styles.noMargin}>et identifiez les aides dont vous pouvez bénéficier d&apos;après votre situation.</p>
+              <p style={{ fontSize: '18px' }}>et identifiez les aides dont vous pouvez bénéficier d&apos;après votre situation.</p>
               <div className={styles.logoContainer}>
                 <Image src={apl.src} width={40} height={40} alt="Logo APL" />
                 <Image src={caf.src} width={40} height={40} alt="Logo CAF" />
@@ -46,7 +48,9 @@ export default async function Home() {
                 <Image src={al.src} width={40} height={40} alt="Logo AL" />
               </div>
               <div className={styles.fullWidth}>
-                <Button className={styles.fullWidthButton}>Commencer la simulation</Button>
+                <Button size="large" className={styles.fullWidthButton}>
+                  Commencer la simulation
+                </Button>
               </div>
             </div>
           </div>
@@ -58,8 +62,8 @@ export default async function Home() {
       <div className={clsx(fr.cx('fr-container'), styles.mainContainer)}>
         <div className={styles.headerSection}>
           <Image src={logo.src} alt="Logo" width={80} height={80} />
-          <h1>Tout savoir pour bien se loger</h1>
-          <p>
+          <h1 style={{ fontSize: '3rem' }}>Tout savoir pour bien se loger</h1>
+          <p style={{ fontSize: '18px' }}>
             Estimation, fiches pratiques et aperçu des logements, tout est là pour <br />
             vous guider pas à pas vers votre prochaine vie étudiante.
           </p>
@@ -69,7 +73,7 @@ export default async function Home() {
             <div className={styles.cardContent}>
               <h1 className={styles.cardTitle}>Explorer les villes étudiantes</h1>
               <div className={styles.citiesGrid}>
-                {popularCities.map((city) => (
+                {sortedPopularCities.map((city) => (
                   <Button className={styles.cityButton} key={city.id} priority="secondary">
                     {city.name}
                   </Button>
@@ -102,7 +106,7 @@ export default async function Home() {
                 <FindStudentColivingAccomodationSwitch />
                 <FindStudentAccessibleAccomodationSwitch />
               </div>
-              <Button iconId="ri-search-line" className={styles.searchButton}>
+              <Button size="large" iconId="ri-search-line" className={styles.searchButton}>
                 Rechercher
               </Button>
             </div>
@@ -153,7 +157,9 @@ export default async function Home() {
               },
             ]}
           />
-          <Button priority="secondary">Foire aux questions</Button>
+          <Button size="large" priority="secondary">
+            Foire aux questions
+          </Button>
         </div>
       </div>
     </>

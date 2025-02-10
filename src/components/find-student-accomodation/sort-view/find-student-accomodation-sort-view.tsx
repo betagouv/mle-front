@@ -9,11 +9,13 @@ import { tss } from 'tss-react'
 import { fr } from '@codegouvfr/react-dsfr'
 import { useAccomodations } from '~/hooks/use-accomodations'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
+import { TTerritory } from '~/schemas/territories'
 
 type FindStudentAccomodationSortViewProps = {
   data: TGetAccomodationsResponse
+  territory?: TTerritory
 }
-export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortViewProps> = ({ data }) => {
+export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortViewProps> = ({ data, territory }) => {
   const [queryStates, setQueryStates] = useQueryStates({
     bbox: parseAsString,
     vue: parseAsString,
@@ -23,9 +25,14 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
   const accomodationsData = useMemo(() => (accommodations ? accommodations : data), [accommodations, data])
   const { classes } = useStyles({ hasResults: accomodationsData && accomodationsData.count > 0 })
 
+  const title = territory?.name ? t('accommodationsWithLocation', { location: territory?.name }) : t('accommodations')
   return (
     <div className={classes.headerContainer}>
-      {accomodationsData && accomodationsData.count > 0 && <h4>{accomodationsData.count} logements</h4>}
+      {accomodationsData && accomodationsData.count > 0 && (
+        <h4>
+          {accomodationsData.count} {title}
+        </h4>
+      )}
       <div className={classes.container}>
         <Select label="" nativeSelectProps={{}}>
           <option disabled hidden defaultValue={t('sortByPrice')} selected>

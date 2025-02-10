@@ -13,9 +13,7 @@ export const FindStudentAccomodationAutocompleteInput: FC = () => {
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()
   const { data, isError, searchQuery, setSearchQuery } = useTerritories()
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value)
-  }
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(event.target.value)
 
   return (
     <div className={classes.container}>

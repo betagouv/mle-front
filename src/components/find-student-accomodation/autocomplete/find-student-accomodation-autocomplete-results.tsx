@@ -54,18 +54,23 @@ export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsP
                 <span className={fr.cx(icon)}>{label}</span>
               </li>
               <ul className={classes.list}>
-                {items.map((item: TTerritory) => (
-                  <Link
-                    key={item.id}
-                    href={{
-                      pathname: `/trouver-un-logement-etudiant/${getCategoryKeySingular(categoryKey)}/${item.name}`,
-                    }}
-                  >
-                    <li className={classes.item} key={item.id} tabIndex={0}>
-                      {item.name}
-                    </li>
-                  </Link>
-                ))}
+                {items.map((item: TTerritory) => {
+                  const searchParams = new URLSearchParams()
+                  searchParams.set('vue', 'carte')
+                  return (
+                    <Link
+                      key={item.id}
+                      href={{
+                        pathname: `/trouver-un-logement-etudiant/${getCategoryKeySingular(categoryKey)}/${item.name}`,
+                        search: searchParams.toString(),
+                      }}
+                    >
+                      <li className={classes.item} key={item.id} tabIndex={0}>
+                        {item.name}
+                      </li>
+                    </Link>
+                  )
+                })}
               </ul>
             </div>
           )
