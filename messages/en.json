@@ -106,6 +106,10 @@
         },
         "card": {
             "priceFrom": "À partir de"
+        },
+        "results": {
+            "noResult": "Aucun résultat pour votre recherche",
+            "description": "Vous pouvez modifier votre recherche ou consulter les questions fréquemment posées sur la page d'informations."
         }
     },
     "prepareStudentLife": {
@@ -231,6 +235,54 @@
                 "name": "Cécilia Foret",
                 "role": "Chargée de déploiement"
             }
+        }
+    },
+    "home": {
+        "header": {
+            "rangeLabel": "Budget maximum"
+        },
+        "hero": {
+            "title": "Trouver votre prochain",
+            "highlight": "logement étudiant",
+            "subtitle": "et découvrez les <aides>aides</aides> auxquelles vous avez droit en tant qu'étudiant boursier."
+        },
+        "simulator": {
+            "title": "Simulez le montant de vos aides au logement",
+            "description": "et identifiez les aides dont vous pouvez bénéficier d'après votre situation.",
+            "button": "Commencer la simulation"
+        },
+        "mainSection": {
+            "title": "Tout savoir pour bien se loger",
+            "description": "<part1>Estimation, fiches pratiques et aperçu des logements, tout est là pour</part1><part2>vous guider pas à pas vers votre prochaine vie étudiante.</part2>"
+        },
+        "features": {
+            "exploreCities": {
+                "title": "Explorer les villes étudiantes",
+                "moreButton": "Plus de villes"
+            },
+            "findAccommodation": {
+                "title": "Trouver son prochain logement étudiant",
+                "locationInput": "Etablissement, académie, ville ou département",
+                "searchButton": "Rechercher"
+            }
+        },
+        "partners": {
+            "title": "Parmi les bailleurs partenaires"
+        },
+        "faq": {
+            "title": "Parmi les questions fréquentes",
+            "description": "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt.",
+            "tabs": {
+                "tab1": "Onglet 1",
+                "tab2": "Onglet 2"
+            },
+            "accordions": {
+                "title1": "Name of the Accordion 1",
+                "content1": "Content of the Accordion 1",
+                "title2": "Name of the Accordion 2",
+                "content2": "Content of the Accordion 2"
+            },
+            "button": "Foire aux questions"
         }
     }
 }
