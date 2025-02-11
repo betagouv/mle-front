@@ -13,8 +13,8 @@ interface PopularCitiesProps {
 export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
   const { classes } = useStyles()
   const { data } = useCities()
-  const mockDescription = '9 802 logements étudiants'
-  const mockDetail = 'Buget minimum 600€'
+
+  const mockDetail = 'Budget minimum 600€'
 
   return (
     <div className={classes.tilesGrid}>
@@ -22,7 +22,7 @@ export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
         <Tile
           noIcon
           key={city.id}
-          desc={mockDescription}
+          desc={`${city.nb_accommodations} logements étudiants`}
           detail={mockDetail}
           linkProps={{
             href: `/preparer-sa-vie-etudiante/${city.name}`,

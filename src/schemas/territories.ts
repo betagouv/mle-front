@@ -19,6 +19,7 @@ const ZAcademyOrDepartment = z
 const ZCity = z
   .object({
     average_income: z.number(),
+    average_rent: z.number(),
     epci_code: z.string(),
     id: z.number(),
     insee_codes: z.array(z.string()),
