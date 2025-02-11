@@ -9,6 +9,7 @@ import { CitiesAutocompleteInput } from '~/components/prepare-student-life/autoc
 import { PrepareStudentLifeSelectDepartment } from '~/components/prepare-student-life/select-department'
 import { PopularCities } from '~/components/prepare-student-life/popular-cities'
 import { getPopularCities } from '~/server-only/get-popular-cities'
+import clsx from 'clsx'
 
 export default async function PrepareYourStudentLife() {
   const t = await getTranslations('prepareStudentLife')
@@ -23,13 +24,11 @@ export default async function PrepareYourStudentLife() {
   ]
   return (
     <>
-      <div className={styles.heroSection}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', position: 'relative' }} className={fr.cx('fr-container')}>
-          <div className={styles.breadcrumbWrapper}>
-            <DynamicBreadcrumb color="white" />
-          </div>
+      <div className="primaryBackgroundColor">
+        <div className={clsx(fr.cx('fr-container'), styles.mainContainer)}>
           <div className={styles.heroContent}>
-            <div>
+            <DynamicBreadcrumb color="white" />
+            <div className={styles.headerContainer}>
               <h1 className={styles.heroCustomFont}>
                 <span className={styles.heroTitle}>{t('titlePart1')}</span>
                 <br />
@@ -46,20 +45,25 @@ export default async function PrepareYourStudentLife() {
               </div>
             </div>
           </div>
-          <Image src={image} quality={100} priority alt="Préparer sa vie étudiante" />
+          <Image className={fr.cx('fr-hidden', 'fr-unhidden-md')} src={image} quality={100} priority alt="Préparer sa vie étudiante" />
         </div>
       </div>
-      <div style={{ marginTop: '-4rem', position: 'relative', zIndex: 1 }} className={fr.cx('fr-container')}>
+      <div className={styles.mobileImageContainer}>
+        <Image
+          className={clsx(fr.cx('fr-hidden-sm'), styles.mobileImage)}
+          src={image}
+          quality={100}
+          priority
+          alt="Préparer sa vie étudiante"
+        />
+      </div>
+      <div className={clsx(fr.cx('fr-container'), styles.searchContainer)}>
         <div className={styles.searchCard}>
           <div className={styles.searchCardContent}>
-            <div style={{ alignItems: 'center', display: 'flex' }} className={fr.cx('fr-col-md-6')}>
-              <h3 className={styles.searchTitle}>
-                {t('searchTitlePart1')}
-                <br />
-                {t('searchTitlePart2')}
-              </h3>
+            <div className={fr.cx('fr-col-md-6')}>
+              <h3 className={styles.searchTitle}>{t('searchTitlePart')}</h3>
             </div>
-            <div style={{ display: 'flex', gap: '1rem' }} className={fr.cx('fr-col-md-6')}>
+            <div className={clsx(fr.cx('fr-col-md-6'), styles.searchCardInputsContainer)}>
               <PrepareStudentLifeSelectDepartment departments={departments} />
               <CitiesAutocompleteInput />
             </div>

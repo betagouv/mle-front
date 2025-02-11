@@ -29,10 +29,6 @@
   background: white;
 }
 
-.heroSection {
-  background-color: #5858AD;
-}
-
 .heroContent {
   display: flex; 
   flex-direction: column;
