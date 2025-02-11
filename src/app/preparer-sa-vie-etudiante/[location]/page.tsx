@@ -14,6 +14,7 @@ import Link from 'next/link'
 import { AccomodationCard } from '~/components/find-student-accomodation/card/find-student-accomodation-card'
 import { getCityDetails } from '~/server-only/get-city-details'
 import { getAccommodations } from '~/server-only/get-accommodations'
+import Badge from '@codegouvfr/react-dsfr/Badge'
 
 const CityMap = dynamic(() => import('~/components/map/city-map').then((mod) => mod.CityMap), {
   loading: () => <MapSkeleton height={700} />,
@@ -24,8 +25,9 @@ export default async function PrepareStudentLifeCityPage({ params }: { params: {
   const t = await getTranslations('prepareStudentLife')
   const { location } = params
   const cityDetails = await getCityDetails(location)
-  const { average_income, bbox, name, nb_students } = cityDetails
+  const { average_income, average_rent, bbox, name, nb_accommodations, nb_students } = cityDetails
   const formattedBbox = `${bbox.xmin},${bbox.ymin},${bbox.xmax},${bbox.ymax}`
+  console.log(average_rent)
 
   const accommodations = await getAccommodations({ bbox: formattedBbox })
   const accommodationsList = accommodations.results.features.slice(0, 6)
@@ -171,7 +173,7 @@ export default async function PrepareStudentLifeCityPage({ params }: { params: {
               <div className={fr.cx('fr-col-md-4')}>
                 <div style={{ backgroundColor: 'white', padding: '2.5rem', textAlign: 'center' }}>
                   <h4>
-                    {accommodations.count} logements étudiants <br /> sur la ville de {location}
+                    {nb_accommodations} logements étudiants <br /> sur la ville de {location}
                   </h4>
                   <p style={{ margin: 0 }}>soit 7% des logements de la ville</p>
                   <div style={{ backgroundColor: '#ddd', height: '1px', marginBottom: '2rem', marginTop: '2rem', width: '100%' }}></div>
@@ -301,9 +303,9 @@ export default async function PrepareStudentLifeCityPage({ params }: { params: {
                         </div>
                       </div>
                     </div>
-                    <p style={{ marginBottom: 0, marginTop: '1rem' }}>
-                      Le taux de colocations étudiantes à Créteil est de <span className={fr.cx('fr-text--bold')}>24 %</span>
-                    </p>
+                    <span className={fr.cx('ri-information-line')} style={{ marginBottom: 0, marginTop: '1rem' }}>
+                      Prévoir un dépôt de garantie ainsi que le versement d&apos;un premier loyer
+                    </span>
                   </div>
                   <p style={{ margin: 0 }}>
                     <span className={fr.cx('ri-thumb-up-line')}>
@@ -403,8 +405,201 @@ export default async function PrepareStudentLifeCityPage({ params }: { params: {
             </div>
             <div className={fr.cx('fr-col-md-12')}></div>
           </div>
+          <div style={{ backgroundColor: '#5858AD' }}>
+            <div
+              className={fr.cx('fr-container')}
+              style={{
+                backgroundColor: 'white',
+                display: 'flex',
+                flexDirection: 'column',
+                padding: '3rem 2.5rem',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ maxWidth: '40%' }}>
+                  <h3>
+                    Le coût de la vie <br />
+                    étudiante à {location}
+                  </h3>
+                  <p>
+                    Une estimation générale des principaux postes de dépense pour un étudiant à Créteil. Les coûts peuvent varier en
+                    fonction du style de vie, des aides perçues et des choix personnels.
+                  </p>
+                </div>
+                <div
+                  style={{
+                    alignItems: 'center',
+                    backgroundColor: '#F9F6F2',
+                    border: '1px solid #DDDDDD',
+                    borderRadius: '0.5rem',
+                    display: 'flex',
+                    marginBottom: '1rem',
+                    padding: '2rem 2.5rem',
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: '2rem', justifyContent: 'space-between' }}>
+                    <div style={{ width: '50%' }}>
+                      <h5 style={{ marginBottom: '0.5rem' }}>Budget minimal</h5>
+                      <p style={{ marginBottom: '0.5rem' }}>Résidence Crous, repas RU, et peu de sorties.</p>
+                      <Badge noIcon severity="new">
+                        Entre 600 et 800 €
+                      </Badge>
+                    </div>
+                    <div style={{ backgroundColor: '#DDDDDD', width: '1px' }} />
+                    <div style={{ width: '50%' }}>
+                      <h5 style={{ marginBottom: '0.5rem' }}>Budget confortable</h5>
+                      <p style={{ marginBottom: '0.5rem' }}>Logement privé et activités diverses.</p>
+                      <Badge noIcon severity="new">
+                        Entre 1000 et 1200 €
+                      </Badge>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style={{ border: '1px solid #DDDDDD', borderRadius: '0.5rem', display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                <div
+                  style={{
+                    borderBottom: '1px solid #DDDDDD',
+                    borderRight: '1px solid #DDDDDD',
+                    display: 'flex',
+                    gap: '0.5rem',
+                    padding: '2rem 3rem',
+                  }}
+                >
+                  <div className={styles.summaryCardTitle}>
+                    <span className={fr.cx('ri-community-line')} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <span className={fr.cx('fr-text--bold')}>Logement</span>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Prix moyen du m²</span> : {Math.round(average_rent)} €.
+                    </div>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Loyer moyen pour un logement de 20m²</span> : {Math.round(average_rent * 20)}{' '}
+                      € par mois.
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    borderBottom: '1px solid #DDDDDD',
+                    display: 'flex',
+                    gap: '0.5rem',
+                    padding: '2rem 3rem',
+                  }}
+                >
+                  <div className={styles.summaryCardTitle}>
+                    <span className={fr.cx('ri-train-line')} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <span className={fr.cx('fr-text--bold')}>Transport</span>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Navigo Imagine&apos;R</span> (carte pour étudiants) : environ 38 € par mois.
+                      (APL déduite)
+                    </div>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Frais occasionnels</span>(covoiturage, taxis, etc.): 10-30 € par mois.
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    borderBottom: '1px solid #DDDDDD',
+                    borderRight: '1px solid #DDDDDD',
+                    display: 'flex',
+                    gap: '0.5rem',
+                    padding: '2rem 3rem',
+                  }}
+                >
+                  <div className={styles.summaryCardTitle}>
+                    <span className={fr.cx('ri-restaurant-line')} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <span className={fr.cx('fr-text--bold')}>Alimentation</span>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Courses alimentaires</span> : 150-200 € par mois. (APL déduite)
+                    </div>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Repas universitaires (Crous)</span> : environ 3.30 € par repas. (si pris au
+                      RU)
+                    </div>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Repas à 1€ pour les étudiants boursiers et précaires.</span>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    borderBottom: '1px solid #DDDDDD',
+                    display: 'flex',
+                    gap: '0.5rem',
+                    padding: '2rem 3rem',
+                  }}
+                >
+                  <div className={styles.summaryCardTitle}>
+                    <span className={fr.cx('ri-pencil-ruler-line')} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <span className={fr.cx('fr-text--bold')}>Frais universitaires</span>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Frais d&apos;inscription annuels</span> : <br />
+                      Licence: 170 € / Master: 243 €
+                    </div>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Mutuelle santé</span> : 10-40 € par mois. (selon les besoins et le statut)
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    borderRight: '1px solid #DDDDDD',
+                    display: 'flex',
+                    gap: '0.5rem',
+                    padding: '2rem 3rem',
+                  }}
+                >
+                  <div className={styles.summaryCardTitle}>
+                    <span className={fr.cx('ri-clapperboard-line')} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <span className={fr.cx('fr-text--bold')}>Loisirs et sorties</span>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Sorties</span> (cinéma, bars, restaurants) : 50-100 € par mois.
+                    </div>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Activités sportives ou culturelles</span> : 20-50 € par mois.
+                    </div>
+                  </div>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '0.5rem',
+                    padding: '2rem 3rem',
+                  }}
+                >
+                  <div className={styles.summaryCardTitle}>
+                    <span className={fr.cx('ri-wifi-line')} />
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <span className={fr.cx('fr-text--bold')}>Autres dépenses</span>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Internet et téléphone</span> : 20-40 € par mois.
+                    </div>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Fournitures scolaires</span> : 20-30 € par mois.
+                    </div>
+                    <div>
+                      <span className={fr.cx('fr-text--bold')}>Assurance habitation</span> : 10-20 € par mois.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
       <div style={{ backgroundColor: '#5858AD' }}>
         <div
           className={fr.cx('fr-container')}
