@@ -106,6 +106,10 @@
         },
         "card": {
             "priceFrom": "À partir de"
+        },
+        "results": {
+            "noResult": "Aucun résultat pour votre recherche",
+            "description": "Vous pouvez modifier votre recherche ou consulter les questions fréquemment posées sur la page d'informations."
         }
     },
     "prepareStudentLife": {

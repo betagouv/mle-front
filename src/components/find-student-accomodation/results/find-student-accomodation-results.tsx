@@ -11,12 +11,14 @@ import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommod
 import { MapSkeleton } from '~/components/map/map-skeleton'
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import { TTerritory } from '~/schemas/territories'
+import { useTranslations } from 'next-intl'
 
 type FindStudentAccomodationResultsProps = {
   data: TGetAccomodationsResponse
   territory?: TTerritory
 }
 export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsProps> = ({ data, territory }) => {
+  const t = useTranslations('findAccomodation.results')
   const [view] = useQueryState('vue', parseAsString)
   const [page] = useQueryState('page', parseAsInteger)
   const [bboxQuery, setBboxQuery] = useQueryState('bbox', parseAsString)
@@ -59,8 +61,8 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
         <div>
           {accomodationsData?.count === 0 && (
             <div>
-              <h3>Aucun résultat pour votre recherche</h3>
-              <p>Vous pouvez modifier votre recherche ou consulter les questions fréquemment posées sur la page d&apos;informations.</p>
+              <h3>{t('noResult')}</h3>
+              <p>{t('description')}</p>
             </div>
           )}
         </div>
