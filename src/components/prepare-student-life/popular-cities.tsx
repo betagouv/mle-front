@@ -22,7 +22,7 @@ export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
         <Tile
           noIcon
           key={city.id}
-          desc={`${city.nb_accommodations} logements étudiants`}
+          desc={`${city.nb_apartments} logements étudiants`}
           detail={mockDetail}
           linkProps={{
             href: `/preparer-sa-vie-etudiante/${city.name}`,

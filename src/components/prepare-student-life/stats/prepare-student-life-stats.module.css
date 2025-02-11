@@ -1,0 +1,214 @@
+.mainContainer {
+  background-color: #5858ad;
+}
+
+@media (min-width: 768px) {
+  .mainContainer {
+    margin-top: -3.5rem;
+    padding-top: 3.5rem;
+  }
+  .cardContainer{  
+    flex-direction: row;
+  }
+  .card {
+    padding: 2.5rem;
+  }
+  .marginLeft {
+    margin-left: 1rem;
+  }
+  .counterContainer {
+    flex-direction: row;
+  }
+   .priceContainer {
+    padding: 0 2.5rem;
+  }
+  .helpersItems {
+    gap: 1rem;
+  }
+  .costContainer {
+    padding: 3rem 2.5rem;
+  }
+  .costHeaderTitleContainer {
+    max-width: 40%;
+  }
+  .budgetsMainContainer {
+    padding: 2rem 2.5rem;
+  }
+  .costGridContainer {
+    grid-template-columns: 1fr 1fr;
+  }
+  .costGridItem {
+    padding: 2rem 3rem;
+  }
+  .borderRight {
+    border-right: 1px solid #DDDDDD;
+  }
+}
+
+@media (max-width: 768px) {
+  .cardContainer {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .card {
+    padding: 1.5rem;
+  }
+  .counterContainer {
+    flex-direction: column;
+  }
+   .priceContainer {
+    padding: 1.5rem;
+  }
+  .studioColocItemsContainer {
+    flex-direction: column;
+  }
+  .costContainer {
+    padding: 1.5rem;
+  }
+  .costHeaderContainer {
+    flex-direction: column;
+  }
+  .budgetsContainer {
+    flex-direction: column;
+  }
+  .budgetsMainContainer {
+    padding: 1rem 1.5rem;
+  }
+  .costGridContainer {
+    grid-template-columns: 1fr;
+  }
+  .costGridItem {
+    padding: 1rem 2rem;
+  }
+}
+
+.cardsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cardContainer {
+  display: flex;
+}
+
+.title {
+  color: white;
+  margin: auto;
+}
+
+.card {
+  background-color: white;
+  text-align: center;
+  height: 100%;
+}
+
+.counterContainer {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.divider {
+  background-color: #ddd;
+  height: 1px;
+  margin-bottom: 2rem;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.logosContainer {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.priceContainer {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  justify-content: space-evenly;
+}
+
+.studioColocContainer {
+  border: 1px solid #ddd;
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.studioColocBorderBottom {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 2rem;
+}
+
+.studioColocItemsContainer {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.studioColocItem {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.warrantyContainer {
+    margin-top: 1rem;
+}
+
+.helpersMainContainer {
+    background-color: var(--beige-gris-galet-975-75);
+}
+.helpersContainer {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    justify-content: space-evenly;
+    text-align: center;
+}
+
+.helpersItems {
+    display: flex;
+    flex-direction: column;
+}
+
+.costContainer {
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+.costHeaderContainer {
+    display: flex; 
+    justify-content: space-between;
+}
+.budgetsContainer {
+    display: flex;
+    gap: 2rem; 
+    justify-content: space-between;
+}
+
+.budgetsMainContainer {
+    align-items: center;
+    background-color: #F9F6F2;
+    border: 1px solid #DDDDDD;
+    border-radius: 0.5rem;
+    display: flex;  
+    margin-bottom: 1rem;
+}
+
+.costGridContainer {
+    border: 1px solid #DDDDDD;
+    border-radius: 0.5rem;
+    display: grid;
+}
+.costGridItem {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.borderBottom {
+    border-bottom: 1px solid #DDDDDD;
+}

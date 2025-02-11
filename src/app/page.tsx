@@ -23,7 +23,7 @@ import { getPopularCities } from '~/server-only/get-popular-cities'
 export default async function Home() {
   const t = await getTranslations('home')
   const popularCities = await getPopularCities()
-  const sortedPopularCities = popularCities.sort((a, b) => b.nb_accommodations - a.nb_accommodations).slice(0, 18)
+  const sortedPopularCities = popularCities.sort((a, b) => b.nb_apartments - a.nb_apartments).slice(0, 18)
 
   return (
     <>
@@ -63,7 +63,7 @@ export default async function Home() {
       <div className={clsx(fr.cx('fr-container'), styles.mainContainer)}>
         <div className={styles.headerSection}>
           <Image src={logo.src} alt="Logo" width={80} height={80} />
-          <h1 style={{ fontSize: '3rem' }}>{t('mainSection.title')}</h1>
+          <h1 className={styles.headerSectionTitle}>{t('mainSection.title')}</h1>
           <p style={{ fontSize: '18px' }}>
             {t.rich('mainSection.description', {
               part1: (chunks) => <>{chunks}</>,
@@ -101,7 +101,7 @@ export default async function Home() {
             <div className={fr.cx('fr-col-md-6')}>
               <Image
                 src={findNextAccommodation}
-                className={styles.featureImage}
+                className={clsx(fr.cx('fr-hidden', 'fr-unhidden-sm'), styles.featureImage)}
                 quality={100}
                 alt="Trouver votre prochain logement étudiant"
               />
@@ -118,6 +118,12 @@ export default async function Home() {
                 {t('features.findAccommodation.searchButton')}
               </Button>
             </div>
+            <Image
+              src={findNextAccommodation}
+              className={clsx(fr.cx('fr-hidden-sm'), styles.featureImage)}
+              quality={100}
+              alt="Trouver votre prochain logement étudiant"
+            />
           </div>
         </div>
       </div>

@@ -1,0 +1,24 @@
+.accommodationGridContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.whiteTitle {
+  color: white;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.accommodationGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .accommodationGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
