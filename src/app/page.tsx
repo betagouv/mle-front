@@ -23,7 +23,7 @@ import { getPopularCities } from '~/server-only/get-popular-cities'
 export default async function Home() {
   const t = await getTranslations('home')
   const popularCities = await getPopularCities()
-  const sortedPopularCities = popularCities.sort((a, b) => b.nb_accommodations - a.nb_accommodations).slice(0, 18)
+  const sortedPopularCities = popularCities.sort((a, b) => b.nb_apartments - a.nb_apartments).slice(0, 18)
 
   return (
     <>
