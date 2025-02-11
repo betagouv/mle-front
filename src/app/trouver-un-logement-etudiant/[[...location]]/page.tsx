@@ -14,6 +14,7 @@ import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import { FindStudentAccomodationHeader } from '~/components/find-student-accomodation/header/find-student-accomodation-header'
 import { redirect } from 'next/navigation'
 import { getTerritoryQuestionsAnswers } from '~/server-only/get-territory-questions-answers'
+import clsx from 'clsx'
 
 const getTerritoriesCategoryKey = (categoryKey: 'ville' | 'academie' | 'departement') => {
   const keys = {
@@ -75,7 +76,7 @@ export default async function FindStudentAccommodationPage({
         <FindStudentAccomodationHeader />
         <FindStudentAccomodationSortView data={accommodations} territory={territory} />
         <FindStudentAccomodationResults data={accommodations} territory={territory} />
-        <div className={styles.mainQaFaqContainer}>
+        <div className={clsx(styles.mainQaFaqContainer, 'primaryBackgroundColor')}>
           <div className={fr.cx('fr-container')}>
             <div className={styles.faqQaContainer}>
               <div className={styles.faqTitleCtaContainer}>

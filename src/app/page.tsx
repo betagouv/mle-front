@@ -27,7 +27,7 @@ export default async function Home() {
 
   return (
     <>
-      <div className={styles.heroSection}>
+      <div className="primaryBackgroundColor">
         <div className={fr.cx('fr-container')}>
           <div className={styles.heroContent}>
             <div className={clsx(fr.cx('fr-col-md-7'), styles.heroTextContainer)}>

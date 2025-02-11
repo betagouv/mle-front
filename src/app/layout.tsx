@@ -14,6 +14,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { TanstackQueryClientProvider } from '~/providers/tanstack-client'
 import '~/globals.css'
 import { NextAppDirEmotionCacheProvider } from 'tss-react/next'
+
 export const generateMetadata = async () => {
   const t = await getTranslations('metadata')
   return {
@@ -29,6 +30,7 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale()
   const messages = await getMessages()
+
   return (
     <html {...getHtmlAttributes({ defaultColorScheme, lang: locale })}>
       <head>

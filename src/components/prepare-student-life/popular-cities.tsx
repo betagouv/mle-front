@@ -35,11 +35,13 @@ export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
     </div>
   )
 }
-
 const useStyles = tss.create({
   tilesGrid: {
+    '@media (min-width: 768px)': {
+      gridTemplateColumns: 'repeat(4, 1fr)',
+    },
     display: 'grid',
     gap: '1rem',
-    gridTemplateColumns: 'repeat(4, 1fr)',
+    gridTemplateColumns: '1fr',
   },
 })

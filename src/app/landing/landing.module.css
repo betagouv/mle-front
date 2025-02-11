@@ -42,9 +42,6 @@
   bottom: -1rem;
 }
 
-.heroSection {
-  background-color: #5858AD;
-}
 
 .heroContent {
   display: flex;
@@ -98,9 +95,6 @@
   .heroTitle {
     text-align: center;
   }
-  .heroDescription {
-    text-align: center;
-  }
   .profileText {
     text-align: center;
   }
@@ -109,6 +103,7 @@
     text-align: center;
   }
   .heroDescription {
+    text-align: center;
     font-size: 1.125rem;
     line-height: 1.5rem;
   }
@@ -176,9 +171,6 @@
   }
   .landingHero {
     display: block;
-  }
-  .heroSection {
-    background-color: #5858AD;
   }
   .impactCard {
     width: 50%;
@@ -262,12 +254,6 @@
   font-weight: bold;
   padding: 0 0.5rem;
   width: fit-content;
-}
-
-.purpleSection {
-  background-color: #5858AD;
-  height: 450px;
-  overflow-y: hidden;
 }
 
 .poingContainer {
@@ -367,10 +353,6 @@
 .stepColumn {
   display: flex;
   flex-direction: column;
-}
-
-.purpleBox {
-  background-color: #5858AD;
 }
 
 .stepContent {

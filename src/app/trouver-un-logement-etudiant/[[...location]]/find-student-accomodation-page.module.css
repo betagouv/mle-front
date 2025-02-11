@@ -29,13 +29,11 @@
 
 .mainQaFaqContainer {
   padding: 1rem;
-  background-color: #5858AD;
-  }
+}
 
 @media (min-width: 768px) {
   .mainQaFaqContainer {
     padding: 3.5rem;
-    background-color: #5858AD;
   }
 }
 
