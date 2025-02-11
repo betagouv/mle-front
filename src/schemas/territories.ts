@@ -23,6 +23,7 @@ const ZCity = z
     id: z.number(),
     insee_codes: z.array(z.string()),
     name: z.string(),
+    nb_accommodations: z.number(),
     nb_students: z.number(),
     nearby_cities: z.array(
       z.object({

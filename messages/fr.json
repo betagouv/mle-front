@@ -86,6 +86,7 @@
             }
         },
         "title": "Trouver un logement étudiant",
+        "titleWithLocation": "Trouver un logement étudiant à {location}",
         "header": {
             "inputLabel": "Académie, ville ou département",
             "shared": "Colocation",
@@ -97,6 +98,8 @@
             "accessbility": "Adapté PMR"
         },
         "filters": {
+            "accommodations": "logements",
+            "accommodationsWithLocation": "logements à {location}",
             "grid": "Grille",
             "map": "Carte",
             "sortByPrice": "Triés par prix"

@@ -7,6 +7,7 @@ import { getPopularCities } from '~/server-only/get-popular-cities'
 export const FooterComponent = async () => {
   const t = await getTranslations()
   const popularCities = await getPopularCities()
+  const sortedPopularCities = popularCities.sort((a, b) => b.nb_accommodations - a.nb_accommodations)
 
   const operatorLogo: NonNullable<FooterProps['operatorLogo']> = {
     alt: 'Mon logement étudiant - logo',
@@ -43,12 +44,36 @@ export const FooterComponent = async () => {
     ],
   }
 
+  const ITEMS_PER_COLUMN = 8
   const linkList = [
     {
-      categoryName: t('footer.linkList.citiesCategoryName'),
-      links: popularCities.map((city) => ({
+      links: sortedPopularCities.slice(0, ITEMS_PER_COLUMN).map((city) => ({
         linkProps: {
-          href: `/trouver-un-logement-etudiant/ville/${city.name}`,
+          href: `/trouver-un-logement-etudiant/ville/${city.name}?vue=carte`,
+        },
+        text: `Logement étudiants ${city.name}`,
+      })),
+    },
+    {
+      links: sortedPopularCities.slice(ITEMS_PER_COLUMN, ITEMS_PER_COLUMN * 2).map((city) => ({
+        linkProps: {
+          href: `/trouver-un-logement-etudiant/ville/${city.name}?vue=carte`,
+        },
+        text: `Logement étudiants ${city.name}`,
+      })),
+    },
+    {
+      links: sortedPopularCities.slice(ITEMS_PER_COLUMN * 2, ITEMS_PER_COLUMN * 3).map((city) => ({
+        linkProps: {
+          href: `/trouver-un-logement-etudiant/ville/${city.name}?vue=carte`,
+        },
+        text: `Logement étudiants ${city.name}`,
+      })),
+    },
+    {
+      links: sortedPopularCities.slice(ITEMS_PER_COLUMN * 3).map((city) => ({
+        linkProps: {
+          href: `/trouver-un-logement-etudiant/ville/${city.name}?vue=carte`,
         },
         text: `Logement étudiants ${city.name}`,
       })),
@@ -59,6 +84,7 @@ export const FooterComponent = async () => {
     <Footer
       classes={{
         logo: styles.logo,
+        root: styles.footer,
       }}
       brandTop={<BrandTop />}
       accessibility="partially compliant"

@@ -1,7 +1,8 @@
 'use client'
 
-import type { DefaultColorScheme } from '@codegouvfr/react-dsfr/next-appdir'
 import { startReactDsfr } from '@codegouvfr/react-dsfr/next-appdir'
+import { defaultColorScheme } from './default-color-scheme'
+
 import Link from 'next/link'
 
 declare module '@codegouvfr/react-dsfr/next-appdir' {
@@ -9,8 +10,6 @@ declare module '@codegouvfr/react-dsfr/next-appdir' {
     Link: typeof Link
   }
 }
-
-export const defaultColorScheme: DefaultColorScheme = 'light'
 
 startReactDsfr({ Link, defaultColorScheme })
 

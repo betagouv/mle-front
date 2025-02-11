@@ -8,7 +8,7 @@ import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import 'leaflet-defaulticon-compatibility'
 import { useAccomodations } from '~/hooks/use-accomodations'
 import { fr } from '@codegouvfr/react-dsfr'
-import { useQueryState } from 'nuqs'
+import { parseAsString, useQueryStates, useQueryState } from 'nuqs'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 
 interface AccomodationsMapProps {
@@ -41,13 +41,30 @@ const BoundsHandler: FC = () => {
 
 export const AccomodationsMap: FC<AccomodationsMapProps> = ({ data }) => {
   const { classes } = useStyles()
+  const [queryStates, setQueryStates] = useQueryStates({
+    bbox: parseAsString,
+    id: parseAsString,
+  })
   const { data: accommodations } = useAccomodations()
 
   const markers = useMemo(() => {
-    return (accommodations?.results.features || data.results.features).map((accommodation) => (
-      <Marker key={accommodation.id} position={[accommodation.geometry.coordinates[1], accommodation.geometry.coordinates[0]]} />
+    const accommodationsData = queryStates.bbox ? accommodations?.results.features || [] : data.results.features
+    return accommodationsData.map((accommodation) => (
+      <Marker
+        eventHandlers={{
+          click: () => {
+            const element = document.getElementById(`accomodation-${accommodation.id}`)
+            if (element) {
+              setQueryStates({ id: accommodation.id.toString() })
+              element.scrollIntoView({ behavior: 'smooth' })
+            }
+          },
+        }}
+        key={accommodation.id}
+        position={[accommodation.geometry.coordinates[1], accommodation.geometry.coordinates[0]]}
+      />
     ))
-  }, [data, accommodations])
+  }, [accommodations, queryStates.bbox, setQueryStates, data])
 
   const memoizedMap = useMemo(() => {
     return (

@@ -86,6 +86,7 @@
             }
         },
         "title": "Trouver un logement étudiant",
+        "titleWithLocation": "Trouver un logement étudiant à {location}",
         "header": {
             "inputLabel": "Académie, ville ou département",
             "shared": "Colocation",
@@ -97,6 +98,8 @@
             "accessbility": "Adapté PMR"
         },
         "filters": {
+            "accommodations": "logements",
+            "accommodationsWithLocation": "logements à {location}",
             "grid": "Grille",
             "map": "Carte",
             "sortByPrice": "Triés par prix"
@@ -130,7 +133,20 @@
         "subTitle": "Vous avez des questions ? Nous avons des réponses ! Cette section est dédiée à vous fournir les informations les plus complètes et précises pour vous aider à bien préparer votre vie étudiante. Nous avons regroupé les questions les plus fréquemment posées pour faciliter votre recherche."
     },
     "siteMap": {
-        "title": "Plan du site"
+        "title": "Plan du site",
+        "links": {
+            "home": "Accueil",
+            "simulation": "Simuler mes aides au logement",
+            "findAccomodation": "Trouver un logement étudiant",
+            "prepareStudentLife": "Préparer sa vie étudiante",
+            "alertAccomodation": "Alertes logements",
+            "faq": "Foire aux questions",
+            "accessibilite": "Accessibilité",
+            "legalMentions": "Mentions légales",
+            "personalData": "Données personnelles",
+            "cookies": "Gestion des cookies",
+            "landing": "Landing - Mon Logement Étudiant"
+        }
     },
     "accessibilite": {
         "title": "Accessibilité"

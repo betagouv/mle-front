@@ -38,7 +38,8 @@
 .searchCard {
   background-color: white;
   box-shadow: 0 6px 18px 0 rgba(0, 0, 18, 0.16);
-  padding: 1rem 3.5rem;
+  padding: 2rem 3.5rem;
+
 }
 
 .searchCardContent {

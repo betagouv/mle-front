@@ -1,3 +1,5 @@
+'use client'
+
 import React, { FC } from 'react'
 import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
 import { Card } from '@codegouvfr/react-dsfr/Card'
@@ -5,12 +7,14 @@ import { Badge } from '@codegouvfr/react-dsfr/Badge'
 import { Tag } from '@codegouvfr/react-dsfr/Tag'
 import { useTranslations } from 'next-intl'
 import { fr } from '@codegouvfr/react-dsfr'
+import { parseAsString, useQueryState } from 'nuqs'
 
 type AccomodationCardProps = {
   accomodation: TAccomodationCard
 }
 
 export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation }) => {
+  const [selectedAccommodation] = useQueryState('id', parseAsString)
   const t = useTranslations('findAccomodation.card')
   const { city, name, nb_total_apartments, postal_code } = accomodation.properties
   const price = '153'
@@ -19,8 +23,10 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation }) =>
 
   return (
     <Card
+      shadow={selectedAccommodation === accomodation.id.toString()}
+      id={`accomodation-${accomodation.id}`}
       background
-      badge={<Badge severity="new">{`${t('priceFrom')} ${price}€`}</Badge>}
+      badge={<Badge severity="new" noIcon>{`${t('priceFrom')} ${price}€`}</Badge>}
       border
       desc={
         <>
@@ -32,7 +38,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation }) =>
         </>
       }
       enlargeLink
-      imageAlt="texte alternatif de"
+      imageAlt="Image descriptive du logement"
       imageUrl="https://www.systeme-de-design.gouv.fr/img/placeholder.16x9.png"
       linkProps={{
         href: `/logement/${accomodation.properties.slug}`,

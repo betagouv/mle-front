@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages, getTranslations } from 'next-intl/server'
 
-import { defaultColorScheme, StartDsfr } from '~/app/start-dsfr'
+import { defaultColorScheme } from '~/app/default-color-scheme'
+import { StartDsfr } from '~/app/start-dsfr'
 import { FooterComponent } from '~/components/ui/footer/footer'
 import styles from './layout.module.css'
 import { HeaderComponent } from '~/components/ui/header/header'
@@ -28,7 +29,6 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale()
   const messages = await getMessages()
-
   return (
     <html {...getHtmlAttributes({ defaultColorScheme, lang: locale })}>
       <head>
