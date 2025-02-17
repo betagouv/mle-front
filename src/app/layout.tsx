@@ -32,7 +32,7 @@ export default async function RootLayout({
   const messages = await getMessages()
 
   return (
-    <html {...getHtmlAttributes({ defaultColorScheme, lang: locale })}>
+    <html {...getHtmlAttributes({ defaultColorScheme, lang: locale })} style={{ overflowX: 'hidden' }}>
       <head>
         <StartDsfr />
         <DsfrHead Link={Link} preloadFonts={['Marianne-Regular', 'Marianne-Medium', 'Marianne-Bold']} />

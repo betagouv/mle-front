@@ -31,8 +31,9 @@ export default async function Home() {
         <div className={fr.cx('fr-container')}>
           <div className={styles.heroContent}>
             <div className={clsx(fr.cx('fr-col-md-7'), styles.heroTextContainer)}>
-              <h1 className={styles.heroTitle}>{t('hero.title')}</h1>
-              <h1 className={styles.heroHighlight}>{t('hero.highlight')}</h1>
+              <h1 className={styles.heroTitle}>
+                {t('hero.title')} <span className={styles.heroHighlight}>{t('hero.highlight')}</span>
+              </h1>
               <h3 className={styles.heroSubtitle}>
                 {t.rich('hero.subtitle', {
                   aides: (chunks) => <span className={fr.cx('fr-text--bold')}>{chunks}</span>,
@@ -56,8 +57,11 @@ export default async function Home() {
             </div>
           </div>
         </div>
-        <div className={styles.heroImageContainer}>
+        <div className={clsx('fr-hidden', 'fr-unhidden-sm', styles.heroImageContainer)}>
           <Image className={styles.heroImage} priority quality={100} src={home} alt="Hero" />
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <Image className={clsx(fr.cx('fr-hidden-sm'), styles.heroImageMobile)} priority quality={100} src={home} alt="Hero" />
         </div>
       </div>
       <div className={clsx(fr.cx('fr-container'), styles.mainContainer)}>

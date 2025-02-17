@@ -5,16 +5,14 @@ import { getTranslations } from 'next-intl/server'
 import { FindStudentAccomodationSortView } from '~/components/find-student-accomodation/sort-view/find-student-accomodation-sort-view'
 import styles from './find-student-accomodation-page.module.css'
 import { FindStudentAccomodationResults } from '~/components/find-student-accomodation/results/find-student-accomodation-results'
-import { Accordion } from '@codegouvfr/react-dsfr/Accordion'
 import { getAccommodations } from '~/server-only/get-accommodations'
-import Button from '@codegouvfr/react-dsfr/Button'
 import { getTerritories } from '~/server-only/get-territories'
 import { TTerritories } from '~/schemas/territories'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import { FindStudentAccomodationHeader } from '~/components/find-student-accomodation/header/find-student-accomodation-header'
 import { redirect } from 'next/navigation'
 import { getTerritoryQuestionsAnswers } from '~/server-only/get-territory-questions-answers'
-import clsx from 'clsx'
+import FindStudentAccommodationQA from '~/components/find-student-accomodation/qa/find-student-accommodation-qa'
 
 const getTerritoriesCategoryKey = (categoryKey: 'ville' | 'academie' | 'departement') => {
   const keys = {
@@ -72,32 +70,12 @@ export default async function FindStudentAccommodationPage({
       <div className={fr.cx('fr-container')}>
         <DynamicBreadcrumb />
 
-        <h1>{title}</h1>
+        <h1 className={styles.title}>{title}</h1>
         <FindStudentAccomodationHeader />
         <FindStudentAccomodationSortView data={accommodations} territory={territory} />
         <FindStudentAccomodationResults data={accommodations} territory={territory} />
-        <div className={clsx(styles.mainQaFaqContainer, 'primaryBackgroundColor')}>
-          <div className={fr.cx('fr-container')}>
-            <div className={styles.faqQaContainer}>
-              <div className={styles.faqTitleCtaContainer}>
-                <h2 className={styles.whiteColor}>{t('faq.title')}</h2>
-                <Button iconId="ri-question-line" className={styles.whiteButton} priority="secondary">
-                  {t('faq.cta')}
-                </Button>
-              </div>
-              <div className={styles.qaContainer}>
-                <div style={{ background: 'white', padding: '2rem' }} className={fr.cx('fr-accordions-group')}>
-                  {qa.map((qa, index) => (
-                    <Accordion key={index} label={qa.title_fr}>
-                      <div dangerouslySetInnerHTML={{ __html: qa.content_fr }} />
-                    </Accordion>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
+      <FindStudentAccommodationQA qa={qa} />
     </>
   )
 }
