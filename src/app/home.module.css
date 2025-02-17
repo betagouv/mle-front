@@ -70,6 +70,9 @@
 }
 
 @media (max-width: 768px) {
+  .heroImageContainer {
+    display: none;
+  }
   .cardTitle {
     text-align: center;
   }
@@ -98,11 +101,6 @@
   display: flex;
   justify-content: center;
   width: 100%;
-}
-
-.heroImageContainer {
-  display: flex;
-  justify-content: center;
 }
 
 .heroImage {
@@ -165,13 +163,6 @@
   padding-top: 2rem;
 }
 
-.partnersGrid {
-  display: flex;
-  justify-content: space-between;
-  padding-bottom: 4rem;
-  padding-top: 3rem;
-}
-
 .faqContainer {
   padding: 2rem 0;
 }
@@ -202,7 +193,25 @@
   background: white;
 }
 
+.partnersGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 2fr);
+  gap: 1rem;
+  place-items: center;
+}
+
 @media (min-width: 768px) {
+  .partnersGrid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 4rem;
+    padding-top: 3rem;
+  }
+  .heroImageContainer {
+    display: flex;
+    justify-content: center;
+  }
   .featureImageMobile {
     display: none;
   }

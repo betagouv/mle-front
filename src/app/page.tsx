@@ -57,7 +57,7 @@ export default async function Home() {
             </div>
           </div>
         </div>
-        <div className={clsx('fr-hidden', 'fr-unhidden-sm', styles.heroImageContainer)}>
+        <div className={styles.heroImageContainer}>
           <Image className={styles.heroImage} priority quality={100} src={home} alt="Hero" />
         </div>
         <div style={{ display: 'flex', justifyContent: 'center' }}>
