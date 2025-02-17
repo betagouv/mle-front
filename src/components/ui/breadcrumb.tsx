@@ -88,12 +88,16 @@ const useStyles = tss.withParams<{ color?: string; margin?: boolean }>().create(
             margin: 0,
           },
         }
-      : {}),
+      : {
+          '& .fr-breadcrumb': {
+            margin: '1rem 0 1rem',
+          },
+        }),
     '& .fr-breadcrumb__link': {
       color: color ? `${color} !important` : undefined,
     },
     color: color ?? undefined,
     marginTop: 0,
-    paddingTop: '1rem',
+    paddingTop: '0.5rem',
   },
 }))

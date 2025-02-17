@@ -112,10 +112,12 @@ const useStyles = tss.withParams<{ hasResults?: boolean; view: string | null }>(
     gridTemplateColumns: '1fr',
   },
   accomodationsContainer: {
-    flex: view === 'carte' ? '0 0 60%' : '0 0 100%',
-    marginBottom: '2rem',
-    maxWidth: view === 'carte' ? '60%' : '100%',
-    width: view === 'carte' ? '60%' : '100%',
+    [fr.breakpoints.up('md')]: {
+      flex: view === 'carte' ? '0 0 60%' : '0 0 100%',
+      marginBottom: '2rem',
+      maxWidth: view === 'carte' ? '60%' : '100%',
+      width: view === 'carte' ? '60%' : '100%',
+    },
   },
   container: {
     display: 'flex',
