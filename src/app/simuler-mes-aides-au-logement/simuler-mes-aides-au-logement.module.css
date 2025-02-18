@@ -1,8 +1,130 @@
-.whiteButton {
-  color: white;
-  box-shadow: inset 0 0 0 1px white;
+@media (min-width: 768px) {
+  .heroSection {
+    padding: 3.5rem;
+  }
+  .formContainer {
+    left: 50%;
+    position: absolute;
+    top: 3rem;
+    transform: translateX(-50%);
+  }
+  .heroTitle {
+    width: 70%;
+  }
+  .stepperWrapper {
+    padding: 1.5rem 3.5rem;
+    position: relative;
+    z-index: 1;
+  }
+  .formBody {
+    padding: 3.5rem;
+  }
+  .faqContent {
+    padding: 2rem;
+  }
+  .faqSection {
+    padding: 3.5rem;
+  }
 }
 
-.whiteButton:hover {
-  color: initial;
-} 
+@media (max-width: 768px) {
+  .heroTitle {
+    width: 100%;
+  }
+  .heroSection {
+    padding-bottom: 1.5rem;
+  }
+  .stepperWrapper {
+    padding: 1.5rem 1rem;
+  }
+  .formBody {
+    padding: 1.5rem;
+  }
+  .faqContent {
+    padding: 1rem;
+  }
+  .faqSection {
+    padding: 1rem;
+  }
+  .faqContainer {
+    flex-direction: column;
+  }
+  .faqTitle {
+    text-align: center;
+  }
+  .faqButtonContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+}
+
+.durationBadge {
+  background-color: #FEE7FC;
+  border-radius: 4px;
+  color: #6E445A;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.heroTitle {
+  color: white;
+  margin: 0;
+}
+
+.heroHighlight {
+  color: #FCC63A;
+}
+
+.heroDescription {
+  color: white;
+  margin: 0;
+}
+
+.imageWrapper {
+  line-height: 0;
+}
+
+.heroImage {
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+.formContent {
+  background-color: white;
+  margin-left: auto;
+}
+
+.stepperWrapper {
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 18, 0.16);
+}
+
+.divider {
+  border: solid 0.5px #ddd;
+  margin: 2rem 0;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.faqTitle {
+  color: white;
+}
+
+.faqContent {
+  background: white;
+}
+
+.faqContainer {
+  display: flex;
+}

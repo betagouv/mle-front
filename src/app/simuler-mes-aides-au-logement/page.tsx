@@ -7,74 +7,41 @@ import styles from './simuler-mes-aides-au-logement.module.css'
 import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import Stepper from '@codegouvfr/react-dsfr/Stepper'
 import { getGlobalQuestionsAnswers } from '~/server-only/get-global-questions-answers'
+import { clsx } from 'clsx'
 
 export default async function SimulateAccommodationAids() {
   const qa = await getGlobalQuestionsAnswers()
   return (
     <>
       <div style={{ position: 'relative' }}>
-        <div style={{ backgroundColor: '#5858AD', paddingBottom: '3.5rem', paddingLeft: '3.5rem', paddingRight: '3.5rem' }}>
-          <div className={fr.cx('fr-container')}>
+        <div className="primaryBackgroundColor">
+          <div className={clsx(fr.cx('fr-container'), styles.heroSection)}>
             <DynamicBreadcrumb color="white" />
-            <div className={fr.cx('fr-col-md-4')} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div>
-                <span
-                  className={fr.cx('fr-text--bold')}
-                  style={{
-                    backgroundColor: '#FEE7FC',
-                    borderRadius: '4px',
-                    color: '#6E445A',
-                    paddingLeft: '0.5rem',
-                    paddingRight: '0.5rem',
-                  }}
-                >
-                  Moins de 3 minutes
-                </span>
+            <div className={clsx(fr.cx('fr-col-md-4'), styles.heroContent)}>
+              <div className={fr.cx('fr-hidden', 'fr-unhidden-md')}>
+                <span className={clsx(fr.cx('fr-text--bold'), styles.durationBadge)}>Moins de 3 minutes</span>
               </div>
-              <h1 style={{ color: 'white', margin: 0 }}>
-                Simulez le <br />
-                montant de <br />
-                vos <span style={{ color: '#FCC63A' }}>aides au</span>
-                <br />
-                <span style={{ color: '#FCC63A' }}>logement</span>
+              <h1 className={styles.heroTitle}>
+                Simulez le montant de vos <span className={styles.heroHighlight}>aides au&nbsp;</span>
+                <span className={styles.heroHighlight}>logement</span>
               </h1>
-              <p style={{ color: 'white', margin: 0 }}>
+              <p className={styles.heroDescription}>
                 12 questions pour estimer vos <br /> droits et faciliter vos recherches
               </p>
             </div>
           </div>
         </div>
 
-        <div style={{ lineHeight: 0 }}>
-          <Image
-            src={homeHero}
-            priority
-            alt="Image de la page d'accueil"
-            quality={100}
-            style={{
-              height: 'auto',
-              objectFit: 'cover',
-              width: '100%',
-            }}
-          />
+        <div className={clsx(styles.imageWrapper, 'fr-hidden', 'fr-unhidden-md')}>
+          <Image src={homeHero} priority alt="Image de la page d'accueil" quality={100} className={styles.heroImage} />
         </div>
 
-        <div className={fr.cx('fr-container')} style={{ left: '50%', position: 'absolute', top: '3rem', transform: 'translateX(-50%)' }}>
-          <div style={{ backgroundColor: 'white', marginLeft: 'auto' }} className={fr.cx('fr-col-md-8')}>
-            <div
-              style={{
-                boxShadow: '0 4px 12px -4px rgba(0, 0, 18, 0.16)',
-                paddingBottom: '1.5rem',
-                paddingLeft: '3.5rem',
-                paddingRight: '3.5rem',
-                paddingTop: '1.5rem',
-                position: 'relative',
-                zIndex: 1,
-              }}
-            >
+        <div className={styles.formContainer}>
+          <div className={clsx(fr.cx('fr-col-md-8'), styles.formContent)}>
+            <div className={styles.stepperWrapper}>
               <Stepper currentStep={1} nextTitle="Mon foyer" style={{ margin: 0 }} stepCount={4} title="Mon profil" />
             </div>
-            <div style={{ padding: '3.5rem' }}>
+            <div className={styles.formBody}>
               <h2>Confirmez votre statut d&apos;étudiant</h2>
 
               <p style={{ margin: 0 }}>
@@ -84,8 +51,8 @@ export default async function SimulateAccommodationAids() {
                 ipsum eiusmod incididunt irure consectetur ut exercitation commodo voluptate elit. Do cillum ut consequat proident occaecat
                 id ullamco velit commodo anim. Do velit do irure ex velit dolor occaecat elit excepteur et dolore enim sit non.
               </p>
-              <div style={{ border: 'solid 0.5px #ddd', marginBottom: '2rem', marginTop: '2rem' }} />
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div className={styles.divider} />
+              <div className={styles.buttonContainer}>
                 <Button priority="secondary" disabled iconId="ri-arrow-left-line">
                   Retour
                 </Button>
@@ -96,22 +63,27 @@ export default async function SimulateAccommodationAids() {
             </div>
           </div>
         </div>
+        <div className={clsx(styles.imageWrapper, 'fr-hidden-sm')}>
+          <Image src={homeHero} priority alt="Image de la page d'accueil" quality={100} className={styles.heroImage} />
+        </div>
       </div>
 
-      <div style={{ backgroundColor: '#5858AD', padding: '3.5rem' }}>
+      <div className={clsx('primaryBackgroundColor', styles.faqSection)}>
         <div className={fr.cx('fr-container')}>
-          <div style={{ display: 'flex' }} className={fr.cx('fr-col-md-12')}>
-            <div className={fr.cx('fr-col-md-4')}>
-              <h3 style={{ color: 'white' }}>
+          <div className={clsx('fr-col-md-12', styles.faqContainer)}>
+            <div className={clsx(fr.cx('fr-col-md-4'), styles.faqTitleContainer)}>
+              <h2 className={styles.faqTitle}>
                 Parmi les questions fréquentes sur les <br />
                 aides aux logements étudiants
-              </h3>
-              <Button iconId="ri-question-line" className={styles.whiteButton} priority="secondary">
-                Foire aux questions
-              </Button>
+              </h2>
+              <div className={styles.faqButtonContainer}>
+                <Button iconId="ri-question-line" className="whiteButton" priority="secondary">
+                  Foire aux questions
+                </Button>
+              </div>
             </div>
             <div className={fr.cx('fr-col-md-8')}>
-              <div style={{ background: 'white', padding: '2rem' }} className={fr.cx('fr-accordions-group')}>
+              <div className={clsx(fr.cx('fr-accordions-group'), styles.faqContent)}>
                 {qa.map((qa, index) => (
                   <Accordion key={index} label={qa.title_fr}>
                     <div dangerouslySetInnerHTML={{ __html: qa.content_fr }} />
