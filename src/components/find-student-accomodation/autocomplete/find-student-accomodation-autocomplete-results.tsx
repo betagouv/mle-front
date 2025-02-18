@@ -7,14 +7,22 @@ import { FC } from 'react'
 import { tss } from 'tss-react'
 import { TTerritories, TTerritory } from '~/schemas/territories'
 
-interface AutocompleteResultsProps {
+interface FindStudentAccomodationAutocompleteResults {
   data: TTerritories
 }
 
-export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsProps> = ({ data }) => {
+const getCategoryKeySingular = (categoryKey: keyof TTerritories) => {
+  const singular = {
+    academies: 'academie',
+    cities: 'ville',
+    departments: 'departement',
+  }
+  return singular[categoryKey]
+}
+
+export const FindStudentAccomodationAutocompleteResults: FC<FindStudentAccomodationAutocompleteResults> = ({ data }) => {
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()
-
   const categories = ['academies', 'cities', 'departments']
 
   const getCategoryLabelAndIcon = (category: keyof TTerritories): { icon: FrCxArg; label: string } => {
@@ -28,15 +36,6 @@ export const FindStudentAccomodationAutocompleteResults: FC<AutocompleteResultsP
 
   if (!Object.keys(data).length) {
     return null
-  }
-
-  const getCategoryKeySingular = (categoryKey: keyof TTerritories) => {
-    const singular = {
-      academies: 'academie',
-      cities: 'ville',
-      departments: 'departement',
-    }
-    return singular[categoryKey]
   }
 
   return (
