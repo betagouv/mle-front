@@ -10,23 +10,16 @@
     .container {
         flex-direction: row;
     }
-}
-
-
-.cardContainer {
-    padding: 2rem 2rem;
-}
-
-@media (min-width: 768px) {
     .cardContainer {
         padding: 4rem 4rem;
     }
 }
 
-.disclaimer {
-    font-size: 12px;
+.cardContainer {
+    padding: 2rem 2rem;
 }
 
 .title {
     margin-bottom: 0.5rem;
 }
+
