@@ -26,7 +26,7 @@ export default async function PrepareYourStudentLife() {
     <>
       <div className="primaryBackgroundColor">
         <div className={clsx(fr.cx('fr-container'), styles.mainContainer)}>
-          <div className={styles.heroContent}>
+          <div>
             <DynamicBreadcrumb color="white" />
             <div className={styles.headerContainer}>
               <h1 className={styles.heroCustomFont}>
