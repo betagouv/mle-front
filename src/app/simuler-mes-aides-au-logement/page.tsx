@@ -5,9 +5,13 @@ import Image from 'next/image'
 import homeHero from '~/images/home-bg.webp'
 import styles from './simuler-mes-aides-au-logement.module.css'
 import Accordion from '@codegouvfr/react-dsfr/Accordion'
-import Stepper from '@codegouvfr/react-dsfr/Stepper'
 import { getGlobalQuestionsAnswers } from '~/server-only/get-global-questions-answers'
+<<<<<<< HEAD
 import { clsx } from 'clsx'
+import AidesSimplifiesSimulator from '~/app/simuler-mes-aides-au-logement/aides-simplifies-simulator'
+=======
+import AidesSimplifiesSimulator from '~/app/simuler-mes-aides-au-logement/aides-simplifies-simulator'
+>>>>>>> c9dc5f4 (feat: add iframe aides simplifies simulator)
 
 export default async function SimulateAccommodationAids() {
   const qa = await getGlobalQuestionsAnswers()
@@ -35,32 +39,9 @@ export default async function SimulateAccommodationAids() {
         <div className={clsx(styles.imageWrapper, 'fr-hidden', 'fr-unhidden-md')}>
           <Image src={homeHero} priority alt="Image de la page d'accueil" quality={100} className={styles.heroImage} />
         </div>
-
-        <div className={styles.formContainer}>
+         <div className={styles.formContainer}>
           <div className={clsx(fr.cx('fr-col-md-8'), styles.formContent)}>
-            <div className={styles.stepperWrapper}>
-              <Stepper currentStep={1} nextTitle="Mon foyer" style={{ margin: 0 }} stepCount={4} title="Mon profil" />
-            </div>
-            <div className={styles.formBody}>
-              <h2>Confirmez votre statut d&apos;étudiant</h2>
-
-              <p style={{ margin: 0 }}>
-                Ipsum occaecat ut tempor mollit velit ea. Et ipsum in do elit officia nisi. Irure aliqua cupidatat amet ipsum eu enim
-                excepteur elit magna do magna proident velit laborum. Cillum sit incididunt sit minim pariatur aliquip aute exercitation
-                nostrud officia ipsum et dolore excepteur enim. Proident dolor eu qui sint nisi esse. Tempor in exercitation sunt ullamco
-                ipsum eiusmod incididunt irure consectetur ut exercitation commodo voluptate elit. Do cillum ut consequat proident occaecat
-                id ullamco velit commodo anim. Do velit do irure ex velit dolor occaecat elit excepteur et dolore enim sit non.
-              </p>
-              <div className={styles.divider} />
-              <div className={styles.buttonContainer}>
-                <Button priority="secondary" disabled iconId="ri-arrow-left-line">
-                  Retour
-                </Button>
-                <Button iconId="ri-arrow-right-line" iconPosition="right">
-                  Continuer
-                </Button>
-              </div>
-            </div>
+            <AidesSimplifiesSimulator />
           </div>
         </div>
         <div className={clsx(styles.imageWrapper, 'fr-hidden-sm')}>
