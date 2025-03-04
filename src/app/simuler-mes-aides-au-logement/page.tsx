@@ -6,12 +6,8 @@ import homeHero from '~/images/home-bg.webp'
 import styles from './simuler-mes-aides-au-logement.module.css'
 import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import { getGlobalQuestionsAnswers } from '~/server-only/get-global-questions-answers'
-<<<<<<< HEAD
 import { clsx } from 'clsx'
 import AidesSimplifiesSimulator from '~/app/simuler-mes-aides-au-logement/aides-simplifies-simulator'
-=======
-import AidesSimplifiesSimulator from '~/app/simuler-mes-aides-au-logement/aides-simplifies-simulator'
->>>>>>> c9dc5f4 (feat: add iframe aides simplifies simulator)
 
 export default async function SimulateAccommodationAids() {
   const qa = await getGlobalQuestionsAnswers()
@@ -39,7 +35,7 @@ export default async function SimulateAccommodationAids() {
         <div className={clsx(styles.imageWrapper, 'fr-hidden', 'fr-unhidden-md')}>
           <Image src={homeHero} priority alt="Image de la page d'accueil" quality={100} className={styles.heroImage} />
         </div>
-         <div className={styles.formContainer}>
+        <div className={styles.formContainer}>
           <div className={clsx(fr.cx('fr-col-md-8'), styles.formContent)}>
             <AidesSimplifiesSimulator />
           </div>
