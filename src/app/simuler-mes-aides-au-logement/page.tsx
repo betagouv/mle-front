@@ -35,7 +35,7 @@ export default async function SimulateAccommodationAids() {
         <div className={clsx(styles.imageWrapper, 'fr-hidden', 'fr-unhidden-md')}>
           <Image src={homeHero} priority alt="Image de la page d'accueil" quality={100} className={styles.heroImage} />
         </div>
-        <div className={styles.formContainer}>
+        <div className={clsx('fr-container', styles.formContainer)}>
           <div className={clsx(fr.cx('fr-col-md-8'), styles.formContent)}>
             <AidesSimplifiesSimulator />
           </div>
