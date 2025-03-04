@@ -18,17 +18,9 @@ interface AlertAccomodationAutocompleteItemProps {
   item: TTerritory
 }
 
-const getCategoryKeySingular = (categoryKey: keyof TTerritories) => {
-  const singular = {
-    academies: 'academy',
-    cities: 'city',
-    departments: 'department',
-  }
-  return singular[categoryKey]
-}
-
 export const AlertAccommodationResultsItem: FC<AlertAccomodationAutocompleteItemProps> = ({ categoryKey, item }) => {
-  const [queryStates, setQueryStates] = useQueryStates({ q: parseAsString, type: parseAsString })
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, setQueryStates] = useQueryStates({ q: parseAsString, type: parseAsString })
 
   const { classes } = useStyles()
   const { setValue } = useFormContext()
@@ -59,10 +51,9 @@ export const AlertAccommodationResultsItem: FC<AlertAccomodationAutocompleteItem
 
 export const AlertAccomodationAutocompleteResults: FC<AlertAccomodationAutocompleteResults> = ({ data, searchQuery }) => {
   const t = useTranslations('findAccomodation')
-  const [searchQueryState, setSearchQueryState] = useQueryState('q')
+  const [searchQueryState] = useQueryState('q')
   const { classes } = useStyles()
   const categories = ['academies', 'cities', 'departments']
-  const { register, setValue } = useFormContext()
 
   const getCategoryLabelAndIcon = (category: keyof TTerritories): { icon: FrCxArg; label: string } => {
     const labels = {
