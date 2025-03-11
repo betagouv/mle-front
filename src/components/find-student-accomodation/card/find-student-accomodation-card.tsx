@@ -3,11 +3,12 @@
 import React, { FC } from 'react'
 import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
 import { Card } from '@codegouvfr/react-dsfr/Card'
-import { Badge } from '@codegouvfr/react-dsfr/Badge'
 import { Tag } from '@codegouvfr/react-dsfr/Tag'
 import { useTranslations } from 'next-intl'
 import { fr } from '@codegouvfr/react-dsfr'
 import { parseAsString, useQueryState } from 'nuqs'
+import { Badge } from '@codegouvfr/react-dsfr/Badge'
+import { FindStudentAccommodationImageCard } from '~/components/find-student-accomodation/card/find-student-accommodation-image-card'
 
 type AccomodationCardProps = {
   accomodation: TAccomodationCard
@@ -16,17 +17,25 @@ type AccomodationCardProps = {
 export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation }) => {
   const [selectedAccommodation] = useQueryState('id', parseAsString)
   const t = useTranslations('findAccomodation.card')
-  const { city, name, nb_total_apartments, postal_code } = accomodation.properties
-  const price = '153'
+  const { city, images_base64, name, nb_total_apartments, postal_code, price_min } = accomodation.properties
   const surface = '100m2'
   const type = 'T1'
 
+  const badgeProps = price_min ? { badge: <Badge severity="new" noIcon>{`${t('priceFrom')} ${price_min}€`}</Badge> } : {}
+  const imageProps =
+    images_base64 && images_base64.length > 0
+      ? { imageComponent: <FindStudentAccommodationImageCard image={images_base64[0]} name={name} /> }
+      : {
+          imageAlt: 'Placeholder image',
+          imageUrl: 'https://www.systeme-de-design.gouv.fr/img/placeholder.16x9.png',
+        }
   return (
     <Card
+      {...badgeProps}
+      {...imageProps}
       shadow={selectedAccommodation === accomodation.id.toString()}
       id={`accomodation-${accomodation.id}`}
       background
-      badge={<Badge severity="new" noIcon>{`${t('priceFrom')} ${price}€`}</Badge>}
       border
       desc={
         <>
@@ -38,8 +47,6 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation }) =>
         </>
       }
       enlargeLink
-      imageAlt="Image descriptive du logement"
-      imageUrl="https://www.systeme-de-design.gouv.fr/img/placeholder.16x9.png"
       linkProps={{
         href: `/logement/${accomodation.properties.slug}`,
       }}

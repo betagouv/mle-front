@@ -1,0 +1,35 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.mainImageContainer {
+  display: flex;
+  position: relative;
+  width: 50%;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.photoCountButton {
+  background-color: white;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  position: absolute;
+}
+
+.photoCount {
+  color: var(--text-label-blue-france);
+  font-weight: 500;
+}
+
+.gridContainer {
+  width: 50%;
+}
+
+.imageGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+} 

@@ -9,6 +9,7 @@ import { getAccommodationById } from '~/server-only/get-accommodation-by-id'
 import styles from './logement.module.css'
 import { getAccommodations } from '~/server-only/get-accommodations'
 import { NearbyAccommodations } from '~/components/accommodation/nearby-accommodations'
+import { AccommodationImages } from '~/components/accommodation/accommodation-images'
 
 const AccomodationMap = dynamic(() => import('~/components/map/accomodation-map').then((mod) => mod.AccomodationMap), {
   loading: () => <MapSkeleton height={400} />,
@@ -18,7 +19,7 @@ const AccomodationMap = dynamic(() => import('~/components/map/accomodation-map'
 export default async function LogementPage({ params }: { params: { slug: string } }) {
   const t = await getTranslations('accomodation')
   const accommodation = await getAccommodationById(params.slug)
-  const { address, city, geom, name, nb_total_apartments, owner_name, postal_code } = accommodation
+  const { address, city, geom, images_base64, name, nb_total_apartments, owner_name, postal_code } = accommodation
   const { coordinates } = geom
   const [longitude, latitude] = coordinates
   const nearbyAccommodations = await getAccommodations({ center: `${longitude},${latitude}` })
@@ -42,6 +43,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
           }}
           className={fr.cx('fr-col-sm-8')}
         >
+          {images_base64 && images_base64.length > 0 && <AccommodationImages images={images_base64} title={name} />}
           <div className={styles.headerSection}>
             <h1>{name}</h1>
             <div className={styles.tagContainer}>
