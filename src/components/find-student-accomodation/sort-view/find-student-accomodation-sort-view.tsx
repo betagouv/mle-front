@@ -3,7 +3,7 @@
 import Button from '@codegouvfr/react-dsfr/Button'
 import Select from '@codegouvfr/react-dsfr/Select'
 import { useTranslations } from 'next-intl'
-import { FC, useMemo } from 'react'
+import { FC } from 'react'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { tss } from 'tss-react'
 import { fr } from '@codegouvfr/react-dsfr'
@@ -21,16 +21,16 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
     vue: parseAsString,
   })
   const t = useTranslations('findAccomodation.filters')
-  const { data: accommodations } = useAccomodations()
-  const accomodationsData = useMemo(() => (accommodations ? accommodations : data), [accommodations, data])
-  const { classes } = useStyles({ hasResults: accomodationsData && accomodationsData.count > 0 })
+  const { data: accommodations } = useAccomodations({ initialData: data })
+
+  const { classes } = useStyles({ hasResults: accommodations && accommodations.count > 0 })
 
   const title = territory?.name ? t('accommodationsWithLocation', { location: territory?.name }) : t('accommodations')
   return (
     <div className={classes.headerContainer}>
-      {accomodationsData && accomodationsData.count > 0 && (
+      {accommodations && accommodations.count > 0 && (
         <h4>
-          {accomodationsData.count} {title}
+          {accommodations.count} {title}
         </h4>
       )}
       <div className={classes.container}>

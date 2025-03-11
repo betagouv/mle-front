@@ -5,13 +5,14 @@ import { FC, Suspense, useEffect, useMemo } from 'react'
 import { fr } from '@codegouvfr/react-dsfr'
 import dynamic from 'next/dynamic'
 import { useAccomodations } from '~/hooks/use-accomodations'
-import { AccomodationCard } from '~/components/find-student-accomodation/card/find-student-accomodation-card'
 import { Pagination } from '@codegouvfr/react-dsfr/Pagination'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 import { MapSkeleton } from '~/components/map/map-skeleton'
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import { TTerritory } from '~/schemas/territories'
 import { useTranslations } from 'next-intl'
+import { CardSkeleton } from '~/components/ui/skeleton/card-skeleton'
+import { AccomodationCard } from '~/components/find-student-accomodation/card/find-student-accomodation-card'
 
 type FindStudentAccomodationResultsProps = {
   data: TGetAccomodationsResponse
@@ -29,10 +30,9 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
     }
   }, [])
 
-  const { data: accommodations } = useAccomodations()
+  const { data: accommodations, isLoading } = useAccomodations({ initialData: data })
   const hasResults = useMemo(() => data.results.features.length > 0, [data])
   const { classes, cx } = useStyles({ hasResults, view })
-  const accomodationsData = useMemo(() => (accommodations ? accommodations : data), [accommodations, data])
 
   const AccomodationsMap = useMemo(
     () =>
@@ -54,12 +54,14 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
       <div className={classes.accomodationsContainer}>
         <div className={fr.cx('fr-hidden-sm')}>{card}</div>
         <div className={classes.accommodationGrid}>
-          {(accomodationsData?.results.features || []).map((accommodation) => (
-            <AccomodationCard key={accommodation.id} accomodation={accommodation} />
-          ))}
+          {!isLoading &&
+            (accommodations?.results.features || []).map((accommodation) => (
+              <AccomodationCard key={accommodation.id} accomodation={accommodation} />
+            ))}
+          {isLoading && Array.from({ length: 8 }).map((_, index) => <CardSkeleton key={index} />)}
         </div>
         <div>
-          {accomodationsData?.count === 0 && (
+          {accommodations?.count === 0 && (
             <div>
               <h3>{t('noResult')}</h3>
               <p>{t('description')}</p>
@@ -67,11 +69,11 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
           )}
         </div>
 
-        {accomodationsData && accomodationsData.count > accomodationsData.page_size && (
+        {accommodations && accommodations.count > accommodations.page_size && (
           <div className={classes.paginationContainer}>
             <Pagination
               showFirstLast={false}
-              count={Math.ceil(accomodationsData.count / accomodationsData.page_size)}
+              count={Math.ceil(accommodations.count / accommodations.page_size)}
               defaultPage={page ?? 1}
               getPageLinkProps={(page: number) => {
                 const params = new URLSearchParams()

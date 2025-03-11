@@ -21,7 +21,11 @@ export const fetchAccomodations = async (
   return response.json()
 }
 
-export const useAccomodations = () => {
+interface UseAccomodationsOptions {
+  initialData?: TGetAccomodationsResponse
+}
+
+export const useAccomodations = ({ initialData }: UseAccomodationsOptions = {}) => {
   const [queryStates] = useQueryStates({
     accessible: parseAsString,
     bbox: parseAsString,
@@ -29,10 +33,11 @@ export const useAccomodations = () => {
     page: parseAsInteger,
   })
   const { accessible, bbox, coliving, page } = queryStates
-
   const enabled = !!bbox || !!accessible || !!page || !!coliving
+
   return useQuery<TGetAccomodationsResponse>({
     enabled,
+    initialData: enabled ? undefined : initialData,
     queryFn: () => fetchAccomodations(bbox, page, accessible, coliving),
     queryKey: ['accomodations', { accessible, bbox, coliving, page }],
   })
