@@ -27,6 +27,7 @@ export const ZAccomodation = z.object({
   properties: z.object({
     address: z.string().max(255),
     city: z.string().max(150),
+    images_base64: z.array(z.string()).nullable(),
     name: z.string().max(250),
     nb_accessible_apartments: z.number().nullable(),
     nb_coliving_apartments: z.number().nullable(),
@@ -39,6 +40,7 @@ export const ZAccomodation = z.object({
     owner_name: z.string().max(150).nullable(),
     owner_url: z.string().max(500).nullable(),
     postal_code: z.string().max(5),
+    price_min: z.number().nullable(),
     residence_type: z.nativeEnum(EResidence),
     slug: z.string().max(250),
   }),
@@ -53,6 +55,7 @@ export const ZAccomodationDetails = z.object({
   address: z.string().max(255),
   city: z.string().max(150),
   geom: ZGeometry,
+  images_base64: z.array(z.string()).nullable(),
   name: z.string().max(250),
   nb_accessible_apartments: z.number().nullable(),
   nb_coliving_apartments: z.number().nullable(),
@@ -65,6 +68,7 @@ export const ZAccomodationDetails = z.object({
   owner_name: z.string().max(150).nullable(),
   owner_url: z.string().max(500).nullable(),
   postal_code: z.string().max(5),
+  price_min: z.number().nullable(),
   residence_type: z.nativeEnum(EResidence),
   slug: z.string().max(250),
 })
