@@ -21,7 +21,7 @@ export const AccommodationImages = ({ images, title }: AccommodationImagesProps)
   return (
     <div className={styles.container}>
       <div className={styles.mainImageContainer}>
-        <Image src={mainImage} alt="Accommodation" width={344} height={300} />
+        <Image src={mainImage} alt="Accommodation" width={400} height={300} />
         <div className={styles.photoCountButton}>
           <AccommodationImagesModal images={images} title={title}>
             <Button priority="tertiary no outline" nativeButtonProps={modal.buttonProps}>
