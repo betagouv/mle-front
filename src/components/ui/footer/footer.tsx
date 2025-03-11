@@ -1,7 +1,7 @@
 import Footer, { type FooterProps } from '@codegouvfr/react-dsfr/Footer'
 import { getTranslations } from 'next-intl/server'
 import styles from './footer.module.css'
-import { BrandTop } from '~/components/brand-top'
+import { BrandTop } from '~/components/ui/brand-top'
 import { getPopularCities } from '~/server-only/get-popular-cities'
 
 export const FooterComponent = async () => {
