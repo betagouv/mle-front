@@ -10,6 +10,7 @@ import styles from './logement.module.css'
 import { getAccommodations } from '~/server-only/get-accommodations'
 import { NearbyAccommodations } from '~/components/accommodation/nearby-accommodations'
 import { AccommodationImages } from '~/components/accommodation/accommodation-images'
+import Image from 'next/image'
 
 const AccomodationMap = dynamic(() => import('~/components/map/accomodation-map').then((mod) => mod.AccomodationMap), {
   loading: () => <MapSkeleton height={400} />,
@@ -19,7 +20,7 @@ const AccomodationMap = dynamic(() => import('~/components/map/accomodation-map'
 export default async function LogementPage({ params }: { params: { slug: string } }) {
   const t = await getTranslations('accomodation')
   const accommodation = await getAccommodationById(params.slug)
-  const { address, city, geom, images_base64, name, nb_total_apartments, owner_name, postal_code } = accommodation
+  const { address, city, geom, images_base64, name, nb_total_apartments, owner, postal_code } = accommodation
   const { coordinates } = geom
   const [longitude, latitude] = coordinates
   const nearbyAccommodations = await getAccommodations({ center: `${longitude},${latitude}` })
@@ -82,14 +83,28 @@ export default async function LogementPage({ params }: { params: { slug: string 
         </div>
         <div style={{ flexDirection: 'column' }} className={fr.cx('fr-col-sm-4')}>
           <div className={styles.sidebarCard}>
-            <h3 className={styles.sidebarTitle}>
-              {owner_name ? `${owner_name} - ` : ''} {t('sidebar.accommodationsCount', { count: nb_total_apartments })}
-            </h3>
-            <p className={styles.sidebarText}>{t('sidebar.share')}</p>
-            <div className={styles.buttonGroup}>
-              <Button size="small" iconId="ri-links-line" priority="tertiary" title={t('sidebar.buttons.link')} />
-              <Button size="small" iconId="ri-mail-line" priority="tertiary" title={t('sidebar.buttons.email')} />
-              <Button size="small" iconId="ri-printer-line" priority="tertiary" title={t('sidebar.buttons.print')} />
+            {nb_total_apartments ? (
+              <h3 className={styles.sidebarTitle}>{t('sidebar.accommodationsCount', { count: nb_total_apartments })}</h3>
+            ) : (
+              <h3 className={styles.sidebarTitle}>{t('sidebar.accommodationsNoCount')}</h3>
+            )}
+            {!!owner && (
+              <div className={styles.sidebarOwner}>
+                <span>proposé par</span>
+                {!!owner.image_base64 && <Image src={owner.image_base64} alt={owner.name} width={32} height={32} />}
+                <h3 className={styles.sidebarText}>{owner.name}</h3>
+                <Button linkProps={{ href: owner.url }} priority="primary">
+                  {t('sidebar.buttons.consult')}
+                </Button>
+              </div>
+            )}
+            <div className={styles.sidebarShare}>
+              <p className={styles.sidebarText}>{t('sidebar.share')}</p>
+              <div className={styles.buttonGroup}>
+                <Button size="small" iconId="ri-links-line" priority="tertiary" title={t('sidebar.buttons.link')} />
+                <Button size="small" iconId="ri-mail-line" priority="tertiary" title={t('sidebar.buttons.email')} />
+                <Button size="small" iconId="ri-printer-line" priority="tertiary" title={t('sidebar.buttons.print')} />
+              </div>
             </div>
           </div>
           <NearbyAccommodations nearbyAccommodations={nearbyAccommodations} />

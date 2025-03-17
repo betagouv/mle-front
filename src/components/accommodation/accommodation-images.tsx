@@ -3,6 +3,8 @@ import Image from 'next/image'
 import { createModal } from '@codegouvfr/react-dsfr/Modal'
 import { AccommodationImagesModal } from '~/components/accommodation/accommodation-images-modal'
 import styles from './accommodation-images.module.css'
+import { fr } from '@codegouvfr/react-dsfr'
+import clsx from 'clsx'
 
 interface AccommodationImagesProps {
   images: string[]
@@ -30,7 +32,7 @@ export const AccommodationImages = ({ images, title }: AccommodationImagesProps)
           </AccommodationImagesModal>
         </div>
       </div>
-      <div className={`fr-hidden fr-unhidden-sm ${styles.gridContainer}`}>
+      <div className={clsx(fr.cx('fr-hidden'), fr.cx('fr-unhidden-sm'), styles.gridContainer)}>
         <div className={styles.imageGrid}>
           {displayedImages.map((image, index) => (
             <Image key={index} src={image} alt="Accommodation" width={200} height={150} />
