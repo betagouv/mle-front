@@ -51,7 +51,7 @@ export const FooterComponent = async () => {
         linkProps: {
           href: `/trouver-un-logement-etudiant/ville/${city.name}?vue=carte`,
         },
-        text: `Logement étudiants ${city.name}`,
+        text: `Logements étudiants ${city.name}`,
       })),
     },
     {
@@ -59,7 +59,7 @@ export const FooterComponent = async () => {
         linkProps: {
           href: `/trouver-un-logement-etudiant/ville/${city.name}?vue=carte`,
         },
-        text: `Logement étudiants ${city.name}`,
+        text: `Logements étudiants ${city.name}`,
       })),
     },
     {
@@ -67,7 +67,7 @@ export const FooterComponent = async () => {
         linkProps: {
           href: `/trouver-un-logement-etudiant/ville/${city.name}?vue=carte`,
         },
-        text: `Logement étudiants ${city.name}`,
+        text: `Logements étudiants ${city.name}`,
       })),
     },
     {
@@ -75,7 +75,7 @@ export const FooterComponent = async () => {
         linkProps: {
           href: `/trouver-un-logement-etudiant/ville/${city.name}?vue=carte`,
         },
-        text: `Logement étudiants ${city.name}`,
+        text: `Logements étudiants ${city.name}`,
       })),
     },
   ]
