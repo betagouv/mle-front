@@ -1,5 +1,6 @@
 'use client'
 
+import { fr } from '@codegouvfr/react-dsfr'
 import { FC, useEffect } from 'react'
 
 const AidesSimplifiesSimulator: FC = () => {
@@ -10,6 +11,7 @@ const AidesSimplifiesSimulator: FC = () => {
     const container = document.getElementById('simulator-container')
     if (container) {
       container.appendChild(script)
+      container.classList.add(fr.cx('fr-p-4w'))
     }
 
     return () => {
