@@ -57,8 +57,10 @@
         },
         "sidebar": {
             "accommodationsCount": "{count} logements",
+            "accommodationsNoCount": "Logements disponibles",
             "share": "Partager le logement",
             "buttons": {
+                "consult": "Consulter l'offre",
                 "link": "Copier le lien",
                 "email": "Envoyer par email",
                 "print": "Imprimer"

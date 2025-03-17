@@ -65,8 +65,14 @@ export const ZAccomodationDetails = z.object({
   nb_t3: z.number().nullable(),
   nb_t4_more: z.number().nullable(),
   nb_total_apartments: z.number().nullable(),
-  owner_name: z.string().max(150).nullable(),
-  owner_url: z.string().max(500).nullable(),
+  owner: z
+    .object({
+      image_base64: z.string().nullable(),
+      name: z.string().max(150),
+      slug: z.string().max(250),
+      url: z.string().max(500),
+    })
+    .nullable(),
   postal_code: z.string().max(5),
   price_min: z.number().nullable(),
   residence_type: z.nativeEnum(EResidence),

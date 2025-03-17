@@ -66,6 +66,7 @@
 }
 
 .sidebarTitle {
+  white-space: nowrap;
   line-height: 3rem;
   margin: 0;
 }
@@ -73,3 +74,23 @@
 .sidebarText {
   margin: 0;
 }
+
+.sidebarOwner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.sidebarShare {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+}
+
+
