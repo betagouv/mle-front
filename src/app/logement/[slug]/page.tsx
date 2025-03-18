@@ -91,7 +91,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
             {!!owner && (
               <div className={styles.sidebarOwner}>
                 <span>proposé par</span>
-                {!!owner.image_base64 && <Image src={owner.image_base64} alt={owner.name} width={32} height={32} />}
+                {!!owner.image_base64 && <Image src={owner.image_base64} alt={owner.name} width={52} height={52} />}
                 <h3 className={styles.sidebarText}>{owner.name}</h3>
                 <Button linkProps={{ href: owner.url }} priority="primary">
                   {t('sidebar.buttons.consult')}
