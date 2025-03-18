@@ -20,7 +20,7 @@ export const PrepareStudentLifeSelectDepartment: FC<{ departments: TDepartment[]
     >
       <option value="Tous">Tous</option>
       {departments.map((department) => (
-        <option key={department.id} value={department.id}>
+        <option key={department.id} value={department.code}>
           {department.name}
         </option>
       ))}

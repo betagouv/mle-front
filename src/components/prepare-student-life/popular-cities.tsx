@@ -12,9 +12,10 @@ interface PopularCitiesProps {
 
 export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
   const { classes } = useStyles()
-  const { data } = useCities()
+  const { data, isLoading } = useCities()
 
   const mockDetail = 'Budget minimum 600€'
+  if (isLoading) return null
 
   return (
     <div className={classes.tilesGrid}>

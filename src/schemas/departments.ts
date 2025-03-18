@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 const ZDepartment = z.object({
   bbox: z.string(),
+  code: z.string(),
   id: z.number(),
   name: z.string(),
 })
