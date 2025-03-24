@@ -18,7 +18,7 @@
     "clsx": "^2.1.1",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
-    "next": "^14.2.18",
+    "next": "^14.2.25",
     "next-intl": "^3.25.2",
     "nuqs": "^2.2.3",
     "react": "^18",
