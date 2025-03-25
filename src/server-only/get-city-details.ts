@@ -4,6 +4,7 @@ export const getCityDetails = async (slug: string): Promise<TCity> => {
   const response = await fetch(`${process.env.API_URL}/territories/cities/${slug.toLowerCase()}/details`, {
     next: { revalidate: 60 * 60 * 24 },
   })
+
   if (!response.ok) {
     throw new Error(`Error occurred calling API while city with slug: ${slug}`)
   }
