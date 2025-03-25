@@ -4,20 +4,25 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import Input from '@codegouvfr/react-dsfr/Input'
 import { useTranslations } from 'next-intl'
-import { FC } from 'react'
+import { parseAsString } from 'nuqs'
+import { useQueryStates } from 'nuqs'
+import { FC, useState } from 'react'
 import { tss } from 'tss-react'
 import { useTerritories } from '~/hooks/use-territories'
 import { AlertAccomodationAutocompleteResults } from '~/schemas/alert-accommodation/autocomplete/alert-accomodation-autocomplete-results'
 
 export const AlertAccomodationAutocompleteInput: FC<{ redirect?: boolean }> = ({ redirect = true }) => {
+  const [queryStates] = useQueryStates({ q: parseAsString, type: parseAsString })
+
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()
-
+  const [open, setOpen] = useState(false)
   const { data, isError, searchQuery, setSearchQuery } = useTerritories()
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(event.target.value)
-  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     e.preventDefault()
+    setOpen(true)
   }
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(event.target.value)
 
   return (
     <div className={classes.container}>
@@ -25,11 +30,11 @@ export const AlertAccomodationAutocompleteInput: FC<{ redirect?: boolean }> = ({
         classes={{ root: classes.input }}
         label={t('header.inputLabel')}
         iconId="ri-map-pin-2-line"
-        nativeInputProps={{ onBlur: handleInputBlur, onChange: handleInputChange, value: searchQuery }}
+        nativeInputProps={{ onChange: handleInputChange, onFocus: handleInputFocus, value: searchQuery }}
         state={isError ? 'error' : 'default'}
       />
 
-      {data && <AlertAccomodationAutocompleteResults data={data} searchQuery={searchQuery} />}
+      {open && data && <AlertAccomodationAutocompleteResults onClick={() => setOpen(false)} data={data} searchQuery={searchQuery} />}
     </div>
   )
 }

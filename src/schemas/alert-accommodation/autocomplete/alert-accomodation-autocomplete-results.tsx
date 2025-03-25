@@ -10,15 +10,17 @@ import { TTerritories, TTerritory } from '~/schemas/territories'
 
 interface AlertAccomodationAutocompleteResults {
   data: TTerritories
+  onClick: () => void
   searchQuery: string
 }
 
 interface AlertAccomodationAutocompleteItemProps {
   categoryKey: keyof TTerritories
   item: TTerritory
+  onClick: () => void
 }
 
-export const AlertAccommodationResultsItem: FC<AlertAccomodationAutocompleteItemProps> = ({ categoryKey, item }) => {
+export const AlertAccommodationResultsItem: FC<AlertAccomodationAutocompleteItemProps> = ({ categoryKey, item, onClick }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, setQueryStates] = useQueryStates({ q: parseAsString, type: parseAsString })
 
@@ -42,6 +44,7 @@ export const AlertAccommodationResultsItem: FC<AlertAccomodationAutocompleteItem
         setQueryStates({ q: item.name, type: getCategoryKeySingular(categoryKey) })
         setValue('territory_name', item.name)
         setValue('territory_type', getCategoryKeySingular(categoryKey))
+        onClick()
       }}
     >
       {item.name}
@@ -49,7 +52,7 @@ export const AlertAccommodationResultsItem: FC<AlertAccomodationAutocompleteItem
   )
 }
 
-export const AlertAccomodationAutocompleteResults: FC<AlertAccomodationAutocompleteResults> = ({ data, searchQuery }) => {
+export const AlertAccomodationAutocompleteResults: FC<AlertAccomodationAutocompleteResults> = ({ data, onClick, searchQuery }) => {
   const t = useTranslations('findAccomodation')
   const [searchQueryState] = useQueryState('q')
   const { classes } = useStyles()
@@ -85,7 +88,7 @@ export const AlertAccomodationAutocompleteResults: FC<AlertAccomodationAutocompl
                 </li>
                 <ul className={classes.list}>
                   {items.map((item: TTerritory) => (
-                    <AlertAccommodationResultsItem key={item.id} categoryKey={categoryKey} item={item} />
+                    <AlertAccommodationResultsItem onClick={onClick} key={item.id} categoryKey={categoryKey} item={item} />
                   ))}
                 </ul>
               </div>

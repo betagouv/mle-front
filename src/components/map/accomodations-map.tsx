@@ -27,10 +27,14 @@ const BoundsHandler: FC = () => {
         [north, east],
       ])
     }
-  }, [queryBbox])
+  }, [queryBbox, map])
 
   useMapEvents({
-    moveend: (e) => {
+    dragend: (e) => {
+      const bounds = e.target.getBounds()
+      setBbox(`${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`)
+    },
+    zoomend: (e) => {
       const bounds = e.target.getBounds()
       setBbox(`${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`)
     },
@@ -90,7 +94,7 @@ const useStyles = tss.create({
     [fr.breakpoints.down('sm')]: {
       height: '400px',
     },
-    height: '600px',
+    height: '500px',
     width: '100%',
   },
 })

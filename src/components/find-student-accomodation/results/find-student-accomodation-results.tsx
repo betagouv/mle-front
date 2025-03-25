@@ -31,8 +31,14 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
   }, [])
 
   const { data: accommodations, isLoading } = useAccomodations({ initialData: data })
-  const hasResults = useMemo(() => data.results.features.length > 0, [data])
-  const { classes, cx } = useStyles({ hasResults, view })
+
+  useEffect(() => {
+    if (!!accommodations?.results?.features && accommodations.results.features.length < 6) {
+      window.scrollTo({ behavior: 'smooth', top: 0 })
+    }
+  }, [accommodations?.results.features.length])
+
+  const { classes, cx } = useStyles({ view })
 
   const AccomodationsMap = useMemo(
     () =>
@@ -58,7 +64,7 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
             (accommodations?.results.features || []).map((accommodation) => (
               <AccomodationCard key={accommodation.id} accomodation={accommodation} />
             ))}
-          {isLoading && Array.from({ length: 8 }).map((_, index) => <CardSkeleton key={index} />)}
+          {isLoading && Array.from({ length: 24 }).map((_, index) => <CardSkeleton key={index} />)}
         </div>
         <div>
           {accommodations?.count === 0 && (
@@ -96,7 +102,7 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
   )
 }
 
-const useStyles = tss.withParams<{ hasResults?: boolean; view: string | null }>().create(({ hasResults = false, view }) => ({
+const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) => ({
   '@keyframes pulse': {
     '0%, 100%': {
       opacity: 1,
@@ -127,9 +133,10 @@ const useStyles = tss.withParams<{ hasResults?: boolean; view: string | null }>(
   },
   mapContainer: {
     [fr.breakpoints.up('md')]: {
-      height: hasResults ? 'calc(100vh - 400px)' : 'auto',
+      height: 'calc(100vh - 400px)',
     },
-    height: hasResults ? 'calc(100vh - 600px)' : 'auto',
+    height: 'calc(100vh - 600px)',
+    minHeight: '400px',
     position: 'sticky',
     top: '1rem',
   },

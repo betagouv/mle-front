@@ -4,7 +4,6 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import Input from '@codegouvfr/react-dsfr/Input'
 import { useTranslations } from 'next-intl'
-import { useQueryState } from 'nuqs'
 import { FC } from 'react'
 import { tss } from 'tss-react'
 import { FindStudentAccomodationAutocompleteResults } from '~/components/find-student-accomodation/autocomplete/find-student-accomodation-autocomplete-results'
@@ -13,7 +12,6 @@ import { useTerritories } from '~/hooks/use-territories'
 export const FindStudentAccomodationAutocompleteInput: FC<{ redirect?: boolean }> = ({ redirect = true }) => {
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()
-  const [searchQueryState] = useQueryState('q')
 
   const { data, isError, searchQuery, setSearchQuery } = useTerritories()
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(event.target.value)

@@ -100,8 +100,8 @@
             "accessbility": "Adapté PMR"
         },
         "filters": {
-            "accommodations": "logements",
-            "accommodationsWithLocation": "logements à {location}",
+            "accommodations": "résidences",
+            "accommodationsWithLocation": "résidences à {location}",
             "grid": "Grille",
             "map": "Carte",
             "sortByPrice": "Triés par prix"
