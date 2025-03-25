@@ -26,7 +26,7 @@ export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
           desc={`${city.nb_apartments} logements étudiants`}
           detail={mockDetail}
           linkProps={{
-            href: `/preparer-sa-vie-etudiante/${city.name}`,
+            href: `/preparer-sa-vie-etudiante/${city.slug}`,
           }}
           orientation="vertical"
           title={city.name}
