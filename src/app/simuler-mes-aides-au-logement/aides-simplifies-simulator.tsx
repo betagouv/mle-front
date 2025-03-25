@@ -17,7 +17,6 @@ const AidesSimplifiesSimulator: FC<AidesSimplifiesSimulatorProps> = ({ onHeightC
     const container = containerRef.current
     if (container) {
       container.appendChild(script)
-      container.classList.add(fr.cx('fr-p-4w'))
     }
 
     // Create a MutationObserver to watch for height changes
