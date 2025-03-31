@@ -88,7 +88,7 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_apa
                         <div>
                           <Link href="#" className={fr.cx('fr-link')}>
                             {/* TODO -reset margin right on ::before {' '} */}
-                            <span className={fr.cx('fr-icon-arrow-right-line')}>Consulter les 34 offres </span>
+                            <span className={fr.cx('fr-icon-arrow-right-line')}>Consulter les 34 offres</span>
                           </Link>
                         </div>
                       </div>
@@ -137,8 +137,8 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_apa
                 </div>
                 <p style={{ margin: 0 }}>
                   <span className={fr.cx('ri-thumb-up-line')}>
-                    Un <span className={fr.cx('fr-text--bold')}>plafonnement des loyers est en vigueur à Créteil</span> afin de limiter les
-                    abus
+                    Un <span className={fr.cx('fr-text--bold')}>plafonnement des loyers est en vigueur à {location}</span> afin de limiter
+                    les abus
                   </span>
                 </p>
               </div>
@@ -281,7 +281,7 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_apa
                     (APL déduite)
                   </div>
                   <div>
-                    <span className={fr.cx('fr-text--bold')}>Frais occasionnels</span>(covoiturage, taxis, etc.): 10-30 € par mois.
+                    <span className={fr.cx('fr-text--bold')}>Frais occasionnels</span> (covoiturage, taxis, etc.): 10-30 € par mois.
                   </div>
                 </div>
               </div>

@@ -194,16 +194,19 @@
 }
 
 .partnersGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 2fr);
-  gap: 1rem;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 2rem;
 }
 
 @media (min-width: 768px) {
   .partnersGrid {
     display: flex;
     justify-content: space-between;
+    flex-direction: row;
     align-items: center;
     padding-bottom: 4rem;
     padding-top: 3rem;

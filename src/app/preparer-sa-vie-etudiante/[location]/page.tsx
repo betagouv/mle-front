@@ -11,7 +11,6 @@ export default async function PrepareStudentLifeCityPage({ params }: { params: {
   const { location } = params
   const cityDetails = await getCityDetails(location)
   const { average_rent, bbox, name, nb_apartments } = cityDetails
-
   return (
     <div>
       <div className={fr.cx('fr-container')}>
