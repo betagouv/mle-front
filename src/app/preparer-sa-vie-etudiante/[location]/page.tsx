@@ -14,12 +14,12 @@ export default async function PrepareStudentLifeCityPage({ params }: { params: {
   return (
     <div>
       <div className={fr.cx('fr-container')}>
-        <DynamicBreadcrumb title={location} />
+        <DynamicBreadcrumb title={name} />
         <h1>{t('title', { title: name })}</h1>
       </div>
-      <PrepareStudentLifeSummary {...cityDetails} location={location} />
-      <PrepareStudentLifeStats average_rent={average_rent} location={location} nb_apartments={nb_apartments} />
-      <PrepareStudentLifeNearbyAccommodations location={location} bbox={bbox} name={name} />
+      <PrepareStudentLifeSummary {...cityDetails} location={name} />
+      <PrepareStudentLifeStats average_rent={average_rent} location={name} nb_apartments={nb_apartments} />
+      <PrepareStudentLifeNearbyAccommodations bbox={bbox} name={name} />
     </div>
   )
 }

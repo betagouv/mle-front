@@ -9,13 +9,19 @@
   padding-bottom: 2rem;
 }
 
-.headerSection {
+.infosContainer {
+  background-color: white;
+  border: 1px solid var(--border-default-grey);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.section {
   border-bottom: 1px solid #E5E5E5;
   padding: 1rem 1rem;
 }
 
 @media (min-width: 768px) {
-  .headerSection {
+  .section {
     padding: 3rem 3.5rem;
   }
 }
@@ -91,6 +97,18 @@
 .buttonGroup {
   display: flex;
   gap: 1rem;
+}
+
+.equipmentsGrid {
+  display: grid;
+  gap: 1rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 

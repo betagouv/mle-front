@@ -10,6 +10,7 @@ import { fr } from '@codegouvfr/react-dsfr'
 import { useAccomodations } from '~/hooks/use-accomodations'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 import { TTerritory } from '~/schemas/territories'
+import { sPluriel } from '~/utils/sPluriel'
 
 type FindStudentAccomodationSortViewProps = {
   data: TGetAccomodationsResponse
@@ -25,7 +26,9 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
 
   const { classes } = useStyles({ hasResults: accommodations && accommodations.count > 0 })
 
-  const title = territory?.name ? t('accommodationsWithLocation', { location: territory?.name }) : t('accommodations')
+  const title = territory?.name
+    ? t('accommodationsWithLocation', { location: territory?.name })
+    : `${t('accommodations')}${sPluriel(accommodations?.count ?? 0)}`
   return (
     <div className={classes.headerContainer}>
       {accommodations && accommodations.count > 0 && (

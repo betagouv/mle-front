@@ -44,13 +44,16 @@
         "faq": "Foire aux questions"
     },
     "accomodation": {
+        "equipments": {
+            "title": "Equipements"
+        },
         "title": "Logement étudiant {title} à {city}",
         "tags": {
             "studio": "Studio",
             "shared": "Colocation",
             "accessible": "Accessible"
         },
-        "availableAccommodations": "Logements disponibles",
+        "availableAccommodations": "Logements de la résidence",
         "location": {
             "title": "Localisation",
             "accessibility": "Accessibilité"
@@ -100,7 +103,7 @@
             "accessbility": "Adapté PMR"
         },
         "filters": {
-            "accommodations": "résidences",
+            "accommodations": "résidence",
             "accommodationsWithLocation": "résidences à {location}",
             "grid": "Grille",
             "map": "Carte",
