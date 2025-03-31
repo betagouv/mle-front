@@ -5,12 +5,14 @@ import apl from '~/images/apl.svg'
 import caf from '~/images/caf.svg'
 import crous from '~/images/logo-crous.svg'
 import al from '~/images/al.svg'
-import logo from '~/images/logo.svg'
+import arpej from '~/images/arpej.svg'
 import home from '~/images/landing.webp'
+import espacil from '~/images/espacil.webp'
+import studefi from '~/images/studefi.webp'
+import sogima from '~/images/sogima.svg'
 import exploreCities from '~/images/explore-cities.webp'
 import findNextAccommodation from '~/images/find-next-accommodation.webp'
 import styles from './home.module.css'
-import Input from '@codegouvfr/react-dsfr/Input'
 import Range from '@codegouvfr/react-dsfr/Range'
 import { getTranslations } from 'next-intl/server'
 import { FindStudentColivingAccomodationSwitch } from '~/components/find-student-accomodation/header/find-student-coliving-accomodation'
@@ -19,6 +21,7 @@ import Tabs from '@codegouvfr/react-dsfr/Tabs'
 import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import clsx from 'clsx'
 import { getPopularCities } from '~/server-only/get-popular-cities'
+import { CitiesAutocompleteInput } from '~/components/prepare-student-life/autocomplete/cities-autocomplete-input'
 
 export default async function Home() {
   const t = await getTranslations('home')
@@ -50,7 +53,7 @@ export default async function Home() {
                 <Image src={al.src} width={40} height={40} alt="Logo AL" />
               </div>
               <div className={styles.fullWidth}>
-                <Button size="large" className={styles.fullWidthButton}>
+                <Button size="large" linkProps={{ href: '/simuler-mes-aides-au-logement' }} className={styles.fullWidthButton}>
                   {t('simulator.button')}
                 </Button>
               </div>
@@ -65,8 +68,8 @@ export default async function Home() {
         </div>
       </div>
       <div className={clsx(fr.cx('fr-container'), styles.mainContainer)}>
-        <div className={styles.headerSection}>
-          <Image src={logo.src} alt="Logo" width={80} height={80} />
+        <div className={clsx(fr.cx('fr-container'), styles.headerSection)}>
+          {/* <Image src={logo.src} alt="Logo" width={80} height={80} /> */}
           <h1 className={styles.headerSectionTitle}>{t('mainSection.title')}</h1>
           <p style={{ fontSize: '18px' }}>
             {t.rich('mainSection.description', {
@@ -86,7 +89,12 @@ export default async function Home() {
               <h1 className={styles.cardTitle}>{t('features.exploreCities.title')}</h1>
               <div className={styles.citiesGrid}>
                 {sortedPopularCities.map((city) => (
-                  <Button className={styles.cityButton} key={city.id} priority="secondary">
+                  <Button
+                    className={styles.cityButton}
+                    linkProps={{ href: `/preparer-sa-vie-etudiante/${city.slug}` }}
+                    key={city.id}
+                    priority="secondary"
+                  >
                     {city.name}
                   </Button>
                 ))}
@@ -112,7 +120,7 @@ export default async function Home() {
             </div>
             <div className={styles.cardContent}>
               <h1 className={styles.cardTitle}>{t('features.findAccommodation.title')}</h1>
-              <Input label={t('features.findAccommodation.locationInput')} iconId="ri-map-pin-2-line" />
+              <CitiesAutocompleteInput />
               <Range label={t('header.rangeLabel')} max={1000} min={350} hideMinMax step={50} />
               <div className={styles.switchContainer}>
                 <FindStudentColivingAccomodationSwitch />
@@ -135,11 +143,10 @@ export default async function Home() {
         <div className={fr.cx('fr-container')}>
           <h2 className={styles.partnersHeader}>{t('partners.title')}</h2>
           <div className={styles.partnersGrid}>
-            <Image src={logo.src} alt="Logo" width={80} height={80} />
-            <Image src={logo.src} alt="Logo" width={80} height={80} />
-            <Image src={logo.src} alt="Logo" width={80} height={80} />
-            <Image src={logo.src} alt="Logo" width={80} height={80} />
-            <Image src={logo.src} alt="Logo" width={80} height={80} />
+            <Image src={arpej.src} alt="Logo Arpej" width={80} height={80} />
+            <Image src={espacil} alt="Logo Espacil" />
+            <Image src={sogima.src} alt="Logo Sogima" width={80} height={80} />
+            <Image src={studefi} alt="Logo Studefi" />
           </div>
         </div>
       </div>

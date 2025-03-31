@@ -8,6 +8,7 @@ import styles from './simuler-mes-aides-au-logement.module.css'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import Image from 'next/image'
 import homeHero from '~/images/home-bg.webp'
+import { useIsMobile } from '~/hooks/use-is-mobile'
 
 export const WrapperSimulator: FC = () => {
   const [simulatorHeight, setSimulatorHeight] = useState<number>(0)
@@ -15,9 +16,11 @@ export const WrapperSimulator: FC = () => {
     return `${simulatorHeight}px`
   }, [simulatorHeight])
 
+  const isMobile = useIsMobile()
+  const containerStyles = isMobile && { height: computedHeight, minHeight: '500px' }
   return (
     <div style={{ position: 'relative' }}>
-      <div style={{ height: computedHeight, minHeight: '500px' }} className="primaryBackgroundColor">
+      <div style={{ ...containerStyles }} className="primaryBackgroundColor">
         <div className={clsx(fr.cx('fr-container'), styles.heroSection)}>
           <DynamicBreadcrumb color="white" />
           <div className={clsx(fr.cx('fr-col-md-4'), styles.heroContent)}>
