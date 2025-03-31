@@ -55,7 +55,7 @@ export const HeaderNavigation: FC<{ academies: TAcademyOrDepartment[] }> = ({ ac
         categories: academiesColumns.map((academyColumn) => ({
           categoryMainLink: { linkProps: { href: '/par-academies', target: '_self' }, text: '' },
           links: academyColumn.map((academy) => ({
-            linkProps: { href: `/trouver-un-logement-etudiant/academie/${academy.name}`, target: '_self' },
+            linkProps: { href: `/trouver-un-logement-etudiant/academie/${academy.name}?vue=carte`, target: '_self' },
             text: academy.name,
           })),
         })),

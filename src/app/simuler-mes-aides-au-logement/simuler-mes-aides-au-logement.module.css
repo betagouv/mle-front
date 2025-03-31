@@ -16,6 +16,7 @@
     position: relative;
     z-index: 1;
   }
+  
   .formBody {
     padding: 3.5rem;
   }
@@ -27,7 +28,7 @@
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) {  
   .formContainer {
     padding-left: 0;
     padding-right: 0;
