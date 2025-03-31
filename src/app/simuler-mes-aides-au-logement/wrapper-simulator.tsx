@@ -17,7 +17,7 @@ export const WrapperSimulator: FC = () => {
   }, [simulatorHeight])
 
   const isMobile = useIsMobile()
-  const containerStyles = isMobile && { height: computedHeight, minHeight: '500px' }
+  const containerStyles = !isMobile && { height: computedHeight, minHeight: '500px' }
   return (
     <div style={{ position: 'relative' }}>
       <div style={{ ...containerStyles }} className="primaryBackgroundColor">
