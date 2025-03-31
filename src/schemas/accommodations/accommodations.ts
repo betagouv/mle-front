@@ -51,11 +51,24 @@ export type TAccomodation = z.infer<typeof ZAccomodation>
 export const ZAccomodationCard = ZAccomodation.pick({ id: true, properties: true })
 export type TAccomodationCard = z.infer<typeof ZAccomodationCard>
 
+enum AccommodationHouseRoomType {
+  private = 'private',
+  shared = 'shared',
+}
+
 export const ZAccomodationDetails = z.object({
   address: z.string().max(255),
+  bathroom: z.nativeEnum(AccommodationHouseRoomType),
+  bike_storage: z.boolean().nullable(),
   city: z.string().max(150),
+  common_areas: z.boolean().nullable(),
+  cooking_plates: z.boolean().nullable(),
+  desk: z.boolean().nullable(),
   geom: ZGeometry,
   images_base64: z.array(z.string()).nullable(),
+  kitchen_type: z.nativeEnum(AccommodationHouseRoomType),
+  laundry_room: z.boolean().nullable(),
+  microwave: z.boolean().nullable(),
   name: z.string().max(250),
   nb_accessible_apartments: z.number().nullable(),
   nb_coliving_apartments: z.number().nullable(),
@@ -73,9 +86,24 @@ export const ZAccomodationDetails = z.object({
       url: z.string().max(500),
     })
     .nullable(),
+  parking: z.boolean().nullable(),
   postal_code: z.string().max(5),
+  price_max: z.number().nullable(),
+  price_max_t1: z.number().nullable(),
+  price_max_t1_bis: z.number().nullable(),
+  price_max_t2: z.number().nullable(),
+  price_max_t3: z.number().nullable(),
+  price_max_t4_more: z.number().nullable(),
   price_min: z.number().nullable(),
+  price_min_t1: z.number().nullable(),
+  price_min_t1_bis: z.number().nullable(),
+  price_min_t2: z.number().nullable(),
+  price_min_t3: z.number().nullable(),
+  price_min_t4_more: z.number().nullable(),
+  refrigerator: z.boolean().nullable(),
+  residence_manager: z.boolean().nullable(),
   residence_type: z.nativeEnum(EResidence),
+  secure_access: z.boolean().nullable(),
   slug: z.string().max(250),
 })
 export type TAccomodationDetails = z.infer<typeof ZAccomodationDetails>

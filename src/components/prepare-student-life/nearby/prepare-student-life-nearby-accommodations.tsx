@@ -14,22 +14,17 @@ interface PrepareStudentLifeNearbyAccommodationsProps {
     ymax: number
     ymin: number
   }
-  location: string
   name: string
 }
 
-export default async function PrepareStudentLifeNearbyAccommodations({
-  bbox,
-  location,
-  name,
-}: PrepareStudentLifeNearbyAccommodationsProps) {
+export default async function PrepareStudentLifeNearbyAccommodations({ bbox, name }: PrepareStudentLifeNearbyAccommodationsProps) {
   const formattedBbox = `${bbox.xmin},${bbox.ymin},${bbox.xmax},${bbox.ymax}`
   const accommodations = await getAccommodations({ bbox: formattedBbox })
   const accommodationsList = accommodations.results.features.slice(0, 6)
   return (
     <div className="primaryBackgroundColor">
       <div className={clsx(fr.cx('fr-container'), styles.accommodationGridContainer)}>
-        <h1 className={styles.whiteTitle}>Parmi les logements étudiants à {location}</h1>
+        <h1 className={styles.whiteTitle}>Parmi les logements étudiants à {name}</h1>
         <div className={styles.accommodationGrid}>
           {accommodationsList.map((accommodation) => (
             <AccomodationCard key={accommodation.id} accomodation={accommodation} />

@@ -1,0 +1,41 @@
+import Button from '@codegouvfr/react-dsfr/Button'
+import Image from 'next/image'
+import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
+import styles from './logement.module.css'
+import { getTranslations } from 'next-intl/server'
+
+interface OwnerDetailsProps {
+  nbTotalApartments: number | null
+  owner: TAccomodationDetails['owner']
+}
+
+export const OwnerDetails = async ({ nbTotalApartments, owner }: OwnerDetailsProps) => {
+  const t = await getTranslations('accomodation')
+  return (
+    <div className={styles.sidebarCard}>
+      {nbTotalApartments ? (
+        <h3 className={styles.sidebarTitle}>{t('sidebar.accommodationsCount', { count: nbTotalApartments })}</h3>
+      ) : (
+        <h3 className={styles.sidebarTitle}>{t('sidebar.accommodationsNoCount')}</h3>
+      )}
+      {!!owner && (
+        <div className={styles.sidebarOwner}>
+          <span>proposé par</span>
+          {!!owner.image_base64 && <Image src={owner.image_base64} alt={owner.name} width={52} height={52} />}
+          <h3 className={styles.sidebarText}>{owner.name}</h3>
+          <Button linkProps={{ href: owner.url }} priority="primary">
+            {t('sidebar.buttons.consult')}
+          </Button>
+        </div>
+      )}
+      <div className={styles.sidebarShare}>
+        <p className={styles.sidebarText}>{t('sidebar.share')}</p>
+        <div className={styles.buttonGroup}>
+          <Button size="small" iconId="ri-links-line" priority="tertiary" title={t('sidebar.buttons.link')} />
+          <Button size="small" iconId="ri-mail-line" priority="tertiary" title={t('sidebar.buttons.email')} />
+          <Button size="small" iconId="ri-printer-line" priority="tertiary" title={t('sidebar.buttons.print')} />
+        </div>
+      </div>
+    </div>
+  )
+}
