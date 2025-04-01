@@ -10,7 +10,8 @@
         "legalMentions": "Mentions légales",
         "personalData": "Données personnelles",
         "cookies": "Gestion des cookies",
-        "sitemap": "Plan du site"
+        "sitemap": "Plan du site",
+        "notFound": "Page non trouvée"
     },
     "loading": {
         "card": "Chargement de la carte..."
@@ -289,5 +290,14 @@
             },
             "button": "Foire aux questions"
         }
+    },
+    "notFound": {
+        "title": "Page introuvable",
+        "errorCode": "Erreur 404",
+        "description": "La page que vous cherchez est introuvable. Excusez-nous pour la gêne occasionnée.",
+        "description2": "Si vous avez tapé l’adresse web dans le navigateur, vérifiez qu’elle est correcte.",
+        "description3": "La page n’est peut-être plus disponible.",
+        "description4": "Dans ce cas, pour continuer votre visite vous pouvez consulter la page d’accueil.",
+        "button": "Page d'accueil"
     }
 }
