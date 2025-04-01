@@ -133,10 +133,24 @@ const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) =>
   },
   mapContainer: {
     [fr.breakpoints.up('md')]: {
-      height: 'calc(100vh - 400px)',
+      '@media (min-height: 900px)': {
+        height: 'calc(100vh - 400px)',
+      },
+      '@media (min-height: 700px) and (max-height: 899px)': {
+        height: 'calc(100vh - 300px)',
+      },
+      '@media (min-height: 500px) and (max-height: 699px)': {
+        height: '400px',
+      },
+      '@media (max-height: 499px)': {
+        height: '300px',
+      },
+    },
+    '@media (max-height: 499px)': {
+      height: '300px',
     },
     height: 'calc(100vh - 600px)',
-    minHeight: '400px',
+    minHeight: '300px',
     position: 'sticky',
     top: '1rem',
   },
