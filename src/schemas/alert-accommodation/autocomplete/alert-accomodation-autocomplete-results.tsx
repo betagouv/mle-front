@@ -21,7 +21,6 @@ interface AlertAccomodationAutocompleteItemProps {
 }
 
 export const AlertAccommodationResultsItem: FC<AlertAccomodationAutocompleteItemProps> = ({ categoryKey, item, onClick }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, setQueryStates] = useQueryStates({ q: parseAsString, type: parseAsString })
 
   const { classes } = useStyles()
