@@ -56,49 +56,51 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
   )
 
   return (
-    <div className={classes.container}>
-      <div className={classes.accomodationsContainer}>
-        <div className={fr.cx('fr-hidden-sm')}>{card}</div>
-        <div className={classes.accommodationGrid}>
-          {!isLoading &&
-            (accommodations?.results.features || []).map((accommodation) => (
-              <AccomodationCard key={accommodation.id} accomodation={accommodation} />
-            ))}
-          {isLoading && Array.from({ length: 24 }).map((_, index) => <CardSkeleton key={index} />)}
-        </div>
-        <div>
-          {accommodations?.count === 0 && (
-            <div>
-              <h3>{t('noResult')}</h3>
-              <p>{t('description')}</p>
+    <>
+      <div className={fr.cx('fr-hidden-sm')}>{card}</div>
+      <div className={classes.container}>
+        <div className={classes.accomodationsContainer}>
+          <div className={classes.accommodationGrid}>
+            {!isLoading &&
+              (accommodations?.results.features || []).map((accommodation) => (
+                <AccomodationCard key={accommodation.id} accomodation={accommodation} />
+              ))}
+            {isLoading && Array.from({ length: 24 }).map((_, index) => <CardSkeleton key={index} />)}
+          </div>
+          <div>
+            {accommodations?.count === 0 && (
+              <div>
+                <h3>{t('noResult')}</h3>
+                <p>{t('description')}</p>
+              </div>
+            )}
+          </div>
+
+          {accommodations && accommodations.count > accommodations.page_size && (
+            <div className={classes.paginationContainer}>
+              <Pagination
+                showFirstLast={false}
+                count={Math.ceil(accommodations.count / accommodations.page_size)}
+                defaultPage={page ?? 1}
+                getPageLinkProps={(page: number) => {
+                  const params = new URLSearchParams()
+                  if (view) params.set('vue', view)
+                  if (bboxQuery) {
+                    params.set('bbox', `${bboxQuery}`)
+                  }
+                  params.set('page', page.toString())
+                  return { href: `/trouver-un-logement-etudiant?${params.toString()}` }
+                }}
+              />
             </div>
           )}
         </div>
 
-        {accommodations && accommodations.count > accommodations.page_size && (
-          <div className={classes.paginationContainer}>
-            <Pagination
-              showFirstLast={false}
-              count={Math.ceil(accommodations.count / accommodations.page_size)}
-              defaultPage={page ?? 1}
-              getPageLinkProps={(page: number) => {
-                const params = new URLSearchParams()
-                if (view) params.set('vue', view)
-                if (bboxQuery) {
-                  params.set('bbox', `${bboxQuery}`)
-                }
-                params.set('page', page.toString())
-                return { href: `/trouver-un-logement-etudiant?${params.toString()}` }
-              }}
-            />
-          </div>
+        {view === 'carte' && (
+          <div className={cx(fr.cx('fr-col-md-5', 'fr-pl-5v', 'fr-hidden', 'fr-unhidden-sm'), classes.mapContainer)}>{card}</div>
         )}
       </div>
-
-      {view === 'carte' && (
-        <div className={cx(fr.cx('fr-col-md-5', 'fr-pl-5v', 'fr-hidden', 'fr-unhidden-sm'), classes.mapContainer)}>{card}</div>
-      )}
-    </div>
+    </>
   )
 }
 
