@@ -15,16 +15,20 @@ type DynamicBreadcrumbProps = {
 
 export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, margin = true, title }) => {
   const pathname = usePathname()
+  console.log(pathname)
   const t = useTranslations()
   const { classes } = useStyles({ color, margin })
 
   const getCurrentPageDetails = () => {
-    let currentPageLabel = t('breadcrumbs.home')
+    let currentPageLabel = t('breadcrumbs.notFound')
     const segments: {
       label: ReactNode
       linkProps: RegisteredLinkProps
     }[] = []
     switch (pathname) {
+      case '/simuler-mes-aides-au-logement':
+        currentPageLabel = t('breadcrumbs.home')
+        break
       case '/accessibilite':
         currentPageLabel = t('breadcrumbs.accessibilite')
         break
