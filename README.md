@@ -10,7 +10,7 @@ This project is a client for the Mon logement étudiant startup. It's a platform
 - React-hook-form
 - Zod (validation DTO - formulaire)
 - Leaflet
-- Prettier + Eslint
+- Biome
 
 ## How to install the project
 
