@@ -1,8 +1,8 @@
 import { fr } from '@codegouvfr/react-dsfr'
-import styles from '../pages.module.css'
+import { Summary } from '@codegouvfr/react-dsfr/Summary'
 import { getTranslations } from 'next-intl/server'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
-import { Summary } from '@codegouvfr/react-dsfr/Summary'
+import styles from '../pages.module.css'
 
 export default async function SiteMap() {
   const t = await getTranslations('siteMap')

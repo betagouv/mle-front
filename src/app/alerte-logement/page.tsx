@@ -1,8 +1,8 @@
-import Image from 'next/image'
-import styles from './alert-logement.module.css'
-import findNextAccommodation from '~/images/find-next-accommodation.webp'
 import { getTranslations } from 'next-intl/server'
+import Image from 'next/image'
 import { AlertAccommodationForm } from '~/components/alert-accommodation/alert-accommodation-form'
+import findNextAccommodation from '~/images/find-next-accommodation.webp'
+import styles from './alert-logement.module.css'
 
 export default async function AlerteLogement() {
   const t = await getTranslations('alertLogement')

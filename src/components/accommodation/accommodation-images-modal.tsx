@@ -1,8 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-import { modal } from './accommodation-images'
 import { tss } from 'tss-react'
+import { modal } from './accommodation-images'
 
 export const AccommodationImagesModal = ({ children, images, title }: { children: React.ReactNode; images: string[]; title: string }) => {
   const { classes } = useStyles()

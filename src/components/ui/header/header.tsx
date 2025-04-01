@@ -1,11 +1,11 @@
 import { fr } from '@codegouvfr/react-dsfr'
+import { Button } from '@codegouvfr/react-dsfr/Button'
 import { Header } from '@codegouvfr/react-dsfr/Header'
 import { getTranslations } from 'next-intl/server'
 import { FC } from 'react'
-import { Button } from '@codegouvfr/react-dsfr/Button'
 import { BrandTop } from '~/components/ui/brand-top'
-import logo from '~/images/logo.svg'
 import { HeaderNavigation } from '~/components/ui/header/navigation'
+import logo from '~/images/logo.svg'
 import { getAcademies } from '~/server-only/get-academies'
 
 export const HeaderComponent: FC = async () => {

@@ -1,11 +1,11 @@
 .logo {
-    box-shadow: none !important;
+  box-shadow: none !important;
 }
 
 .footer :global(.fr-footer__top-list li) {
-    min-width: 250px;
+  min-width: 250px;
 }
 
 .footer :global(.fr-grid-row--gutters) {
-    justify-content: space-between;
+  justify-content: space-between;
 }

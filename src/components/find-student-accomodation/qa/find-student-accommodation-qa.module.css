@@ -17,7 +17,7 @@
 @media (min-width: 768px) {
   .faqQaContainer {
     display: flex;
-    gap:2rem;
+    gap: 2rem;
   }
   .qaContainer {
     flex: 0 0 66.6666666667%;
@@ -41,5 +41,5 @@
 }
 
 .titleMargin {
-    margin: 0;
+  margin: 0;
 }

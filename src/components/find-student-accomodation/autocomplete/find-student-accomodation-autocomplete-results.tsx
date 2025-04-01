@@ -1,6 +1,6 @@
 'use client'
 
-import { fr, FrCxArg } from '@codegouvfr/react-dsfr'
+import { FrCxArg, fr } from '@codegouvfr/react-dsfr'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { FC } from 'react'

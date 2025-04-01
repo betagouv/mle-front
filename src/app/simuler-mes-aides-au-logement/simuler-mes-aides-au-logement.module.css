@@ -16,7 +16,7 @@
     position: relative;
     z-index: 1;
   }
-  
+
   .formBody {
     padding: 3.5rem;
   }
@@ -28,7 +28,7 @@
   }
 }
 
-@media (max-width: 768px) {  
+@media (max-width: 768px) {
   .formContainer {
     padding-left: 0;
     padding-right: 0;
@@ -66,9 +66,9 @@
 }
 
 .durationBadge {
-  background-color: #FEE7FC;
+  background-color: #fee7fc;
   border-radius: 4px;
-  color: #6E445A;
+  color: #6e445a;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
 }
@@ -85,7 +85,7 @@
 }
 
 .heroHighlight {
-  color: #FCC63A;
+  color: #fcc63a;
 }
 
 .heroDescription {

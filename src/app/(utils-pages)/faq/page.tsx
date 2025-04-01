@@ -1,10 +1,10 @@
+import { fr } from '@codegouvfr/react-dsfr'
+import Accordion from '@codegouvfr/react-dsfr/Accordion'
+import { Tile } from '@codegouvfr/react-dsfr/Tile'
+import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import styles from './faq.module.css'
-import { Tile } from '@codegouvfr/react-dsfr/Tile'
-import { fr } from '@codegouvfr/react-dsfr'
-import Accordion from '@codegouvfr/react-dsfr/Accordion'
-import clsx from 'clsx'
 
 export default async function Faq() {
   const t = await getTranslations('faq')

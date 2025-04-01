@@ -1,10 +1,10 @@
 import { fr } from '@codegouvfr/react-dsfr'
-import Button from '@codegouvfr/react-dsfr/Button'
-import styles from './simuler-mes-aides-au-logement.module.css'
 import Accordion from '@codegouvfr/react-dsfr/Accordion'
-import { getGlobalQuestionsAnswers } from '~/server-only/get-global-questions-answers'
+import Button from '@codegouvfr/react-dsfr/Button'
 import { clsx } from 'clsx'
 import { WrapperSimulator } from '~/app/simuler-mes-aides-au-logement/wrapper-simulator'
+import { getGlobalQuestionsAnswers } from '~/server-only/get-global-questions-answers'
+import styles from './simuler-mes-aides-au-logement.module.css'
 
 export default async function SimulateAccommodationAids() {
   const qa = await getGlobalQuestionsAnswers()

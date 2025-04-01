@@ -1,6 +1,6 @@
 .verticalLine {
   width: 0.5rem;
-  background-color: #FCC63A;
+  background-color: #fcc63a;
   position: absolute;
   top: -3rem;
   bottom: -3rem;
@@ -14,7 +14,7 @@
   left: 50%;
   width: 2rem;
   height: 2rem;
-  background-color: #FCC63A;
+  background-color: #fcc63a;
   border-radius: 50%;
   transform: translateX(-50%);
   box-shadow: 0 0 0 1rem rgba(0, 0, 18, 0.08);
@@ -23,7 +23,7 @@
 
 .circleTop::after,
 .circleBottom::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 50%;
   top: 50%;
@@ -41,7 +41,6 @@
 .circleBottom {
   bottom: -1rem;
 }
-
 
 .heroContent {
   display: flex;
@@ -63,7 +62,7 @@
 }
 
 .highlight {
-  color: #FCC63A;
+  color: #fcc63a;
 }
 
 .heroDescription {
@@ -155,7 +154,6 @@
     display: flex;
     width: 100%;
     overflow: hidden;
-    
   }
   .heroTitle {
     font-size: 3.5rem;
@@ -204,7 +202,7 @@
   .callToActionTitle {
     margin-top: 4rem;
   }
-  .mainTitle { 
+  .mainTitle {
     width: 60%;
   }
   .featureCard {
@@ -249,7 +247,7 @@
 
 .stepIndicator {
   border-radius: 0.25rem;
-  background-color: #5757AD;
+  background-color: #5757ad;
   color: white;
   font-weight: bold;
   padding: 0 0.5rem;
@@ -287,7 +285,7 @@
 .featuresContainer {
   display: flex;
   gap: 2rem;
-    padding-bottom: 3rem;
+  padding-bottom: 3rem;
   padding-top: 3rem;
 }
 
@@ -321,7 +319,7 @@
 }
 
 .impactCard {
-  background-color: #5757AD;
+  background-color: #5757ad;
   box-shadow: 0 4px 12px 0px rgba(0, 0, 18, 0.16);
   color: white;
   display: flex;
@@ -365,7 +363,7 @@
 }
 
 .stepBadge {
-  background-color: #5757AD;
+  background-color: #5757ad;
   border-radius: 0.25rem;
   color: white;
   font-weight: bold;
@@ -413,4 +411,3 @@
   line-height: 2rem;
   margin: 0;
 }
-

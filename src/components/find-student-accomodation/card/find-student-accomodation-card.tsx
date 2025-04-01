@@ -1,14 +1,14 @@
 'use client'
 
-import React, { FC } from 'react'
-import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
+import { fr } from '@codegouvfr/react-dsfr'
+import { Badge } from '@codegouvfr/react-dsfr/Badge'
 import { Card } from '@codegouvfr/react-dsfr/Card'
 import { Tag } from '@codegouvfr/react-dsfr/Tag'
 import { useTranslations } from 'next-intl'
-import { fr } from '@codegouvfr/react-dsfr'
 import { parseAsString, useQueryState } from 'nuqs'
-import { Badge } from '@codegouvfr/react-dsfr/Badge'
+import { FC } from 'react'
 import { FindStudentAccommodationImageCard } from '~/components/find-student-accomodation/card/find-student-accommodation-image-card'
+import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
 
 type AccomodationCardProps = {
   accomodation: TAccomodationCard

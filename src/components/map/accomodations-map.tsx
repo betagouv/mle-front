@@ -6,9 +6,9 @@ import { tss } from 'tss-react'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import 'leaflet-defaulticon-compatibility'
-import { useAccomodations } from '~/hooks/use-accomodations'
 import { fr } from '@codegouvfr/react-dsfr'
-import { parseAsString, useQueryStates, useQueryState } from 'nuqs'
+import { parseAsString, useQueryState, useQueryStates } from 'nuqs'
+import { useAccomodations } from '~/hooks/use-accomodations'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 
 interface AccomodationsMapProps {

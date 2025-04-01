@@ -1,8 +1,8 @@
-import { getTranslations } from 'next-intl/server'
-import styles from './logement.module.css'
-import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
 import clsx from 'clsx'
+import { getTranslations } from 'next-intl/server'
 import { FC } from 'react'
+import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
+import styles from './logement.module.css'
 
 type AccommodationEquipmentsProps = {
   accommodation: TAccomodationDetails

@@ -1,10 +1,10 @@
 import { fr } from '@codegouvfr/react-dsfr'
+import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
-import styles from './find-student-accommodation-qa.module.css'
 import { getTranslations } from 'next-intl/server'
-import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import { TGetQuestionsAnswersResponse } from '~/schemas/questions-answers/question-answers'
+import styles from './find-student-accommodation-qa.module.css'
 
 type FindStudentAccommodationQAProps = {
   qa: TGetQuestionsAnswersResponse

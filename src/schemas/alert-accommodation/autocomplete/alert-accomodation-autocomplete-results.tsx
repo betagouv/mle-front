@@ -1,6 +1,6 @@
 'use client'
 
-import { fr, FrCxArg } from '@codegouvfr/react-dsfr'
+import { FrCxArg, fr } from '@codegouvfr/react-dsfr'
 import { useTranslations } from 'next-intl'
 import { parseAsString, useQueryState, useQueryStates } from 'nuqs'
 import { FC } from 'react'

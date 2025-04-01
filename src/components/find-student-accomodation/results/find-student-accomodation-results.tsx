@@ -1,18 +1,18 @@
 'use client'
 
-import { tss } from 'tss-react'
-import { FC, Suspense, useEffect, useMemo } from 'react'
 import { fr } from '@codegouvfr/react-dsfr'
-import dynamic from 'next/dynamic'
-import { useAccomodations } from '~/hooks/use-accomodations'
 import { Pagination } from '@codegouvfr/react-dsfr/Pagination'
-import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
-import { MapSkeleton } from '~/components/map/map-skeleton'
-import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
-import { TTerritory } from '~/schemas/territories'
 import { useTranslations } from 'next-intl'
-import { CardSkeleton } from '~/components/ui/skeleton/card-skeleton'
+import dynamic from 'next/dynamic'
+import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
+import { FC, Suspense, useEffect, useMemo } from 'react'
+import { tss } from 'tss-react'
 import { AccomodationCard } from '~/components/find-student-accomodation/card/find-student-accomodation-card'
+import { MapSkeleton } from '~/components/map/map-skeleton'
+import { CardSkeleton } from '~/components/ui/skeleton/card-skeleton'
+import { useAccomodations } from '~/hooks/use-accomodations'
+import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
+import { TTerritory } from '~/schemas/territories'
 
 type FindStudentAccomodationResultsProps = {
   data: TGetAccomodationsResponse

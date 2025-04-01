@@ -24,7 +24,7 @@
 }
 
 .heroContent {
-  display: flex; 
+  display: flex;
   flex-direction: column;
   position: relative;
   text-align: center;
@@ -43,8 +43,8 @@
 }
 
 .heroHighlight {
-  margin: 0; 
-  color: #FCC63A;
+  margin: 0;
+  color: #fcc63a;
 }
 
 .heroSubtitle {
@@ -157,7 +157,7 @@
 
 .partnersHeader {
   text-align: center;
-  border-bottom: 1px solid #DDDDDD;
+  border-bottom: 1px solid #dddddd;
   padding-bottom: 1rem;
   margin: 0;
   padding-top: 2rem;
@@ -234,7 +234,8 @@
     flex-direction: row;
     padding: 0;
   }
-  .heroTitle, .heroHighlight {
+  .heroTitle,
+  .heroHighlight {
     font-size: 3.5rem;
     line-height: 4rem;
     margin: var(--title-spacing);
@@ -268,12 +269,11 @@
   .featureCard {
     flex-direction: row;
   }
-  .featuresContainer {      
+  .featuresContainer {
     gap: 3rem;
   }
-
 }
-.heroImageMobile{
+.heroImageMobile {
   object-fit: cover;
   width: 100%;
   height: 180px;
