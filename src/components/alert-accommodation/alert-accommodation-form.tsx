@@ -2,16 +2,16 @@
 
 import Button from '@codegouvfr/react-dsfr/Button'
 import Input from '@codegouvfr/react-dsfr/Input'
-import { useTranslations } from 'next-intl'
-import { FormProvider, useForm } from 'react-hook-form'
-import { FC } from 'react'
-import { tss } from 'tss-react'
-import { ZAlertAccommodationFormSchema } from '~/schemas/alert-accommodation/alert-accommodation'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertAccomodationAutocompleteInput } from '~/schemas/alert-accommodation/autocomplete/alert-accomodation-autocomplete-input'
-import { useAlertAccommodation } from '~/hooks/use-alert-accommodation'
+import { useTranslations } from 'next-intl'
 import { useQueryStates } from 'nuqs'
 import { parseAsString } from 'nuqs'
+import { FC } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { tss } from 'tss-react'
+import { useAlertAccommodation } from '~/hooks/use-alert-accommodation'
+import { ZAlertAccommodationFormSchema } from '~/schemas/alert-accommodation/alert-accommodation'
+import { AlertAccomodationAutocompleteInput } from '~/schemas/alert-accommodation/autocomplete/alert-accomodation-autocomplete-input'
 
 export const AlertAccommodationForm: FC = () => {
   const [queryStates] = useQueryStates({ q: parseAsString, type: parseAsString })

@@ -1,11 +1,11 @@
-import { Range } from '@codegouvfr/react-dsfr/Range'
-import { FC } from 'react'
-import styles from './find-student-accomodation-header.module.css'
-import { FindStudentAccomodationAutocompleteInput } from '~/components/find-student-accomodation/autocomplete/find-student-accomodation-autocomplete-input'
-import { getTranslations } from 'next-intl/server'
-import { FindStudentAccessibleAccomodationSwitch } from '~/components/find-student-accomodation/header/find-student-accessible-accomodation-switch'
 import { fr } from '@codegouvfr/react-dsfr'
+import { Range } from '@codegouvfr/react-dsfr/Range'
+import { getTranslations } from 'next-intl/server'
+import { FC } from 'react'
+import { FindStudentAccomodationAutocompleteInput } from '~/components/find-student-accomodation/autocomplete/find-student-accomodation-autocomplete-input'
+import { FindStudentAccessibleAccomodationSwitch } from '~/components/find-student-accomodation/header/find-student-accessible-accomodation-switch'
 import { FindStudentColivingAccomodationSwitch } from '~/components/find-student-accomodation/header/find-student-coliving-accomodation'
+import styles from './find-student-accomodation-header.module.css'
 
 export const FindStudentAccomodationHeader: FC = async () => {
   const t = await getTranslations('findAccomodation')

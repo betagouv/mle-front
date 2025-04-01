@@ -7,7 +7,7 @@
     margin-top: -3.5rem;
     padding-top: 3.5rem;
   }
-  .cardContainer{  
+  .cardContainer {
     flex-direction: row;
   }
   .card {
@@ -19,7 +19,7 @@
   .counterContainer {
     flex-direction: row;
   }
-   .priceContainer {
+  .priceContainer {
     padding: 0 2.5rem;
   }
   .helpersItems {
@@ -41,7 +41,7 @@
     padding: 2rem 3rem;
   }
   .borderRight {
-    border-right: 1px solid #DDDDDD;
+    border-right: 1px solid #dddddd;
   }
 }
 
@@ -56,7 +56,7 @@
   .counterContainer {
     flex-direction: column;
   }
-   .priceContainer {
+  .priceContainer {
     padding: 1.5rem;
   }
   .studioColocItemsContainer {
@@ -83,9 +83,9 @@
 }
 
 .cardsContainer {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
 .cardContainer {
@@ -144,35 +144,35 @@
 }
 
 .studioColocItemsContainer {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
 }
 .studioColocItem {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .warrantyContainer {
-    margin-top: 1rem;
+  margin-top: 1rem;
 }
 
 .helpersMainContainer {
-    background-color: var(--beige-gris-galet-975-75);
+  background-color: var(--beige-gris-galet-975-75);
 }
 .helpersContainer {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    justify-content: space-evenly;
-    text-align: center;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  justify-content: space-evenly;
+  text-align: center;
 }
 
 .helpersItems {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .costContainer {
@@ -181,34 +181,34 @@
   flex-direction: column;
 }
 .costHeaderContainer {
-    display: flex; 
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 .budgetsContainer {
-    display: flex;
-    gap: 2rem; 
-    justify-content: space-between;
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
 }
 
 .budgetsMainContainer {
-    align-items: center;
-    background-color: #F9F6F2;
-    border: 1px solid #DDDDDD;
-    border-radius: 0.5rem;
-    display: flex;  
-    margin-bottom: 1rem;
+  align-items: center;
+  background-color: #f9f6f2;
+  border: 1px solid #dddddd;
+  border-radius: 0.5rem;
+  display: flex;
+  margin-bottom: 1rem;
 }
 
 .costGridContainer {
-    border: 1px solid #DDDDDD;
-    border-radius: 0.5rem;
-    display: grid;
+  border: 1px solid #dddddd;
+  border-radius: 0.5rem;
+  display: grid;
 }
 .costGridItem {
-    display: flex;
-    gap: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
 }
 
 .borderBottom {
-    border-bottom: 1px solid #DDDDDD;
+  border-bottom: 1px solid #dddddd;
 }

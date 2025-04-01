@@ -1,11 +1,11 @@
 'use client'
 
-import { tss } from 'tss-react'
-import { FC, ReactNode } from 'react'
-import { useTranslations } from 'next-intl'
 import { Breadcrumb } from '@codegouvfr/react-dsfr/Breadcrumb'
-import { usePathname } from 'next/navigation'
 import { RegisteredLinkProps } from '@codegouvfr/react-dsfr/link'
+import { useTranslations } from 'next-intl'
+import { usePathname } from 'next/navigation'
+import { FC, ReactNode } from 'react'
+import { tss } from 'tss-react'
 
 type DynamicBreadcrumbProps = {
   color?: string

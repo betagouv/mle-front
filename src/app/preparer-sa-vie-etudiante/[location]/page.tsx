@@ -1,10 +1,10 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import { getTranslations } from 'next-intl/server'
+import PrepareStudentLifeNearbyAccommodations from '~/components/prepare-student-life/nearby/prepare-student-life-nearby-accommodations'
+import PrepareStudentLifeStats from '~/components/prepare-student-life/stats/prepare-student-life-stats'
+import PrepareStudentLifeSummary from '~/components/prepare-student-life/summary/prepare-student-life-summary'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import { getCityDetails } from '~/server-only/get-city-details'
-import PrepareStudentLifeSummary from '~/components/prepare-student-life/summary/prepare-student-life-summary'
-import PrepareStudentLifeStats from '~/components/prepare-student-life/stats/prepare-student-life-stats'
-import PrepareStudentLifeNearbyAccommodations from '~/components/prepare-student-life/nearby/prepare-student-life-nearby-accommodations'
 
 export default async function PrepareStudentLifeCityPage({ params }: { params: { location: string } }) {
   const t = await getTranslations('prepareStudentLife')

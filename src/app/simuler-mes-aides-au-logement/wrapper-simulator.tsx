@@ -2,12 +2,12 @@
 
 import { fr } from '@codegouvfr/react-dsfr'
 import clsx from 'clsx'
+import Image from 'next/image'
 import { FC, useMemo, useState } from 'react'
 import AidesSimplifiesSimulator from '~/app/simuler-mes-aides-au-logement/aides-simplifies-simulator'
-import styles from './simuler-mes-aides-au-logement.module.css'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
-import Image from 'next/image'
 import homeHero from '~/images/home-bg.webp'
+import styles from './simuler-mes-aides-au-logement.module.css'
 
 const WrapperHeaderSimulator: FC = () => {
   return (

@@ -11,8 +11,8 @@ import { tss } from 'tss-react'
 import { useTerritories } from '~/hooks/use-territories'
 import { AlertAccomodationAutocompleteResults } from '~/schemas/alert-accommodation/autocomplete/alert-accomodation-autocomplete-results'
 
-export const AlertAccomodationAutocompleteInput: FC<{ redirect?: boolean }> = ({ redirect = true }) => {
-  const [queryStates] = useQueryStates({ q: parseAsString, type: parseAsString })
+export const AlertAccomodationAutocompleteInput: FC = () => {
+  const [_queryStates] = useQueryStates({ q: parseAsString, type: parseAsString })
 
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()

@@ -1,10 +1,10 @@
+import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
-import Image from 'next/image'
 import { createModal } from '@codegouvfr/react-dsfr/Modal'
+import clsx from 'clsx'
+import Image from 'next/image'
 import { AccommodationImagesModal } from '~/components/accommodation/accommodation-images-modal'
 import styles from './accommodation-images.module.css'
-import { fr } from '@codegouvfr/react-dsfr'
-import clsx from 'clsx'
 
 interface AccommodationImagesProps {
   images: string[]

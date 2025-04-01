@@ -1,8 +1,8 @@
 import Button from '@codegouvfr/react-dsfr/Button'
+import { getTranslations } from 'next-intl/server'
 import Image from 'next/image'
 import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
 import styles from './logement.module.css'
-import { getTranslations } from 'next-intl/server'
 
 interface OwnerDetailsProps {
   nbTotalApartments: number | null

@@ -1,10 +1,10 @@
 .animatePulse {
-    animation: skeleton_pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    background-color: rgba(88, 88, 173, 0.1);
+  animation: skeleton_pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  background-color: rgba(88, 88, 173, 0.1);
 }
 
 @keyframes skeleton_pulse {
-    50% {
-        opacity: 0.5;
-    }
+  50% {
+    opacity: 0.5;
+  }
 }

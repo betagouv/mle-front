@@ -1,0 +1,66 @@
+version: 2.1
+
+executors:
+  node:
+    docker:
+      - image: cimg/node:22.10.0
+
+parameters:
+  lockfile:
+    type: string
+    default: './pnpm-lock.yaml'
+  virtual_store_dir:
+    type: string
+    default: '.pnpm-store'
+  cache_version:
+    type: string
+    default: 'v1'
+    
+jobs:
+  prepare_workspace_dependencies:
+    executor: node
+    steps:
+      - checkout
+      - skip/skip_unchanged:
+          paths: pnpm-lock.yaml
+      - install_dependencies
+      - run:
+          name: 'Fetch dependencies'
+          command: pnpm install --virtual-store-dir << pipeline.parameters.virtual_store_dir >> --frozen-lockfile
+      - save_cache:
+          key: << pipeline.parameters.cache_version >>-pnpm-{{ checksum "<< pipeline.parameters.lockfile >>" }}
+          paths:
+            - << pipeline.parameters.virtual_store_dir >>
+            - ./node_modules
+      
+  lint:
+    executor: node
+    steps:
+      - checkout
+      - install_dependencies
+      - run:
+          name: 'Lint'
+          command: pnpm lint
+
+  build:
+    executor: node
+    steps:
+      - checkout
+      - install_dependencies
+      - run:
+          name: 'Build'
+          command: pnpm build 
+
+commands:
+  install_pnpm:
+    steps:
+      - run:
+          name: 'Install pnpm'
+          command: sudo npm install -g pnpm
+          
+  install_dependencies:
+    steps:
+      - install_pnpm
+      - restore_cache:
+          keys:
+            - << pipeline.parameters.cache_version >>-pnpm-{{ checksum "<< pipeline.parameters.lockfile >>" }}

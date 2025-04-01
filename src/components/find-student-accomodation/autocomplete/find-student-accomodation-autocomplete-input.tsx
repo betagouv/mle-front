@@ -9,7 +9,7 @@ import { tss } from 'tss-react'
 import { FindStudentAccomodationAutocompleteResults } from '~/components/find-student-accomodation/autocomplete/find-student-accomodation-autocomplete-results'
 import { useTerritories } from '~/hooks/use-territories'
 
-export const FindStudentAccomodationAutocompleteInput: FC<{ redirect?: boolean }> = ({ redirect = true }) => {
+export const FindStudentAccomodationAutocompleteInput: FC = () => {
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()
 

@@ -1,11 +1,11 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import clsx from 'clsx'
 
-import styles from './prepare-student-life-nearby-accommodations.module.css'
-import { AccomodationCard } from '~/components/find-student-accomodation/card/find-student-accomodation-card'
 import Button from '@codegouvfr/react-dsfr/Button'
 import Link from 'next/link'
+import { AccomodationCard } from '~/components/find-student-accomodation/card/find-student-accomodation-card'
 import { getAccommodations } from '~/server-only/get-accommodations'
+import styles from './prepare-student-life-nearby-accommodations.module.css'
 
 interface PrepareStudentLifeNearbyAccommodationsProps {
   bbox: {

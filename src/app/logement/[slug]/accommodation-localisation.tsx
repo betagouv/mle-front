@@ -1,9 +1,9 @@
 import { AccomodationMap } from '~/components/map/accomodation-map'
 
-import Button from '@codegouvfr/react-dsfr/Button'
 import { fr } from '@codegouvfr/react-dsfr'
-import styles from './logement.module.css'
+import Button from '@codegouvfr/react-dsfr/Button'
 import { getTranslations } from 'next-intl/server'
+import styles from './logement.module.css'
 
 type AccommodationLocalisationProps = {
   address: string

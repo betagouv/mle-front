@@ -1,12 +1,12 @@
 import { fr } from '@codegouvfr/react-dsfr'
-import Image from 'next/image'
-import logoCrous from '~/images/logo-crous.svg'
-import compteur from '~/images/compteur.png'
-import Link from 'next/link'
-import Button from '@codegouvfr/react-dsfr/Button'
-import styles from './prepare-student-life-stats.module.css'
-import clsx from 'clsx'
 import Badge from '@codegouvfr/react-dsfr/Badge'
+import Button from '@codegouvfr/react-dsfr/Button'
+import clsx from 'clsx'
+import Image from 'next/image'
+import Link from 'next/link'
+import compteur from '~/images/compteur.png'
+import logoCrous from '~/images/logo-crous.svg'
+import styles from './prepare-student-life-stats.module.css'
 interface PrepareStudentLifeStatsProps {
   average_rent: number
   location: string

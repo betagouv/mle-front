@@ -1,11 +1,11 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import { HeaderQuickAccessItem } from '@codegouvfr/react-dsfr/Header'
-import { cookies } from 'next/headers'
 import { useTranslations } from 'next-intl'
+import { cookies } from 'next/headers'
 import { FC } from 'react'
 
-import { AvailableLocales } from '~/i18n/request'
 import { LanguageLink } from '~/components/ui/header/langage-selection/language-link'
+import { AvailableLocales } from '~/i18n/request'
 
 export const LanguageSelect: FC = () => {
   const lang = cookies().get('NEXT_LOCALE')?.value as AvailableLocales

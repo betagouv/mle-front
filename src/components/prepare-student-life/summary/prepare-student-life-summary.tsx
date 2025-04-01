@@ -1,12 +1,12 @@
 import { fr } from '@codegouvfr/react-dsfr'
+import Button from '@codegouvfr/react-dsfr/Button'
+import Tabs from '@codegouvfr/react-dsfr/Tabs'
+import Tag from '@codegouvfr/react-dsfr/Tag'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
-import styles from './prepare-student-life-summary.module.css'
 import dynamic from 'next/dynamic'
 import { MapSkeleton } from '~/components/map/map-skeleton'
-import Tabs from '@codegouvfr/react-dsfr/Tabs'
-import Button from '@codegouvfr/react-dsfr/Button'
-import Tag from '@codegouvfr/react-dsfr/Tag'
+import styles from './prepare-student-life-summary.module.css'
 
 interface PrepareStudentLifeSummaryProps {
   average_income: number
