@@ -1,4 +1,4 @@
-import { TDepartments } from '~/schemas/departments'
+import { TDepartment, TDepartments } from '~/schemas/departments'
 
 export const getDepartments = async () => {
   const response = await fetch(`${process.env.API_URL}/territories/departments`, { next: { revalidate: 60 * 60 * 24 } })
@@ -8,5 +8,5 @@ export const getDepartments = async () => {
   }
   const data = await response.json()
 
-  return data as TDepartments
+  return data.sort((a: TDepartment, b: TDepartment) => a.name.localeCompare(b.name)) as TDepartments
 }

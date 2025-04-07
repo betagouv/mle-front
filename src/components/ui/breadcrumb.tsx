@@ -15,7 +15,6 @@ type DynamicBreadcrumbProps = {
 
 export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, margin = true, title }) => {
   const pathname = usePathname()
-  console.log(pathname)
   const t = useTranslations()
   const { classes } = useStyles({ color, margin })
 

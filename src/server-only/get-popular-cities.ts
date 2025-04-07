@@ -8,5 +8,5 @@ export const getPopularCities = async (): Promise<TCity[]> => {
   }
   const data = await response.json()
 
-  return data as TCity[]
+  return data.sort((a: TCity, b: TCity) => a.name.localeCompare(b.name)) as TCity[]
 }
