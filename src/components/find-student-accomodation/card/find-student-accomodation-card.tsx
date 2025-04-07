@@ -12,15 +12,15 @@ import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
 
 type AccomodationCardProps = {
   accomodation: TAccomodationCard
+  maxWidth?: string
 }
 
-export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation }) => {
+export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxWidth }) => {
   const [selectedAccommodation] = useQueryState('id', parseAsString)
   const t = useTranslations('findAccomodation.card')
   const { city, images_base64, name, nb_total_apartments, postal_code, price_min } = accomodation.properties
   const surface = '100m2'
   const type = 'T1'
-
   const badgeProps = price_min ? { badge: <Badge severity="new" noIcon>{`${t('priceFrom')} ${price_min}€`}</Badge> } : {}
   const imageProps =
     images_base64 && images_base64.length > 0
@@ -29,10 +29,12 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation }) =>
           imageAlt: 'Placeholder image',
           imageUrl: 'https://www.systeme-de-design.gouv.fr/img/placeholder.16x9.png',
         }
+
   return (
     <Card
       {...badgeProps}
       {...imageProps}
+      classes={{ root: maxWidth }}
       shadow={selectedAccommodation === accomodation.id.toString()}
       id={`accomodation-${accomodation.id}`}
       background
@@ -57,9 +59,9 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation }) =>
           </li>
         </ul>
       }
-      size="medium"
+      size="small"
       title={name}
-      titleAs="h3"
+      titleAs="h6"
     />
   )
 }

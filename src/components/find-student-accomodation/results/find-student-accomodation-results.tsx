@@ -2,6 +2,7 @@
 
 import { fr } from '@codegouvfr/react-dsfr'
 import { Pagination } from '@codegouvfr/react-dsfr/Pagination'
+import clsx from 'clsx'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
@@ -38,7 +39,7 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
     }
   }, [accommodations?.results.features.length])
 
-  const { classes, cx } = useStyles({ view })
+  const { classes } = useStyles({ view })
 
   const AccomodationsMap = useMemo(
     () =>
@@ -63,18 +64,17 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
           <div className={classes.accommodationGrid}>
             {!isLoading &&
               (accommodations?.results.features || []).map((accommodation) => (
-                <AccomodationCard key={accommodation.id} accomodation={accommodation} />
+                <AccomodationCard key={accommodation.id} accomodation={accommodation} maxWidth={classes.cardWidth} />
               ))}
             {isLoading && Array.from({ length: 24 }).map((_, index) => <CardSkeleton key={index} />)}
           </div>
-          <div>
-            {accommodations?.count === 0 && (
-              <div>
-                <h3>{t('noResult')}</h3>
-                <p>{t('description')}</p>
-              </div>
-            )}
-          </div>
+
+          {accommodations?.count === 0 && (
+            <div>
+              <h3>{t('noResult')}</h3>
+              <p>{t('description')}</p>
+            </div>
+          )}
 
           {accommodations && accommodations.count > accommodations.page_size && (
             <div className={classes.paginationContainer}>
@@ -96,9 +96,7 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
           )}
         </div>
 
-        {view === 'carte' && (
-          <div className={cx(fr.cx('fr-col-md-5', 'fr-pl-5v', 'fr-hidden', 'fr-unhidden-sm'), classes.mapContainer)}>{card}</div>
-        )}
+        {view === 'carte' && <div className={clsx(fr.cx('fr-col-md-5', 'fr-hidden', 'fr-unhidden-sm'), classes.mapContainer)}>{card}</div>}
       </div>
     </>
   )
@@ -118,8 +116,7 @@ const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) =>
       gridTemplateColumns: view === 'carte' ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
     },
     display: 'grid',
-    gap: '2rem',
-    gridTemplateColumns: '1fr',
+    gap: '1rem',
   },
   accomodationsContainer: {
     [fr.breakpoints.up('md')]: {
@@ -127,6 +124,12 @@ const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) =>
       marginBottom: '2rem',
       maxWidth: view === 'carte' ? '60%' : '100%',
       width: view === 'carte' ? '60%' : '100%',
+    },
+  },
+  cardWidth: {
+    [fr.breakpoints.up('md')]: {
+      maxWidth: view === 'carte' ? '333px' : '400px',
+      width: '100%',
     },
   },
   container: {
