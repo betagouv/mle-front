@@ -27,7 +27,7 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
   const { classes } = useStyles({ hasResults: accommodations && accommodations.count > 0 })
 
   const title = territory?.name
-    ? t('accommodationsWithLocation', { location: territory?.name })
+    ? t('accommodationsWithLocation', { pluralize: sPluriel(accommodations?.count ?? 0), location: territory?.name })
     : `${t('accommodations')}${sPluriel(accommodations?.count ?? 0)}`
   return (
     <div className={classes.headerContainer}>
