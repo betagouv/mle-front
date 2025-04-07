@@ -139,13 +139,13 @@ const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) =>
         height: 'calc(100vh - 400px)',
       },
       '@media (min-height: 700px) and (max-height: 899px)': {
-        height: 'calc(100vh - 300px)',
+        height: 'calc(100vh - 200px)',
       },
       '@media (min-height: 500px) and (max-height: 699px)': {
-        height: '400px',
+        height: '600px',
       },
       '@media (max-height: 499px)': {
-        height: '300px',
+        height: '600px',
       },
     },
     '@media (max-height: 499px)': {
