@@ -121,7 +121,7 @@ export default async function Home() {
             <div className={styles.cardContent}>
               <h1 className={styles.cardTitle}>{t('features.findAccommodation.title')}</h1>
               <CitiesAutocompleteInput />
-              <Range label={t('header.rangeLabel')} max={1000} min={350} hideMinMax step={50} />
+              <Range label={t('header.rangeLabel')} max={1000} min={350} hideMinMax step={50} suffix=" €" />
               <div className={styles.switchContainer}>
                 <FindStudentColivingAccomodationSwitch />
                 <FindStudentAccessibleAccomodationSwitch />
