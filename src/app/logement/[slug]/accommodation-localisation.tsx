@@ -1,8 +1,7 @@
-import { AccomodationMap } from '~/components/map/accomodation-map'
-
 import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { getTranslations } from 'next-intl/server'
+import AccommodationMap from '~/app/logement/[slug]/accommodation-map'
 import styles from './logement.module.css'
 
 type AccommodationLocalisationProps = {
@@ -28,7 +27,7 @@ export const AccommodationLocalisation = async ({ address, city, latitude, longi
         </Button>
       </div>
       <div style={{ width: '50%' }} className={fr.cx('fr-hidden', 'fr-unhidden-sm')}>
-        <AccomodationMap center={[latitude, longitude]} />
+        <AccommodationMap latitude={latitude} longitude={longitude} />
       </div>
     </div>
   )

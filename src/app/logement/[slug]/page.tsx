@@ -2,23 +2,17 @@ import { FrIconClassName, RiIconClassName, fr } from '@codegouvfr/react-dsfr'
 import { Tag } from '@codegouvfr/react-dsfr/Tag'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
-import dynamic from 'next/dynamic'
 import { AccommodationEquipments } from '~/app/logement/[slug]/accommodation-equipments'
 import { AccommodationLocalisation } from '~/app/logement/[slug]/accommodation-localisation'
+import AccommodationMap from '~/app/logement/[slug]/accommodation-map'
 import { AccommodationResidence } from '~/app/logement/[slug]/accommodation-residence'
 import { OwnerDetails } from '~/app/logement/[slug]/owner-details'
 import { AccommodationImages } from '~/components/accommodation/accommodation-images'
 import { NearbyAccommodations } from '~/components/accommodation/nearby-accommodations'
-import { MapSkeleton } from '~/components/map/map-skeleton'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import { getAccommodationById } from '~/server-only/get-accommodation-by-id'
 import { getAccommodations } from '~/server-only/get-accommodations'
 import styles from './logement.module.css'
-
-const AccomodationMap = dynamic(() => import('~/components/map/accomodation-map').then((mod) => mod.AccomodationMap), {
-  loading: () => <MapSkeleton height={400} />,
-  ssr: false,
-})
 
 export default async function LogementPage({ params }: { params: { slug: string } }) {
   const t = await getTranslations('accomodation')
@@ -59,7 +53,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
           <AccommodationEquipments accommodation={accommodation} />
           <AccommodationLocalisation address={address} city={city} latitude={latitude} longitude={longitude} postalCode={postal_code} />
         </div>
-        <div className={fr.cx('fr-hidden-sm')}>{<AccomodationMap center={[latitude, longitude]} />}</div>
+        <div className={fr.cx('fr-hidden-sm')}>{<AccommodationMap latitude={latitude} longitude={longitude} />}</div>
         <div style={{ flexDirection: 'column' }} className={fr.cx('fr-col-sm-4')}>
           <OwnerDetails owner={owner} nbTotalApartments={nb_total_apartments} />
           <NearbyAccommodations nearbyAccommodations={nearbyAccommodations} />
