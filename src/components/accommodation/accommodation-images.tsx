@@ -4,6 +4,7 @@ import { createModal } from '@codegouvfr/react-dsfr/Modal'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { AccommodationImagesModal } from '~/components/accommodation/accommodation-images-modal'
+import { sPluriel } from '~/utils/sPluriel'
 import styles from './accommodation-images.module.css'
 
 interface AccommodationImagesProps {
@@ -27,7 +28,9 @@ export const AccommodationImages = ({ images, title }: AccommodationImagesProps)
         <div className={styles.photoCountButton}>
           <AccommodationImagesModal images={images} title={title}>
             <Button priority="tertiary no outline" nativeButtonProps={modal.buttonProps}>
-              <span className={`ri-image-line ${styles.photoCount}`}>{images.length} photos</span>
+              <span className={`ri-image-line ${styles.photoCount}`}>
+                {images.length} photo{sPluriel(images.length)}
+              </span>
             </Button>
           </AccommodationImagesModal>
         </div>
