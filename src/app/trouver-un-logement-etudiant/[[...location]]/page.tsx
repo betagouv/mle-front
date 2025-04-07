@@ -41,8 +41,7 @@ export default async function FindStudentAccommodationPage({
 }) {
   const t = await getTranslations('findAccomodation')
   const routeCategoryKey = params?.location?.[0] || ''
-  const routeLocation = params?.location?.[1] || ''
-
+  const routeLocation = decodeURIComponent(params?.location?.[1] || '')
   if (params && (params?.location?.length < 2 || params?.location?.length > 2)) {
     redirect(`/trouver-un-logement-etudiant?vue=carte`)
   }
