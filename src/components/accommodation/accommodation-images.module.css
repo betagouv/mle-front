@@ -3,10 +3,14 @@
   justify-content: space-between;
 }
 
+.mainImage {
+  object-fit: cover;
+  width: 100%;
+}
+
 .mainImageContainer {
   display: flex;
   position: relative;
-  width: 50%;
 
   @media (max-width: 768px) {
     width: 100%;
@@ -27,6 +31,11 @@
 
 .gridContainer {
   width: 50%;
+  overflow: hidden;
+}
+
+.gridContainer[data-images="3"] {
+  width: 66.67%;
 }
 
 .imageGrid {
