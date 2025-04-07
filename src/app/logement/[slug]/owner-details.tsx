@@ -11,6 +11,7 @@ interface OwnerDetailsProps {
 
 export const OwnerDetails = async ({ nbTotalApartments, owner }: OwnerDetailsProps) => {
   const t = await getTranslations('accomodation')
+  console.log(owner)
   return (
     <div className={styles.sidebarCard}>
       {nbTotalApartments ? (
@@ -23,9 +24,11 @@ export const OwnerDetails = async ({ nbTotalApartments, owner }: OwnerDetailsPro
           <span>proposé par</span>
           {!!owner.image_base64 && <Image src={owner.image_base64} alt={owner.name} width={52} height={52} />}
           <h3 className={styles.sidebarText}>{owner.name}</h3>
-          <Button linkProps={{ href: owner.url }} priority="primary">
-            {t('sidebar.buttons.consult')}
-          </Button>
+          {!!owner.url && (
+            <Button linkProps={{ href: owner.url }} priority="primary">
+              {t('sidebar.buttons.consult')}
+            </Button>
+          )}
         </div>
       )}
       <div className={styles.sidebarShare}>
