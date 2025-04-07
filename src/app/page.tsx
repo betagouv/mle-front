@@ -69,7 +69,6 @@ export default async function Home() {
       </div>
       <div className={clsx(fr.cx('fr-container'), styles.mainContainer)}>
         <div className={clsx(fr.cx('fr-container'), styles.headerSection)}>
-          {/* <Image src={logo.src} alt="Logo" width={80} height={80} /> */}
           <h1 className={styles.headerSectionTitle}>{t('mainSection.title')}</h1>
           <p style={{ fontSize: '18px' }}>
             {t.rich('mainSection.description', {
