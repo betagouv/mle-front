@@ -277,11 +277,11 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_apa
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <span className={fr.cx('fr-text--bold')}>Transport</span>
                   <div>
-                    <span className={fr.cx('fr-text--bold')}>Navigo Imagine&apos;R</span> (carte pour étudiants) : environ 38 € par mois.
-                    (APL déduite)
+                    <span className={fr.cx('fr-text--bold')}>Navigo Imagine&apos;R</span> (carte pour étudiants) : environ 38 € par mois
+                    (APL déduite).
                   </div>
                   <div>
-                    <span className={fr.cx('fr-text--bold')}>Frais occasionnels</span> (covoiturage, taxis, etc.): 10-30 € par mois.
+                    <span className={fr.cx('fr-text--bold')}>Frais occasionnels</span> (covoiturage, taxis, etc.) : 10-30 € par mois.
                   </div>
                 </div>
               </div>
@@ -292,10 +292,10 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_apa
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <span className={fr.cx('fr-text--bold')}>Alimentation</span>
                   <div>
-                    <span className={fr.cx('fr-text--bold')}>Courses alimentaires</span> : 150-200 € par mois. (APL déduite)
+                    <span className={fr.cx('fr-text--bold')}>Courses alimentaires</span> : 150-200 € par mois (APL déduite).
                   </div>
                   <div>
-                    <span className={fr.cx('fr-text--bold')}>Repas universitaires (Crous)</span> : environ 3.30 € par repas. (si pris au RU)
+                    <span className={fr.cx('fr-text--bold')}>Repas universitaires (Crous)</span> : environ 3.30 € par repas (si pris au RU).
                   </div>
                   <div>
                     <span className={fr.cx('fr-text--bold')}>Repas à 1€ pour les étudiants boursiers et précaires.</span>
@@ -310,10 +310,10 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_apa
                   <span className={fr.cx('fr-text--bold')}>Frais universitaires</span>
                   <div>
                     <span className={fr.cx('fr-text--bold')}>Frais d&apos;inscription annuels</span> : <br />
-                    Licence: 170 € / Master: 243 €
+                    Licence : 170 € / Master: 243 €.
                   </div>
                   <div>
-                    <span className={fr.cx('fr-text--bold')}>Mutuelle santé</span> : 10-40 € par mois. (selon les besoins et le statut)
+                    <span className={fr.cx('fr-text--bold')}>Mutuelle santé</span> : 10-40 € par mois (selon les besoins et le statut).
                   </div>
                 </div>
               </div>
