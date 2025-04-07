@@ -5,6 +5,7 @@ import { getTranslations } from 'next-intl/server'
 import dynamic from 'next/dynamic'
 import { AccommodationEquipments } from '~/app/logement/[slug]/accommodation-equipments'
 import { AccommodationLocalisation } from '~/app/logement/[slug]/accommodation-localisation'
+import { AccommodationResidence } from '~/app/logement/[slug]/accommodation-residence'
 import { OwnerDetails } from '~/app/logement/[slug]/owner-details'
 import { AccommodationImages } from '~/components/accommodation/accommodation-images'
 import { NearbyAccommodations } from '~/components/accommodation/nearby-accommodations'
@@ -54,9 +55,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
               )}
             </div>
           </div>
-          <div className={styles.section}>
-            <h4>{t('availableAccommodations')}</h4>
-          </div>
+          <AccommodationResidence accommodation={accommodation} />
           <AccommodationEquipments accommodation={accommodation} />
           <AccommodationLocalisation address={address} city={city} latitude={latitude} longitude={longitude} postalCode={postal_code} />
         </div>
