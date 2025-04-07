@@ -1,5 +1,6 @@
 'use client'
 
+import Alert from '@codegouvfr/react-dsfr/Alert'
 import Tile from '@codegouvfr/react-dsfr/Tile'
 import { FC } from 'react'
 import { tss } from 'tss-react'
@@ -16,6 +17,15 @@ export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
 
   const mockDetail = 'Budget minimum 600€'
   if (isLoading) return null
+
+  if (data?.length === 0)
+    return (
+      <Alert
+        severity="info"
+        title="Aucun logement dans ce département"
+        description="Il n'y a pas de logements pour les villes de ce département. Nous vous invitons à réessayer plus tard, de nouvelles résidences sont ajoutées régulièrement."
+      />
+    )
 
   return (
     <div className={classes.tilesGrid}>

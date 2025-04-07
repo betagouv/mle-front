@@ -9,12 +9,20 @@ export const PrepareStudentLifeSelectDepartment: FC<{ departments: TDepartment[]
   const t = useTranslations('prepareStudentLife')
   const [department, setDepartment] = useQueryState('department', parseAsString)
 
+  const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (e.target.value === 'Tous') {
+      setDepartment(null)
+    } else {
+      setDepartment(e.target.value)
+    }
+  }
+
   return (
     <Select
       style={{ flex: '1', margin: 0 }}
       label={t('department')}
       nativeSelectProps={{
-        onChange: (e) => setDepartment(e.target.value),
+        onChange: handleSelect,
         value: department || '',
       }}
     >
