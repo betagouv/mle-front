@@ -11,7 +11,6 @@ interface OwnerDetailsProps {
 
 export const OwnerDetails = async ({ nbTotalApartments, owner }: OwnerDetailsProps) => {
   const t = await getTranslations('accomodation')
-  console.log(owner)
   return (
     <div className={styles.sidebarCard}>
       {nbTotalApartments ? (
