@@ -1,303 +1,303 @@
 {
-    "breadcrumbs": {
-        "home": "Simulez mes aides au logement",
-        "findAccomodation": "Trouver un logement étudiant",
-        "logement": "Logement étudiant {title}",
-        "prepareStudentLife": "Préparer sa vie étudiante",
-        "prepareStudentLifeTitle": "Préparer sa vie étudiante à {title}",
-        "faq": "Foire aux questions",
-        "accessibilite": "Accessibilité",
-        "legalMentions": "Mentions légales",
-        "personalData": "Données personnelles",
-        "cookies": "Gestion des cookies",
-        "sitemap": "Plan du site",
-        "notFound": "Page non trouvée"
+  "breadcrumbs": {
+    "home": "Simulez mes aides au logement",
+    "findAccomodation": "Trouver un logement étudiant",
+    "logement": "Logement étudiant {title}",
+    "prepareStudentLife": "Préparer sa vie étudiante",
+    "prepareStudentLifeTitle": "Préparer sa vie étudiante à {title}",
+    "faq": "Foire aux questions",
+    "accessibilite": "Accessibilité",
+    "legalMentions": "Mentions légales",
+    "personalData": "Données personnelles",
+    "cookies": "Gestion des cookies",
+    "sitemap": "Plan du site",
+    "notFound": "Page non trouvée"
+  },
+  "loading": {
+    "card": "Chargement de la carte..."
+  },
+  "metadata": {
+    "title": "Mon logement étudiant",
+    "description": "Mon logement étudiant - Votre guide à l'accès au logement étudiant",
+    "homeLinkTitle": "Accueil - Mon logement étudiant"
+  },
+  "header": {
+    "title": "Mon logement étudiant",
+    "description": "Faciliter l'accès au logement pour les étudiants boursiers",
+    "alerts": "Alertes logements"
+  },
+  "footer": {
+    "linkList": {
+      "departmentsCategoryName": "Départements",
+      "citiesCategoryName": "Villes étudiantes"
+    }
+  },
+  "languages": {
+    "title": "Sélectionner la langue",
+    "fr": "Français",
+    "en": "Anglais"
+  },
+  "navigation": {
+    "home": "Simuler mes aides au logement",
+    "prepareBudget": "Préparer sa vie étudiante",
+    "findAccommodation": "Trouver un logement étudiant",
+    "byAcademies": "Par académies",
+    "faq": "Foire aux questions"
+  },
+  "accomodation": {
+    "equipments": {
+      "title": "Equipements"
     },
-    "loading": {
-        "card": "Chargement de la carte..."
+    "title": "Logement étudiant {title} à {city}",
+    "tags": {
+      "studio": "Studio",
+      "shared": "Colocation",
+      "accessible": "Accessible"
     },
-    "metadata": {
-        "title": "Mon logement étudiant",
-        "description": "Mon logement étudiant - Votre guide à l'accès au logement étudiant",
-        "homeLinkTitle": "Accueil - Mon logement étudiant"
+    "availableAccommodations": "Logements de la résidence",
+    "location": {
+      "title": "Localisation",
+      "accessibility": "Accessibilité"
     },
+    "sidebar": {
+      "accommodationsCount": "{count} logements",
+      "accommodationsNoCount": "Logements disponibles",
+      "share": "Partager le logement",
+      "buttons": {
+        "consult": "Consulter l'offre",
+        "link": "Copier le lien",
+        "email": "Envoyer par email",
+        "print": "Imprimer"
+      }
+    },
+    "nearby": {
+      "title": "Autres logements à proximité",
+      "buttons": {
+        "previous": "Précédent",
+        "next": "Suivant"
+      },
+      "count": "{count} logements"
+    }
+  },
+  "findAccomodation": {
+    "faq": {
+      "title": "Parmi les questions fréquentes sur les logements étudiants",
+      "cta": "Foire aux questions"
+    },
+    "autocomplete": {
+      "categories": {
+        "academies": "Académies",
+        "cities": "Villes",
+        "departments": "Départements"
+      }
+    },
+    "title": "Trouver un logement étudiant",
+    "titleWithLocation": "Trouver un logement étudiant à {location}",
     "header": {
-        "title": "Mon logement étudiant",
-        "description": "Faciliter l'accès au logement pour les étudiants boursiers",
-        "alerts": "Alertes logements"
+      "inputLabel": "Académie, ville ou département",
+      "shared": "Colocation",
+      "tooltip": {
+        "accessible": "Etablissements en capacité d'accueillir des personnes en situation de handicap"
+      },
+      "rangeLabel": "Budget maximum",
+      "filtersCta": "Filtres",
+      "accessbility": "Adapté PMR"
     },
-    "footer": {
-        "linkList": {
-            "departmentsCategoryName": "Départements",
-            "citiesCategoryName": "Villes étudiantes"
+    "filters": {
+      "accommodations": "résidence",
+      "accommodationsWithLocation": "résidence{pluralize} à {location}",
+      "grid": "Grille",
+      "map": "Carte",
+      "sortByPrice": "Triés par prix"
+    },
+    "card": {
+      "priceFrom": "À partir de"
+    },
+    "results": {
+      "noResult": "Aucun résultat pour votre recherche",
+      "description": "Vous pouvez modifier votre recherche ou consulter les questions fréquemment posées sur la page d'informations."
+    }
+  },
+  "prepareStudentLife": {
+    "titlePart1": "Le guide pratique",
+    "titlePart2": "pour bien préparer",
+    "titlePart3": "sa vie étudiante",
+    "department": "Département",
+    "city": "Ville",
+    "searchTitlePart": "Tout ce qu'il faut savoir sur sa prochaine ville étudiante",
+    "popularCities": "Villes étudiantes populaires",
+    "title": "Préparer sa vie étudiante à {title}",
+    "subTitle": "Être étudiant à {title}",
+    "nearbyCities": "Villes à proximité de {title}"
+  },
+  "alertLogement": {
+    "title": "Restez alerté des dernières annonces",
+    "subTitle": "en recevant en temps réel les nouvelles offres disponibles dans la zone académique recherchée",
+    "disclaimer": "En renseignant votre adresse électronique, vous acceptez de recevoir nos alertes par courriel. Vous pouvez vous désinscrire à tout moment à l'aide des liens de désinscription ou en nous contactant.",
+    "emailPlaceholder": "Entrer votre email",
+    "subscribe": "S'abonner"
+  },
+  "faq": {
+    "title": "Foire aux questions",
+    "subTitle": "Vous avez des questions ? Nous avons des réponses ! Cette section est dédiée à vous fournir les informations les plus complètes et précises pour vous aider à bien préparer votre vie étudiante. Nous avons regroupé les questions les plus fréquemment posées pour faciliter votre recherche."
+  },
+  "siteMap": {
+    "title": "Plan du site",
+    "links": {
+      "home": "Accueil",
+      "simulation": "Simuler mes aides au logement",
+      "findAccomodation": "Trouver un logement étudiant",
+      "prepareStudentLife": "Préparer sa vie étudiante",
+      "alertAccomodation": "Alertes logements",
+      "faq": "Foire aux questions",
+      "accessibilite": "Accessibilité",
+      "legalMentions": "Mentions légales",
+      "personalData": "Données personnelles",
+      "cookies": "Gestion des cookies",
+      "landing": "Landing - Mon Logement Étudiant"
+    }
+  },
+  "accessibilite": {
+    "title": "Accessibilité"
+  },
+  "legalMentions": {
+    "title": "Mentions légales"
+  },
+  "personalData": {
+    "title": "Données personnelles"
+  },
+  "cookies": {
+    "title": "Gestion des cookies"
+  },
+  "landing": {
+    "hero": {
+      "title": "Connectons les acteurs du",
+      "highlight": "logement étudiant",
+      "description": " centralise les offres de logements sociaux des différents bailleurs. La plateforme intègre également un simulateur d'aides financières, permettant à chaque étudiant d'estimer son futur budget selon son prochain lieu de vie.",
+      "contact": {
+        "name": "Cécilia Foret",
+        "role": "Chargée de déploiement de Mon Logement Etudiant",
+        "button": "Contacter"
+      }
+    },
+    "features": {
+      "mainTitle": "Accéder à un logement ne devrait jamais être un obstacle à la réussite.",
+      "visibility": {
+        "title": "Gagnez en visibilité",
+        "description": "Centralisez vos offres sur une plateforme officielle, soutenue par des relais de communication ciblés pour toucher un maximum d'étudiants. Une intégration rapide de vos données, permettant de rediriger les étudiants directement sur votre site. ",
+        "free": "Et c'est gratuit."
+      },
+      "priority": {
+        "title": "Notre priorité, les étudiants boursiers.",
+        "description": "La plateforme accompagne les étudiants à identifier les aides disponibles et à évaluer le coût de la vie des différentes villes étudiantes. Le service simplifie également la recherche de studios ou colocations disponibles."
+      },
+      "impact": {
+        "title": "Impact social renforcé",
+        "description": "En rejoignant ce projet, vous affirmez votre engagement pour faciliter l'accès au logement et soutenir les étudiants précaires dans leur parcours."
+      },
+      "initiative": {
+        "title": "Une initiative soutenue et encouragée",
+        "description": "Mon Logement Etudiant est déployé dans le cadre de la lutte contre la précarité étudiante."
+      }
+    },
+    "mission": {
+      "title": {
+        "part1": "Notre mission:",
+        "part2": "faciliter la recherche",
+        "part3": "de logement d'un étudiant"
+      }
+    },
+    "steps": {
+      "step1": {
+        "badge": "Étape 1",
+        "title": "Je simule mes aides au logement",
+        "description": "En quelques clics, l'étudiant identifie ses droits aux différentes aides disponibles et obtient des informations claires sur les démarches à réaliser.",
+        "organismsCount": "Plus de 50 organismes"
+      },
+      "step2": {
+        "badge": "Étape 2",
+        "title": "Je prépare ma vie étudiante",
+        "description": "Tout ce qu'il faut savoir sur sa prochaine ville étudiante et son marché locatif.",
+        "features": {
+          "info": "Informations pratiques",
+          "pressure": "Pression locative",
+          "price": "Prix moyen des loyers",
+          "cost": "Coût de la vie étudiante"
         }
+      },
+      "step3": {
+        "badge": "Étape 3",
+        "title": "Je trouve un logement étudiant",
+        "description": "Une recherche efficace grâce aux filtres personnalisés (localisation, budget, type de logement, accès PMR, etc.). La fiche détaillée présente la résidence en détails en incitant à consulter la page de destination de votre choix."
+      }
     },
-    "languages": {
-        "title": "Sélectionner la langue",
-        "fr": "Français",
-        "en": "Anglais"
+    "callToAction": {
+      "title": {
+        "part1": "C'est aussi simple que ça.",
+        "part2": "On vous intègre ?"
+      },
+      "button": "Prendre rendez-vous",
+      "contact": {
+        "name": "Cécilia Foret",
+        "role": "Chargée de déploiement"
+      }
+    }
+  },
+  "home": {
+    "header": {
+      "rangeLabel": "Budget maximum"
     },
-    "navigation": {
-        "home": "Simuler mes aides au logement",
-        "prepareBudget": "Préparer sa vie étudiante",
-        "findAccommodation": "Trouver un logement étudiant",
-        "byAcademies": "Par académies",
-        "faq": "Foire aux questions"
+    "hero": {
+      "title": "Trouver votre prochain",
+      "highlight": "logement étudiant",
+      "subtitle": "et découvrez les <aides>aides</aides> auxquelles vous avez droit en tant qu'étudiant boursier."
     },
-    "accomodation": {
-        "equipments": {
-            "title": "Equipements"
-        },
-        "title": "Logement étudiant {title} à {city}",
-        "tags": {
-            "studio": "Studio",
-            "shared": "Colocation",
-            "accessible": "Accessible"
-        },
-        "availableAccommodations": "Logements de la résidence",
-        "location": {
-            "title": "Localisation",
-            "accessibility": "Accessibilité"
-        },
-        "sidebar": {
-            "accommodationsCount": "{count} logements",
-            "accommodationsNoCount": "Logements disponibles",
-            "share": "Partager le logement",
-            "buttons": {
-                "consult": "Consulter l'offre",
-                "link": "Copier le lien",
-                "email": "Envoyer par email",
-                "print": "Imprimer"
-            }
-        },
-        "nearby": {
-            "title": "Autres logements à proximité",
-            "buttons": {
-                "previous": "Précédent",
-                "next": "Suivant"
-            },
-            "count": "{count} logements"
-        }
+    "simulator": {
+      "title": "Simulez le montant de vos aides au logement",
+      "description": "et identifiez les aides dont vous pouvez bénéficier d'après votre situation.",
+      "button": "Commencer la simulation"
     },
-    "findAccomodation": {
-        "faq": {
-            "title": "Parmi les questions fréquentes sur les logements étudiants",
-            "cta": "Foire aux questions"
-        },
-        "autocomplete": {
-            "categories": {
-                "academies": "Académies",
-                "cities": "Villes",
-                "departments": "Départements"
-            }
-        },
-        "title": "Trouver un logement étudiant",
-        "titleWithLocation": "Trouver un logement étudiant à {location}",
-        "header": {
-            "inputLabel": "Académie, ville ou département",
-            "shared": "Colocation",
-            "tooltip": {
-                "accessible": "Etablissements en capacité d'accueillir des personnes en situation de handicap"
-            },
-            "rangeLabel": "Budget maximum",
-            "filtersCta": "Filtres",
-            "accessbility": "Adapté PMR"
-        },
-        "filters": {
-            "accommodations": "résidence",
-            "accommodationsWithLocation": "résidences à {location}",
-            "grid": "Grille",
-            "map": "Carte",
-            "sortByPrice": "Triés par prix"
-        },
-        "card": {
-            "priceFrom": "À partir de"
-        },
-        "results": {
-            "noResult": "Aucun résultat pour votre recherche",
-            "description": "Vous pouvez modifier votre recherche ou consulter les questions fréquemment posées sur la page d'informations."
-        }
+    "mainSection": {
+      "title": "Tout savoir pour bien se loger",
+      "description": "<part1>Estimation, fiches pratiques et aperçu des logements, tout est là pour</part1><part2>vous guider pas à pas vers votre prochaine vie étudiante.</part2>"
     },
-    "prepareStudentLife": {
-        "titlePart1": "Le guide pratique",
-        "titlePart2": "pour bien préparer",
-        "titlePart3": "sa vie étudiante",
-        "department": "Département",
-        "city": "Ville",
-        "searchTitlePart": "Tout ce qu'il faut savoir sur sa prochaine ville étudiante",
-        "popularCities": "Villes étudiantes populaires",
-        "title": "Préparer sa vie étudiante à {title}",
-        "subTitle": "Être étudiant à {title}",
-        "nearbyCities": "Villes à proximité de {title}"
+    "features": {
+      "exploreCities": {
+        "title": "Explorer les villes étudiantes",
+        "moreButton": "Plus de villes"
+      },
+      "findAccommodation": {
+        "title": "Trouver son prochain logement étudiant",
+        "locationInput": "Etablissement, académie, ville ou département",
+        "searchButton": "Rechercher"
+      }
     },
-    "alertLogement": {
-        "title": "Restez alerté des dernières annonces",
-        "subTitle": "en recevant en temps réel les nouvelles offres disponibles dans la zone académique recherchée",
-        "disclaimer": "En renseignant votre adresse électronique, vous acceptez de recevoir nos alertes par courriel. Vous pouvez vous désinscrire à tout moment à l'aide des liens de désinscription ou en nous contactant.",
-        "emailPlaceholder": "Entrer votre email",
-        "subscribe": "S'abonner"
+    "partners": {
+      "title": "Parmi les bailleurs partenaires"
     },
     "faq": {
-        "title": "Foire aux questions",
-        "subTitle": "Vous avez des questions ? Nous avons des réponses ! Cette section est dédiée à vous fournir les informations les plus complètes et précises pour vous aider à bien préparer votre vie étudiante. Nous avons regroupé les questions les plus fréquemment posées pour faciliter votre recherche."
-    },
-    "siteMap": {
-        "title": "Plan du site",
-        "links": {
-            "home": "Accueil",
-            "simulation": "Simuler mes aides au logement",
-            "findAccomodation": "Trouver un logement étudiant",
-            "prepareStudentLife": "Préparer sa vie étudiante",
-            "alertAccomodation": "Alertes logements",
-            "faq": "Foire aux questions",
-            "accessibilite": "Accessibilité",
-            "legalMentions": "Mentions légales",
-            "personalData": "Données personnelles",
-            "cookies": "Gestion des cookies",
-            "landing": "Landing - Mon Logement Étudiant"
-        }
-    },
-    "accessibilite": {
-        "title": "Accessibilité"
-    },
-    "legalMentions": {
-        "title": "Mentions légales"
-    },
-    "personalData": {
-        "title": "Données personnelles"
-    },
-    "cookies": {
-        "title": "Gestion des cookies"
-    },
-    "landing": {
-        "hero": {
-            "title": "Connectons les acteurs du",
-            "highlight": "logement étudiant",
-            "description": " centralise les offres de logements sociaux des différents bailleurs. La plateforme intègre également un simulateur d'aides financières, permettant à chaque étudiant d'estimer son futur budget selon son prochain lieu de vie.",
-            "contact": {
-                "name": "Cécilia Foret",
-                "role": "Chargée de déploiement de Mon Logement Etudiant",
-                "button": "Contacter"
-            }
-        },
-        "features": {
-            "mainTitle": "Accéder à un logement ne devrait jamais être un obstacle à la réussite.",
-            "visibility": {
-                "title": "Gagnez en visibilité",
-                "description": "Centralisez vos offres sur une plateforme officielle, soutenue par des relais de communication ciblés pour toucher un maximum d'étudiants. Une intégration rapide de vos données, permettant de rediriger les étudiants directement sur votre site. ",
-                "free": "Et c'est gratuit."
-            },
-            "priority": {
-                "title": "Notre priorité, les étudiants boursiers.",
-                "description": "La plateforme accompagne les étudiants à identifier les aides disponibles et à évaluer le coût de la vie des différentes villes étudiantes. Le service simplifie également la recherche de studios ou colocations disponibles."
-            },
-            "impact": {
-                "title": "Impact social renforcé",
-                "description": "En rejoignant ce projet, vous affirmez votre engagement pour faciliter l'accès au logement et soutenir les étudiants précaires dans leur parcours."
-            },
-            "initiative": {
-                "title": "Une initiative soutenue et encouragée",
-                "description": "Mon Logement Etudiant est déployé dans le cadre de la lutte contre la précarité étudiante."
-            }
-        },
-        "mission": {
-            "title": {
-                "part1": "Notre mission:",
-                "part2": "faciliter la recherche",
-                "part3": "de logement d'un étudiant"
-            }
-        },
-        "steps": {
-            "step1": {
-                "badge": "Étape 1",
-                "title": "Je simule mes aides au logement",
-                "description": "En quelques clics, l'étudiant identifie ses droits aux différentes aides disponibles et obtient des informations claires sur les démarches à réaliser.",
-                "organismsCount": "Plus de 50 organismes"
-            },
-            "step2": {
-                "badge": "Étape 2",
-                "title": "Je prépare ma vie étudiante",
-                "description": "Tout ce qu'il faut savoir sur sa prochaine ville étudiante et son marché locatif.",
-                "features": {
-                    "info": "Informations pratiques",
-                    "pressure": "Pression locative",
-                    "price": "Prix moyen des loyers",
-                    "cost": "Coût de la vie étudiante"
-                }
-            },
-            "step3": {
-                "badge": "Étape 3",
-                "title": "Je trouve un logement étudiant",
-                "description": "Une recherche efficace grâce aux filtres personnalisés (localisation, budget, type de logement, accès PMR, etc.). La fiche détaillée présente la résidence en détails en incitant à consulter la page de destination de votre choix."
-            }
-        },
-        "callToAction": {
-            "title": {
-                "part1": "C'est aussi simple que ça.",
-                "part2": "On vous intègre ?"
-            },
-            "button": "Prendre rendez-vous",
-            "contact": {
-                "name": "Cécilia Foret",
-                "role": "Chargée de déploiement"
-            }
-        }
-    },
-    "home": {
-        "header": {
-            "rangeLabel": "Budget maximum"
-        },
-        "hero": {
-            "title": "Trouver votre prochain",
-            "highlight": "logement étudiant",
-            "subtitle": "et découvrez les <aides>aides</aides> auxquelles vous avez droit en tant qu'étudiant boursier."
-        },
-        "simulator": {
-            "title": "Simulez le montant de vos aides au logement",
-            "description": "et identifiez les aides dont vous pouvez bénéficier d'après votre situation.",
-            "button": "Commencer la simulation"
-        },
-        "mainSection": {
-            "title": "Tout savoir pour bien se loger",
-            "description": "<part1>Estimation, fiches pratiques et aperçu des logements, tout est là pour</part1><part2>vous guider pas à pas vers votre prochaine vie étudiante.</part2>"
-        },
-        "features": {
-            "exploreCities": {
-                "title": "Explorer les villes étudiantes",
-                "moreButton": "Plus de villes"
-            },
-            "findAccommodation": {
-                "title": "Trouver son prochain logement étudiant",
-                "locationInput": "Etablissement, académie, ville ou département",
-                "searchButton": "Rechercher"
-            }
-        },
-        "partners": {
-            "title": "Parmi les bailleurs partenaires"
-        },
-        "faq": {
-            "title": "Parmi les questions fréquentes",
-            "description": "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt.",
-            "tabs": {
-                "tab1": "Onglet 1",
-                "tab2": "Onglet 2"
-            },
-            "accordions": {
-                "title1": "Name of the Accordion 1",
-                "content1": "Content of the Accordion 1",
-                "title2": "Name of the Accordion 2",
-                "content2": "Content of the Accordion 2"
-            },
-            "button": "Foire aux questions"
-        }
-    },
-    "notFound": {
-        "title": "Page introuvable",
-        "errorCode": "Erreur 404",
-        "description": "La page que vous cherchez est introuvable. Excusez-nous pour la gêne occasionnée.",
-        "description2": "Si vous avez tapé l’adresse web dans le navigateur, vérifiez qu’elle est correcte.",
-        "description3": "La page n’est peut-être plus disponible.",
-        "description4": "Dans ce cas, pour continuer votre visite vous pouvez consulter la page d’accueil.",
-        "button": "Page d'accueil"
+      "title": "Parmi les questions fréquentes",
+      "description": "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt.",
+      "tabs": {
+        "tab1": "Onglet 1",
+        "tab2": "Onglet 2"
+      },
+      "accordions": {
+        "title1": "Name of the Accordion 1",
+        "content1": "Content of the Accordion 1",
+        "title2": "Name of the Accordion 2",
+        "content2": "Content of the Accordion 2"
+      },
+      "button": "Foire aux questions"
     }
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "errorCode": "Erreur 404",
+    "description": "La page que vous cherchez est introuvable. Excusez-nous pour la gêne occasionnée.",
+    "description2": "Si vous avez tapé l’adresse web dans le navigateur, vérifiez qu’elle est correcte.",
+    "description3": "La page n’est peut-être plus disponible.",
+    "description4": "Dans ce cas, pour continuer votre visite vous pouvez consulter la page d’accueil.",
+    "button": "Page d'accueil"
+  }
 }
