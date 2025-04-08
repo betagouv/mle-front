@@ -7,7 +7,7 @@ import styles from './footer.module.css'
 export const FooterComponent = async () => {
   const t = await getTranslations()
   const popularCities = await getPopularCities()
-  const sortedPopularCities = popularCities.sort((a, b) => b.nb_apartments - a.nb_apartments)
+  const sortedPopularCities = popularCities.sort((a, b) => b.nb_total_apartments - a.nb_total_apartments)
 
   const operatorLogo: NonNullable<FooterProps['operatorLogo']> = {
     alt: 'Mon logement étudiant - logo',

@@ -26,7 +26,7 @@ import styles from './home.module.css'
 export default async function Home() {
   const t = await getTranslations('home')
   const popularCities = await getPopularCities()
-  const sortedPopularCities = popularCities.sort((a, b) => b.nb_apartments - a.nb_apartments).slice(0, 18)
+  const sortedPopularCities = popularCities.sort((a, b) => b.nb_total_apartments - a.nb_total_apartments).slice(0, 18)
 
   return (
     <>
