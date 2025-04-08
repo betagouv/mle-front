@@ -13,13 +13,13 @@ import al from '~/images/al.svg'
 import apl from '~/images/apl.svg'
 import arpej from '~/images/arpej.svg'
 import caf from '~/images/caf.svg'
-import espacil from '~/images/espacil.webp'
+import espacil from '~/images/espacil.svg'
 import exploreCities from '~/images/explore-cities.webp'
 import findNextAccommodation from '~/images/find-next-accommodation.webp'
 import home from '~/images/landing.webp'
 import crous from '~/images/logo-crous.svg'
 import sogima from '~/images/sogima.svg'
-import studefi from '~/images/studefi.webp'
+import studefi from '~/images/studefi.svg'
 import { getPopularCities } from '~/server-only/get-popular-cities'
 import styles from './home.module.css'
 
@@ -98,7 +98,12 @@ export default async function Home() {
                   </Button>
                 ))}
                 <div className={styles.moreContainer}>
-                  <Button priority="secondary" iconPosition="right" iconId="fr-icon-arrow-right-line">
+                  <Button
+                    priority="secondary"
+                    linkProps={{ href: `/preparer-sa-vie-etudiante` }}
+                    iconPosition="right"
+                    iconId="fr-icon-arrow-right-line"
+                  >
                     {t('features.exploreCities.moreButton')}
                   </Button>
                 </div>
@@ -120,7 +125,7 @@ export default async function Home() {
             <div className={styles.cardContent}>
               <h1 className={styles.cardTitle}>{t('features.findAccommodation.title')}</h1>
               <CitiesAutocompleteInput />
-              <Range label={t('header.rangeLabel')} max={1000} min={350} hideMinMax step={50} suffix=" €" />
+              <Range label={t('header.rangeLabel')} max={1000} min={150} hideMinMax step={50} suffix=" €" />
               <div className={styles.switchContainer}>
                 <FindStudentColivingAccomodationSwitch />
                 <FindStudentAccessibleAccomodationSwitch />
@@ -142,10 +147,10 @@ export default async function Home() {
         <div className={fr.cx('fr-container')}>
           <h2 className={styles.partnersHeader}>{t('partners.title')}</h2>
           <div className={styles.partnersGrid}>
-            <Image src={arpej.src} alt="Logo Arpej" width={80} height={80} />
-            <Image src={espacil} alt="Logo Espacil" />
-            <Image src={sogima.src} alt="Logo Sogima" width={80} height={80} />
-            <Image src={studefi} alt="Logo Studefi" />
+            <Image src={arpej} alt="Logo Arpej" quality={100} width={201} height={90} />
+            <Image src={espacil} alt="Logo Espacil" quality={100} width={201} height={90} />
+            <Image src={sogima} alt="Logo Sogima" quality={100} width={201} height={90} />
+            <Image src={studefi} alt="Logo Studefi" quality={100} width={201} height={90} />
           </div>
         </div>
       </div>

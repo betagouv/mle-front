@@ -16,7 +16,7 @@ export const FindStudentAccomodationHeader: FC = async () => {
         <div className={styles.container}>
           <FindStudentAccomodationAutocompleteInput />
 
-          <Range label={t('header.rangeLabel')} max={1000} min={350} hideMinMax step={50} suffix=" €" />
+          <Range label={t('header.rangeLabel')} max={1000} min={150} hideMinMax step={50} suffix=" €" />
           <FindStudentColivingAccomodationSwitch />
           <FindStudentAccessibleAccomodationSwitch />
           {/* Remove since we do not use it for now */}
