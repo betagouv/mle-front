@@ -180,6 +180,10 @@
         "button": "Contacter"
       }
     },
+    "partners": {
+      "title": "Parmi les partenaires de",
+      "mle": "Mon Logement Étudiant"
+    },
     "features": {
       "mainTitle": "Accéder à un logement ne devrait jamais être un obstacle à la réussite.",
       "visibility": {
