@@ -10,10 +10,10 @@ import styles from './prepare-student-life-stats.module.css'
 interface PrepareStudentLifeStatsProps {
   average_rent: number
   location: string
-  nb_apartments: number
+  nb_total_apartments: number
 }
 
-export default function PrepareStudentLifeStats({ average_rent, location, nb_apartments }: PrepareStudentLifeStatsProps) {
+export default function PrepareStudentLifeStats({ average_rent, location, nb_total_apartments }: PrepareStudentLifeStatsProps) {
   const locationAids = ['Aides nationales', 'Aides régionales', 'Aides départementales', 'Aides de la ville']
 
   return (
@@ -25,7 +25,7 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_apa
             <div className={fr.cx('fr-col-md-4')}>
               <div className={styles.card}>
                 <h4>
-                  {nb_apartments} logements étudiants <br /> sur la ville de {location}
+                  {nb_total_apartments} logements étudiants <br /> sur la ville de {location}
                 </h4>
                 <p style={{ margin: 0 }}>soit 7% des logements de la ville</p>
                 <div className={styles.divider}></div>
