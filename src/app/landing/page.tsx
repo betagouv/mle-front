@@ -3,10 +3,15 @@ import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
 import Image from 'next/image'
+import agefo from '~/images/agefo.svg'
 import al from '~/images/al.svg'
 import apl from '~/images/apl.svg'
+import aquitanis from '~/images/aquitanis.svg'
+import arpej from '~/images/arpej.svg'
 import avatarCecilia from '~/images/avatar-cecilia.svg'
 import caf from '~/images/caf.svg'
+import espacil from '~/images/espacil.svg'
+import heneo from '~/images/heneo.svg'
 import landingStep1 from '~/images/landing-step-1.svg'
 import landingStep2 from '~/images/landing-step-2.svg'
 import landingStep3 from '~/images/landing-step-3.svg'
@@ -14,7 +19,10 @@ import landingHero from '~/images/landing.webp'
 import crous from '~/images/logo-crous.svg'
 import logo from '~/images/logo.svg'
 import enseignementSup from '~/images/ministere-enseignement-sup.svg'
+import mmh from '~/images/mmh.svg'
 import poingFerme from '~/images/poing-ferme.svg'
+import sogima from '~/images/sogima.svg'
+import studefi from '~/images/studefi.svg'
 import visibilityAvatar from '~/images/visibility.webp'
 import styles from './landing.module.css'
 
@@ -58,7 +66,25 @@ export default async function LandingPage() {
         </div>
       </div>
 
-      <div className={`${fr.cx('fr-container')} ${styles.mainSection}`}>
+      <div className={clsx(styles.partnersSection, fr.cx('fr-hidden', 'fr-unhidden-sm'))}>
+        <div className={fr.cx('fr-container', 'fr-py-8v')}>
+          <p className={styles.partnersTitle}>
+            {t('partners.title')} <span className={fr.cx('fr-text--bold')}>{t('partners.mle')}</span>
+          </p>
+          <div className={styles.partnersContainer}>
+            <Image src={arpej} width={200} height={90} quality={100} priority alt="Logo Arpej" />
+            <Image src={espacil} width={200} height={90} quality={100} priority alt="Logo Espacil" />
+            <Image src={aquitanis} width={200} height={90} quality={100} priority alt="Logo Aquitanis" />
+            <Image src={agefo} width={200} height={90} quality={100} priority alt="Logo Agefo" />
+            <Image src={sogima} width={200} height={90} quality={100} priority alt="Logo Sogima" />
+            <Image src={mmh} width={200} height={90} quality={100} priority alt="Logo Meurthe et Moselle Habitat" />
+            <Image src={heneo} width={200} height={90} quality={100} priority alt="Logo Heneo" />
+            <Image src={studefi} width={200} height={90} quality={100} priority alt="Logo Studefi" />
+          </div>
+        </div>
+      </div>
+
+      <div className={clsx(fr.cx('fr-container'), styles.mainSection)}>
         <h1 className={styles.mainTitle}>{t('features.mainTitle')}</h1>
         <div className={styles.featuresContainer}>
           <div className={`${fr.cx('fr-col-md-4')} ${styles.featureCard}`}>
