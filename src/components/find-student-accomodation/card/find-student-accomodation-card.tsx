@@ -7,6 +7,7 @@ import { Tag } from '@codegouvfr/react-dsfr/Tag'
 import { useTranslations } from 'next-intl'
 import { parseAsString, useQueryState } from 'nuqs'
 import { FC } from 'react'
+import { tss } from 'tss-react'
 import { FindStudentAccommodationImageCard } from '~/components/find-student-accomodation/card/find-student-accommodation-image-card'
 import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
 
@@ -18,6 +19,7 @@ type AccomodationCardProps = {
 export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxWidth }) => {
   const [selectedAccommodation] = useQueryState('id', parseAsString)
   const t = useTranslations('findAccomodation.card')
+  const { classes } = useStyles()
   const { city, images_base64, name, nb_total_apartments, postal_code, price_min } = accomodation.properties
   const surface = '100m2'
   const type = 'T1'
@@ -34,7 +36,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxW
     <Card
       {...badgeProps}
       {...imageProps}
-      classes={{ root: maxWidth }}
+      classes={{ root: maxWidth, header: classes.header }}
       shadow={selectedAccommodation === accomodation.id.toString()}
       id={`accomodation-${accomodation.id}`}
       background
@@ -65,3 +67,9 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxW
     />
   )
 }
+
+export const useStyles = tss.create({
+  header: {
+    overflow: 'hidden',
+  },
+})
