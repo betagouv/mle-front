@@ -1,31 +1,24 @@
 'use client'
 
-import Link from 'next/link'
 import { FC } from 'react'
 import { tss } from 'tss-react'
 import { TCity } from '~/schemas/territories'
 
 interface AutocompleteResultsProps {
   data: TCity[]
+  onClickItem: (item: TCity) => void
 }
 
-export const CitiesAutocompleteResults: FC<AutocompleteResultsProps> = ({ data }) => {
+export const FindStudentAccommodationCitiesAutocompleteResults: FC<AutocompleteResultsProps> = ({ data, onClickItem }) => {
   const { classes } = useStyles()
 
   return (
     <div className={classes.container}>
       <ul className={classes.list}>
         {data.map((item: TCity) => (
-          <Link
-            key={item.id}
-            href={{
-              pathname: `/preparer-sa-vie-etudiante/${item.name}`,
-            }}
-          >
-            <li className={classes.item} key={item.id}>
-              {item.name}
-            </li>
-          </Link>
+          <li className={classes.item} key={item.id} onClick={() => onClickItem(item)}>
+            {item.name}
+          </li>
         ))}
       </ul>
     </div>
