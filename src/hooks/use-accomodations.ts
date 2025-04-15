@@ -8,12 +8,17 @@ export const fetchAccomodations = async (
   page: number | null,
   isAccessible: string | null,
   hasColiving: string | null,
+  maxPrice: number | null,
 ): Promise<TGetAccomodationsResponse> => {
   const params = new URLSearchParams()
   if (bbox) params.append('bbox', bbox)
   if (page) params.append('page', page.toString())
   if (isAccessible) params.append('is_accessible', isAccessible)
   if (hasColiving) params.append('has_coliving', hasColiving)
+  if (maxPrice) params.append('price_max', maxPrice.toString())
+
+  console.log(params.toString())
+
   const response = await fetch(`/api/accommodations${params.size > 0 ? `?${params.toString()}` : ''}`)
   if (!response.ok) {
     throw new Error('Error occurred calling API retrieving accomodations')
@@ -31,14 +36,16 @@ export const useAccomodations = ({ initialData }: UseAccomodationsOptions = {}) 
     bbox: parseAsString,
     coliving: parseAsString,
     page: parseAsInteger,
+    maxPrice: parseAsInteger,
   })
-  const { accessible, bbox, coliving, page } = queryStates
-  const enabled = !!bbox || !!accessible || !!page || !!coliving
+  const { accessible, bbox, coliving, page, maxPrice } = queryStates
+  const enabled = !!bbox || !!accessible || !!page || !!coliving || !!maxPrice
+  console.log('maxPrice', enabled)
 
   return useQuery<TGetAccomodationsResponse>({
     enabled,
     initialData: enabled ? undefined : initialData,
-    queryFn: () => fetchAccomodations(bbox, page, accessible, coliving),
-    queryKey: ['accomodations', { accessible, bbox, coliving, page }],
+    queryFn: () => fetchAccomodations(bbox, page, accessible, coliving, maxPrice),
+    queryKey: ['accomodations', { accessible, bbox, coliving, page, maxPrice }],
   })
 }

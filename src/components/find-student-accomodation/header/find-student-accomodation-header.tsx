@@ -1,22 +1,18 @@
 import { fr } from '@codegouvfr/react-dsfr'
-import { Range } from '@codegouvfr/react-dsfr/Range'
-import { getTranslations } from 'next-intl/server'
 import { FC } from 'react'
 import { FindStudentAccomodationAutocompleteInput } from '~/components/find-student-accomodation/autocomplete/find-student-accomodation-autocomplete-input'
 import { FindStudentAccessibleAccomodationSwitch } from '~/components/find-student-accomodation/header/find-student-accessible-accomodation-switch'
+import { FindStudentAccommodationPrice } from '~/components/find-student-accomodation/header/find-student-accommodation-price'
 import { FindStudentColivingAccomodationSwitch } from '~/components/find-student-accomodation/header/find-student-coliving-accomodation'
 import styles from './find-student-accomodation-header.module.css'
 
 export const FindStudentAccomodationHeader: FC = async () => {
-  const t = await getTranslations('findAccomodation')
-
   return (
     <>
       <div className={fr.cx('fr-hidden', 'fr-unhidden-sm')}>
         <div className={styles.container}>
           <FindStudentAccomodationAutocompleteInput />
-
-          <Range label={t('header.rangeLabel')} max={1000} min={150} hideMinMax step={50} suffix=" €" />
+          <FindStudentAccommodationPrice />
           <FindStudentColivingAccomodationSwitch />
           <FindStudentAccessibleAccomodationSwitch />
           {/* Remove since we do not use it for now */}
