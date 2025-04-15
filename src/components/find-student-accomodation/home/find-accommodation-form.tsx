@@ -15,7 +15,7 @@ export const FindAccommodationForm: FC = () => {
   const t = useTranslations('home')
   const { classes } = useStyles()
   const [queryStates, setQueryStates] = useQueryStates({
-    budget: parseAsInteger.withDefault(600),
+    maxPrice: parseAsInteger.withDefault(1000),
     q: parseAsString,
     bbox: parseAsString,
     coliving: parseAsBoolean.withDefault(false),
@@ -24,7 +24,7 @@ export const FindAccommodationForm: FC = () => {
 
   const form = useForm({
     values: {
-      budget: queryStates.budget,
+      maxPrice: queryStates.maxPrice,
       q: queryStates.q,
       bbox: queryStates.bbox,
       coliving: queryStates.coliving,
@@ -32,10 +32,10 @@ export const FindAccommodationForm: FC = () => {
     },
   })
 
-  const handleOnChangeBudget = (event: React.ChangeEvent<HTMLInputElement>) => setQueryStates({ budget: Number(event.target.value) })
+  const handleOnChangeBudget = (event: React.ChangeEvent<HTMLInputElement>) => setQueryStates({ maxPrice: Number(event.target.value) })
 
   const searchParams = new URLSearchParams({
-    budget: form.getValues('budget').toString(),
+    maxPrice: form.getValues('maxPrice').toString(),
     bbox: form.getValues('bbox') ?? '',
     coliving: form.getValues('coliving') ? 'true' : 'false',
     accessible: form.getValues('accessible') ? 'true' : 'false',
@@ -53,7 +53,7 @@ export const FindAccommodationForm: FC = () => {
         hideMinMax
         step={50}
         suffix=" €"
-        nativeInputProps={{ onChange: handleOnChangeBudget }}
+        nativeInputProps={{ onChange: handleOnChangeBudget, value: queryStates.maxPrice }}
       />
       <div className={classes.switchContainer}>
         <FindStudentColivingAccomodationSwitch />
