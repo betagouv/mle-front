@@ -4,8 +4,7 @@ import Tabs from '@codegouvfr/react-dsfr/Tabs'
 import Tag from '@codegouvfr/react-dsfr/Tag'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
-import dynamic from 'next/dynamic'
-import { MapSkeleton } from '~/components/map/map-skeleton'
+import PrepareStudentLifeMap from '~/components/map/prepare-student-life-map'
 import styles from './prepare-student-life-summary.module.css'
 
 interface PrepareStudentLifeSummaryProps {
@@ -16,11 +15,6 @@ interface PrepareStudentLifeSummaryProps {
   nb_students: number
   nearby_cities: Array<{ name: string; slug: string }>
 }
-
-const CityMap = dynamic(() => import('~/components/map/city-map').then((mod) => mod.CityMap), {
-  loading: () => <MapSkeleton height={700} />,
-  ssr: false,
-})
 
 export default async function PrepareStudentLifeSummary({
   average_income,
@@ -108,7 +102,7 @@ export default async function PrepareStudentLifeSummary({
         </div>
         <div className={clsx(fr.cx('fr-col-md-4'), styles.mapContainer)}>
           <div className={clsx(fr.cx('fr-hidden', 'fr-unhidden-sm'), styles.mapWrapper)}>
-            <CityMap bbox={formattedBbox} />
+            <PrepareStudentLifeMap bbox={formattedBbox} />
           </div>
           <div className={styles.nearbyContainer}>
             <p>Villes à proximité de {location}</p>
