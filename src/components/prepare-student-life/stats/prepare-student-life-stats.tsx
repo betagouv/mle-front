@@ -11,9 +11,10 @@ interface PrepareStudentLifeStatsProps {
   average_rent: number
   location: string
   nb_total_apartments: number
+  price_min: number | null
 }
 
-export default function PrepareStudentLifeStats({ average_rent, location, nb_total_apartments }: PrepareStudentLifeStatsProps) {
+export default function PrepareStudentLifeStats({ average_rent, location, nb_total_apartments, price_min }: PrepareStudentLifeStatsProps) {
   const locationAids = ['Aides nationales', 'Aides régionales', 'Aides départementales', 'Aides de la ville']
 
   return (
@@ -239,17 +240,31 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_tot
                   <div>
                     <h5 style={{ marginBottom: '0.5rem' }}>Budget minimal</h5>
                     <p style={{ marginBottom: '0.5rem' }}>Résidence Crous, repas RU, et peu de sorties.</p>
-                    <Badge noIcon severity="new">
-                      Entre 600 et 800 €
-                    </Badge>
+                    {/* biome-ignore lint/complexity/noExtraBooleanCast: <explanation> */}
+                    {!!price_min ? (
+                      <Badge noIcon severity="new">
+                        Entre {price_min} et {price_min * 1.5} €
+                      </Badge>
+                    ) : (
+                      <Badge noIcon severity="new">
+                        Non connu
+                      </Badge>
+                    )}
                   </div>
                   <div className={fr.cx('fr-hidden', 'fr-unhidden-sm')} style={{ backgroundColor: '#DDDDDD', width: '1px' }} />
                   <div>
                     <h5 style={{ marginBottom: '0.5rem' }}>Budget confortable</h5>
                     <p style={{ marginBottom: '0.5rem' }}>Logement privé et activités diverses.</p>
-                    <Badge noIcon severity="new">
-                      Entre 1000 et 1200 €
-                    </Badge>
+                    {/* biome-ignore lint/complexity/noExtraBooleanCast: <explanation> */}
+                    {!!price_min ? (
+                      <Badge noIcon severity="new">
+                        Entre {price_min * 2} et {price_min * 3} €
+                      </Badge>
+                    ) : (
+                      <Badge noIcon severity="new">
+                        Non connu
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </div>

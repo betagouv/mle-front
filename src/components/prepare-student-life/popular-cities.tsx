@@ -15,7 +15,6 @@ export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
   const { classes } = useStyles()
   const { data, isLoading } = useCities()
 
-  const mockDetail = 'Budget minimum 600€'
   if (isLoading) return null
 
   if (data?.length === 0)
@@ -34,13 +33,14 @@ export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
           noIcon
           key={city.id}
           desc={`${city.nb_total_apartments} logements étudiants`}
-          detail={mockDetail}
+          detail={city.price_min ? `Budget minimum ${city.price_min}€` : undefined}
           linkProps={{
             href: `/preparer-sa-vie-etudiante/${city.slug}`,
           }}
           orientation="vertical"
           title={city.name}
           titleAs="h3"
+          classes={{ root: classes.tileContainer }}
         />
       ))}
     </div>
@@ -54,5 +54,8 @@ const useStyles = tss.create({
     display: 'grid',
     gap: '1rem',
     gridTemplateColumns: '1fr',
+  },
+  tileContainer: {
+    height: '160px',
   },
 })
