@@ -34,6 +34,7 @@ const ZCity = z
     ),
     popular: z.boolean(),
     postal_codes: z.array(z.string()),
+    price_min: z.number().nullable(),
     slug: z.string(),
   })
   .merge(ZBbox)
