@@ -14,7 +14,7 @@ export const fetchCities = async (query: string): Promise<TCity[]> => {
 }
 
 export const useSearchCities = (debounceTime = 200) => {
-  const [searchQueryState] = useQueryState('q')
+  const [searchQueryState, setSearchQueryState] = useQueryState('q')
 
   const [searchQuery, setSearchQuery] = useState(searchQueryState || '')
   const [debouncedSearchQuery] = useDebounce(searchQuery, debounceTime)
@@ -29,6 +29,8 @@ export const useSearchCities = (debounceTime = 200) => {
     isError,
     isLoading,
     searchQuery,
+    searchQueryState,
     setSearchQuery,
+    setSearchQueryState,
   }
 }

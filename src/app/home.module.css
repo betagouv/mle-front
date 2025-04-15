@@ -139,18 +139,6 @@
   display: flex;
 }
 
-.switchContainer {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-
-.searchButton {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-}
-
 .partnersSection {
   background-color: white;
 }
