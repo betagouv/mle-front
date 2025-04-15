@@ -1,14 +1,11 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import { Button } from '@codegouvfr/react-dsfr/Button'
-import Range from '@codegouvfr/react-dsfr/Range'
 import Tabs from '@codegouvfr/react-dsfr/Tabs'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
 import Image from 'next/image'
-import { FindStudentAccessibleAccomodationSwitch } from '~/components/find-student-accomodation/header/find-student-accessible-accomodation-switch'
-import { FindStudentColivingAccomodationSwitch } from '~/components/find-student-accomodation/header/find-student-coliving-accomodation'
-import { CitiesAutocompleteInput } from '~/components/prepare-student-life/autocomplete/cities-autocomplete-input'
+import { FindAccommodationForm } from '~/components/find-student-accomodation/home/find-accommodation-form'
 import al from '~/images/al.svg'
 import apl from '~/images/apl.svg'
 import arpej from '~/images/arpej.svg'
@@ -124,15 +121,7 @@ export default async function Home() {
             </div>
             <div className={styles.cardContent}>
               <h1 className={styles.cardTitle}>{t('features.findAccommodation.title')}</h1>
-              <CitiesAutocompleteInput />
-              <Range label={t('header.rangeLabel')} max={1000} min={150} hideMinMax step={50} suffix=" €" />
-              <div className={styles.switchContainer}>
-                <FindStudentColivingAccomodationSwitch />
-                <FindStudentAccessibleAccomodationSwitch />
-              </div>
-              <Button size="large" iconId="ri-search-line" className={styles.searchButton}>
-                {t('features.findAccommodation.searchButton')}
-              </Button>
+              <FindAccommodationForm />
             </div>
             <Image
               src={findNextAccommodation}
