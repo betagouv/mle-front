@@ -1,0 +1,25 @@
+.container {
+  display: flex;
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.image {
+  height: 100%;
+  width: 100%;
+}
+
+.imageContainer {
+  @media (max-width: 768px) {
+    height: 250px;
+  }
+  width: 100%;
+}
+
+.imageContainer img {
+  object-fit: cover;
+}
