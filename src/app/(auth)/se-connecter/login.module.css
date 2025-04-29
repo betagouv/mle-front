@@ -1,0 +1,95 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  padding-left: 0;
+  padding-right: 0;
+  
+  @media (min-width: 768px) {
+    .container {
+      flex-direction: row;
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.firstVisitContainer {
+  display: flex;
+  flex-direction: column;
+  @media (max-width: 768px) {
+    align-items: center;
+  }
+}
+
+.cardContainer {
+  @media (min-width: 768px) {
+    padding: 4rem 4rem;
+  }
+  @media (max-width: 768px) {
+    padding: 1.5rem 1rem;
+  }
+}
+
+.title {
+  margin-bottom: 0.5rem;
+}
+
+.dividerContainer {
+  position: relative;
+  width: 100%;
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.divider {
+  background-color: white;
+  padding: 0 1rem;
+  color: #666666;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  font-weight: 700;
+  position: relative;
+}
+
+.dividerContainer::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #dddddd;
+  z-index: 0;
+}
+
+.image {
+  color: transparent;
+  @media (min-width: 768px) {
+    position: absolute;
+  }
+  height: 100%;
+  width: 100%;
+  inset: 0px;
+}
+
+.imageContainer {
+  @media (max-width: 768px) {
+    height: 250px;
+    width: 100%;
+  }
+
+  @media (min-width: 768px) {
+    display: block;
+    position: relative;
+    width: 50%;
+    height: 60vh;
+  }
+}
+
+.imageContainer img {
+  object-fit: cover;
+}

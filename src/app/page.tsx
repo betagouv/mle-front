@@ -12,7 +12,7 @@ import arpej from '~/images/arpej.svg'
 import caf from '~/images/caf.svg'
 import espacil from '~/images/espacil.svg'
 import exploreCities from '~/images/explore-cities.webp'
-import findNextAccommodation from '~/images/find-next-accommodation.webp'
+import background from '~/images/background.webp'
 import home from '~/images/landing.webp'
 import crous from '~/images/logo-crous.svg'
 import sogima from '~/images/sogima.svg'
@@ -113,7 +113,7 @@ export default async function Home() {
           <div className={clsx('boxShadow', styles.featureCard)}>
             <div className={fr.cx('fr-col-md-6')}>
               <Image
-                src={findNextAccommodation}
+                src={background}
                 className={clsx(fr.cx('fr-hidden', 'fr-unhidden-sm'), styles.featureImage)}
                 quality={100}
                 alt="Trouver votre prochain logement étudiant"
@@ -124,7 +124,7 @@ export default async function Home() {
               <FindAccommodationForm />
             </div>
             <Image
-              src={findNextAccommodation}
+              src={background}
               className={clsx(fr.cx('fr-hidden-sm'), styles.featureImage)}
               quality={100}
               alt="Trouver votre prochain logement étudiant"

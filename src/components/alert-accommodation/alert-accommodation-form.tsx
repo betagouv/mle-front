@@ -32,7 +32,7 @@ export const AlertAccommodationForm: FC = () => {
 
   const { mutateAsync } = useAlertAccommodation()
 
-  const t = useTranslations('alertLogement')
+  const t = useTranslations('alertAccommodation')
   const { classes } = useStyles()
 
   const onSubmit = async () => {
