@@ -23,12 +23,15 @@ export const HeaderComponent: FC = async () => {
           {t('navigation.faq')}
         </Button>,
         <Button
-          priority="tertiary"
+          priority="tertiary no outline"
           key="alerts-cta"
           iconId="ri-notification-3-line"
           linkProps={{ href: '/alerte-logement', target: '_self' }}
         >
           {t('header.alerts')}
+        </Button>,
+        <Button priority="tertiary" key="login-cta" iconId="ri-user-line" linkProps={{ href: '/se-connecter', target: '_self' }}>
+          {t('header.login')}
         </Button>,
       ]}
       brandTop={<BrandTop />}
