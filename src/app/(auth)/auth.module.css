@@ -1,0 +1,14 @@
+.container {
+  background-color: white;
+  padding: 4rem 4rem;
+  @media (max-width: 768px) {
+    padding: 1.5rem 1.5rem;
+  }
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.required {
+  color: red;
+}

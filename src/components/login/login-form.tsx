@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import clsx from 'clsx'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { tss } from 'tss-react'
 import { ZLoginForm } from '~/schemas/login/login'
@@ -23,7 +23,8 @@ export const LoginForm: FC = () => {
     },
     resolver: zodResolver(ZLoginForm),
   })
-  const { getValues, handleSubmit, register } = loginForm
+  const [showPassword, setShowPassword] = useState(false)
+  const { formState, getValues, handleSubmit, register } = loginForm
 
   const onSubmit = async () => {
     console.log(getValues())
@@ -41,22 +42,34 @@ export const LoginForm: FC = () => {
                   &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
                 </>
               }
+              state={formState.errors.email ? 'error' : undefined}
+              stateRelatedMessage={formState.errors.email?.message}
               nativeInputProps={{
                 ...register('email'),
-                required: true,
               }}
             />
 
             <Input
+              addon={
+                <Button
+                  iconId="ri-eye-line"
+                  priority="tertiary"
+                  type="button"
+                  title="Afficher le mot de passe"
+                  nativeButtonProps={{ onClick: () => setShowPassword(!showPassword) }}
+                />
+              }
               label={
                 <>
                   {t('labels.password')}
                   &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>
                 </>
               }
+              state={formState.errors.password ? 'error' : undefined}
+              stateRelatedMessage={formState.errors.password?.message}
               nativeInputProps={{
                 ...register('password'),
-                required: true,
+                type: showPassword ? 'text' : 'password',
               }}
             />
           </div>
