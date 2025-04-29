@@ -307,7 +307,8 @@
   },
   "login": {
     "title": "Se connecter à mon espace",
-    "subTitle": "Les champs marqués du symbole * sont obligatoires.",
+    "subTitlePart1": "Les champs marqués du symbole",
+    "subTitlePart2": "sont obligatoires.",
     "labels": {
       "email": "Email",
       "password": "Mot de passe",
@@ -320,5 +321,46 @@
       "description": "Créez votre compte dès maintenant pour accèder votre espace Mon Logement Etudiant",
       "cta": "Créer un compte"
     }
+  },
+  "forgotPassword": {
+    "title": "Réinitialiser son mot de passe",
+    "subTitlePart1": "Les champs marqués du symbole",
+    "subTitlePart2": "sont obligatoires.",
+    "labels": {
+      "email": "Email",
+      "cta": "Réinitialiser votre mot de passe"
+    },
+    "backToLogin": "Retour à la page de connexion",
+    "success": {
+      "description": "Si cet identifiant correspond bien à votre compte, un e-mail vous a été envoyé pour vous permettre de réinitialiser votre mot de passe. En cas de difficulté veuillez contacter <mailto>support@monlogementetudiant.beta.gouv.fr</mailto>"
+    }
+  },
+  "resetPassword": {
+    "title": "Définition du mot de passe",
+    "labels": {
+      "newPassword": "Nouveau mot de passe",
+      "newPasswordDescription": "12 caractères, composé de chiffres, lettres et caractères spéciaux.",
+      "confirmPassword": "Confirmation du nouveau mot de passe",
+      "cta": "Réinitialiser votre mot de passe"
+    },
+    "success": {
+      "description": "Votre nouveau mot de passe a bien été enregistré.Vous pouvez retourner à la page de connexion."
+    },
+    "backToLogin": "Retour à la page de connexion"
+  },
+  "signUp": {
+    "title": "Création de compte",
+    "subTitlePart1": "Les champs marqués du symbole",
+    "subTitlePart2": "sont obligatoires.",
+    "labels": {
+      "firstname": "Prénom",
+      "lastname": "Nom",
+      "email": "Email",
+      "password": "Mot de passe",
+      "passwordHintText": "12 caractères, composé de chiffres, lettres et caractères spéciaux.",
+      "cta": "Créer un compte",
+      "privacyPolicy": "Politique de confidentialité"
+    },
+    "backToLogin": "Retour à la page de connexion"
   }
 }
