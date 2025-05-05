@@ -24,7 +24,7 @@ export default async function PrepareStudentLifeNearbyAccommodations({ bbox, nam
   return (
     <div className="primaryBackgroundColor">
       <div className={clsx(fr.cx('fr-container'), styles.accommodationGridContainer)}>
-        <h1 className={styles.whiteTitle}>Parmi les logements étudiants à {name}</h1>
+        <h1 className={clsx('h1', styles.whiteTitle)}>Parmi les logements étudiants à {name}</h1>
         <div className={styles.accommodationGrid}>
           {accommodationsList.map((accommodation) => (
             <AccomodationCard key={accommodation.id} accomodation={accommodation} />
