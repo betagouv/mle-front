@@ -17,8 +17,6 @@ export const fetchAccomodations = async (
   if (hasColiving) params.append('has_coliving', hasColiving)
   if (maxPrice) params.append('price_max', maxPrice.toString())
 
-  console.log(params.toString())
-
   const response = await fetch(`/api/accommodations${params.size > 0 ? `?${params.toString()}` : ''}`)
   if (!response.ok) {
     throw new Error('Error occurred calling API retrieving accomodations')
@@ -40,7 +38,6 @@ export const useAccomodations = ({ initialData }: UseAccomodationsOptions = {}) 
   })
   const { accessible, bbox, coliving, page, maxPrice } = queryStates
   const enabled = !!bbox || !!accessible || !!page || !!coliving || !!maxPrice
-  console.log('maxPrice', enabled)
 
   return useQuery<TGetAccomodationsResponse>({
     enabled,

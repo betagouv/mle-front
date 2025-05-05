@@ -27,7 +27,7 @@ export const ZAccomodation = z.object({
   properties: z.object({
     address: z.string().max(255),
     city: z.string().max(150),
-    images_base64: z.array(z.string()).nullable(),
+    images_urls: z.array(z.string()).nullable(),
     name: z.string().max(250),
     nb_accessible_apartments: z.number().nullable(),
     nb_coliving_apartments: z.number().nullable(),
@@ -65,7 +65,7 @@ export const ZAccomodationDetails = z.object({
   cooking_plates: z.boolean().nullable(),
   desk: z.boolean().nullable(),
   geom: ZGeometry,
-  images_base64: z.array(z.string()).nullable(),
+  images_urls: z.array(z.string()).nullable(),
   kitchen_type: z.nativeEnum(AccommodationHouseRoomType),
   laundry_room: z.boolean().nullable(),
   microwave: z.boolean().nullable(),
