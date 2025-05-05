@@ -32,9 +32,9 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
   return (
     <div className={classes.headerContainer}>
       {accommodations && accommodations.count > 0 && (
-        <h4>
+        <h2 className="h4">
           {accommodations.count} {title}
-        </h4>
+        </h2>
       )}
       <div className={classes.container}>
         <Select label="" nativeSelectProps={{}}>

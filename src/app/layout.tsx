@@ -13,6 +13,7 @@ import { HeaderComponent } from '~/components/ui/header/header'
 import { TanstackQueryClientProvider } from '~/providers/tanstack-client'
 import styles from './layout.module.css'
 import '~/globals.css'
+import '~/text.css'
 import { NextAppDirEmotionCacheProvider } from 'tss-react/next'
 
 export const generateMetadata = async () => {

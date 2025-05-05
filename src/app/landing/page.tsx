@@ -91,7 +91,7 @@ export default async function LandingPage() {
             <div className={styles.featureImageContainer}>
               <Image src={visibilityAvatar} quality={100} priority alt="Gagnez en visibilité" />
             </div>
-            <h4>{t('features.visibility.title')}</h4>
+            <h2>{t('features.visibility.title')}</h2>
             <span>
               {t('features.visibility.description')}
               <span className={fr.cx('fr-text--bold')}>{t('features.visibility.free')}</span>
@@ -101,7 +101,7 @@ export default async function LandingPage() {
           <div className={styles.rightFeatures}>
             <div className={styles.topFeatureCard}>
               <div className={styles.featureContent}>
-                <h4>{t('features.priority.title')}</h4>
+                <h3>{t('features.priority.title')}</h3>
                 <span>{t('features.priority.description')}</span>
               </div>
               <Image src={logo.src} width={120} height={120} quality={100} priority alt="Logo Mon Logement Etudiant" />
