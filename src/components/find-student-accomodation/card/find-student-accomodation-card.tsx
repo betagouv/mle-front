@@ -63,7 +63,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxW
       }
       size="small"
       title={name}
-      titleAs="h6"
+      titleAs="h2"
     />
   )
 }

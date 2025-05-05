@@ -34,11 +34,11 @@ export default async function Home() {
               <h1 className={styles.heroTitle}>
                 {t('hero.title')} <span className={styles.heroHighlight}>{t('hero.highlight')}</span>
               </h1>
-              <h3 className={styles.heroSubtitle}>
+              <h2 className={styles.heroSubtitle}>
                 {t.rich('hero.subtitle', {
                   aides: (chunks) => <span className={fr.cx('fr-text--bold')}>{chunks}</span>,
                 })}
-              </h3>
+              </h2>
             </div>
             <div className={clsx(fr.cx('fr-col-md-5'), 'boxShadow', styles.simulatorCard)}>
               <h2>{t('simulator.title')}</h2>
@@ -156,8 +156,12 @@ export default async function Home() {
               {
                 content: (
                   <div className={clsx(fr.cx('fr-accordions-group'), styles.accordionContainer)}>
-                    <Accordion label={t('faq.accordions.title1')}>{t('faq.accordions.content1')}</Accordion>
-                    <Accordion label={t('faq.accordions.title2')}>{t('faq.accordions.content2')}</Accordion>
+                    <Accordion titleAs="h2" label={t('faq.accordions.title1')}>
+                      {t('faq.accordions.content1')}
+                    </Accordion>
+                    <Accordion titleAs="h2" label={t('faq.accordions.title2')}>
+                      {t('faq.accordions.content2')}
+                    </Accordion>
                   </div>
                 ),
                 iconId: 'ri-arrow-right-line',
@@ -166,8 +170,12 @@ export default async function Home() {
               {
                 content: (
                   <div className={clsx(fr.cx('fr-accordions-group'), styles.accordionContainer)}>
-                    <Accordion label={t('faq.accordions.title1')}>{t('faq.accordions.content1')}</Accordion>
-                    <Accordion label={t('faq.accordions.title2')}>{t('faq.accordions.content2')}</Accordion>
+                    <Accordion titleAs="h2" label={t('faq.accordions.title1')}>
+                      {t('faq.accordions.content1')}
+                    </Accordion>
+                    <Accordion titleAs="h2" label={t('faq.accordions.title2')}>
+                      {t('faq.accordions.content2')}
+                    </Accordion>
                   </div>
                 ),
                 iconId: 'ri-arrow-right-line',

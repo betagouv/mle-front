@@ -31,8 +31,10 @@ export default async function PrepareYourStudentLife() {
             <div className={styles.headerContainer}>
               <h1 className={styles.heroCustomFont}>
                 <span className={styles.heroTitle}>{t('titlePart1')}</span>
+                &nbsp;
                 <br />
                 <span className={styles.heroTitle}>{t('titlePart2')}</span>
+                &nbsp;
                 <br />
                 <span className={styles.heroTitleHighlight}>{t('titlePart3')}</span>
               </h1>
@@ -61,7 +63,7 @@ export default async function PrepareYourStudentLife() {
         <div className={styles.searchCard}>
           <div className={styles.searchCardContent}>
             <div className={fr.cx('fr-col-md-6')}>
-              <h3 className={styles.searchTitle}>{t('searchTitlePart')}</h3>
+              <h2 className={clsx('h3', styles.searchTitle)}>{t('searchTitlePart')}</h2>
             </div>
             <div className={clsx(fr.cx('fr-col-md-6'), styles.searchCardInputsContainer)}>
               <PrepareStudentLifeSelectDepartment departments={departments} />

@@ -25,9 +25,9 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_tot
           <div className={styles.cardContainer}>
             <div className={fr.cx('fr-col-md-4')}>
               <div className={styles.card}>
-                <h4>
+                <h2 className="h4">
                   {nb_total_apartments} logements étudiants <br /> sur la ville de {location}
-                </h4>
+                </h2>
                 <p style={{ margin: 0 }}>soit 7% des logements de la ville</p>
                 <div className={styles.divider}></div>
                 <p>3 bailleurs sociaux à {location}</p>
@@ -42,17 +42,17 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_tot
               <div className={clsx(styles.card, styles.marginLeft)}>
                 <div className={styles.counterContainer}>
                   <div>
-                    <h4>Facilité à trouver un logement</h4>
+                    <h2 className="h4">Facilité à trouver un logement</h2>
                     <Image src={compteur.src} alt="compteur" quality={100} width={142} height={72} />
-                    <h4>Facile</h4>
+                    <h3 className="h4">Facile</h3>
                     <p>
                       <span className={fr.cx('fr-text--bold')}>3 semaines</span> en moyenne pour trouver un logement étudiant à {location}
                     </p>
                   </div>
                   <div>
-                    <h4>Budget des locataires</h4>
+                    <h2 className="h4">Budget des locataires</h2>
                     <Image src={compteur.src} alt="compteur" quality={100} width={142} height={72} />
-                    <h4>Équilibré</h4>
+                    <h3 className="h4">Équilibré</h3>
                     <p>Le budget des étudiants locataires à Créteil est équilibré.</p>
                   </div>
                 </div>
@@ -207,8 +207,7 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_tot
                     />
                   </svg>
                   <div>
-                    <h4 style={{ margin: 0 }}>17 aides disponibles</h4>
-                    <h6 style={{ margin: 0 }}>pour les étudiants résidant à {location}</h6>
+                    <h4 style={{ margin: 0 }}>17 aides disponibles pour les étudiants résidant à {location}</h4>
                   </div>
                   <div className={styles.helpersItems}>
                     {locationAids.map((aid) => (
@@ -238,7 +237,9 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_tot
               <div className={styles.budgetsMainContainer}>
                 <div className={styles.budgetsContainer}>
                   <div>
-                    <h5 style={{ marginBottom: '0.5rem' }}>Budget minimal</h5>
+                    <h4 className="h5" style={{ marginBottom: '0.5rem' }}>
+                      Budget minimal
+                    </h4>
                     <p style={{ marginBottom: '0.5rem' }}>Résidence Crous, repas RU, et peu de sorties.</p>
                     {/* biome-ignore lint/complexity/noExtraBooleanCast: <explanation> */}
                     {!!price_min ? (
@@ -253,7 +254,9 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_tot
                   </div>
                   <div className={fr.cx('fr-hidden', 'fr-unhidden-sm')} style={{ backgroundColor: '#DDDDDD', width: '1px' }} />
                   <div>
-                    <h5 style={{ marginBottom: '0.5rem' }}>Budget confortable</h5>
+                    <h4 className="h5" style={{ marginBottom: '0.5rem' }}>
+                      Budget confortable
+                    </h4>
                     <p style={{ marginBottom: '0.5rem' }}>Logement privé et activités diverses.</p>
                     {/* biome-ignore lint/complexity/noExtraBooleanCast: <explanation> */}
                     {!!price_min ? (
