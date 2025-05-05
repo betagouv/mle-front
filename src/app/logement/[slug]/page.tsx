@@ -17,7 +17,7 @@ import styles from './logement.module.css'
 export default async function LogementPage({ params }: { params: { slug: string } }) {
   const t = await getTranslations('accomodation')
   const accommodation = await getAccommodationById(params.slug)
-  const { address, city, geom, images_base64, name, nb_total_apartments, owner, postal_code } = accommodation
+  const { address, city, geom, images_urls, name, nb_total_apartments, owner, postal_code } = accommodation
   const { coordinates } = geom
   const [longitude, latitude] = coordinates
   const nearbyAccommodations = await getAccommodations({ center: `${longitude},${latitude}` })
@@ -34,7 +34,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
       <h2>{t('title', { city, title: name })}</h2>
       <div className={styles.container}>
         <div className={clsx(fr.cx('fr-col-sm-8'), styles.infosContainer)}>
-          {images_base64 && images_base64.length > 0 && <AccommodationImages images={images_base64} title={name} />}
+          {images_urls && images_urls.length > 0 && <AccommodationImages images={images_urls} title={name} />}
           <div className={styles.section}>
             <h1>{name}</h1>
             <div className={styles.tagContainer}>
