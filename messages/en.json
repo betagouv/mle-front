@@ -61,6 +61,7 @@
       "accessibility": "Accessibilité"
     },
     "sidebar": {
+      "proposedBy": "proposé par",
       "accommodationsCount": "{count} logements",
       "accommodationsNoCount": "Logements disponibles",
       "share": "Partager le logement",
@@ -253,7 +254,7 @@
       "rangeLabel": "Budget maximum"
     },
     "hero": {
-      "title": "Trouver votre prochain",
+      "title": "Trouvez votre prochain",
       "highlight": "logement étudiant",
       "subtitle": "et découvrez les <aides>aides</aides> auxquelles vous avez droit en tant qu'étudiant boursier."
     },
