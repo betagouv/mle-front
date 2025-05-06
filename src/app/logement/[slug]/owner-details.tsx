@@ -20,8 +20,9 @@ export const OwnerDetails = async ({ nbTotalApartments, owner }: OwnerDetailsPro
       )}
       {!!owner && (
         <div className={styles.sidebarOwner}>
-          <span>proposé par</span>
-          {!!owner.image_base64 && <Image src={owner.image_base64} alt={owner.name} width={52} height={52} />}
+          <span>{t('sidebar.proposedBy')}</span>
+          {!!owner.image_base64 && <Image src={owner.image_base64} alt={owner.name} width={201} height={90} quality={100} />}
+
           <h3 className={styles.sidebarText}>{owner.name}</h3>
           {!!owner.url && (
             <Button linkProps={{ href: owner.url }} priority="primary">
