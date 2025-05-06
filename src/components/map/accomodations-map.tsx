@@ -26,6 +26,8 @@ const BoundsHandler: FC = () => {
         [south, west],
         [north, east],
       ])
+    } else {
+      map.setView([46.5, 2.4], 6)
     }
   }, [queryBbox, map])
 
@@ -49,6 +51,7 @@ export const AccomodationsMap: FC<AccomodationsMapProps> = ({ data }) => {
     bbox: parseAsString,
     id: parseAsString,
   })
+
   const { data: accommodations } = useAccomodations()
 
   const markers = useMemo(() => {
@@ -81,7 +84,7 @@ export const AccomodationsMap: FC<AccomodationsMapProps> = ({ data }) => {
         {markers}
       </MapContainer>
     )
-  }, [markers])
+  }, [markers, queryStates.bbox])
 
   return memoizedMap
 }
