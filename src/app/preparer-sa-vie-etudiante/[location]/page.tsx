@@ -10,7 +10,7 @@ export default async function PrepareStudentLifeCityPage({ params }: { params: {
   const t = await getTranslations('prepareStudentLife')
   const { location } = params
   const cityDetails = await getCityDetails(location)
-  const { average_rent, bbox, name, nb_total_apartments, price_min } = cityDetails
+  const { bbox, name } = cityDetails
 
   return (
     <div>
@@ -19,12 +19,7 @@ export default async function PrepareStudentLifeCityPage({ params }: { params: {
         <h1>{t('title', { title: name })}</h1>
       </div>
       <PrepareStudentLifeSummary {...cityDetails} location={name} />
-      <PrepareStudentLifeStats
-        average_rent={average_rent}
-        location={name}
-        nb_total_apartments={nb_total_apartments}
-        price_min={price_min}
-      />
+      <PrepareStudentLifeStats {...cityDetails} location={name} />
       <PrepareStudentLifeNearbyAccommodations bbox={bbox} name={name} />
     </div>
   )

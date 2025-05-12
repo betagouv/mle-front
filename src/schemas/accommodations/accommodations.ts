@@ -107,3 +107,14 @@ export const ZAccomodationDetails = z.object({
   slug: z.string().max(250),
 })
 export type TAccomodationDetails = z.infer<typeof ZAccomodationDetails>
+
+export const ZPrepareStudentLifeAccommodationResidence = ZAccomodationDetails.pick({
+  nb_t1: true,
+  nb_t1_bis: true,
+  nb_t2: true,
+  nb_t3: true,
+  nb_t4_more: true,
+}).extend({
+  location: z.string().max(250),
+})
+export type TPrepareStudentLifeAccommodationResidence = z.infer<typeof ZPrepareStudentLifeAccommodationResidence>
