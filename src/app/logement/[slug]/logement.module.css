@@ -32,12 +32,9 @@
   gap: 0.5rem;
 }
 
-.locationSection {
-  border-bottom: 1px solid #e5e5e5;
-}
-
 .locationContent {
   display: flex;
+  border-bottom: 1px solid #e5e5e5;
   justify-content: space-between;
 }
 
@@ -110,4 +107,10 @@
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
   }
+}
+
+.prepareStudentLifeSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
