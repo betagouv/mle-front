@@ -108,7 +108,7 @@
     "filters": {
       "accommodations": "résidence",
       "accommodationsWithLocation": "résidence{pluralize} à {location}",
-      "grid": "Grille",
+      "grid": "Liste",
       "map": "Carte",
       "sortByPrice": "Triés par prix"
     },
