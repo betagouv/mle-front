@@ -39,6 +39,7 @@ const useStyles = tss.create({
     [fr.breakpoints.down('sm')]: {
       width: '100%',
     },
+    width: '30%',
   },
   input: {
     marginBottom: '0 !important',
