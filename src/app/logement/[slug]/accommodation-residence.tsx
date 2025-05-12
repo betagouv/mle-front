@@ -100,35 +100,32 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
             )}
 
             {hasAppartements && (
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '0.5rem',
-                  justifyContent: 'start',
-                }}
-              >
+              <div className={styles.appartmentsContainer}>
                 <span className={fr.cx('ri-user-line', 'fr-text--bold')} style={{ color: fr.colors.decisions.text.mention.grey.default }}>
-                  Appartements individuels (T3, T4+)
+                  Appartements (
+                  {priceTiles
+                    .filter((tile) => tile.enabled)
+                    .map((tile) => tile.type)
+                    .join(' • ')}
+                  )
                 </span>
-                <div>
-                  <span
-                    style={{
-                      backgroundColor: fr.colors.options.yellowTournesol._950_100.default,
-                      borderRadius: '4px',
-                      color: fr.colors.options.yellowTournesol.sun407moon922.default,
-                      padding: '0 0.5rem',
-                    }}
-                    className={fr.cx('fr-text--bold')}
-                  >
-                    {priceTiles
-                      .filter((tile) => tile.enabled)
-                      .map((tile) => (
-                        <span key={tile.type}>
-                          {tile.type}: de {tile.min} à {tile.max} €
-                        </span>
-                      ))}
-                  </span>
+                <div className={styles.pricesTiles}>
+                  {priceTiles
+                    .filter((tile) => tile.enabled)
+                    .map((tile) => (
+                      <span
+                        style={{
+                          backgroundColor: fr.colors.options.yellowTournesol._950_100.default,
+                          borderRadius: '4px',
+                          color: fr.colors.options.yellowTournesol.sun407moon922.default,
+                          padding: '0 0.5rem',
+                        }}
+                        className={fr.cx('fr-text--bold')}
+                        key={tile.type}
+                      >
+                        {tile.type}: de {tile.min} à {tile.max} €
+                      </span>
+                    ))}
                 </div>
               </div>
             )}
