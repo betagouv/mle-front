@@ -55,7 +55,6 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
       <AccomodationsMap data={data} />
     </Suspense>
   )
-
   return (
     <>
       <div className={fr.cx('fr-hidden-sm')}>{card}</div>
