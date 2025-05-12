@@ -48,3 +48,10 @@
   display: flex;
   gap: 0.25rem;
 }
+
+.appartmentsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: start;
+}
