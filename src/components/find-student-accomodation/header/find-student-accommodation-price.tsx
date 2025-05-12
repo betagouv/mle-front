@@ -16,6 +16,7 @@ export const FindStudentAccommodationPrice = () => {
       hideMinMax
       step={50}
       suffix=" €"
+      style={{ width: '25%' }}
       nativeInputProps={{ value: maxPrice, onChange: (e) => setMaxPrice(Number(e.target.value)) }}
     />
   )

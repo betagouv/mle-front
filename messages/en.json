@@ -55,7 +55,7 @@
       "shared": "Colocation",
       "accessible": "Accessible"
     },
-    "availableAccommodations": "Logements de la résidence",
+    "availableAccommodations": "Logements de la résidence étudiante",
     "location": {
       "title": "Localisation",
       "accessibility": "Accessibilité"
@@ -113,7 +113,9 @@
       "sortByPrice": "Triés par prix"
     },
     "card": {
-      "priceFrom": "À partir de"
+      "priceFrom": "À partir de",
+      "individual": "Individuel",
+      "colocation": "Colocation"
     },
     "results": {
       "noResult": "Aucun résultat pour votre recherche",

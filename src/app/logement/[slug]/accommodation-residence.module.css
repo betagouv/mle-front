@@ -1,0 +1,50 @@
+.accommodationsContainer {
+  border: 1px solid #ddd;
+  border-radius: 1rem;
+  padding: 1.5rem;
+}
+
+.studioColocBorderBottom {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 2rem;
+}
+
+.mainContainer {
+  display: flex;
+  gap: 1rem;
+}
+
+.studioContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 50%;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.borderRight {
+  border-right: 1px solid #ddd;
+}
+
+.warrantyContainer {
+  margin-top: 1rem;
+}
+
+.section {
+  border-bottom: 1px solid #e5e5e5;
+  padding: 1rem 1rem;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: 3rem 3.5rem;
+  }
+}
+
+.pricesTiles {
+  display: flex;
+  gap: 0.25rem;
+}

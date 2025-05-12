@@ -21,7 +21,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxW
   const t = useTranslations('findAccomodation.card')
   const { classes } = useStyles()
   const { city, images_urls, name, nb_total_apartments, postal_code, price_min } = accomodation.properties
-  const type = 'T1'
+  const accommodationsTypes = accomodation.properties.nb_coliving_apartments ? [t('individual'), t('colocation')] : [t('individual')]
   const badgeProps = price_min ? { badge: <Badge severity="new" noIcon>{`${t('priceFrom')} ${price_min}€`}</Badge> } : {}
   const imageProps =
     images_urls && images_urls.length > 0
@@ -41,7 +41,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxW
       border
       desc={
         <>
-          <span className={fr.cx('ri-group-line')}>{type}</span>
+          <span className={fr.cx('ri-group-line')}>{accommodationsTypes.join(' • ')}</span>
           <br />
           {nb_total_apartments && <span className={fr.cx('ri-community-line')}>{`${nb_total_apartments} logements`}</span>}
         </>
