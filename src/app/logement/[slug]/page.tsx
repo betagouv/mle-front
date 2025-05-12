@@ -7,6 +7,7 @@ import { AccommodationLocalisation } from '~/app/logement/[slug]/accommodation-l
 import AccommodationMap from '~/app/logement/[slug]/accommodation-map'
 import { AccommodationResidence } from '~/app/logement/[slug]/accommodation-residence'
 import { OwnerDetails } from '~/app/logement/[slug]/owner-details'
+import { PrepareStudentLifeRedirection } from '~/app/logement/[slug]/prepare-student-life-redirection'
 import { AccommodationImages } from '~/components/accommodation/accommodation-images'
 import { NearbyAccommodations } from '~/components/accommodation/nearby-accommodations'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
@@ -52,6 +53,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
           <AccommodationResidence accommodation={accommodation} />
           <AccommodationEquipments accommodation={accommodation} />
           <AccommodationLocalisation address={address} city={city} latitude={latitude} longitude={longitude} postalCode={postal_code} />
+          <PrepareStudentLifeRedirection city={city} />
         </div>
         <div className={fr.cx('fr-hidden-sm')}>{<AccommodationMap latitude={latitude} longitude={longitude} />}</div>
         <div className={fr.cx('fr-col-sm-4')}>
