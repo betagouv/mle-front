@@ -3,18 +3,27 @@ import Badge from '@codegouvfr/react-dsfr/Badge'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import Image from 'next/image'
-import Link from 'next/link'
+import { PrepareStudentLifeAccommodationResidence } from '~/components/prepare-student-life/stats/prepare-student-life-accommodation-residence'
 import compteur from '~/images/compteur.png'
 import logoCrous from '~/images/logo-crous.svg'
+import { TCity } from '~/schemas/territories'
 import styles from './prepare-student-life-stats.module.css'
-interface PrepareStudentLifeStatsProps {
-  average_rent: number
+
+type PrepareStudentLifeStatsProps = TCity & {
   location: string
-  nb_total_apartments: number
-  price_min: number | null
 }
 
-export default function PrepareStudentLifeStats({ average_rent, location, nb_total_apartments, price_min }: PrepareStudentLifeStatsProps) {
+export default function PrepareStudentLifeStats({
+  average_rent,
+  location,
+  nb_total_apartments,
+  price_min,
+  nb_t1,
+  nb_t1_bis,
+  nb_t2,
+  nb_t3,
+  nb_t4_more,
+}: PrepareStudentLifeStatsProps) {
   const locationAids = ['Aides nationales', 'Aides régionales', 'Aides départementales', 'Aides de la ville']
 
   return (
@@ -61,88 +70,14 @@ export default function PrepareStudentLifeStats({ average_rent, location, nb_tot
           </div>
           <div className={styles.cardContainer}>
             <div className={fr.cx('fr-col-md-8')}>
-              <div className={styles.priceContainer}>
-                <h3 style={{ margin: 0 }}>Prix moyen des loyers étudiants à {location}</h3>
-                <div className={styles.studioColocContainer}>
-                  <div className={styles.studioColocBorderBottom}>
-                    <div className={styles.studioColocItemsContainer}>
-                      <div className={styles.studioColocItem}>
-                        <span
-                          className={fr.cx('ri-user-line', 'fr-text--bold')}
-                          style={{ color: fr.colors.decisions.text.mention.grey.default }}
-                        >
-                          STUDIO
-                        </span>
-                        <div>
-                          <span
-                            style={{
-                              backgroundColor: fr.colors.options.yellowTournesol._950_100.default,
-                              borderRadius: '4px',
-                              color: fr.colors.options.yellowTournesol.sun407moon922.default,
-                              padding: '0 0.5rem',
-                            }}
-                            className={fr.cx('fr-text--bold')}
-                          >
-                            294.98 €
-                          </span>
-                        </div>
-                        <div>
-                          <Link href="#" className={fr.cx('fr-link')}>
-                            {/* TODO -reset margin right on ::before {' '} */}
-                            <span className={fr.cx('fr-icon-arrow-right-line')}>Consulter les 34 offres</span>
-                          </Link>
-                        </div>
-                      </div>
-                      <div style={{ borderLeft: '1px solid #ddd' }}></div>
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'column',
-                          gap: '0.5rem',
-                          justifyContent: 'start',
-                        }}
-                      >
-                        <span
-                          className={fr.cx('ri-user-line', 'fr-text--bold')}
-                          style={{ color: fr.colors.decisions.text.mention.grey.default }}
-                        >
-                          CHAMBRE EN COLOCATION
-                        </span>
-                        <div>
-                          <span
-                            style={{
-                              backgroundColor: fr.colors.options.yellowTournesol._950_100.default,
-                              borderRadius: '4px',
-                              color: fr.colors.options.yellowTournesol.sun407moon922.default,
-                              padding: '0 0.5rem',
-                            }}
-                            className={fr.cx('fr-text--bold')}
-                          >
-                            219 €
-                          </span>
-                        </div>
-                        <div>
-                          <Link href="#" className={fr.cx('fr-link')}>
-                            {/* TODO -reset margin right on ::before Consulter les 42 offres{' '} */}
-                            <span className={fr.cx('fr-icon-arrow-right-line')}>Consulter les 42 offres</span>
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className={styles.warrantyContainer}>
-                    <span className={fr.cx('ri-information-line')}>
-                      Prévoir un dépôt de garantie ainsi que le versement d&apos;un premier loyer
-                    </span>
-                  </div>
-                </div>
-                <p style={{ margin: 0 }}>
-                  <span className={fr.cx('ri-thumb-up-line')}>
-                    Un <span className={fr.cx('fr-text--bold')}>plafonnement des loyers est en vigueur à {location}</span> afin de limiter
-                    les abus
-                  </span>
-                </p>
-              </div>
+              <PrepareStudentLifeAccommodationResidence
+                location={location}
+                nb_t1={nb_t1}
+                nb_t1_bis={nb_t1_bis}
+                nb_t2={nb_t2}
+                nb_t3={nb_t3}
+                nb_t4_more={nb_t4_more}
+              />
             </div>
             <div className={fr.cx('fr-col-md-4')}>
               <div className={clsx(styles.card, styles.helpersMainContainer, styles.marginLeft)}>

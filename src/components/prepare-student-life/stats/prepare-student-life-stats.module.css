@@ -19,9 +19,6 @@
   .counterContainer {
     flex-direction: row;
   }
-  .priceContainer {
-    padding: 0 2.5rem;
-  }
   .helpersItems {
     gap: 1rem;
   }
