@@ -42,6 +42,31 @@ export const NearbyAccommodations = ({ nearbyAccommodations }: { nearbyAccommoda
     titleAs: 'h5' as const,
   } as CardProps & (typeof hasImage extends true ? CardProps.WithImageLink : CardProps.WithoutImage)
 
+  const currentFeature = nearbyFeatures[currentIndex]?.properties
+  const hasImage = !!currentFeature?.images_urls?.[0]
+  const nbTotalApartments = currentFeature?.nb_total_apartments
+
+  const cardProps = {
+    background: true,
+    border: true,
+    badge: currentFeature.price_min ? <Badge severity="new" noIcon>{`${currentFeature.price_min}€`}</Badge> : undefined,
+    desc: <>{nbTotalApartments && <span className={fr.cx('ri-community-line')}>{`${nbTotalApartments} logements`}</span>}</>,
+    enlargeLink: true,
+    horizontal: true,
+    ...(hasImage
+      ? {
+          imageAlt: `Image de la résidence ${currentFeature?.name}`,
+          imageUrl: currentFeature?.images_urls?.[0] ?? '',
+        }
+      : {}),
+    linkProps: {
+      href: `/logement/${currentFeature?.slug}`,
+    },
+    size: 'small' as const,
+    title: currentFeature?.name,
+    titleAs: 'h5' as const,
+  } as CardProps & (typeof hasImage extends true ? CardProps.WithImageLink : CardProps.WithoutImage)
+
   return (
     <>
       <div className={classes.nearbySection}>
