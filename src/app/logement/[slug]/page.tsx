@@ -54,7 +54,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
           <AccommodationLocalisation address={address} city={city} latitude={latitude} longitude={longitude} postalCode={postal_code} />
         </div>
         <div className={fr.cx('fr-hidden-sm')}>{<AccommodationMap latitude={latitude} longitude={longitude} />}</div>
-        <div style={{ flexDirection: 'column' }} className={fr.cx('fr-col-sm-4')}>
+        <div className={fr.cx('fr-col-sm-4')}>
           <OwnerDetails owner={owner} nbTotalApartments={nb_total_apartments} />
           <NearbyAccommodations nearbyAccommodations={nearbyAccommodations} />
         </div>
