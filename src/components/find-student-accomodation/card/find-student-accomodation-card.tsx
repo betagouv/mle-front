@@ -31,7 +31,6 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxW
           imageAlt: 'Placeholder image',
           imageUrl: 'https://www.systeme-de-design.gouv.fr/img/placeholder.16x9.png',
         }
-
   return (
     <Card
       {...badgeProps}

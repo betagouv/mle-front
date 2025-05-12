@@ -2,7 +2,6 @@
 
 import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
-import Select from '@codegouvfr/react-dsfr/Select'
 import { useTranslations } from 'next-intl'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { FC } from 'react'
@@ -37,11 +36,12 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
         </h2>
       )}
       <div className={classes.container}>
-        <Select label="" nativeSelectProps={{}}>
+        {/* Implement it as soon as we have differents sorting strategies */}
+        {/* <Select label="" nativeSelectProps={{}}>
           <option disabled hidden defaultValue={t('sortByPrice')} selected>
             {t('sortByPrice')}
           </option>
-        </Select>
+        </Select> */}
         <div className={fr.cx('fr-hidden', 'fr-unhidden-md')}>
           <div>
             <Button

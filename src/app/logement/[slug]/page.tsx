@@ -23,9 +23,9 @@ export default async function LogementPage({ params }: { params: { slug: string 
   const nearbyAccommodations = await getAccommodations({ center: `${longitude},${latitude}` })
 
   const tags: Array<{ iconId?: FrIconClassName | RiIconClassName; label: string }> = [
-    { iconId: 'ri-user-line', label: t('tags.studio') },
-    { iconId: 'ri-group-line', label: t('tags.shared') },
-    { iconId: 'ri-wheelchair-line', label: t('tags.accessible') },
+    ...(accommodation.nb_t1 || accommodation.nb_t1_bis ? [{ iconId: 'ri-user-line' as RiIconClassName, label: t('tags.studio') }] : []),
+    ...(accommodation.nb_coliving_apartments ? [{ iconId: 'ri-group-line' as RiIconClassName, label: t('tags.shared') }] : []),
+    ...(accommodation.nb_accessible_apartments ? [{ iconId: 'ri-wheelchair-line' as RiIconClassName, label: t('tags.accessible') }] : []),
   ]
 
   return (
