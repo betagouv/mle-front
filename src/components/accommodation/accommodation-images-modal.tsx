@@ -1,19 +1,39 @@
 'use client'
 
+import { fr } from '@codegouvfr/react-dsfr'
+import Button from '@codegouvfr/react-dsfr/Button'
 import Image from 'next/image'
+import { useState } from 'react'
 import { tss } from 'tss-react'
 import { modal } from './accommodation-images'
 
 export const AccommodationImagesModal = ({ children, images, title }: { children: React.ReactNode; images: string[]; title: string }) => {
   const { classes } = useStyles()
+  const [currentImage, setCurrentImage] = useState(0)
   return (
     <>
       {children}
-      <modal.Component title={title}>
+      <modal.Component title={title} size="large">
         <div className={classes.container}>
-          {images.map((image, index) => (
-            <Image key={index} src={image} alt="Accommodation" width={400} height={400} />
-          ))}
+          <div style={{ position: 'relative', width: '100%', height: '50vh' }}>
+            <Image src={images[currentImage]} alt="Accommodation" fill style={{ objectFit: 'contain' }} />
+          </div>
+        </div>
+        <div className={classes.buttonsContainer}>
+          <div className={fr.cx('fr-mt-4w')}>
+            <Button
+              iconId="ri-arrow-left-line"
+              priority="secondary"
+              title="Image précédente"
+              onClick={() => setCurrentImage(currentImage - 1)}
+            />
+            <Button
+              iconId="ri-arrow-right-line"
+              priority="secondary"
+              title="Image suivante"
+              onClick={() => setCurrentImage(currentImage + 1)}
+            />
+          </div>
         </div>
       </modal.Component>
     </>
@@ -21,6 +41,13 @@ export const AccommodationImagesModal = ({ children, images, title }: { children
 }
 
 const useStyles = tss.create({
+  buttonsContainer: {
+    display: 'flex',
+    borderTop: '1px solid var(--border-default-grey)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: '1rem',
+  },
   container: {
     alignItems: 'center',
     display: 'flex',
