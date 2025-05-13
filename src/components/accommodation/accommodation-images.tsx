@@ -2,7 +2,7 @@ import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { createModal } from '@codegouvfr/react-dsfr/Modal'
 import clsx from 'clsx'
-import Image from 'next/image'
+import { AccommodationImage } from '~/components/accommodation/accommodation-image'
 import { AccommodationImagesModal } from '~/components/accommodation/accommodation-images-modal'
 import { sPluriel } from '~/utils/sPluriel'
 import styles from './accommodation-images.module.css'
@@ -12,7 +12,7 @@ interface AccommodationImagesProps {
   title: string
 }
 
-export const modal = createModal({
+export const accommodationPicturesModal = createModal({
   id: 'accommodation-images-modal',
   isOpenedByDefault: false,
 })
@@ -29,7 +29,7 @@ function ImageGrid({ images, imageWidth, imageHeight, totalImages }: ImageGridPr
     <div className={clsx(fr.cx('fr-hidden'), fr.cx('fr-unhidden-sm'), styles.gridContainer)} data-images={totalImages}>
       <div className={styles.imageGrid}>
         {images.map((image, index) => (
-          <Image key={index} src={image} alt="Accommodation" width={imageWidth} height={imageHeight} />
+          <AccommodationImage key={index} src={image} width={imageWidth} height={imageHeight} />
         ))}
       </div>
     </div>
@@ -50,10 +50,10 @@ export const AccommodationImages = ({ images, title }: AccommodationImagesProps)
   return (
     <div className={styles.container}>
       <div className={styles.mainImageContainer} style={{ width: widthStyle }}>
-        <Image src={mainImage} className={styles.mainImage} alt="Accommodation" width={400} height={300} />
+        <AccommodationImage src={mainImage} className={styles.mainImage} width={400} height={300} />
         <div className={styles.photoCountButton}>
           <AccommodationImagesModal images={images} title={title}>
-            <Button priority="tertiary no outline" nativeButtonProps={modal.buttonProps}>
+            <Button priority="tertiary no outline" nativeButtonProps={accommodationPicturesModal.buttonProps}>
               <span className={`ri-image-line ${styles.photoCount}`}>
                 {images.length} photo{sPluriel(images.length)}
               </span>

@@ -12,6 +12,10 @@
   display: flex;
   position: relative;
 
+  & > img {
+    cursor: pointer;
+  }
+
   @media (max-width: 768px) {
     width: 100% !important;
   }
@@ -41,4 +45,5 @@
 .imageGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  cursor: pointer;
 }
