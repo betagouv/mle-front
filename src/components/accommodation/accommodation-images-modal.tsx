@@ -6,7 +6,7 @@ import clsx from 'clsx'
 import Image from 'next/image'
 import { useState } from 'react'
 import { tss } from 'tss-react'
-import { modal } from './accommodation-images'
+import { accommodationPicturesModal } from './accommodation-images'
 
 export const AccommodationImagesModal = ({ children, images, title }: { children: React.ReactNode; images: string[]; title: string }) => {
   const { classes } = useStyles()
@@ -14,7 +14,7 @@ export const AccommodationImagesModal = ({ children, images, title }: { children
   return (
     <>
       {children}
-      <modal.Component title={title} size="large">
+      <accommodationPicturesModal.Component title={title} size="large">
         <div className={classes.container}>
           <div style={{ position: 'relative', width: '100%', height: '50vh' }}>
             <Image src={images[currentImage]} alt="Accommodation" fill style={{ objectFit: 'contain' }} />
@@ -36,7 +36,7 @@ export const AccommodationImagesModal = ({ children, images, title }: { children
             />
           </div>
         </div>
-      </modal.Component>
+      </accommodationPicturesModal.Component>
     </>
   )
 }
