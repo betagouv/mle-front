@@ -57,8 +57,7 @@
     },
     "availableAccommodations": "Logements de la résidence étudiante",
     "location": {
-      "title": "Localisation",
-      "accessibility": "Accessibilité"
+      "title": "Localisation"
     },
     "sidebar": {
       "proposedBy": "proposé par",
@@ -348,7 +347,7 @@
       "cta": "Réinitialiser votre mot de passe"
     },
     "success": {
-      "description": "Votre nouveau mot de passe a bien été enregistré. Vous pouvez retourner à la page de connexion."
+      "description": "Votre nouveau mot de passe a bien été enregistré. Vous pouvez retourner à la page de connexion."
     },
     "backToLogin": "Retour à la page de connexion"
   },

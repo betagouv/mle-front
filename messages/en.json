@@ -57,8 +57,7 @@
     },
     "availableAccommodations": "Logements de la résidence étudiante",
     "location": {
-      "title": "Localisation",
-      "accessibility": "Accessibilité"
+      "title": "Localisation"
     },
     "sidebar": {
       "proposedBy": "proposé par",
