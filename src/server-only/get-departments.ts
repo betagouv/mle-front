@@ -8,5 +8,7 @@ export const getDepartments = async () => {
   }
   const data = await response.json()
 
-  return data.sort((a: TDepartment, b: TDepartment) => a.name.localeCompare(b.name)) as TDepartments
+  return data
+    .filter((department: TDepartment) => !!department.name)
+    .sort((a: TDepartment, b: TDepartment) => a.name.localeCompare(b.name)) as TDepartments
 }
