@@ -7,9 +7,10 @@ import styles from './logement.module.css'
 interface OwnerDetailsProps {
   nbTotalApartments: number | null
   owner: TAccomodationDetails['owner']
+  externalUrl: string | undefined
 }
 
-export const OwnerDetails = async ({ nbTotalApartments, owner }: OwnerDetailsProps) => {
+export const OwnerDetails = async ({ nbTotalApartments, owner, externalUrl }: OwnerDetailsProps) => {
   const t = await getTranslations('accomodation')
   return (
     <div className={styles.sidebarCard}>
@@ -25,7 +26,7 @@ export const OwnerDetails = async ({ nbTotalApartments, owner }: OwnerDetailsPro
 
           <h3 className={styles.sidebarText}>{owner.name}</h3>
           {!!owner.url && (
-            <Button linkProps={{ href: owner.url }} priority="primary">
+            <Button linkProps={{ href: externalUrl ?? owner.url }} priority="primary">
               {t('sidebar.buttons.consult')}
             </Button>
           )}

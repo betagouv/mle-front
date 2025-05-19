@@ -105,6 +105,7 @@ export const ZAccomodationDetails = z.object({
   residence_type: z.nativeEnum(EResidence),
   secure_access: z.boolean().nullable(),
   slug: z.string().max(250),
+  external_url: z.string().optional(),
 })
 export type TAccomodationDetails = z.infer<typeof ZAccomodationDetails>
 
