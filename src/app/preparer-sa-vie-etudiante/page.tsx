@@ -74,10 +74,6 @@ export default async function PrepareYourStudentLife() {
       </div>
       <div className={fr.cx('fr-container', 'fr-py-6w')}>
         <div className={styles.popularCitiesSection}>
-          <div className={styles.popularCitiesTitle}>
-            <h3>{t('popularCities')}</h3>
-          </div>
-
           <PopularCities cities={popularCities} />
         </div>
       </div>
