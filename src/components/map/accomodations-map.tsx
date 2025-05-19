@@ -1,7 +1,6 @@
 'use client'
 
-import type { Map as LeafletMap } from 'leaflet'
-import { FC, useEffect, useMemo, useRef } from 'react'
+import { FC, useEffect, useMemo } from 'react'
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { tss } from 'tss-react'
 import 'leaflet/dist/leaflet.css'
@@ -10,17 +9,15 @@ import 'leaflet-defaulticon-compatibility'
 import { fr } from '@codegouvfr/react-dsfr'
 import { parseAsString, useQueryState, useQueryStates } from 'nuqs'
 import { useAccomodations } from '~/hooks/use-accomodations'
-import { useScroll } from '~/hooks/use-scroll'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 
 interface AccomodationsMapProps {
   data: TGetAccomodationsResponse
 }
 
-const BoundsHandler: FC<{ mapContainerRef: React.RefObject<HTMLDivElement> }> = ({ mapContainerRef }) => {
+const BoundsHandler: FC = () => {
   const map = useMap()
   const [queryBbox, setBbox] = useQueryState('bbox')
-  const isScrollingOutside = useScroll(mapContainerRef)
 
   useEffect(() => {
     if (queryBbox) {
@@ -45,29 +42,11 @@ const BoundsHandler: FC<{ mapContainerRef: React.RefObject<HTMLDivElement> }> = 
     },
   })
 
-  useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (isScrollingOutside) {
-        e.preventDefault()
-        e.stopPropagation()
-      }
-    }
-
-    const mapElement = map.getContainer()
-    mapElement.addEventListener('wheel', handleWheel, { passive: false })
-
-    return () => {
-      mapElement.removeEventListener('wheel', handleWheel)
-    }
-  }, [map, isScrollingOutside])
-
   return null
 }
 
 export const AccomodationsMap: FC<AccomodationsMapProps> = ({ data }) => {
   const { classes } = useStyles()
-  const mapRef = useRef<LeafletMap>(null)
-  const mapContainerRef = useRef<HTMLDivElement>(null)
   const [queryStates, setQueryStates] = useQueryStates({
     bbox: parseAsString,
     id: parseAsString,
@@ -96,18 +75,16 @@ export const AccomodationsMap: FC<AccomodationsMapProps> = ({ data }) => {
 
   const memoizedMap = useMemo(() => {
     return (
-      <div ref={mapContainerRef} className={classes.mapContainer}>
-        <MapContainer ref={mapRef} center={[46.5, 2.4]} zoom={6} style={{ height: '100%', width: '100%' }}>
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          <BoundsHandler mapContainerRef={mapContainerRef} />
-          {markers}
-        </MapContainer>
-      </div>
+      <MapContainer center={[46.5, 2.4]} zoom={6} className={classes.mapContainer} scrollWheelZoom={false}>
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        <BoundsHandler />
+        {markers}
+      </MapContainer>
     )
-  }, [markers, queryStates.bbox, classes.mapContainer])
+  }, [markers, queryStates.bbox])
 
   return memoizedMap
 }
