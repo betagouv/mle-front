@@ -67,7 +67,7 @@ export default async function FindStudentAccommodationPage({
   return (
     <>
       <div className={fr.cx('fr-container')}>
-        <DynamicBreadcrumb />
+        <DynamicBreadcrumb title={title} />
 
         <h1 className={styles.title}>{title}</h1>
         <FindStudentAccomodationHeader />

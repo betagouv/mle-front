@@ -2,12 +2,12 @@ import { FrIconClassName, RiIconClassName, fr } from '@codegouvfr/react-dsfr'
 import { Tag } from '@codegouvfr/react-dsfr/Tag'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
-import { AccommodationEquipments } from '~/app/logement/[slug]/accommodation-equipments'
-import { AccommodationLocalisation } from '~/app/logement/[slug]/accommodation-localisation'
-import AccommodationMap from '~/app/logement/[slug]/accommodation-map'
-import { AccommodationResidence } from '~/app/logement/[slug]/accommodation-residence'
-import { OwnerDetails } from '~/app/logement/[slug]/owner-details'
-import { PrepareStudentLifeRedirection } from '~/app/logement/[slug]/prepare-student-life-redirection'
+import { AccommodationEquipments } from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-equipments'
+import { AccommodationLocalisation } from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-localisation'
+import AccommodationMap from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-map'
+import { AccommodationResidence } from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-residence'
+import { OwnerDetails } from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/owner-details'
+import { PrepareStudentLifeRedirection } from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/prepare-student-life-redirection'
 import { AccommodationImages } from '~/components/accommodation/accommodation-images'
 import { NearbyAccommodations } from '~/components/accommodation/nearby-accommodations'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
@@ -17,6 +17,7 @@ import styles from './logement.module.css'
 
 export default async function LogementPage({ params }: { params: { slug: string } }) {
   const t = await getTranslations('accomodation')
+  const commonT = await getTranslations()
   const accommodation = await getAccommodationById(params.slug)
   const { address, city, geom, images_urls, name, nb_total_apartments, owner, postal_code } = accommodation
   const { coordinates } = geom
@@ -29,9 +30,11 @@ export default async function LogementPage({ params }: { params: { slug: string 
     ...(accommodation.nb_accessible_apartments ? [{ iconId: 'ri-wheelchair-line' as RiIconClassName, label: t('tags.accessible') }] : []),
   ]
 
+  const breadCrumbTitle = commonT('breadcrumbs.accommodationTitle', { name, city })
+
   return (
     <div className={fr.cx('fr-container')}>
-      <DynamicBreadcrumb title={name} />
+      <DynamicBreadcrumb title={breadCrumbTitle} />
       <h2>{t('title', { city, title: name })}</h2>
       <div className={styles.container}>
         <div className={clsx(fr.cx('fr-col-sm-8'), styles.infosContainer)}>

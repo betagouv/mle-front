@@ -2,7 +2,7 @@
   "breadcrumbs": {
     "home": "Simulez mes aides au logement",
     "findAccomodation": "Trouver un logement étudiant",
-    "logement": "Logement étudiant {title}",
+    "accommodationTitle": "Logement étudiant {name} à {city}",
     "prepareStudentLife": "Préparer sa vie étudiante",
     "prepareStudentLifeTitle": "Préparer sa vie étudiante à {title}",
     "faq": "Foire aux questions",

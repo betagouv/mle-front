@@ -48,7 +48,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxW
       }
       enlargeLink
       linkProps={{
-        href: `/logement/${accomodation.properties.slug}`,
+        href: `/trouver-un-logement-etudiant/ville/${encodeURIComponent(city)}/${accomodation.properties.slug}`,
       }}
       start={
         <ul className="fr-tags-group">
