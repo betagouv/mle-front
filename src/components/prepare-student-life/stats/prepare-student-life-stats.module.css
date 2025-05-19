@@ -1,7 +1,3 @@
-.mainContainer {
-  background-color: #5858ad;
-}
-
 @media (min-width: 768px) {
   .mainContainer {
     margin-top: -3.5rem;
@@ -155,9 +151,6 @@
   margin-top: 1rem;
 }
 
-.helpersMainContainer {
-  background-color: var(--beige-gris-galet-975-75);
-}
 .helpersContainer {
   align-items: center;
   display: flex;
