@@ -28,9 +28,8 @@ export default function PrepareStudentLifeStats({
 
   return (
     <div className={styles.mainContainer}>
-      <div className={fr.cx('fr-container', 'fr-py-6w', 'fr-col-md-12')}>
+      <div className={fr.cx('fr-container', 'fr-pt-2w', 'fr-pb-6w', 'fr-col-md-12')}>
         <div className={styles.cardsContainer}>
-          <h1 className={styles.title}>Se loger à {location}</h1>
           <div className={styles.cardContainer}>
             <div className={fr.cx('fr-col-md-4')}>
               <div className={styles.card}>
@@ -176,7 +175,7 @@ export default function PrepareStudentLifeStats({
                       Budget minimal
                     </h4>
                     <p style={{ marginBottom: '0.5rem' }}>Résidence Crous, repas RU, et peu de sorties.</p>
-                    {/* biome-ignore lint/complexity/noExtraBooleanCast: <explanation> */}
+                    {/* biome-ignore lint/complexity/noExtraBooleanCast: price min can be undefined */}
                     {!!price_min ? (
                       <Badge noIcon severity="new">
                         Entre {price_min} et {price_min * 1.5} €
@@ -193,7 +192,7 @@ export default function PrepareStudentLifeStats({
                       Budget confortable
                     </h4>
                     <p style={{ marginBottom: '0.5rem' }}>Logement privé et activités diverses.</p>
-                    {/* biome-ignore lint/complexity/noExtraBooleanCast: <explanation> */}
+                    {/* biome-ignore lint/complexity/noExtraBooleanCast: price min can be undefined */}
                     {!!price_min ? (
                       <Badge noIcon severity="new">
                         Entre {price_min * 2} et {price_min * 3} €
