@@ -17,7 +17,6 @@ export const NearbyAccommodations = ({ nearbyAccommodations }: { nearbyAccommoda
   const maxIndex = nearbyFeatures.length - 1
   const handlePrevious = () => setCurrentIndex((prev) => (prev > 0 ? prev - 1 : maxIndex))
   const handleNext = () => setCurrentIndex((prev) => (prev < maxIndex ? prev + 1 : 0))
-
   const currentFeature = nearbyFeatures[currentIndex]?.properties
   const hasImage = !!currentFeature?.images_urls?.[0]
   const nbTotalApartments = currentFeature?.nb_total_apartments
@@ -36,7 +35,7 @@ export const NearbyAccommodations = ({ nearbyAccommodations }: { nearbyAccommoda
         }
       : {}),
     linkProps: {
-      href: `/logement/${currentFeature?.slug}`,
+      href: `/trouver-un-logement-etudiant/ville/${encodeURIComponent(currentFeature.city)}/${currentFeature.slug}`,
     },
     size: 'small' as const,
     title: currentFeature?.name,

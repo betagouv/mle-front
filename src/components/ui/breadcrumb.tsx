@@ -24,6 +24,7 @@ export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, margin = 
       label: ReactNode
       linkProps: RegisteredLinkProps
     }[] = []
+
     switch (pathname) {
       case '/simuler-mes-aides-au-logement':
         currentPageLabel = t('breadcrumbs.home')
@@ -48,6 +49,19 @@ export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, margin = 
         break
       case '/trouver-un-logement-etudiant':
         currentPageLabel = t('breadcrumbs.findAccomodation')
+        break
+      case pathname.match(/^\/trouver-un-logement-etudiant\/ville\/[^/]+\/[^/]+$/)?.input:
+        segments.push({
+          label: t('breadcrumbs.findAccomodation'),
+          linkProps: {
+            href: '/trouver-un-logement-etudiant',
+          },
+        })
+        currentPageLabel = title as string
+        break
+      case pathname.match(/^\/trouver-un-logement-etudiant\/[^?]+(?:\?.*)?$/)?.input:
+        currentPageLabel = title as string
+
         break
       case '/preparer-sa-vie-etudiante':
         currentPageLabel = t('breadcrumbs.prepareStudentLife')
