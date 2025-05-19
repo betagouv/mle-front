@@ -20,22 +20,26 @@ export const AccommodationImagesModal = ({ children, images, title }: { children
             <Image src={images[currentImage]} alt="Accommodation" fill style={{ objectFit: 'contain' }} />
           </div>
         </div>
-        <div className={classes.buttonsContainer}>
-          <div className={clsx(classes.buttons, fr.cx('fr-mt-4w'))}>
-            <Button
-              iconId="ri-arrow-left-line"
-              priority="secondary"
-              title="Image précédente"
-              onClick={() => setCurrentImage(currentImage - 1)}
-            />
-            <Button
-              iconId="ri-arrow-right-line"
-              priority="secondary"
-              title="Image suivante"
-              onClick={() => setCurrentImage(currentImage + 1)}
-            />
+        {images.length > 1 && (
+          <div className={classes.buttonsContainer}>
+            <div className={clsx(classes.buttons, fr.cx('fr-mt-4w'))}>
+              <Button
+                iconId="ri-arrow-left-line"
+                priority="secondary"
+                title="Image précédente"
+                onClick={() => setCurrentImage(currentImage - 1)}
+                disabled={currentImage === 0}
+              />
+              <Button
+                iconId="ri-arrow-right-line"
+                priority="secondary"
+                title="Image suivante"
+                onClick={() => setCurrentImage(currentImage + 1)}
+                disabled={currentImage === images.length - 1}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </accommodationPicturesModal.Component>
     </>
   )
