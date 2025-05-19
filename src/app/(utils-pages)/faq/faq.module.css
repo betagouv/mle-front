@@ -4,28 +4,47 @@
   gap: 2rem;
 }
 
-@media (min-width: 768px) {
-  .descriptionContainer {
-    width: 60%;
-  }
-}
-
-.tilesContainer {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-@media (min-width: 768px) {
-  .tilesContainer {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-}
-
 .accordionContainer {
   background-color: white;
-  padding: 2.5rem;
+  @media (min-width: 768px) {
+    padding: 2.5rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+}
+
+.description {
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.75rem;
+  margin: 0;
+}
+
+.titleContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  width: 45%;
+}
+
+.border {
+  width: 100%;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+.noMargin {
+  margin: 0;
+}
+
+.italic {
+  font-style: italic;
 }

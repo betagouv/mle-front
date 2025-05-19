@@ -143,7 +143,8 @@
   },
   "faq": {
     "title": "Foire aux questions",
-    "subTitle": "Vous avez des questions ? Nous avons des réponses ! Cette section est dédiée à vous fournir les informations les plus complètes et précises pour vous aider à bien préparer votre vie étudiante. Nous avons regroupé les questions les plus fréquemment posées pour faciliter votre recherche."
+    "subTitle": "Vous avez des questions ? Nous avons des réponses ! Cette section est dédiée à vous fournir les informations les plus complètes et précises pour vous aider à bien préparer votre vie étudiante. Nous avons regroupé les questions les plus fréquemment posées pour faciliter votre recherche.",
+    "popularQuestions": "Questions populaires"
   },
   "siteMap": {
     "title": "Plan du site",
