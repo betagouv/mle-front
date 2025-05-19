@@ -4,6 +4,7 @@ import { fr } from '@codegouvfr/react-dsfr'
 import { Badge } from '@codegouvfr/react-dsfr/Badge'
 import { Card } from '@codegouvfr/react-dsfr/Card'
 import { Tag } from '@codegouvfr/react-dsfr/Tag'
+import clsx from 'clsx'
 import { useTranslations } from 'next-intl'
 import { parseAsString, useQueryState } from 'nuqs'
 import { FC } from 'react'
@@ -34,8 +35,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxW
     <Card
       {...badgeProps}
       {...imageProps}
-      classes={{ root: maxWidth, header: classes.header }}
-      shadow={selectedAccommodation === accomodation.id.toString()}
+      classes={{ root: clsx(maxWidth, selectedAccommodation === accomodation.id.toString() && classes.active), header: classes.header }}
       id={`accomodation-${accomodation.id}`}
       background
       border
@@ -67,5 +67,8 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxW
 export const useStyles = tss.create({
   header: {
     overflow: 'hidden',
+  },
+  active: {
+    border: '2px solid #3B7FF6',
   },
 })
