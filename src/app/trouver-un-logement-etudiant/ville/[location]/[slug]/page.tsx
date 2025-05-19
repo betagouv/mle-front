@@ -19,7 +19,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
   const t = await getTranslations('accomodation')
   const commonT = await getTranslations()
   const accommodation = await getAccommodationById(params.slug)
-  const { address, city, geom, images_urls, name, nb_total_apartments, owner, postal_code } = accommodation
+  const { address, city, geom, images_urls, name, nb_total_apartments, owner, postal_code, external_url } = accommodation
   const { coordinates } = geom
   const [longitude, latitude] = coordinates
   const nearbyAccommodations = await getAccommodations({ center: `${longitude},${latitude}` })
@@ -60,7 +60,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
         </div>
         <div className={fr.cx('fr-hidden-sm')}>{<AccommodationMap latitude={latitude} longitude={longitude} />}</div>
         <div className={fr.cx('fr-col-sm-4')}>
-          <OwnerDetails owner={owner} nbTotalApartments={nb_total_apartments} />
+          <OwnerDetails owner={owner} nbTotalApartments={nb_total_apartments} externalUrl={external_url} />
           <NearbyAccommodations nearbyAccommodations={nearbyAccommodations} />
         </div>
       </div>
