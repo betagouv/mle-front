@@ -1,0 +1,16 @@
+.mainContainer {
+  background-color: white;
+}
+
+.description {
+  margin: 0;
+}
+
+.boldTable td:first-child,
+.boldTable th:first-child {
+  font-weight: bold;
+}
+
+.boldTable tr:last-child td {
+  font-weight: bold;
+}
