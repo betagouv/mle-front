@@ -26,7 +26,12 @@
     "title": "Mon logement étudiant",
     "description": "Faciliter l'accès au logement pour les étudiants boursiers",
     "alerts": "Alertes logements",
-    "login": "Se connecter"
+    "login": "Se connecter",
+    "banner": {
+      "title": "Lancement de la plateforme",
+      "description": "De nouvelles offres de locations sont ajoutées régulièrement, restez connecté !",
+      "close": "Fermer"
+    }
   },
   "footer": {
     "linkList": {
