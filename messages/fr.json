@@ -11,7 +11,8 @@
     "personalData": "Données personnelles",
     "cookies": "Gestion des cookies",
     "sitemap": "Plan du site",
-    "notFound": "Page non trouvée"
+    "notFound": "Page non trouvée",
+    "budget": "Budget Mon Logement Étudiant"
   },
   "loading": {
     "card": "Chargement de la carte..."
@@ -366,5 +367,21 @@
       "privacyPolicy": "Politique de confidentialité"
     },
     "backToLogin": "Retour à la page de connexion"
+  },
+  "budget": {
+    "title": "Budget Mon Logement Étudiant",
+    "lastUpdate": "Mis à jour le",
+    "description": "Le budget de la startup Mon Logement Étudiant est présenté en comité d'investissement tous les 6 mois.",
+    "description2": "Il doit permettre à l’équipe d’atteindre les objectifs fixés dans la feuille de route et de se concentrer sur la satisfaction utilisateur. L’essentiel des dépenses se concentre sur les frais de personnel. Cinq indépendants travaillent pour la startup Mon Logement Étudiant, ainsi qu’une chargée de mission “Logement étudiant” au MESR.",
+    "repartition": "Répartition des dépenses",
+    "investigationDate": "Octobre à janvier 2024 (investigation)",
+    "constructionDate": "Novembre 2024 à mars 2025 (construction)",
+    "table": {
+      "coaching": "Coaching",
+      "development": "Développement",
+      "design": "Design",
+      "deployment": "Déploiement",
+      "total": "Total TTC"
+    }
   }
 }

@@ -80,6 +80,15 @@ export const FooterComponent = async () => {
     },
   ]
 
+  const bottomItems: FooterProps['bottomItems'] = [
+    {
+      linkProps: {
+        href: '/budget',
+        title: 'Budget Mon Logement Étudiant',
+      },
+      text: 'Budget Mon Logement Étudiant',
+    },
+  ]
   return (
     <Footer
       classes={{
@@ -102,6 +111,7 @@ export const FooterComponent = async () => {
       }
       operatorLogo={operatorLogo}
       partnersLogos={partnersLogos}
+      bottomItems={bottomItems}
       termsLinkProps={{
         href: '/mentions-legales',
       }}
