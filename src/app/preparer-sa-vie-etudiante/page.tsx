@@ -18,7 +18,6 @@ export default async function PrepareYourStudentLife() {
 
   const informations = [
     { iconId: 'ri-community-line' as FrIconClassName, title: 'Informations pratiques' },
-    { iconId: 'ri-line-chart-line' as FrIconClassName, title: 'Tendance du marché locatif' },
     { iconId: 'ri-money-euro-box-line' as FrIconClassName, title: 'Prix moyen des loyers' },
     { iconId: 'ri-shopping-bag-line' as FrIconClassName, title: 'Coût de la vie étudiante' },
   ]
