@@ -1,11 +1,12 @@
 import { fr } from '@codegouvfr/react-dsfr'
-import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
+import { FaqQuestionsAnswers } from '~/components/faq/faq-questions-answers'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
+import { TFaqQuestionsAnswers } from '~/schemas/faq/faq-questions-answers'
 import styles from './faq.module.css'
 
-const contents = [
+export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
   {
     question: 'Quels types de logements sont accessibles aux étudiants ?',
     answer: (
@@ -13,29 +14,29 @@ const contents = [
         <p>Plusieurs options s'offrent à vous :</p>
         <ul>
           <li>
-            <p className={styles.noMargin}>
-              <span className={styles.bold}>Résidences universitaires conventionnées ou à vocation sociale</span>&nbsp;: réservées aux:
-              réservées aux étudiants, elles proposent des loyers encadrés, souvent inférieurs aux prix du marché. L’accès est priorisé pour
-              les étudiants aux revenus modestes (ex. : boursiers du Crous).
+            <p className={fr.cx('fr-m-0')}>
+              <span className={fr.cx('fr-text--bold')}>Résidences universitaires conventionnées ou à vocation sociale</span>&nbsp;:
+              réservées aux: réservées aux étudiants, elles proposent des loyers encadrés, souvent inférieurs aux prix du marché. L’accès
+              est priorisé pour les étudiants aux revenus modestes (ex. : boursiers du Crous).
             </p>
             <p className={styles.italic}>Inclut : résidences Crous, logements gérés par des associations ou bailleurs sociaux.</p>
           </li>
           <li>
             <p>
-              <span className={styles.bold}>Résidences services étudiantes</span>&nbsp;: également réservées aux étudiants, mais avec des
-              loyers non encadrés.
+              <span className={fr.cx('fr-text--bold')}>Résidences services étudiantes</span>&nbsp;: également réservées aux étudiants, mais
+              avec des loyers non encadrés.
             </p>
           </li>
           <li>
             <p>
-              <span className={styles.bold}>Location classique</span>&nbsp;: logement indépendant loué auprès d’un particulier ou via une
-              agence.
+              <span className={fr.cx('fr-text--bold')}>Location classique</span>&nbsp;: logement indépendant loué auprès d’un particulier ou
+              via une agence.
             </p>
           </li>
           <li>
-            <p className={styles.noMargin}>
-              <span className={styles.bold}>Logement chez l’habitant ou intergénérationnel</span>&nbsp;: chambre louée dans un logement
-              occupé, souvent avec des loyers réduits.
+            <p className={fr.cx('fr-m-0')}>
+              <span className={fr.cx('fr-text--bold')}>Logement chez l’habitant ou intergénérationnel</span>&nbsp;: chambre louée dans un
+              logement occupé, souvent avec des loyers réduits.
             </p>
           </li>
         </ul>
@@ -49,18 +50,18 @@ const contents = [
         <ul>
           <li>
             <p>
-              <span className={styles.bold}>Studio</span>&nbsp;: une seule pièce à vivre avec une pièce d’eau (salle de bain/WC).
+              <span className={fr.cx('fr-text--bold')}>Studio</span>&nbsp;: une seule pièce à vivre avec une pièce d’eau (salle de bain/WC).
             </p>
           </li>
           <li>
             <p>
-              <span className={styles.bold}>T1</span>&nbsp;: une pièce à vivre + une cuisine séparée + salle de bain/WC.
+              <span className={fr.cx('fr-text--bold')}>T1</span>&nbsp;: une pièce à vivre + une cuisine séparée + salle de bain/WC.
             </p>
           </li>
           <li>
-            <p className={styles.noMargin}>
-              <span className={styles.bold}>T2, T3...</span>&nbsp;: chaque chiffre supplémentaire correspond à une pièce en plus (ex. : un
-              T2 comprend un salon et une chambre).
+            <p className={fr.cx('fr-m-0')}>
+              <span className={fr.cx('fr-text--bold')}>T2, T3...</span>&nbsp;: chaque chiffre supplémentaire correspond à une pièce en plus
+              (ex. : un T2 comprend un salon et une chambre).
             </p>
           </li>
         </ul>
@@ -80,7 +81,7 @@ const contents = [
             <p>L'eau froide/chaude, voir l'électricité</p>
           </li>
         </ul>
-        <p className={clsx(styles.italic, styles.noMargin)}>⚠️ Vérifiez toujours précisément ce que couvrent les charges avant de signer.</p>
+        <p className={clsx(styles.italic, fr.cx('fr-m-0'))}>⚠️ Vérifiez toujours précisément ce que couvrent les charges avant de signer.</p>
       </>
     ),
   },
@@ -91,14 +92,14 @@ const contents = [
         <ul>
           <li>
             <p>
-              <span className={styles.bold}>Meublé</span>&nbsp;: contient un équipement minimum (lit, plaques de cuisson, frigo, vaisselle,
-              etc.). Les loyers sont généralement plus élevés.
+              <span className={fr.cx('fr-text--bold')}>Meublé</span>&nbsp;: contient un équipement minimum (lit, plaques de cuisson, frigo,
+              vaisselle, etc.). Les loyers sont généralement plus élevés.
             </p>
           </li>
           <li>
-            <p className={styles.noMargin}>
-              <span className={styles.bold}>Non meublé</span>&nbsp;: vide ou partiellement équipé, avec un bail souvent plus long (3 ans
-              contre 1 an pour un meublé).
+            <p className={fr.cx('fr-m-0')}>
+              <span className={fr.cx('fr-text--bold')}>Non meublé</span>&nbsp;: vide ou partiellement équipé, avec un bail souvent plus long
+              (3 ans contre 1 an pour un meublé).
             </p>
           </li>
         </ul>
@@ -112,17 +113,18 @@ const contents = [
         <ul>
           <li>
             <p>
-              <span className={styles.bold}>DPE (Diagnostic de performance énergétique)</span>&nbsp;: indique la consommation énergétique du
-              logement (note de A à G).
+              <span className={fr.cx('fr-text--bold')}>DPE (Diagnostic de performance énergétique)</span>&nbsp;: indique la consommation
+              énergétique du logement (note de A à G).
             </p>
           </li>
           <li>
             <p>
-              <span className={styles.bold}>GES (Gaz à effet de serre) </span>&nbsp;: mesure les émissions liées à l’énergie utilisée.
+              <span className={fr.cx('fr-text--bold')}>GES (Gaz à effet de serre) </span>&nbsp;: mesure les émissions liées à l’énergie
+              utilisée.
             </p>
           </li>
         </ul>
-        <p className={clsx(styles.italic, styles.noMargin)}>
+        <p className={clsx(styles.italic, fr.cx('fr-m-0'))}>
           👉 Un logement mal noté (E à G) peut être mal isolé, coûteux à chauffer et inconfortable en été.
         </p>
       </>
@@ -131,7 +133,7 @@ const contents = [
   {
     question: 'Où puis-je trouver ce type de logement étudiant ?',
     answer: (
-      <p className={styles.noMargin}>
+      <p className={fr.cx('fr-m-0')}>
         Les résidences universitaires conventionnées et autres logements sociaux sont listés dans la section "Trouver un logement étudiant"
         sur monlogementetudiant.beta.gouv.fr
       </p>
@@ -145,24 +147,26 @@ const contents = [
         <ul>
           <li>
             <p>
-              <span className={styles.bold}>APL (Aide Personnalisée au Logement)</span>&nbsp;: versée par la CAF selon vos ressources, le
-              type de logement et le loyer.
+              <span className={fr.cx('fr-text--bold')}>APL (Aide Personnalisée au Logement)</span>&nbsp;: versée par la CAF selon vos
+              ressources, le type de logement et le loyer.
             </p>
           </li>
           <li>
             <p>
-              <span className={styles.bold}>ALS (Allocation de Logement Sociale)</span>&nbsp;: si vous n'êtes pas éligible à l'APL.
+              <span className={fr.cx('fr-text--bold')}>ALS (Allocation de Logement Sociale)</span>&nbsp;: si vous n'êtes pas éligible à
+              l'APL.
             </p>
           </li>
           <li>
             <p>
-              <span className={styles.bold}>FSL (Fonds de solidarité pour le logement) </span>&nbsp;: aide ponctuelle en cas de difficultés.
+              <span className={fr.cx('fr-text--bold')}>FSL (Fonds de solidarité pour le logement) </span>&nbsp;: aide ponctuelle en cas de
+              difficultés.
             </p>
           </li>
           <li>
-            <p className={styles.noMargin}>
-              <span className={styles.bold}>Aides locales</span>&nbsp;: certaines régions ou villes proposent des aides spécifiques
-              (renseignez-vous auprès de votre mairie ou région).
+            <p className={fr.cx('fr-m-0')}>
+              <span className={fr.cx('fr-text--bold')}>Aides locales</span>&nbsp;: certaines régions ou villes proposent des aides
+              spécifiques (renseignez-vous auprès de votre mairie ou région).
             </p>
           </li>
         </ul>
@@ -180,12 +184,13 @@ const contents = [
         <ul>
           <li>
             <p>
-              <span className={styles.bold}>La grantie Visale</span>&nbsp;(gratuite et publique)
+              <span className={fr.cx('fr-text--bold')}>La grantie Visale</span>&nbsp;(gratuite et publique)
             </p>
           </li>
           <li>
-            <p className={styles.noMargin}>
-              <span className={styles.bold}>Des garanties privées payantes</span>&nbsp;: proposées par certaines plateformes de location.
+            <p className={fr.cx('fr-m-0')}>
+              <span className={fr.cx('fr-text--bold')}>Des garanties privées payantes</span>&nbsp;: proposées par certaines plateformes de
+              location.
             </p>
           </li>
         </ul>
@@ -211,7 +216,7 @@ const contents = [
             <p>Un justificatif de ressources (ou ceux du garant)</p>
           </li>
           <li>
-            <p className={styles.noMargin}>Le contrat de travail ou une attestation de bourse, si applicable</p>
+            <p className={fr.cx('fr-m-0')}>Le contrat de travail ou une attestation de bourse, si applicable</p>
           </li>
         </ul>
       </>
@@ -236,7 +241,7 @@ const contents = [
             <p>La conformité du logement (surface minimale, équipements obligatoires pour un meublé, etc.)</p>
           </li>
           <li>
-            <p className={styles.noMargin}>L’existence d’une clause de solidarité si vous êtes en colocation</p>
+            <p className={fr.cx('fr-m-0')}>L’existence d’une clause de solidarité si vous êtes en colocation</p>
           </li>
         </ul>
       </>
@@ -259,15 +264,7 @@ export default async function Faq() {
           <h2 className={styles.title}>{t('popularQuestions')}</h2>
           <hr className={styles.border} />
         </div>
-        <div className={styles.accordionContainer}>
-          <div className={fr.cx('fr-accordions-group')}>
-            {contents.map((content, index) => (
-              <Accordion key={index} label={content.question}>
-                {content.answer}
-              </Accordion>
-            ))}
-          </div>
-        </div>
+        <FaqQuestionsAnswers />
       </div>
     </div>
   )

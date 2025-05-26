@@ -1,10 +1,10 @@
 import { fr } from '@codegouvfr/react-dsfr'
-import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import { Button } from '@codegouvfr/react-dsfr/Button'
-import Tabs from '@codegouvfr/react-dsfr/Tabs'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
 import Image from 'next/image'
+import { FAQ_CONTENTS } from '~/app/(utils-pages)/faq/page'
+import { FaqQuestionsAnswers } from '~/components/faq/faq-questions-answers'
 import { FindAccommodationForm } from '~/components/find-student-accomodation/home/find-accommodation-form'
 import al from '~/images/al.svg'
 import apl from '~/images/apl.svg'
@@ -147,43 +147,11 @@ export default async function Home() {
         <div className={styles.faqContent}>
           <div>
             <h1 className={styles.faqHeader}>{t('faq.title')}</h1>
-            <p className={styles.faqDescription}>{t('faq.description')}</p>
           </div>
-          <Tabs
-            className={styles.tabs}
-            classes={{ panel: styles.backgroundWhite }}
-            tabs={[
-              {
-                content: (
-                  <div className={clsx(fr.cx('fr-accordions-group'), styles.accordionContainer)}>
-                    <Accordion titleAs="h2" label={t('faq.accordions.title1')}>
-                      {t('faq.accordions.content1')}
-                    </Accordion>
-                    <Accordion titleAs="h2" label={t('faq.accordions.title2')}>
-                      {t('faq.accordions.content2')}
-                    </Accordion>
-                  </div>
-                ),
-                iconId: 'ri-arrow-right-line',
-                label: t('faq.tabs.tab1'),
-              },
-              {
-                content: (
-                  <div className={clsx(fr.cx('fr-accordions-group'), styles.accordionContainer)}>
-                    <Accordion titleAs="h2" label={t('faq.accordions.title1')}>
-                      {t('faq.accordions.content1')}
-                    </Accordion>
-                    <Accordion titleAs="h2" label={t('faq.accordions.title2')}>
-                      {t('faq.accordions.content2')}
-                    </Accordion>
-                  </div>
-                ),
-                iconId: 'ri-arrow-right-line',
-                label: t('faq.tabs.tab2'),
-              },
-            ]}
-          />
-          <Button size="large" priority="secondary">
+
+          <FaqQuestionsAnswers contents={FAQ_CONTENTS.slice(0, 5)} />
+
+          <Button size="large" priority="secondary" linkProps={{ href: '/faq' }}>
             {t('faq.button')}
           </Button>
         </div>

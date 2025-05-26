@@ -1,0 +1,14 @@
+.accordionContainer {
+  background-color: white;
+  @media (min-width: 768px) {
+    padding: 2.5rem;
+  }
+
+  @media (max-width: 768px) {
+    padding: 1.5rem;
+  }
+}
+
+.italic {
+  font-style: italic;
+}
