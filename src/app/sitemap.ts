@@ -71,7 +71,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.3,
     },
     {
-      url: `${baseUrl}/politique-de-confidentialite`,
+      url: `${baseUrl}/donnees-personnelles`,
+      lastModified,
+      changeFrequency: 'monthly',
+      priority: 0.1,
+    },
+    {
+      url: `${baseUrl}/gestion-des-cookies`,
+      lastModified,
+      changeFrequency: 'monthly',
+      priority: 0.1,
     },
   ]
 }
