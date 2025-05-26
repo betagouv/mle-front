@@ -25,7 +25,7 @@ export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
 
   if (data?.length === 0) return <Alert severity="info" title={t('noResultTitle')} description={t('noResultDescription')} />
   const sortedCities = data?.sort((a: TCity, b: TCity) => a.name.localeCompare(b.name))
-  console.log(sortedCities, cities)
+
   return (
     <>
       {!departmentQuery && (
@@ -48,7 +48,7 @@ export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
               orientation="vertical"
               title={city.name}
               titleAs="h3"
-              classes={{ root: classes.tileContainer }}
+              classes={{ root: classes.tileContainer, title: classes.tileTitle }}
             />
           )
         })}
@@ -67,6 +67,14 @@ const useStyles = tss.create({
   },
   tileContainer: {
     height: '160px',
+  },
+  tileTitle: {
+    '&::before': {
+      backgroundImage: 'none',
+    },
+    '& a::before': {
+      zIndex: 0,
+    },
   },
   popularCitiesTitle: {
     color: '#666666',
