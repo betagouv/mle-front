@@ -138,7 +138,9 @@
     "popularCities": "Villes étudiantes populaires",
     "title": "Préparer sa vie étudiante à {title}",
     "subTitle": "Être étudiant à {title}",
-    "nearbyCities": "Villes à proximité de {title}"
+    "nearbyCities": "Villes à proximité de {title}",
+    "noResultTitle": "Aucun logement étudiant répertorié pour le moment",
+    "noResultDescription": "Il n'y a pas de logements pour les villes de ce département. Nous vous invitons à réessayer plus tard, de nouvelles résidences sont ajoutées régulièrement."
   },
   "alertAccommodation": {
     "title": "Restez alerté des dernières annonces",

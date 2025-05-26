@@ -23,14 +23,9 @@ export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
 
   if (isLoading) return null
 
-  if (data?.length === 0)
-    return (
-      <Alert
-        severity="info"
-        title="Aucun logement dans ce département"
-        description="Il n'y a pas de logements pour les villes de ce département. Nous vous invitons à réessayer plus tard, de nouvelles résidences sont ajoutées régulièrement."
-      />
-    )
+  if (data?.length === 0) return <Alert severity="info" title={t('noResultTitle')} description={t('noResultDescription')} />
+  const sortedCities = data?.sort((a: TCity, b: TCity) => a.name.localeCompare(b.name))
+  console.log(sortedCities, cities)
   return (
     <>
       {!departmentQuery && (
@@ -39,7 +34,7 @@ export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
         </div>
       )}
       <div className={classes.tilesGrid}>
-        {(data || cities).map((city) => {
+        {(sortedCities || cities).map((city) => {
           const desc = !!city.nb_total_apartments && `${city.nb_total_apartments} logement${sPluriel(city.nb_total_apartments)} étudiants`
           return (
             <Tile
