@@ -35,7 +35,7 @@ export const FooterComponent = async () => {
       },
       {
         alt: "Ministère de l'Enseignement Supérieur et de la Recherche - logo",
-        imgUrl: '/images/logo-parcours-sup.svg',
+        imgUrl: '/images/logo-esr.svg',
         linkProps: {
           href: 'https://www.enseignementsup-recherche.gouv.fr/',
           title: "Lien vers le site du ministère de l'Enseignement Supérieur et de la Recherche",
@@ -114,9 +114,6 @@ export const FooterComponent = async () => {
       bottomItems={bottomItems}
       termsLinkProps={{
         href: '/mentions-legales',
-      }}
-      accessibilityLinkProps={{
-        href: '/accessibilite',
       }}
       websiteMapLinkProps={{
         href: '/plan-du-site',
