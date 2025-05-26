@@ -9,7 +9,10 @@ import { useTranslations } from 'next-intl'
 import { parseAsString, useQueryState } from 'nuqs'
 import { FC } from 'react'
 import { tss } from 'tss-react'
-import { FindStudentAccommodationImageCard } from '~/components/find-student-accomodation/card/find-student-accommodation-image-card'
+import {
+  FindStudentAccommodationImageCard,
+  FindStudentAccommodationPlaceholderImageCard,
+} from '~/components/find-student-accomodation/card/find-student-accommodation-image-card'
 import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
 
 type AccomodationCardProps = {
@@ -28,8 +31,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxW
     images_urls && images_urls.length > 0
       ? { imageComponent: <FindStudentAccommodationImageCard image={images_urls[0]} name={name} /> }
       : {
-          imageAlt: 'Placeholder image',
-          imageUrl: 'https://www.systeme-de-design.gouv.fr/img/placeholder.16x9.png',
+          imageComponent: <FindStudentAccommodationPlaceholderImageCard />,
         }
   return (
     <Card
