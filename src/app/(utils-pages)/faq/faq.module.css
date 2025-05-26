@@ -4,17 +4,6 @@
   gap: 2rem;
 }
 
-.accordionContainer {
-  background-color: white;
-  @media (min-width: 768px) {
-    padding: 2.5rem;
-  }
-
-  @media (max-width: 768px) {
-    padding: 1.5rem;
-  }
-}
-
 .description {
   font-size: 1.125rem;
   font-weight: 500;
@@ -35,16 +24,4 @@
 
 .border {
   width: 100%;
-}
-
-.bold {
-  font-weight: 700;
-}
-
-.noMargin {
-  margin: 0;
-}
-
-.italic {
-  font-style: italic;
 }

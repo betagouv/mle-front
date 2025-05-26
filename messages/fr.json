@@ -265,7 +265,7 @@
     "hero": {
       "title": "Trouvez votre prochain",
       "highlight": "logement étudiant",
-      "subtitle": "et découvrez les <aides>aides</aides> auxquelles vous avez droit en tant qu'étudiant boursier."
+      "subtitle": "et découvrez les <aides>aides</aides> auxquelles vous avez droit en tant qu'étudiant."
     },
     "simulator": {
       "title": "Simulez le montant de vos aides au logement",
@@ -292,7 +292,6 @@
     },
     "faq": {
       "title": "Parmi les questions fréquentes",
-      "description": "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt.",
       "tabs": {
         "tab1": "Onglet 1",
         "tab2": "Onglet 2"
