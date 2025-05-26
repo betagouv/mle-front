@@ -53,6 +53,7 @@ jobs:
     steps:
       - checkout
       - install_dependencies
+      - create_dotenv_file
       - run:
           name: 'Lint'
           command: pnpm lint
@@ -62,6 +63,7 @@ jobs:
     steps:
       - checkout
       - install_dependencies
+      - create_dotenv_file
       - run:
           name: 'Build'
           command: pnpm build 
@@ -79,3 +81,10 @@ commands:
       - restore_cache:
           keys:
             - << pipeline.parameters.cache_version >>-pnpm-{{ checksum "<< pipeline.parameters.lockfile >>" }}
+
+  create_dotenv_file:
+    steps:
+      - run:
+          name: 'Create .env file from .env.dist'
+          command: |
+            cp .env.dist .env
