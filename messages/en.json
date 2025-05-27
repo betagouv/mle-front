@@ -70,6 +70,7 @@
       "accommodationsCount": "{count} logements",
       "accommodationsNoCount": "Logements disponibles",
       "share": "Partager le logement",
+      "hasAvailableAccommodation": "Sous réserve de disponibilité des logements",
       "buttons": {
         "consult": "Consulter l'offre",
         "link": "Copier le lien",

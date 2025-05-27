@@ -66,7 +66,7 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
     <div className={styles.section}>
       <h4>{t('availableAccommodations')}</h4>
       <div className={styles.accommodationsContainer}>
-        <div className={styles.studioColocBorderBottom}>
+        <div>
           <div className={styles.mainContainer}>
             {hasStudio && (
               <div className={clsx(styles.studioContainer, hasAppartements && styles.borderRight)}>
@@ -130,11 +130,6 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
               </div>
             )}
           </div>
-        </div>
-        <div className={styles.warrantyContainer}>
-          <span className={fr.cx('ri-information-line')}>
-            Avance déductible du premier mois de loyer: <b>100 €</b>
-          </span>
         </div>
       </div>
     </div>

@@ -4,11 +4,6 @@
   padding: 1.5rem;
 }
 
-.studioColocBorderBottom {
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 2rem;
-}
-
 .mainContainer {
   display: flex;
   gap: 1rem;

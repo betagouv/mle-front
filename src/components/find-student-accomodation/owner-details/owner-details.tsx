@@ -1,8 +1,10 @@
+import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { getTranslations } from 'next-intl/server'
 import Image from 'next/image'
+import { OwnerDetailsActions } from '~/components/find-student-accomodation/owner-details/owner-details-actions'
 import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
-import styles from './logement.module.css'
+import styles from './owner-details.module.css'
 
 interface OwnerDetailsProps {
   nbTotalApartments: number | null
@@ -12,6 +14,7 @@ interface OwnerDetailsProps {
 
 export const OwnerDetails = async ({ nbTotalApartments, owner, externalUrl }: OwnerDetailsProps) => {
   const t = await getTranslations('accomodation')
+  const ownerUrl = externalUrl || owner?.url
   return (
     <div className={styles.sidebarCard}>
       {nbTotalApartments ? (
@@ -22,24 +25,22 @@ export const OwnerDetails = async ({ nbTotalApartments, owner, externalUrl }: Ow
       {!!owner && (
         <div className={styles.sidebarOwner}>
           <span>{t('sidebar.proposedBy')}</span>
-          {!!owner.image_base64 && <Image src={owner.image_base64} alt={owner.name} width={201} height={90} quality={100} />}
-
-          <h3 className={styles.sidebarText}>{owner.name}</h3>
-          {!!owner.url && (
-            <Button linkProps={{ href: externalUrl ?? owner.url }} priority="primary">
-              {t('sidebar.buttons.consult')}
-            </Button>
+          {owner.image_base64 ? (
+            <Image src={owner.image_base64} alt={owner.name} width={201} height={90} quality={100} />
+          ) : (
+            <h3 className={fr.cx('fr-m-0')}>{owner.name}</h3>
+          )}
+          {!!ownerUrl && (
+            <>
+              <span className={fr.cx('fr-text--sm', 'fr-m-0')}>{t('sidebar.hasAvailableAccommodation')}</span>
+              <Button linkProps={{ href: ownerUrl }} priority="primary" size="large">
+                {t('sidebar.buttons.consult')}
+              </Button>
+            </>
           )}
         </div>
       )}
-      <div className={styles.sidebarShare}>
-        <p className={styles.sidebarText}>{t('sidebar.share')}</p>
-        <div className={styles.buttonGroup}>
-          <Button size="small" iconId="ri-links-line" priority="tertiary" title={t('sidebar.buttons.link')} />
-          <Button size="small" iconId="ri-mail-line" priority="tertiary" title={t('sidebar.buttons.email')} />
-          <Button size="small" iconId="ri-printer-line" priority="tertiary" title={t('sidebar.buttons.print')} />
-        </div>
-      </div>
+      <OwnerDetailsActions />
     </div>
   )
 }
