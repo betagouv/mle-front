@@ -15,6 +15,7 @@ import styles from './layout.module.css'
 import '~/globals.css'
 import '~/text.css'
 import { NextAppDirEmotionCacheProvider } from 'tss-react/next'
+import Toaster from '~/components/ui/toaster'
 
 export const generateMetadata = async () => {
   const t = await getTranslations('metadata')
@@ -46,6 +47,7 @@ export default async function RootLayout({
                 <NuqsAdapter>
                   <HeaderComponent />
                   <main className={styles.container}>{children}</main>
+                  <Toaster />
                   <FooterComponent />
                 </NuqsAdapter>
               </TanstackQueryClientProvider>
