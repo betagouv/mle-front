@@ -1,0 +1,73 @@
+.toast {
+  border-radius: 8px !important;
+  box-shadow: 0 8px 24px -6px rgb(0 0 36 / 12%) !important;
+  max-width: 480px !important;
+}
+
+.toastContent {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.icon {
+  color: inherit;
+}
+
+.action {
+  background: transparent !important;
+  color: inherit !important;
+  text-decoration: underline;
+}
+
+.info {
+  background-color: var(--background-contrast-info) !important;
+
+  --hover: var(--background-contrast-info-hover);
+  --active: var(--background-contrast-info-active);
+
+  color: var(--text-default-info) !important;
+
+  .icon {
+    color: var(--text-default-info) !important;
+  }
+}
+
+.warning {
+  background-color: var(--background-contrast-warning) !important;
+
+  --hover: var(--background-contrast-warning-hover);
+  --active: var(--background-contrast-warning-active);
+
+  color: var(--text-default-warning) !important;
+
+  .icon {
+    color: var(--text-default-warning) !important;
+  }
+}
+
+.error {
+  background-color: var(--background-contrast-error) !important;
+
+  --hover: var(--background-contrast-error-hover);
+  --active: var(--background-contrast-error-active);
+
+  color: var(--text-default-error) !important;
+
+  .icon {
+    color: var(--text-default-error) !important;
+  }
+}
+
+.success {
+  background-color: var(--background-contrast-success) !important;
+
+  --hover: var(--background-contrast-success-hover);
+  --active: var(--background-contrast-success-active);
+
+  color: var(--text-default-success) !important;
+
+  .icon {
+    color: var(--text-default-success) !important;
+  }
+}

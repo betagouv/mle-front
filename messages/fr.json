@@ -70,6 +70,9 @@
       "accommodationsCount": "{count} logements",
       "accommodationsNoCount": "Logements disponibles",
       "share": "Partager le logement",
+      "hasAvailableAccommodation": "Sous réserve de disponibilité des logements",
+      "emailSubject": "Logement étudiant {title} à {location}",
+      "emailBody": "Venez découvrir le logement étudiant {title}, situé à {location}.\n\n🔗 {url}\n📍 {location}\n\nCordialement,\nMon Logement Étudiant",
       "buttons": {
         "consult": "Consulter l'offre",
         "link": "Copier le lien",
@@ -84,7 +87,12 @@
         "next": "Suivant"
       },
       "count": "{count} logements"
-    }
+    },
+    "studio": "Studio {type}",
+    "colocation": "Colocation",
+    "appartement": "Appartement {type}",
+    "simulator": "Sous réserve de l'obtention des aides aux logements étudiants",
+    "simulatorButton": "Simulateur"
   },
   "findAccomodation": {
     "faq": {
@@ -311,9 +319,9 @@
     "title": "Page introuvable",
     "errorCode": "Erreur 404",
     "description": "La page que vous cherchez est introuvable. Excusez-nous pour la gêne occasionnée.",
-    "description2": "Si vous avez tapé l’adresse web dans le navigateur, vérifiez qu’elle est correcte.",
-    "description3": "La page n’est peut-être plus disponible.",
-    "description4": "Dans ce cas, pour continuer votre visite vous pouvez consulter la page d’accueil.",
+    "description2": "Si vous avez tapé l'adresse web dans le navigateur, vérifiez qu'elle est correcte.",
+    "description3": "La page n'est peut-être plus disponible.",
+    "description4": "Dans ce cas, pour continuer votre visite vous pouvez consulter la page d'accueil.",
     "button": "Page d'accueil"
   },
   "login": {
@@ -378,7 +386,7 @@
     "title": "Budget Mon Logement Étudiant",
     "lastUpdate": "Mis à jour le",
     "description": "Le budget de la startup Mon Logement Étudiant est présenté en comité d'investissement tous les 6 mois.",
-    "description2": "Il doit permettre à l’équipe d’atteindre les objectifs fixés dans la feuille de route et de se concentrer sur la satisfaction utilisateur. L’essentiel des dépenses se concentre sur les frais de personnel. Cinq indépendants travaillent pour la startup Mon Logement Étudiant, ainsi qu’une chargée de mission “Logement étudiant” au MESR.",
+    "description2": "Il doit permettre à l'équipe d'atteindre les objectifs fixés dans la feuille de route et de se concentrer sur la satisfaction utilisateur. L'essentiel des dépenses se concentre sur les frais de personnel. Cinq indépendants travaillent pour la startup Mon Logement Étudiant, ainsi qu'une chargée de mission \"Logement étudiant\" au MESR.",
     "repartition": "Répartition des dépenses",
     "investigationDate": "Octobre à janvier 2024 (investigation)",
     "constructionDate": "Novembre 2024 à mars 2025 (construction)",

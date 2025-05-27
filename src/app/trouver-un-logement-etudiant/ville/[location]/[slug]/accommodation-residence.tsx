@@ -1,5 +1,6 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import Alert from '@codegouvfr/react-dsfr/Alert'
+import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
 import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
@@ -32,7 +33,7 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
       enabled: !!accommodation.nb_t2 && accommodation.price_min_t2 && accommodation.price_max_t2,
     },
   ]
-  const priceTiles = [
+  const appartmentsPriceTiles = [
     {
       type: 'T3',
       min: accommodation.price_min_t3,
@@ -47,7 +48,7 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
     },
   ]
   const hasStudio = studioPriceTiles.some((tile) => tile.enabled)
-  const hasAppartements = priceTiles.some((tile) => tile.enabled)
+  const hasAppartements = appartmentsPriceTiles.some((tile) => tile.enabled)
 
   if (!hasStudio && !hasAppartements) {
     return (
@@ -64,26 +65,18 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
 
   return (
     <div className={styles.section}>
-      <h4>{t('availableAccommodations')}</h4>
-      <div className={styles.accommodationsContainer}>
-        <div className={styles.studioColocBorderBottom}>
-          <div className={styles.mainContainer}>
-            {hasStudio && (
-              <div className={clsx(styles.studioContainer, hasAppartements && styles.borderRight)}>
-                <span className={fr.cx('ri-user-line', 'fr-text--bold')} style={{ color: fr.colors.decisions.text.mention.grey.default }}>
-                  STUDIO (
-                  {studioPriceTiles
-                    .filter((tile) => tile.enabled)
-                    .map((tile) => tile.type)
-                    .join(' • ')}
-                  )
-                </span>
-                <div className={styles.pricesTiles}>
-                  {studioPriceTiles
-                    .filter((tile) => tile.enabled)
-                    .map((tile) => (
+      <div className={styles.sectionContent}>
+        <h4 className={fr.cx('fr-mb-0')}>{t('availableAccommodations')}</h4>
+        <div className={styles.accommodationsContainer}>
+          <div>
+            <div className={styles.mainContainer}>
+              {studioPriceTiles
+                .filter((tile) => tile.enabled)
+                .map((stud, idx) => (
+                  <div className={clsx(idx === 0 && styles.borderRightGrid, styles.studioContainer)} key={stud.type}>
+                    <span className={fr.cx('ri-user-line', 'fr-text--bold')}>{t('studio', { type: stud.type })}</span>
+                    <div className={styles.pricesTiles}>
                       <span
-                        key={tile.type}
                         style={{
                           backgroundColor: fr.colors.options.yellowTournesol._950_100.default,
                           borderRadius: '4px',
@@ -92,27 +85,18 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
                         }}
                         className={fr.cx('fr-text--bold')}
                       >
-                        {tile.type}: de {tile.min} à {tile.max} €
+                        DE {stud.min} À {stud.max} €
                       </span>
-                    ))}
-                </div>
-              </div>
-            )}
+                    </div>
+                  </div>
+                ))}
 
-            {hasAppartements && (
-              <div className={styles.appartmentsContainer}>
-                <span className={fr.cx('ri-user-line', 'fr-text--bold')} style={{ color: fr.colors.decisions.text.mention.grey.default }}>
-                  Appartements (
-                  {priceTiles
-                    .filter((tile) => tile.enabled)
-                    .map((tile) => tile.type)
-                    .join(' • ')}
-                  )
-                </span>
-                <div className={styles.pricesTiles}>
-                  {priceTiles
-                    .filter((tile) => tile.enabled)
-                    .map((tile) => (
+              {appartmentsPriceTiles
+                .filter((tile) => tile.enabled)
+                .map((appartment, idx) => (
+                  <div className={clsx(idx === 0 && styles.borderRightGrid, styles.appartmentsContainer)} key={appartment.type}>
+                    <span className={fr.cx('ri-user-line', 'fr-text--bold')}>{t('appartement', { type: appartment.type })}</span>
+                    <div className={styles.pricesTiles}>
                       <span
                         style={{
                           backgroundColor: fr.colors.options.yellowTournesol._950_100.default,
@@ -121,20 +105,26 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
                           padding: '0 0.5rem',
                         }}
                         className={fr.cx('fr-text--bold')}
-                        key={tile.type}
                       >
-                        {tile.type}: de {tile.min} à {tile.max} €
+                        DE {appartment.min} À {appartment.max} €
                       </span>
-                    ))}
-                </div>
-              </div>
-            )}
+                    </div>
+                  </div>
+                ))}
+            </div>
           </div>
         </div>
-        <div className={styles.warrantyContainer}>
-          <span className={fr.cx('ri-information-line')}>
-            Avance déductible du premier mois de loyer: <b>100 €</b>
-          </span>
+        <div className={styles.simulatorContainer}>
+          <p className={fr.cx('fr-mb-0')}>{t('simulator')}</p>
+          <Button
+            size="small"
+            iconId="fr-icon-money-euro-circle-fill"
+            iconPosition="left"
+            linkProps={{ href: '/simuler-mes-aides-au-logement' }}
+            priority="tertiary"
+          >
+            {t('simulatorButton')}
+          </Button>
         </div>
       </div>
     </div>

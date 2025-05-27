@@ -4,14 +4,23 @@
   padding: 1.5rem;
 }
 
-.studioColocBorderBottom {
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 2rem;
+.mainContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
 }
 
-.mainContainer {
-  display: flex;
-  gap: 1rem;
+.borderLeft {
+  border-left: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+  .mainContainer {
+    grid-template-columns: 1fr;
+  }
+  .borderLeft {
+    border-left: none;
+  }
 }
 
 .studioContainer {
@@ -54,4 +63,27 @@
   flex-direction: column;
   gap: 0.5rem;
   justify-content: flex-start;
+}
+
+.simulatorContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sectionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.borderRightGrid {
+  border-right: 1px solid #ddd;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .borderRightGrid {
+    border-right: none;
+  }
 }
