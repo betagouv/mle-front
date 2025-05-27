@@ -8,11 +8,20 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import 'leaflet-defaulticon-compatibility'
 
-export const AccomodationMap: FC<{ center: [number, number] }> = ({ center }) => {
+export const AccomodationMap: FC<{ center: [number, number]; withScroll: boolean }> = ({ center, withScroll }) => {
   const { classes } = useStyles()
 
   return (
-    <MapContainer center={center} zoom={16} className={classes.mapContainer}>
+    <MapContainer
+      center={center}
+      zoom={16}
+      className={classes.mapContainer}
+      scrollWheelZoom={withScroll}
+      dragging={withScroll}
+      touchZoom={withScroll}
+      doubleClickZoom={withScroll}
+      zoomControl={withScroll}
+    >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
