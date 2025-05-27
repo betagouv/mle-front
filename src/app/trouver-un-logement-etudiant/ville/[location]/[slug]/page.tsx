@@ -6,10 +6,10 @@ import { AccommodationEquipments } from '~/app/trouver-un-logement-etudiant/vill
 import { AccommodationLocalisation } from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-localisation'
 import AccommodationMap from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-map'
 import { AccommodationResidence } from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-residence'
-import { OwnerDetails } from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/owner-details'
 import { PrepareStudentLifeRedirection } from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/prepare-student-life-redirection'
 import { AccommodationImages } from '~/components/accommodation/accommodation-images'
 import { NearbyAccommodations } from '~/components/accommodation/nearby-accommodations'
+import { OwnerDetails } from '~/components/find-student-accomodation/owner-details/owner-details'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import { getAccommodationById } from '~/server-only/get-accommodation-by-id'
 import { getAccommodations } from '~/server-only/get-accommodations'
@@ -60,7 +60,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
         </div>
         <div className={fr.cx('fr-hidden-sm')}>{<AccommodationMap latitude={latitude} longitude={longitude} />}</div>
         <div className={fr.cx('fr-col-sm-4')}>
-          <OwnerDetails owner={owner} nbTotalApartments={nb_total_apartments} externalUrl={external_url} />
+          <OwnerDetails owner={owner} nbTotalApartments={nb_total_apartments} externalUrl={external_url} title={name} location={city} />
           <NearbyAccommodations nearbyAccommodations={nearbyAccommodations} />
         </div>
       </div>
