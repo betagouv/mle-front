@@ -52,10 +52,9 @@ export const AccomodationsMap: FC<AccomodationsMapProps> = ({ data }) => {
     id: parseAsString,
   })
 
-  const { data: accommodations } = useAccomodations()
-
+  const { data: accommodations } = useAccomodations({ initialData: data })
   const markers = useMemo(() => {
-    const accommodationsData = queryStates.bbox ? accommodations?.results.features || [] : data.results.features
+    const accommodationsData = accommodations?.results.features || []
     return accommodationsData.map((accommodation) => (
       <Marker
         eventHandlers={{
@@ -71,7 +70,7 @@ export const AccomodationsMap: FC<AccomodationsMapProps> = ({ data }) => {
         position={[accommodation.geometry.coordinates[1], accommodation.geometry.coordinates[0]]}
       />
     ))
-  }, [accommodations, queryStates.bbox, setQueryStates, data])
+  }, [accommodations, queryStates.bbox, setQueryStates])
 
   const memoizedMap = useMemo(() => {
     return (

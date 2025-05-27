@@ -2,11 +2,14 @@
 
 import { Range } from '@codegouvfr/react-dsfr/Range'
 import { useTranslations } from 'next-intl'
-import { parseAsInteger, useQueryState } from 'nuqs'
+import { parseAsInteger, useQueryStates } from 'nuqs'
 
 export const FindStudentAccommodationPrice = () => {
   const t = useTranslations('findAccomodation')
-  const [maxPrice, setMaxPrice] = useQueryState('maxPrice', parseAsInteger.withDefault(1000))
+  const [queryStates, setQueryStates] = useQueryStates({
+    prix: parseAsInteger.withDefault(1000),
+    page: parseAsInteger,
+  })
 
   return (
     <Range
@@ -17,7 +20,7 @@ export const FindStudentAccommodationPrice = () => {
       step={50}
       suffix=" €"
       style={{ width: '25%' }}
-      nativeInputProps={{ value: maxPrice, onChange: (e) => setMaxPrice(Number(e.target.value)) }}
+      nativeInputProps={{ value: queryStates.prix, onChange: (e) => setQueryStates({ prix: Number(e.target.value), page: 1 }) }}
     />
   )
 }

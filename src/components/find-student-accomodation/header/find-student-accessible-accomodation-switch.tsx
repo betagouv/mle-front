@@ -3,16 +3,19 @@
 import { ToggleSwitch } from '@codegouvfr/react-dsfr/ToggleSwitch'
 import { Tooltip } from '@codegouvfr/react-dsfr/Tooltip'
 import { useTranslations } from 'next-intl'
-import { useQueryState } from 'nuqs'
+import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 import { FC } from 'react'
 import { tss } from 'tss-react'
 
 export const FindStudentAccessibleAccomodationSwitch: FC = () => {
-  const [isAccessible, setIsAccessible] = useQueryState('accessible')
+  const [queryStates, setQueryStates] = useQueryStates({
+    accessible: parseAsString,
+    page: parseAsInteger,
+  })
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()
 
-  const handleChange = (value: boolean) => setIsAccessible(value ? 'true' : 'false')
+  const handleChange = (value: boolean) => setQueryStates({ accessible: value ? 'true' : 'false', page: 1 })
 
   return (
     <div className={classes.container}>
@@ -22,7 +25,7 @@ export const FindStudentAccessibleAccomodationSwitch: FC = () => {
         showCheckedHint={false}
         label={t('header.accessbility')}
         labelPosition="right"
-        checked={isAccessible === 'true'}
+        checked={queryStates.accessible === 'true'}
         onChange={handleChange}
       />
       <Tooltip kind="hover" title={t('header.tooltip.accessible')} />
