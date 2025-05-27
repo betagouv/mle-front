@@ -2,16 +2,19 @@
 
 import { ToggleSwitch } from '@codegouvfr/react-dsfr/ToggleSwitch'
 import { useTranslations } from 'next-intl'
-import { useQueryState } from 'nuqs'
+import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 import { FC } from 'react'
 import { tss } from 'tss-react'
 
 export const FindStudentColivingAccomodationSwitch: FC = () => {
-  const [hasColiving, setHasColiving] = useQueryState('coliving')
+  const [queryStates, setQueryStates] = useQueryStates({
+    colocation: parseAsString,
+    page: parseAsInteger,
+  })
   const t = useTranslations('findAccomodation')
   const { classes } = useStyles()
 
-  const handleChange = (value: boolean) => setHasColiving(value ? 'true' : 'false')
+  const handleChange = (value: boolean) => setQueryStates({ colocation: value ? 'true' : 'false', page: 1 })
 
   return (
     <div className={classes.container}>
@@ -21,7 +24,7 @@ export const FindStudentColivingAccomodationSwitch: FC = () => {
         showCheckedHint={false}
         label={t('header.shared')}
         labelPosition="right"
-        checked={hasColiving === 'true'}
+        checked={queryStates.colocation === 'true'}
         onChange={handleChange}
       />
     </div>

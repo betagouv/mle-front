@@ -5,7 +5,7 @@ export const getAccommodations = async (searchParams: {
   bbox?: string
   center?: string
   hasColiving?: string
-  maxPrice?: string
+  prix?: string
   page?: string
 }) => {
   const params = new URLSearchParams()
@@ -17,10 +17,9 @@ export const getAccommodations = async (searchParams: {
   }
   if (searchParams.accessible) params.append('is_accessible', searchParams.accessible)
   if (searchParams.hasColiving) params.append('has_coliving', searchParams.hasColiving)
-  if (searchParams.maxPrice) params.append('price_max', searchParams.maxPrice)
+  if (searchParams.prix) params.append('price_max', searchParams.prix)
 
   const response = await fetch(`${process.env.API_URL}/accommodations/${params.size > 0 ? `?${params.toString()}` : ''}`)
-
   if (!response.ok) {
     throw new Error('Error occurred calling API while retrieving accommodations')
   }

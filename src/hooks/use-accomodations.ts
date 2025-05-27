@@ -32,17 +32,17 @@ export const useAccomodations = ({ initialData }: UseAccomodationsOptions = {}) 
   const [queryStates] = useQueryStates({
     accessible: parseAsString,
     bbox: parseAsString,
-    coliving: parseAsString,
+    colocation: parseAsString,
     page: parseAsInteger,
-    maxPrice: parseAsInteger,
+    prix: parseAsInteger,
   })
-  const { accessible, bbox, coliving, page, maxPrice } = queryStates
-  const enabled = !!bbox || !!accessible || !!page || !!coliving || !!maxPrice
+  const { accessible, bbox, colocation, page, prix } = queryStates
+  const enabled = !!bbox || !!accessible || !!page || !!colocation || !!prix
 
   return useQuery<TGetAccomodationsResponse>({
     enabled,
     initialData: enabled ? undefined : initialData,
-    queryFn: () => fetchAccomodations(bbox, page, accessible, coliving, maxPrice),
-    queryKey: ['accomodations', { accessible, bbox, coliving, page, maxPrice }],
+    queryFn: () => fetchAccomodations(bbox, page, accessible, colocation, prix),
+    queryKey: ['accomodations', { accessible, bbox, colocation, page, prix }],
   })
 }

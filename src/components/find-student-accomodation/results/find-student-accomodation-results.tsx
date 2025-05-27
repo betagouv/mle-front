@@ -5,7 +5,7 @@ import { Pagination } from '@codegouvfr/react-dsfr/Pagination'
 import clsx from 'clsx'
 import { useTranslations } from 'next-intl'
 import dynamic from 'next/dynamic'
-import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
+import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 import { FC, Suspense, useEffect, useMemo } from 'react'
 import { tss } from 'tss-react'
 import { AccomodationCard } from '~/components/find-student-accomodation/card/find-student-accomodation-card'
@@ -21,13 +21,18 @@ type FindStudentAccomodationResultsProps = {
 }
 export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsProps> = ({ data, territory }) => {
   const t = useTranslations('findAccomodation.results')
-  const [view] = useQueryState('vue', parseAsString)
-  const [page] = useQueryState('page', parseAsInteger)
-  const [bboxQuery, setBboxQuery] = useQueryState('bbox', parseAsString)
+  const [queryStates, setQueryStates] = useQueryStates({
+    vue: parseAsString,
+    page: parseAsInteger,
+    bbox: parseAsString,
+    prix: parseAsInteger,
+    accessible: parseAsString,
+    colocation: parseAsString,
+  })
 
   useEffect(() => {
     if (territory && territory.bbox) {
-      setBboxQuery(`${territory.bbox.xmin},${territory.bbox.ymin},${territory.bbox.xmax},${territory.bbox.ymax}`)
+      setQueryStates({ bbox: `${territory.bbox.xmin},${territory.bbox.ymin},${territory.bbox.xmax},${territory.bbox.ymax}` })
     }
   }, [])
 
@@ -39,7 +44,7 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
     }
   }, [accommodations?.results.features.length])
 
-  const { classes } = useStyles({ view })
+  const { classes } = useStyles({ view: queryStates.vue })
 
   const AccomodationsMap = useMemo(
     () =>
@@ -80,12 +85,21 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
               <Pagination
                 showFirstLast={false}
                 count={Math.ceil(accommodations.count / accommodations.page_size)}
-                defaultPage={page ?? 1}
+                defaultPage={queryStates.page ?? 1}
                 getPageLinkProps={(page: number) => {
                   const params = new URLSearchParams()
-                  if (view) params.set('vue', view)
-                  if (bboxQuery) {
-                    params.set('bbox', `${bboxQuery}`)
+                  if (queryStates.vue) params.set('vue', queryStates.vue)
+                  if (queryStates.bbox) {
+                    params.set('bbox', `${queryStates.bbox}`)
+                  }
+                  if (queryStates.accessible) {
+                    params.set('accessible', queryStates.accessible)
+                  }
+                  if (queryStates.colocation) {
+                    params.set('colocation', queryStates.colocation)
+                  }
+                  if (queryStates.prix) {
+                    params.set('prix', queryStates.prix.toString())
                   }
                   params.set('page', page.toString())
                   return { href: `/trouver-un-logement-etudiant?${params.toString()}` }
@@ -95,7 +109,9 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
           )}
         </div>
 
-        {view === 'carte' && <div className={clsx(fr.cx('fr-col-md-5', 'fr-hidden', 'fr-unhidden-sm'), classes.mapContainer)}>{card}</div>}
+        {queryStates.vue === 'carte' && (
+          <div className={clsx(fr.cx('fr-col-md-5', 'fr-hidden', 'fr-unhidden-sm'), classes.mapContainer)}>{card}</div>
+        )}
       </div>
     </>
   )
