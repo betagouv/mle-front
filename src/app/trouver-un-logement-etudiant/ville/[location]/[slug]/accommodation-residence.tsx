@@ -13,44 +13,47 @@ type AccommodationResidenceProps = {
 export const AccommodationResidence = async ({ accommodation }: AccommodationResidenceProps) => {
   const t = await getTranslations('accomodation')
 
-  const studioPriceTiles = [
+  const accommodationsTiles = [
     {
       type: 'T1',
       min: accommodation.price_min_t1,
       max: accommodation.price_max_t1,
       enabled: !!accommodation.nb_t1 && accommodation.price_min_t1 && accommodation.price_max_t1,
+      title: t('studio', { type: 'T1' }),
     },
     {
       type: 'T1bis',
       min: accommodation.price_min_t1_bis,
       max: accommodation.price_max_t1_bis,
       enabled: !!accommodation.nb_t1_bis && accommodation.price_min_t1_bis && accommodation.price_max_t1_bis,
+      title: t('studio', { type: 'T1bis' }),
     },
     {
       type: 'T2',
       min: accommodation.price_min_t2,
       max: accommodation.price_max_t2,
       enabled: !!accommodation.nb_t2 && accommodation.price_min_t2 && accommodation.price_max_t2,
+      title: t('studio', { type: 'T2' }),
     },
-  ]
-  const appartmentsPriceTiles = [
     {
       type: 'T3',
       min: accommodation.price_min_t3,
       max: accommodation.price_max_t3,
       enabled: !!accommodation.nb_t3 && accommodation.price_min_t3 && accommodation.price_max_t3,
+      title: t('appartement', { type: 'T3' }),
     },
     {
       type: 'T4+',
       min: accommodation.price_min_t4_more,
       max: accommodation.price_max_t4_more,
       enabled: !!accommodation.nb_t4_more && accommodation.price_min_t4_more && accommodation.price_max_t4_more,
+      title: t('appartement', { type: 'T4+' }),
     },
   ]
-  const hasStudio = studioPriceTiles.some((tile) => tile.enabled)
-  const hasAppartements = appartmentsPriceTiles.some((tile) => tile.enabled)
 
-  if (!hasStudio && !hasAppartements) {
+  const hasAccommodations = accommodationsTiles.some((tile) => tile.enabled)
+
+  if (!hasAccommodations) {
     return (
       <div className={styles.section}>
         <h4>{t('availableAccommodations')}</h4>
@@ -62,6 +65,8 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
       </div>
     )
   }
+  const enabledAccommodationTiles = accommodationsTiles.filter((tile) => tile.enabled)
+  // const enabledAppartmentsTiles = appartmentsPriceTiles.filter((tile) => tile.enabled)
 
   return (
     <div className={styles.section}>
@@ -70,47 +75,31 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
         <div className={styles.accommodationsContainer}>
           <div>
             <div className={styles.mainContainer}>
-              {studioPriceTiles
-                .filter((tile) => tile.enabled)
-                .map((stud, idx) => (
-                  <div className={clsx(idx === 0 && styles.borderRightGrid, styles.studioContainer)} key={stud.type}>
-                    <span className={fr.cx('ri-user-line', 'fr-text--bold')}>{t('studio', { type: stud.type })}</span>
-                    <div className={styles.pricesTiles}>
-                      <span
-                        style={{
-                          backgroundColor: fr.colors.options.yellowTournesol._950_100.default,
-                          borderRadius: '4px',
-                          color: fr.colors.options.yellowTournesol.sun407moon922.default,
-                          padding: '0 0.5rem',
-                        }}
-                        className={fr.cx('fr-text--bold')}
-                      >
-                        DE {stud.min} À {stud.max} €
-                      </span>
-                    </div>
-                  </div>
-                ))}
+              {enabledAccommodationTiles.map((accommodation, idx) => (
+                <div
+                  className={clsx(
+                    idx % 2 === 0 && idx !== enabledAccommodationTiles.length - 1 && styles.borderRightGrid,
+                    styles.studioContainer,
+                  )}
+                  key={accommodation.type}
+                >
+                  <span className={fr.cx('ri-user-line', 'fr-text--bold')}>{accommodation.title}</span>
 
-              {appartmentsPriceTiles
-                .filter((tile) => tile.enabled)
-                .map((appartment, idx) => (
-                  <div className={clsx(idx === 0 && styles.borderRightGrid, styles.appartmentsContainer)} key={appartment.type}>
-                    <span className={fr.cx('ri-user-line', 'fr-text--bold')}>{t('appartement', { type: appartment.type })}</span>
-                    <div className={styles.pricesTiles}>
-                      <span
-                        style={{
-                          backgroundColor: fr.colors.options.yellowTournesol._950_100.default,
-                          borderRadius: '4px',
-                          color: fr.colors.options.yellowTournesol.sun407moon922.default,
-                          padding: '0 0.5rem',
-                        }}
-                        className={fr.cx('fr-text--bold')}
-                      >
-                        DE {appartment.min} À {appartment.max} €
-                      </span>
-                    </div>
+                  <div className={styles.pricesTiles}>
+                    <span
+                      style={{
+                        backgroundColor: fr.colors.options.yellowTournesol._950_100.default,
+                        borderRadius: '4px',
+                        color: fr.colors.options.yellowTournesol.sun407moon922.default,
+                        padding: '0 0.5rem',
+                      }}
+                      className={fr.cx('fr-text--bold')}
+                    >
+                      DE {accommodation.min} À {accommodation.max} €
+                    </span>
                   </div>
-                ))}
+                </div>
+              ))}
             </div>
           </div>
         </div>
