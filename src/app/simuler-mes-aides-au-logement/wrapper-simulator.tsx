@@ -2,6 +2,7 @@
 
 import { fr } from '@codegouvfr/react-dsfr'
 import clsx from 'clsx'
+import { useTranslations } from 'next-intl'
 import Image from 'next/image'
 import { FC, useMemo, useState } from 'react'
 import AidesSimplifiesSimulator from '~/app/simuler-mes-aides-au-logement/aides-simplifies-simulator'
@@ -10,16 +11,17 @@ import homeHero from '~/images/home-bg.webp'
 import styles from './simuler-mes-aides-au-logement.module.css'
 
 const WrapperHeaderSimulator: FC = () => {
+  const t = useTranslations('simulator')
   return (
     <div className={clsx(fr.cx('fr-container'), styles.heroSection)}>
       <DynamicBreadcrumb color="white" />
       <div className={clsx(fr.cx('fr-col-md-4'), styles.heroContent)}>
         <h1 className={styles.heroTitle}>
-          Simulez le montant de vos <span className={styles.heroHighlight}>aides au&nbsp;</span>
-          <span className={styles.heroHighlight}>logement</span>
+          {t('titlePart1')} <span className={styles.heroHighlight}>{t('titlePart2')}&nbsp;</span>
+          <span className={styles.heroHighlight}>{t('titlePart3')}</span>
         </h1>
         <p className={styles.heroDescription}>
-          12 questions pour estimer vos <br /> droits et faciliter vos recherches
+          {t('descriptionPart1')} <br /> {t('descriptionPart2')}
         </p>
       </div>
     </div>

@@ -397,5 +397,12 @@
       "deployment": "Déploiement",
       "total": "Total TTC"
     }
+  },
+  "simulator": {
+    "titlePart1": "Simulez le montant de vos",
+    "titlePart2": "aides",
+    "titlePart3": "au logement",
+    "descriptionPart1": "20 questions pour estimer vos",
+    "descriptionPart2": "droits et faciliter vos recherches"
   }
 }
