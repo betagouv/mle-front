@@ -21,7 +21,7 @@ export default async function SimulateAccommodationAids() {
                 aides aux logements étudiants
               </h2>
               <div className={styles.faqButtonContainer}>
-                <Button iconId="ri-question-line" className="whiteButton" priority="secondary">
+                <Button iconId="ri-question-line" className="whiteButton" priority="secondary" linkProps={{ href: '/faq' }}>
                   Foire aux questions
                 </Button>
               </div>
