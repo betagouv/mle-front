@@ -32,9 +32,9 @@ export const HeaderComponent: FC = async () => {
           >
             {t('header.alerts')}
           </Button>,
-          <Button priority="tertiary" key="login-cta" iconId="ri-user-line" linkProps={{ href: '/se-connecter', target: '_self' }}>
-            {t('header.login')}
-          </Button>,
+          // <Button priority="tertiary" key="login-cta" iconId="ri-user-line" linkProps={{ href: '/se-connecter', target: '_self' }}>
+          //   {t('header.login')}
+          // </Button>,
         ]}
         brandTop={<BrandTop />}
         serviceTagline={t('header.description')}

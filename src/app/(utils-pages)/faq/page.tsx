@@ -16,8 +16,8 @@ export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
           <li>
             <p className={fr.cx('fr-m-0')}>
               <span className={fr.cx('fr-text--bold')}>Résidences universitaires conventionnées ou à vocation sociale</span>&nbsp;:
-              réservées aux: réservées aux étudiants, elles proposent des loyers encadrés, souvent inférieurs aux prix du marché. L’accès
-              est priorisé pour les étudiants aux revenus modestes (ex. : boursiers du Crous).
+              réservées aux étudiants, elles proposent des loyers encadrés, souvent inférieurs aux prix du marché. L’accès est priorisé pour
+              les étudiants aux revenus modestes (ex. : boursiers du Crous).
             </p>
             <p className={styles.italic}>Inclut : résidences Crous, logements gérés par des associations ou bailleurs sociaux.</p>
           </li>
