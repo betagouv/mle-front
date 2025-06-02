@@ -1,18 +1,16 @@
 export const dynamic = 'force-dynamic'
 
 import { fr } from '@codegouvfr/react-dsfr'
-import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
+import { FindStudentAccommodationTitle } from '~/components/find-student-accomodation/header/find-student-accommodation-title'
 import { FindStudentAccomodationHeader } from '~/components/find-student-accomodation/header/find-student-accomodation-header'
 import FindStudentAccommodationQA from '~/components/find-student-accomodation/qa/find-student-accommodation-qa'
 import { FindStudentAccomodationResults } from '~/components/find-student-accomodation/results/find-student-accomodation-results'
 import { FindStudentAccomodationSortView } from '~/components/find-student-accomodation/sort-view/find-student-accomodation-sort-view'
-import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import { TTerritories } from '~/schemas/territories'
 import { getAccommodations } from '~/server-only/get-accommodations'
 import { getTerritories } from '~/server-only/get-territories'
 import { getTerritoryQuestionsAnswers } from '~/server-only/get-territory-questions-answers'
-import styles from './find-student-accomodation-page.module.css'
 
 const getTerritoriesCategoryKey = (categoryKey: 'ville' | 'academie' | 'departement') => {
   const keys = {
@@ -37,9 +35,15 @@ export default async function FindStudentAccommodationPage({
   searchParams,
 }: {
   params: { location: string }
-  searchParams: { accessible: string; bbox?: string; content_type?: string; hasColiving?: string; object_id?: string; page?: string }
+  searchParams: {
+    accessible: string
+    bbox?: string
+    content_type?: string
+    hasColiving?: string
+    object_id?: string
+    page?: string
+  }
 }) {
-  const t = await getTranslations('findAccomodation')
   const routeCategoryKey = params?.location?.[0] || ''
   const routeLocation = decodeURIComponent(params?.location?.[1] || '')
   if (params && (params?.location?.length < 2 || params?.location?.length > 2)) {
@@ -63,13 +67,10 @@ export default async function FindStudentAccommodationPage({
     object_id: territory?.id,
   })
 
-  const title = territory?.name ? t('titleWithLocation', { location: territory?.name }) : t('title')
   return (
     <>
       <div className={fr.cx('fr-container')}>
-        <DynamicBreadcrumb title={title} />
-
-        <h1 className={styles.title}>{title}</h1>
+        <FindStudentAccommodationTitle location={territory?.name} />
         <FindStudentAccomodationHeader />
         <FindStudentAccomodationSortView data={accommodations} territory={territory} />
         <FindStudentAccomodationResults data={accommodations} territory={territory} />

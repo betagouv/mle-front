@@ -6,8 +6,7 @@ import { tss } from 'tss-react'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import 'leaflet-defaulticon-compatibility'
-import { fr } from '@codegouvfr/react-dsfr'
-import { parseAsString, useQueryState, useQueryStates } from 'nuqs'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { useAccomodations } from '~/hooks/use-accomodations'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 
@@ -17,11 +16,14 @@ interface AccomodationsMapProps {
 
 const BoundsHandler: FC = () => {
   const map = useMap()
-  const [queryBbox, setBbox] = useQueryState('bbox')
+  const [queryStates, setQueryStates] = useQueryStates({
+    bbox: parseAsString,
+    ['recherche-par-carte']: parseAsString,
+  })
 
   useEffect(() => {
-    if (queryBbox) {
-      const [west, south, east, north] = queryBbox.split(',').map(Number)
+    if (queryStates.bbox) {
+      const [west, south, east, north] = queryStates.bbox.split(',').map(Number)
       map.fitBounds([
         [south, west],
         [north, east],
@@ -29,16 +31,22 @@ const BoundsHandler: FC = () => {
     } else {
       map.setView([46.5, 2.4], 6)
     }
-  }, [queryBbox, map])
+  }, [queryStates.bbox, map])
 
   useMapEvents({
     dragend: (e) => {
       const bounds = e.target.getBounds()
-      setBbox(`${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`)
+      setQueryStates({
+        bbox: `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`,
+        ['recherche-par-carte']: 'true',
+      })
     },
     zoomend: (e) => {
       const bounds = e.target.getBounds()
-      setBbox(`${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`)
+      setQueryStates({
+        bbox: `${bounds.getWest()},${bounds.getSouth()},${bounds.getEast()},${bounds.getNorth()}`,
+        ['recherche-par-carte']: 'true',
+      })
     },
   })
 
@@ -93,10 +101,6 @@ const useStyles = tss.create({
     '[href]': {
       backgroundImage: 'unset !important',
     },
-    [fr.breakpoints.down('sm')]: {
-      height: '400px',
-    },
-    height: '500px',
     width: '100%',
   },
 })

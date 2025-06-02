@@ -29,7 +29,7 @@
     "login": "Se connecter",
     "banner": {
       "title": "Lancement de la plateforme",
-      "description": "De nouvelles offres de locations sont ajoutées régulièrement, restez connecté !",
+      "description": "De nouvelles offres de location sont ajoutées régulièrement, restez connecté !",
       "close": "Fermer"
     }
   },
@@ -132,7 +132,8 @@
     },
     "results": {
       "noResult": "Aucun résultat pour votre recherche",
-      "description": "Vous pouvez modifier votre recherche ou consulter les questions fréquemment posées sur la page d'informations."
+      "description": "Cela ne veut pas dire que l’offre n’existe pas, mais peut-être qu’elle n’est pas encore recensée sur ce site.",
+      "description2": "Vous pouvez modifier votre recherche ou consulter les questions fréquemment posées sur la page d'informations."
     }
   },
   "prepareStudentLife": {
