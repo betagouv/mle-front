@@ -27,5 +27,14 @@ export const FindStudentAccommodationPlaceholderImageCard = () => {
 
 export const FindStudentAccommodationImageCard = ({ image, name }: { image: string; name: string }) => {
   const [vue] = useQueryState('vue', parseAsString)
-  return <Image style={{ objectFit: 'cover' }} src={image} alt={name} width={vue === 'carte' ? 344 : 390} height={193} priority />
+  return (
+    <Image
+      style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+      src={image}
+      alt={name}
+      width={vue === 'carte' ? 344 : 390}
+      height={193}
+      priority
+    />
+  )
 }

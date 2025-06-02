@@ -68,7 +68,7 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
           <div className={classes.accommodationGrid}>
             {!isLoading &&
               (accommodations?.results.features || []).map((accommodation) => (
-                <AccomodationCard key={accommodation.id} accomodation={accommodation} maxWidth={classes.cardWidth} />
+                <AccomodationCard key={accommodation.id} accomodation={accommodation} />
               ))}
             {isLoading && Array.from({ length: 24 }).map((_, index) => <CardSkeleton key={index} />)}
           </div>
@@ -110,9 +110,7 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
           )}
         </div>
 
-        {queryStates.vue === 'carte' && (
-          <div className={clsx(fr.cx('fr-col-md-5', 'fr-hidden', 'fr-unhidden-sm'), classes.mapContainer)}>{card}</div>
-        )}
+        {queryStates.vue === 'carte' && <div className={clsx(fr.cx('fr-hidden', 'fr-unhidden-sm'), classes.mapContainer)}>{card}</div>}
       </div>
     </>
   )
@@ -150,27 +148,12 @@ const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) =>
   },
   container: {
     display: 'flex',
+    gap: '1rem',
     justifyContent: 'space-between',
   },
   mapContainer: {
-    [fr.breakpoints.up('md')]: {
-      '@media (min-height: 900px)': {
-        height: 'calc(100vh - 400px)',
-      },
-      '@media (min-height: 700px) and (max-height: 899px)': {
-        height: 'calc(100vh - 200px)',
-      },
-      '@media (min-height: 500px) and (max-height: 699px)': {
-        height: '600px',
-      },
-      '@media (max-height: 499px)': {
-        height: '600px',
-      },
-    },
-    '@media (max-height: 499px)': {
-      height: '300px',
-    },
-    height: 'calc(100vh - 600px)',
+    width: '100%',
+    height: 'calc(100vh - 20px)',
     minHeight: '300px',
     position: 'sticky',
     top: '1rem',

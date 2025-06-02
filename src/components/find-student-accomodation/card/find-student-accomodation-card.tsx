@@ -17,10 +17,9 @@ import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
 
 type AccomodationCardProps = {
   accomodation: TAccomodationCard
-  maxWidth?: string
 }
 
-export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxWidth }) => {
+export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation }) => {
   const [selectedAccommodation] = useQueryState('id', parseAsString)
   const t = useTranslations('findAccomodation.card')
   const { classes } = useStyles()
@@ -37,7 +36,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({ accomodation, maxW
     <Card
       {...badgeProps}
       {...imageProps}
-      classes={{ root: clsx(maxWidth, selectedAccommodation === accomodation.id.toString() && classes.active), header: classes.header }}
+      classes={{ root: clsx(selectedAccommodation === accomodation.id.toString() && classes.active), header: classes.header }}
       id={`accomodation-${accomodation.id}`}
       background
       border
