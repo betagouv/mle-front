@@ -3,7 +3,7 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { useTranslations } from 'next-intl'
-import { parseAsString, useQueryStates } from 'nuqs'
+import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { FC } from 'react'
 import { tss } from 'tss-react'
 import { useAccomodations } from '~/hooks/use-accomodations'
@@ -18,6 +18,7 @@ type FindStudentAccomodationSortViewProps = {
 export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortViewProps> = ({ data, territory }) => {
   const [queryStates, setQueryStates] = useQueryStates({
     bbox: parseAsString,
+    ['recherche-par-carte']: parseAsBoolean.withDefault(false),
     vue: parseAsString,
   })
   const t = useTranslations('findAccomodation.filters')
@@ -25,9 +26,10 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
 
   const { classes } = useStyles({ hasResults: accommodations && accommodations.count > 0 })
 
-  const title = territory?.name
-    ? t('accommodationsWithLocation', { pluralize: sPluriel(accommodations?.count ?? 0), location: territory?.name })
-    : `${t('accommodations')}${sPluriel(accommodations?.count ?? 0)}`
+  const title =
+    territory?.name && !queryStates['recherche-par-carte']
+      ? t('accommodationsWithLocation', { pluralize: sPluriel(accommodations?.count ?? 0), location: territory?.name })
+      : `${t('accommodations')}${sPluriel(accommodations?.count ?? 0)}`
   return (
     <div className={classes.headerContainer}>
       {accommodations && accommodations.count > 0 && (

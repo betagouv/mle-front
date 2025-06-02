@@ -74,9 +74,10 @@ export const FindStudentAccomodationResults: FC<FindStudentAccomodationResultsPr
           </div>
 
           {accommodations?.count === 0 && (
-            <div>
+            <div className={fr.cx('fr-col-md-11')}>
               <h3>{t('noResult')}</h3>
-              <p>{t('description')}</p>
+              <p className={fr.cx('fr-mb-0')}>{t('description')}</p>
+              <p>{t('description2')}</p>
             </div>
           )}
 
