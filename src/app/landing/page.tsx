@@ -17,8 +17,8 @@ import landingStep2 from '~/images/landing-step-2.svg'
 import landingStep3 from '~/images/landing-step-3.svg'
 import landingHero from '~/images/landing.webp'
 import crous from '~/images/logo-crous.svg'
+import ministereEnseignementSup from '~/images/logo-esr.svg'
 import logo from '~/images/logo.svg'
-import enseignementSup from '~/images/ministere-enseignement-sup.svg'
 import mmh from '~/images/mmh.svg'
 import poingFerme from '~/images/poing-ferme.svg'
 import sogima from '~/images/sogima.svg'
@@ -122,7 +122,7 @@ export default async function LandingPage() {
                   <span>{t('features.initiative.description')}</span>
                 </div>
                 <div className={styles.enseignementSup}>
-                  <Image src={enseignementSup.src} width={178} height={120} alt="Logo de l'enseignement supérieur" />
+                  <Image src={ministereEnseignementSup.src} width={178} height={120} alt="Logo de l'enseignement supérieur" />
                 </div>
               </div>
             </div>
