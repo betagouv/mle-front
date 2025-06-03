@@ -4,6 +4,8 @@ export const BrandTop: FC = () => (
   <>
     Ministère
     <br />
+    Chargé
+    <br />
     de l&apos;enseignement
     <br /> supérieur
     <br />
