@@ -19,7 +19,7 @@ export const CitiesAutocompleteResults: FC<AutocompleteResultsProps> = ({ data }
           <Link
             key={item.id}
             href={{
-              pathname: `/preparer-sa-vie-etudiante/${item.name}`,
+              pathname: `/preparer-sa-vie-etudiante/${item.slug}`,
             }}
           >
             <li className={classes.item} key={item.id}>
