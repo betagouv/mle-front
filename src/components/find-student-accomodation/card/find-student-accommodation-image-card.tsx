@@ -15,7 +15,7 @@ export const FindStudentAccommodationPlaceholderImageCard = () => {
 
   return (
     <Image
-      style={{ objectFit: 'cover' }}
+      style={{ objectFit: 'cover', width: '100%', height: '100%' }}
       src={randomImage}
       alt="Image placeholder d'une résidence"
       width={vue === 'carte' ? 332 : 390}
