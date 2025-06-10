@@ -3,6 +3,7 @@
     "home": "Simulez mes aides au logement",
     "findAccomodation": "Trouver un logement étudiant",
     "accommodationTitle": "Logement étudiant {name} à {city}",
+    "prepareBudget": "Préparer mon budget étudiant",
     "prepareStudentLife": "Préparer sa vie étudiante",
     "prepareStudentLifeTitle": "Préparer sa vie étudiante à {title}",
     "faq": "Foire aux questions",
@@ -46,7 +47,8 @@
   },
   "navigation": {
     "home": "Simuler mes aides au logement",
-    "prepareBudget": "Préparer sa vie étudiante",
+    "prepareBudget": "Préparer mon budget étudiant",
+    "prepareStudentLife": "Préparer sa vie étudiante",
     "findAccommodation": "Trouver un logement étudiant",
     "byAcademies": "Par académies",
     "faq": "Foire aux questions"
@@ -150,6 +152,141 @@
     "nearbyCities": "Villes à proximité de {title}",
     "noResultTitle": "Aucun logement étudiant répertorié pour le moment",
     "noResultDescription": "Il n'y a pas de logements pour les villes de ce département. Nous vous invitons à réessayer plus tard, de nouvelles résidences sont ajoutées régulièrement."
+  },
+  "prepareBudget": {
+    "title": "Préparer mon budget étudiant",
+    "sideMenu": {
+      "title": "Au programme",
+      "items": {
+        "monthlyResources": "1. Définir vos ressources mensuelles",
+        "fixedCharges": "2. Identifier vos charges fixes",
+        "variableExpenses": "3. Estimer vos dépenses variables",
+        "exceptionalExpenses": "4. Anticiper les dépenses exceptionnelles",
+        "aids": "5. Les aides à ne pas oublier"
+      }
+    },
+    "content": {
+      "subtitle": "Fiche pratique",
+      "mainTitlePart1": "Préparer votre budget étudiant :",
+      "mainTitlePart2": "les clés pour bien commencer",
+      "header": {
+        "title": "Pourquoi établir un budget ?",
+        "description": "Quand on devient étudiant, gérer son argent devient vite une nécessité. Entre le loyer, les frais de scolarité, les courses ou encore les sorties, chaque euro compte. Un budget bien préparé vous permet de :",
+        "list": {
+          "item1": "Suivre vos dépenses",
+          "item2": "Éviter les découverts",
+          "item3": "Anticiper les imprévus",
+          "item4": "Mieux planifier vos projets (voyage, permis, matériel...)",
+          "item5": "Garder l'esprit tranquille pour vos études",
+          "item6": "💡 Bon à savoir : de nombreux services (Crous, CAF, ADIL...) peuvent vous accompagner gratuitement."
+        }
+      },
+      "item1": {
+        "title": "1. Définir vos ressources mensuelles",
+        "description": "Commencez par faire le point sur vos revenus fixes et ponctuels. Cela vous permettra de déterminer combien vous pouvez dépenser chaque mois.",
+        "simulationCard": {
+          "title": "Simulez le montant de vos aides étudiantes",
+          "cta": "Simuler mes aides"
+        },
+        "list": {
+          "title": "Revenus possibles :",
+          "item1": "Bourse sur critères sociaux (Crous)",
+          "item2": "Aides au logement (APL ou ALS via la CAF)",
+          "item3": "Soutien familial",
+          "item4": "Salaire d'un job étudiant",
+          "item5": "Stages ou alternance rémunérés",
+          "item6": "Aides régionales, départementales ou municipales",
+          "item7": "Aides spécifiques (rupture familiale, situation de handicap...)",
+          "item8": "Prêt étudiant garanti par l’État"
+        }
+      },
+      "item2": {
+        "title": "2. Identifier vos charges fixes",
+        "description": "Ce sont les dépenses récurrentes, souvent incontournables. Elles varient selon votre situation (ville, logement, transport…).",
+        "list": {
+          "title": "Exemples de charges fixes :",
+          "item1": "Loyer + charges",
+          "item2": "Abonnement Internet et mobile",
+          "item3": "Transports en commun ou frais de carburant",
+          "item4": "Assurance habitation, santé, responsabilité civile",
+          "item5": "Frais de scolarité ou d'inscription",
+          "item6": "Abonnements divers (streaming, sport, presse...)"
+        },
+        "descriptionSubList": "🎯 Objectif : ces dépenses ne doivent pas dépasser 50 % de vos revenus mensuels."
+      },
+      "item3": {
+        "title": "3. Estimer vos dépenses variables",
+        "description": "Ce sont celles qui changent chaque mois et que vous pouvez ajuster.",
+        "list": {
+          "title": "Incluez notamment :",
+          "item1": "Courses alimentaires",
+          "item2": "Sorties, loisirs, activités sportives",
+          "item3": "Restaurants, cafés",
+          "item4": "Petits achats (vêtements, livres, fournitures...)",
+          "item5": "Dépenses imprévues"
+        },
+        "descriptionSubList": "📌 Gardez une marge de manœuvre pour éviter les mauvaises surprises."
+      },
+      "item4": {
+        "title": "4. Anticiper les dépenses exceptionnelles",
+        "description": "Même avec un bon budget, certaines dépenses arrivent moins souvent mais peuvent coûter cher :",
+        "list": {
+          "item1": "Déménagement ou rentrée universitaire",
+          "item2": "Achat d’un ordinateur ou matériel spécialisé",
+          "item3": "Dépenses médicales non prises en charge",
+          "item4": "Billets de train pour rentrer chez vous",
+          "item5": "Caution ou frais d’agence pour un logement"
+        },
+        "descriptionSubList": "💼 Astuce : mettez de côté 5 à 10 % de vos revenus chaque mois, si possible."
+      },
+      "item5": {
+        "title": "5. Les aides à ne pas oublier",
+        "description": "Voici quelques dispositifs valables sur tout le territoire :",
+        "table": {
+          "header": {
+            "column1": "Aides",
+            "column2": "Description",
+            "column3": "Où s'informer ?"
+          },
+          "row1": {
+            "column1": "Bourse CROUS",
+            "column2": "Selon les revenus familiaux",
+            "column3": "etudiant.gouv.fr"
+          },
+          "row2": {
+            "column1": "APL / ALS",
+            "column2": "Aide au logement par la CAF",
+            "column3": "caf.fr"
+          },
+          "row3": {
+            "column1": "Visale",
+            "column2": "Garantie de loyer gratuite",
+            "column3": "visale.fr"
+          },
+          "row4": {
+            "column1": "Aide au mérite / mobilité",
+            "column2": "Complément pour les boursiers",
+            "column3": "etudiant.gouv.fr"
+          },
+          "row5": {
+            "column1": "Complémentaire santé solidaire",
+            "column2": "Aide à la mutuelle santé",
+            "column3": "ameli.fr"
+          },
+          "row6": {
+            "column1": "Aides locales",
+            "column2": "Villes, départements, régions",
+            "column3": "Mairie ou site régional"
+          }
+        }
+      },
+      "redirectionCard": {
+        "title": "A la recherche d’un logement en résidence étudiante ?",
+        "description": "Mon Logement Etudiant facilite l'accès au logement et aux droits pour les étudiants.",
+        "cta": "Trouver un logement étudiant",
+        "ctaDisclaimer": "Plus de 1000 résidences partout en France"
+      }
+    }
   },
   "alertAccommodation": {
     "title": "Restez alerté des dernières annonces",
@@ -306,12 +443,6 @@
       "tabs": {
         "tab1": "Onglet 1",
         "tab2": "Onglet 2"
-      },
-      "accordions": {
-        "title1": "Name of the Accordion 1",
-        "content1": "Content of the Accordion 1",
-        "title2": "Name of the Accordion 2",
-        "content2": "Content of the Accordion 2"
       },
       "button": "Foire aux questions"
     }

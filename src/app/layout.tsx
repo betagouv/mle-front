@@ -1,13 +1,6 @@
-import { DsfrHead } from '@codegouvfr/react-dsfr/next-appdir/DsfrHead'
-import { DsfrProvider } from '@codegouvfr/react-dsfr/next-appdir/DsfrProvider'
-import { getHtmlAttributes } from '@codegouvfr/react-dsfr/next-appdir/getHtmlAttributes'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages, getTranslations } from 'next-intl/server'
-import Link from 'next/link'
-
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
-import { defaultColorScheme } from '~/app/default-color-scheme'
-import { StartDsfr } from '~/app/start-dsfr'
 import { FooterComponent } from '~/components/ui/footer/footer'
 import { HeaderComponent } from '~/components/ui/header/header'
 import { TanstackQueryClientProvider } from '~/providers/tanstack-client'
@@ -17,6 +10,8 @@ import '~/text.css'
 import { NextAppDirEmotionCacheProvider } from 'tss-react/next'
 import Matomo from '~/app/matomo'
 import Toaster from '~/components/ui/toaster'
+import { DsfrHead, getHtmlAttributes } from '~/dsfr/dsfr-head'
+import { DsfrProvider } from '~/dsfr/dsfr-provider'
 
 export const generateMetadata = async () => {
   const t = await getTranslations('metadata')
@@ -35,10 +30,9 @@ export default async function RootLayout({
   const messages = await getMessages()
 
   return (
-    <html {...getHtmlAttributes({ defaultColorScheme, lang: locale })} style={{ overflowX: 'hidden' }}>
+    <html {...getHtmlAttributes({ lang: locale })} style={{ overflowX: 'hidden' }}>
       <head>
-        <StartDsfr />
-        <DsfrHead Link={Link} preloadFonts={['Marianne-Regular', 'Marianne-Medium', 'Marianne-Bold']} />
+        <DsfrHead preloadFonts={['Marianne-Regular', 'Marianne-Medium', 'Marianne-Bold']} />
         <Matomo />
       </head>
       <body>

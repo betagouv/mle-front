@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1px solid #dddddd;
+  background-color: #f9f6f2;
+}
+
+.icon {
+  color: #17753c;
+}
