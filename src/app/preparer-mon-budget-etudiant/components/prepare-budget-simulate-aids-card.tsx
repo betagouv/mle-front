@@ -21,7 +21,9 @@ export default async function PrepareBudgetSimulateAidsCard() {
           </div>
         ))}
       </div>
-      <Button iconId="ri-money-euro-circle-line">{t('cta')}</Button>
+      <Button linkProps={{ href: '/simuler-mes-aides-au-logement' }} iconId="ri-money-euro-circle-line">
+        {t('cta')}
+      </Button>
     </div>
   )
 }
