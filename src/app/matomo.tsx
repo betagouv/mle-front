@@ -7,7 +7,7 @@ export default function Matomo() {
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_APP_ENV === 'production') {
       init({
-        url: process.env.NEXT_PUBLIC_BASE_URL || '',
+        url: process.env.NEXT_PUBLIC_MATOMO_URL || '',
         siteId: process.env.NEXT_PUBLIC_MATOMO_SITE_ID || '',
         disableCookies: true,
       })
