@@ -1,0 +1,27 @@
+.headerList {
+  list-style: none;
+  padding-left: 0;
+  margin-left: 0;
+}
+
+.headerItem {
+  color: #18753c;
+}
+
+.item::before {
+  --icon-size: 1.125rem;
+}
+
+.border {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.content {
+  display: flex;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

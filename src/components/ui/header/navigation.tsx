@@ -35,13 +35,21 @@ export const HeaderNavigation: FC<{ academies: TAcademyOrDepartment[] }> = ({ ac
       text: t('home'),
     },
     {
-      isActive: pathname === '/preparer-sa-vie-etudiante',
+      isActive: pathname === '/preparer-mon-budget-etudiant',
       linkProps: {
-        href: '/preparer-sa-vie-etudiante',
+        href: '/preparer-mon-budget-etudiant',
         target: '_self',
       },
       text: t('prepareBudget'),
     },
+    // {
+    //   isActive: pathname === '/preparer-sa-vie-etudiante',
+    //   linkProps: {
+    //     href: '/preparer-sa-vie-etudiante',
+    //     target: '_self',
+    //   },
+    //   text: t('prepareStudentLife'),
+    // },
     {
       isActive: pathname === '/trouver-un-logement-etudiant',
       linkProps: {

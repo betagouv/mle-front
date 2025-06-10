@@ -65,6 +65,9 @@ export const DynamicBreadcrumb: FC<DynamicBreadcrumbProps> = ({ color, margin = 
       case pathname.match(/^\/trouver-un-logement-etudiant\/[^?]+(?:\?.*)?$/)?.input:
         currentPageLabel = title as string
         break
+      case '/preparer-mon-budget-etudiant':
+        currentPageLabel = t('breadcrumbs.prepareBudget')
+        break
       case '/preparer-sa-vie-etudiante':
         currentPageLabel = t('breadcrumbs.prepareStudentLife')
         break
