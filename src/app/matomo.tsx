@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 
 export default function Matomo() {
   useEffect(() => {
-    if (process.env.APP_ENV === 'production') {
+    if (process.env.NEXT_PUBLIC_APP_ENV === 'production') {
       init({
         url: process.env.NEXT_PUBLIC_BASE_URL || '',
         siteId: process.env.NEXT_PUBLIC_MATOMO_SITE_ID || '',
