@@ -15,6 +15,7 @@ import styles from './layout.module.css'
 import '~/globals.css'
 import '~/text.css'
 import { NextAppDirEmotionCacheProvider } from 'tss-react/next'
+import Matomo from '~/app/matomo'
 import Toaster from '~/components/ui/toaster'
 
 export const generateMetadata = async () => {
@@ -38,6 +39,7 @@ export default async function RootLayout({
       <head>
         <StartDsfr />
         <DsfrHead Link={Link} preloadFonts={['Marianne-Regular', 'Marianne-Medium', 'Marianne-Bold']} />
+        <Matomo />
       </head>
       <body>
         <NextAppDirEmotionCacheProvider options={{ key: 'css' }}>
