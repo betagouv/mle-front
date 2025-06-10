@@ -12,7 +12,9 @@ export default async function PrepareBudgetRedirectionCard() {
       <Companie width={80} height={80} />
       <h3 className={fr.cx('fr-mb-0')}>{t('title')}</h3>
       <p className={fr.cx('fr-mb-0')}>{t('description')}</p>
-      <Button size="large">{t('cta')}</Button>
+      <Button linkProps={{ href: '/trouver-un-logement-etudiant?vue=carte' }} size="large">
+        {t('cta')}
+      </Button>
       <p className={clsx(fr.cx('fr-mb-0'), styles.ctaDisclaimer)}>{t('ctaDisclaimer')}</p>
     </div>
   )
