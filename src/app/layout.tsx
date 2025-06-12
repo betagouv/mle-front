@@ -18,6 +18,10 @@ export const generateMetadata = async () => {
   return {
     description: t('description'),
     title: t('title'),
+    robots: {
+      index: false,
+      follow: false,
+    },
   }
 }
 
