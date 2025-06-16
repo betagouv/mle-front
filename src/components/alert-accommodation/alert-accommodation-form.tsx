@@ -9,6 +9,7 @@ import { parseAsString } from 'nuqs'
 import { FC } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { tss } from 'tss-react'
+import { createToast } from '~/components/ui/createToast'
 import { useAlertAccommodation } from '~/hooks/use-alert-accommodation'
 import { ZAlertAccommodationFormSchema } from '~/schemas/alert-accommodation/alert-accommodation'
 import { AlertAccomodationAutocompleteInput } from '~/schemas/alert-accommodation/autocomplete/alert-accomodation-autocomplete-input'
@@ -38,6 +39,10 @@ export const AlertAccommodationForm: FC = () => {
   const onSubmit = async () => {
     const data = getValues()
     await mutateAsync(data)
+    createToast({
+      priority: 'success',
+      message: 'Vous êtes inscrit à la newsletter',
+    })
   }
 
   return (

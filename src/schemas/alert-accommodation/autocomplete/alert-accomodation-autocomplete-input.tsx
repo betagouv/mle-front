@@ -22,6 +22,10 @@ export const AlertAccomodationAutocompleteInput: FC = () => {
     setOpen(true)
   }
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(event.target.value)
+  const handleOnClick = (value: string) => {
+    setSearchQuery(value)
+    setOpen(false)
+  }
 
   return (
     <div className={classes.container}>
@@ -33,7 +37,7 @@ export const AlertAccomodationAutocompleteInput: FC = () => {
         state={isError ? 'error' : 'default'}
       />
 
-      {open && data && <AlertAccomodationAutocompleteResults onClick={() => setOpen(false)} data={data} searchQuery={searchQuery} />}
+      {open && data && <AlertAccomodationAutocompleteResults onClick={handleOnClick} data={data} searchQuery={searchQuery} />}
     </div>
   )
 }
