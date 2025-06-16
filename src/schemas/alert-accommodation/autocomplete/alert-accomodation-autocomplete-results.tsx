@@ -10,14 +10,14 @@ import { TTerritories, TTerritory } from '~/schemas/territories'
 
 interface AlertAccomodationAutocompleteResults {
   data: TTerritories
-  onClick: () => void
+  onClick: (name: string) => void
   searchQuery: string
 }
 
 interface AlertAccomodationAutocompleteItemProps {
   categoryKey: keyof TTerritories
   item: TTerritory
-  onClick: () => void
+  onClick: (name: string) => void
 }
 
 export const AlertAccommodationResultsItem: FC<AlertAccomodationAutocompleteItemProps> = ({ categoryKey, item, onClick }) => {
@@ -43,7 +43,7 @@ export const AlertAccommodationResultsItem: FC<AlertAccomodationAutocompleteItem
         setQueryStates({ q: item.name, type: getCategoryKeySingular(categoryKey) })
         setValue('territory_name', item.name)
         setValue('territory_type', getCategoryKeySingular(categoryKey))
-        onClick()
+        onClick(item.name)
       }}
     >
       {item.name}
