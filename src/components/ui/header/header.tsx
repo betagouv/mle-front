@@ -3,6 +3,7 @@ import { Button } from '@codegouvfr/react-dsfr/Button'
 import { Header } from '@codegouvfr/react-dsfr/Header'
 import { getTranslations } from 'next-intl/server'
 import { FC } from 'react'
+import { z } from 'zod'
 import { BrandTop } from '~/components/ui/brand-top'
 import { Banner } from '~/components/ui/header/banner/banner'
 import { HeaderNavigation } from '~/components/ui/header/navigation'
@@ -12,7 +13,7 @@ import { getAcademies } from '~/server-only/get-academies'
 export const HeaderComponent: FC = async () => {
   const t = await getTranslations()
   const academies = await getAcademies()
-
+  const tallyUrl = z.string().parse(process.env.NEXT_PUBLIC_TALLY_URL)
   return (
     <div>
       <Header
@@ -31,6 +32,9 @@ export const HeaderComponent: FC = async () => {
             linkProps={{ href: '/alerte-logement', target: '_self' }}
           >
             {t('header.alerts')}
+          </Button>,
+          <Button priority="tertiary" key="tally-cta" iconId="ri-questionnaire-line" linkProps={{ href: tallyUrl, target: '_blank' }}>
+            {t('header.tally')}
           </Button>,
           // <Button priority="tertiary" key="login-cta" iconId="ri-user-line" linkProps={{ href: '/se-connecter', target: '_self' }}>
           //   {t('header.login')}
