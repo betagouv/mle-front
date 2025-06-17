@@ -11,7 +11,7 @@ import { NextAppDirEmotionCacheProvider } from 'tss-react/next'
 import Matomo from '~/app/matomo'
 import Toaster from '~/components/ui/toaster'
 import { DsfrHead, getHtmlAttributes } from '~/dsfr/dsfr-head'
-import { DsfrProvider } from '~/dsfr/dsfr-provider'
+import { DsfrProvider, StartDsfrOnHydration } from '~/dsfr/dsfr-provider'
 
 export const generateMetadata = async () => {
   const t = await getTranslations('metadata')
@@ -41,6 +41,7 @@ export default async function RootLayout({
       </head>
       <body>
         <NextAppDirEmotionCacheProvider options={{ key: 'css' }}>
+          <StartDsfrOnHydration />
           <NextIntlClientProvider messages={messages}>
             <DsfrProvider lang={locale}>
               <TanstackQueryClientProvider>
