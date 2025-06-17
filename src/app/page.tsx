@@ -82,6 +82,45 @@ export default async function Home() {
         <div className={styles.featuresContainer}>
           <div className={clsx('boxShadow', styles.featureCard)}>
             <div className={styles.cardContent}>
+              <div>
+
+              <h1 className={styles.cardTitle}>{t('features.prepareBudget.title')}</h1>
+              <p className='fr-text--lg'>
+                {t('features.prepareBudget.description')}
+              </p>
+              </div>
+              <Button size="large" linkProps={{ href: '/preparer-sa-vie-etudiante' }}>
+                {t('features.prepareBudget.button')}
+              </Button>
+              {/* <div className={styles.citiesGrid}>
+                {sortedPopularCities.map((city) => (
+                  <Button
+                    className={styles.cityButton}
+                    linkProps={{ href: `/preparer-sa-vie-etudiante/${city.slug}` }}
+                    key={city.id}
+                    priority="secondary"
+                  >
+                    {city.name}
+                  </Button>
+                ))}
+                <div className={styles.moreContainer}>
+                  <Button
+                    priority="secondary"
+                    linkProps={{ href: `/preparer-sa-vie-etudiante` }}
+                    iconPosition="right"
+                    iconId="fr-icon-arrow-right-line"
+                  >
+                    {t('features.exploreCities.moreButton')}
+                  </Button>
+                </div> 
+              </div>*/}
+            </div>
+            <div className={fr.cx('fr-col-md-6')}>
+              <Image src={exploreCities} className={styles.featureImage} alt="Préparer son budget étudiant" priority quality={100} />
+            </div>
+          </div>
+          {/* <div className={clsx('boxShadow', styles.featureCard)}>
+            <div className={styles.cardContent}>
               <h1 className={styles.cardTitle}>{t('features.exploreCities.title')}</h1>
               <div className={styles.citiesGrid}>
                 {sortedPopularCities.map((city) => (
@@ -109,7 +148,7 @@ export default async function Home() {
             <div className={fr.cx('fr-col-md-6')}>
               <Image src={exploreCities} className={styles.featureImage} alt="Explorer les villes étudiantes" priority quality={100} />
             </div>
-          </div>
+          </div> */}
           <div className={clsx('boxShadow', styles.featureCard)}>
             <div className={fr.cx('fr-col-md-6')}>
               <Image

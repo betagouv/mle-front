@@ -426,6 +426,11 @@
       "description": "<part1>Estimation, fiches pratiques et aperçu des logements, tout est là pour</part1><part2>vous guider pas à pas vers votre prochaine vie étudiante.</part2>"
     },
     "features": {
+      "prepareBudget": {
+        "title": "Préparer son budget étudiant",
+        "description": "Gérer son budget est l’un des premiers défis de la vie étudiante. Entre le loyer, l’alimentation, les transports et les loisirs, il peut être difficile de s’y retrouver et de faire les bons choix financiers. Pourtant, avec quelques repères et de bons outils, il est tout à fait possible de garder le contrôle et d’éviter les mauvaises surprises.",
+        "button": "Tout savoir"
+      },
       "exploreCities": {
         "title": "Explorer les villes étudiantes",
         "moreButton": "Plus de villes"
