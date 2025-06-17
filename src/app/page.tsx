@@ -23,7 +23,7 @@ import styles from './home.module.css'
 export default async function Home() {
   const t = await getTranslations('home')
   const popularCities = await getPopularCities()
-  const sortedPopularCities = popularCities.sort((a, b) => b.nb_total_apartments - a.nb_total_apartments).slice(0, 18)
+  const _sortedPopularCities = popularCities.sort((a, b) => b.nb_total_apartments - a.nb_total_apartments).slice(0, 18)
 
   return (
     <>
@@ -83,11 +83,8 @@ export default async function Home() {
           <div className={clsx('boxShadow', styles.featureCard)}>
             <div className={styles.cardContent}>
               <div>
-
-              <h1 className={styles.cardTitle}>{t('features.prepareBudget.title')}</h1>
-              <p className='fr-text--lg'>
-                {t('features.prepareBudget.description')}
-              </p>
+                <h1 className={styles.cardTitle}>{t('features.prepareBudget.title')}</h1>
+                <p className="fr-text--lg">{t('features.prepareBudget.description')}</p>
               </div>
               <Button size="large" linkProps={{ href: '/preparer-sa-vie-etudiante' }}>
                 {t('features.prepareBudget.button')}
