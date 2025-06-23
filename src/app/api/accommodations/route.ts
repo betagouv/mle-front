@@ -3,7 +3,6 @@ import { NextResponse } from 'next/server'
 export async function GET(request: Request) {
   const url = new URL(request.url)
   const params = new URLSearchParams()
-
   const isAccessible = url.searchParams.get('is_accessible')
   const hasColiving = url.searchParams.get('has_coliving')
   const bbox = url.searchParams.get('bbox')

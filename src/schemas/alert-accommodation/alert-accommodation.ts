@@ -1,8 +1,8 @@
 import { z } from 'zod'
 
 export const ZAlertAccommodationFormSchema = z.object({
-  email: z.string().email(),
-  territory_name: z.string(),
+  email: z.string().email().min(1, { message: 'Votre email est requis.' }),
+  territory_name: z.string().min(1, { message: 'Une ville est requise.' }),
   territory_type: z.string(),
 })
 

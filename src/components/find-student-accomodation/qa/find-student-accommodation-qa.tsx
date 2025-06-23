@@ -1,15 +1,15 @@
 import { fr } from '@codegouvfr/react-dsfr'
-import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
-import { TGetQuestionsAnswersResponse } from '~/schemas/questions-answers/question-answers'
+import { FAQ_CONTENTS } from '~/app/(utils-pages)/faq/page'
+import { FaqQuestionsAnswers } from '~/components/faq/faq-questions-answers'
 import styles from './find-student-accommodation-qa.module.css'
 
-type FindStudentAccommodationQAProps = {
-  qa: TGetQuestionsAnswersResponse
-}
-export default async function FindStudentAccommodationQA({ qa }: FindStudentAccommodationQAProps) {
+// type FindStudentAccommodationQAProps = {
+//   qa: TGetQuestionsAnswersResponse
+// }
+export default async function FindStudentAccommodationQA() {
   const t = await getTranslations('findAccomodation')
 
   return (
@@ -18,18 +18,12 @@ export default async function FindStudentAccommodationQA({ qa }: FindStudentAcco
         <div className={styles.faqQaContainer}>
           <div className={styles.faqTitleCtaContainer}>
             <h2 className={clsx(styles.whiteColor, styles.titleMargin)}>{t('faq.title')}</h2>
-            <Button iconId="ri-question-line" className="whiteButton" priority="secondary">
+            <Button iconId="ri-question-line" linkProps={{ href: '/faq', target: '_self' }} className="whiteButton" priority="secondary">
               {t('faq.cta')}
             </Button>
           </div>
           <div className={styles.qaContainer}>
-            <div style={{ background: 'white', padding: '2rem' }} className={fr.cx('fr-accordions-group')}>
-              {qa.map((qa, index) => (
-                <Accordion key={index} label={qa.title_fr}>
-                  <div dangerouslySetInnerHTML={{ __html: qa.content_fr }} />
-                </Accordion>
-              ))}
-            </div>
+            <FaqQuestionsAnswers contents={FAQ_CONTENTS.slice(0, 3)} />
           </div>
         </div>
       </div>

@@ -10,7 +10,6 @@ import { FindStudentAccomodationSortView } from '~/components/find-student-accom
 import { TTerritories } from '~/schemas/territories'
 import { getAccommodations } from '~/server-only/get-accommodations'
 import { getTerritories } from '~/server-only/get-territories'
-import { getTerritoryQuestionsAnswers } from '~/server-only/get-territory-questions-answers'
 
 const getTerritoriesCategoryKey = (categoryKey: 'ville' | 'academie' | 'departement') => {
   const keys = {
@@ -21,14 +20,14 @@ const getTerritoriesCategoryKey = (categoryKey: 'ville' | 'academie' | 'departem
   return keys[categoryKey] as keyof TTerritories
 }
 
-const getQACategoryKey = (categoryKey: 'ville' | 'academie' | 'departement') => {
-  const keys = {
-    academie: 'academy',
-    departement: 'department',
-    ville: 'city',
-  }
-  return keys[categoryKey]
-}
+// const getQACategoryKey = (categoryKey: 'ville' | 'academie' | 'departement') => {
+//   const keys = {
+//     academie: 'academy',
+//     departement: 'department',
+//     ville: 'city',
+//   }
+//   return keys[categoryKey]
+// }
 
 export default async function FindStudentAccommodationPage({
   params,
@@ -37,9 +36,10 @@ export default async function FindStudentAccommodationPage({
   params: { location: string }
   searchParams: {
     accessible: string
+    prix?: string
     bbox?: string
     content_type?: string
-    hasColiving?: string
+    colocation?: string
     object_id?: string
     page?: string
   }
@@ -62,10 +62,10 @@ export default async function FindStudentAccommodationPage({
     ? `${territory.bbox.xmin},${territory.bbox.ymin},${territory.bbox.xmax},${territory.bbox.ymax}`
     : undefined
   const accommodations = await getAccommodations({ ...searchParams, bbox: territoryBbox })
-  const qa = await getTerritoryQuestionsAnswers({
-    content_type: getQACategoryKey(routeCategoryKey as 'ville' | 'academie' | 'departement'),
-    object_id: territory?.id,
-  })
+  // const qa = await getTerritoryQuestionsAnswers({
+  //   content_type: getQACategoryKey(routeCategoryKey as 'ville' | 'academie' | 'departement'),
+  //   object_id: territory?.id,
+  // })
 
   return (
     <>
@@ -75,7 +75,7 @@ export default async function FindStudentAccommodationPage({
         <FindStudentAccomodationSortView data={accommodations} territory={territory} />
         <FindStudentAccomodationResults data={accommodations} territory={territory} />
       </div>
-      <FindStudentAccommodationQA qa={qa} />
+      <FindStudentAccommodationQA />
     </>
   )
 }
