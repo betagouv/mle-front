@@ -6,7 +6,6 @@ import { AccommodationEquipments } from '~/app/trouver-un-logement-etudiant/vill
 import { AccommodationLocalisation } from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-localisation'
 import AccommodationMap from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-map'
 import { AccommodationResidence } from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-residence'
-import { PrepareStudentLifeRedirection } from '~/app/trouver-un-logement-etudiant/ville/[location]/[slug]/prepare-student-life-redirection'
 import { AccommodationImages } from '~/components/accommodation/accommodation-images'
 import { NearbyAccommodations } from '~/components/accommodation/nearby-accommodations'
 import { OwnerDetails } from '~/components/find-student-accomodation/owner-details/owner-details'
@@ -56,7 +55,8 @@ export default async function LogementPage({ params }: { params: { slug: string 
           <AccommodationResidence accommodation={accommodation} />
           <AccommodationEquipments accommodation={accommodation} />
           <AccommodationLocalisation address={address} city={city} latitude={latitude} longitude={longitude} postalCode={postal_code} />
-          <PrepareStudentLifeRedirection city={city} />
+          {/* TODO: Uncomment when we want to reenable the redirection */}
+          {/* <PrepareStudentLifeRedirection city={city} /> */}
         </div>
         <div className={fr.cx('fr-hidden-sm')}>{<AccommodationMap latitude={latitude} longitude={longitude} />}</div>
         <div className={fr.cx('fr-col-sm-4')}>

@@ -30,8 +30,8 @@
     "login": "Se connecter",
     "tally": "Donnez votre avis",
     "banner": {
-      "title": "Lancement de la plateforme",
-      "description": "De nouvelles offres de location sont ajoutées régulièrement, restez connecté !",
+      "title": "Lancement de la plateforme :",
+      "description": "de nouvelles résidences étudiantes sont ajoutées régulièrement, restez connecté !",
       "close": "Fermer"
     }
   },
@@ -252,7 +252,7 @@
           "row1": {
             "column1": "Bourse CROUS",
             "column2": "Selon les revenus familiaux",
-            "column3": "etudiant.gouv.fr"
+            "column3": "lescrous.fr"
           },
           "row2": {
             "column1": "APL / ALS",

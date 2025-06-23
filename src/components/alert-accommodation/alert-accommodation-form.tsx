@@ -24,12 +24,9 @@ export const AlertAccommodationForm: FC = () => {
     },
     resolver: zodResolver(ZAlertAccommodationFormSchema),
   })
-  const {
-    formState: { isValid },
-    getValues,
-    handleSubmit,
-    register,
-  } = alertForm
+  const { formState, getValues, handleSubmit, register } = alertForm
+
+  const { isValid, errors } = formState
 
   const { mutateAsync } = useAlertAccommodation()
 
@@ -49,13 +46,20 @@ export const AlertAccommodationForm: FC = () => {
     <FormProvider {...alertForm}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={classes.inputContainer}>
-          <AlertAccomodationAutocompleteInput />
+          <AlertAccomodationAutocompleteInput formState={formState} />
           <Input
-            label="Email"
+            label={
+              <div className={classes.labelContainer}>
+                Email
+                <span className={classes.asterisk}>*</span>
+              </div>
+            }
             nativeInputProps={{
               placeholder: t('emailPlaceholder'),
               ...register('email'),
             }}
+            state={errors.email ? 'error' : undefined}
+            stateRelatedMessage={errors.email?.message}
             addon={
               <Button disabled={!isValid} type="submit">
                 {t('subscribe')}
@@ -77,5 +81,13 @@ const useStyles = tss.create({
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
+  },
+  labelContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+  },
+  asterisk: {
+    color: 'red',
   },
 })

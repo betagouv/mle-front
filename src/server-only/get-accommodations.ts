@@ -4,7 +4,7 @@ export const getAccommodations = async (searchParams: {
   accessible?: string
   bbox?: string
   center?: string
-  hasColiving?: string
+  colocation?: string
   prix?: string
   page?: string
 }) => {
@@ -16,7 +16,7 @@ export const getAccommodations = async (searchParams: {
     params.append('radius', '5')
   }
   if (searchParams.accessible) params.append('is_accessible', searchParams.accessible)
-  if (searchParams.hasColiving) params.append('has_coliving', searchParams.hasColiving)
+  if (searchParams.colocation) params.append('coliving', searchParams.colocation)
   if (searchParams.prix) params.append('price_max', searchParams.prix)
 
   const response = await fetch(`${process.env.API_URL}/accommodations/${params.size > 0 ? `?${params.toString()}` : ''}`)

@@ -35,9 +35,9 @@ export const FindAccommodationForm: FC = () => {
   const handleOnChangeBudget = (event: React.ChangeEvent<HTMLInputElement>) => setQueryStates({ prix: Number(event.target.value) })
 
   const searchParams = new URLSearchParams({
-    maxPrice: form.getValues('maxPrice').toString(),
+    prix: form.getValues('maxPrice').toString(),
     bbox: form.getValues('bbox') ?? '',
-    coliving: form.getValues('coliving') ? 'true' : 'false',
+    colocation: form.getValues('coliving') ? 'true' : 'false',
     accessible: form.getValues('accessible') ? 'true' : 'false',
     vue: 'carte',
   })

@@ -86,7 +86,7 @@ export default async function Home() {
                 <h1 className={styles.cardTitle}>{t('features.prepareBudget.title')}</h1>
                 <p className="fr-text--lg">{t('features.prepareBudget.description')}</p>
               </div>
-              <Button size="large" linkProps={{ href: '/preparer-sa-vie-etudiante' }}>
+              <Button size="large" linkProps={{ href: '/preparer-mon-budget-etudiant' }}>
                 {t('features.prepareBudget.button')}
               </Button>
               {/* <div className={styles.citiesGrid}>

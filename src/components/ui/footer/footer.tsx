@@ -96,7 +96,7 @@ export const FooterComponent = async () => {
         root: styles.footer,
       }}
       brandTop={<BrandTop />}
-      accessibility="partially compliant"
+      accessibility="non compliant"
       linkList={linkList as NonNullable<FooterProps['linkList']>}
       homeLinkProps={{
         href: '/',
