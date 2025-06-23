@@ -6,11 +6,18 @@ import { useTranslations } from 'next-intl'
 import { parseAsString } from 'nuqs'
 import { useQueryStates } from 'nuqs'
 import { FC, useState } from 'react'
+import { FormState } from 'react-hook-form'
 import { tss } from 'tss-react'
 import { useTerritories } from '~/hooks/use-territories'
 import { AlertAccomodationAutocompleteResults } from '~/schemas/alert-accommodation/autocomplete/alert-accomodation-autocomplete-results'
 
-export const AlertAccomodationAutocompleteInput: FC = () => {
+export const AlertAccomodationAutocompleteInput: FC<{
+  formState: FormState<{
+    email: string
+    territory_name: string
+    territory_type: string
+  }>
+}> = ({ formState }) => {
   const [_queryStates] = useQueryStates({ q: parseAsString, type: parseAsString })
 
   const t = useTranslations('findAccomodation')
@@ -31,10 +38,16 @@ export const AlertAccomodationAutocompleteInput: FC = () => {
     <div className={classes.container}>
       <Input
         classes={{ root: classes.input }}
-        label={t('header.inputLabel')}
+        label={
+          <div className={classes.labelContainer}>
+            {t('header.inputLabel')}
+            <span className={classes.asterisk}>*</span>
+          </div>
+        }
         iconId="ri-map-pin-2-line"
         nativeInputProps={{ onChange: handleInputChange, onFocus: handleInputFocus, value: searchQuery }}
         state={isError ? 'error' : 'default'}
+        stateRelatedMessage={formState.errors.territory_name?.message}
       />
 
       {open && data && <AlertAccomodationAutocompleteResults onClick={handleOnClick} data={data} searchQuery={searchQuery} />}
@@ -51,5 +64,13 @@ const useStyles = tss.create({
   },
   input: {
     marginBottom: '0 !important',
+  },
+  labelContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0.5rem',
+  },
+  asterisk: {
+    color: 'red',
   },
 })

@@ -8,11 +8,9 @@ import { BrandTop } from '~/components/ui/brand-top'
 import { Banner } from '~/components/ui/header/banner/banner'
 import { HeaderNavigation } from '~/components/ui/header/navigation'
 import logo from '~/images/logo.svg'
-import { getAcademies } from '~/server-only/get-academies'
 
 export const HeaderComponent: FC = async () => {
   const t = await getTranslations()
-  const academies = await getAcademies()
   const tallyUrl = z.string().parse(process.env.NEXT_PUBLIC_TALLY_URL)
   return (
     <div>
@@ -43,7 +41,8 @@ export const HeaderComponent: FC = async () => {
         brandTop={<BrandTop />}
         serviceTagline={t('header.description')}
         serviceTitle={t('header.title')}
-        navigation={<HeaderNavigation academies={academies} />}
+        // navigation={<HeaderNavigation academies={academies} />}
+        navigation={<HeaderNavigation />}
         className={fr.cx('fr-header')}
         operatorLogo={{
           alt: 'Mon logement étudiant - logo',
