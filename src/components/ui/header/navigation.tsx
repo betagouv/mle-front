@@ -27,14 +27,6 @@ export const HeaderNavigation: FC = () => {
 
   let items: MainNavigationProps.Item[] = [
     {
-      isActive: pathname === '/simuler-mes-aides-au-logement',
-      linkProps: {
-        href: '/simuler-mes-aides-au-logement',
-        target: '_self',
-      },
-      text: t('home'),
-    },
-    {
       isActive: pathname === '/preparer-mon-budget-etudiant',
       linkProps: {
         href: '/preparer-mon-budget-etudiant',
@@ -42,6 +34,15 @@ export const HeaderNavigation: FC = () => {
       },
       text: t('prepareBudget'),
     },
+    {
+      isActive: pathname === '/simuler-mes-aides-au-logement',
+      linkProps: {
+        href: '/simuler-mes-aides-au-logement',
+        target: '_self',
+      },
+      text: t('home'),
+    },
+
     // {
     //   isActive: pathname === '/preparer-sa-vie-etudiante',
     //   linkProps: {
