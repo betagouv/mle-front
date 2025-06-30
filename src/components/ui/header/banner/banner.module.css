@@ -1,11 +1,11 @@
 .bannerContainer {
-  background-color: #ecebfd;
+  background-color: #9ef9be;
   display: flex;
 }
 
 .bannerText {
   margin: 0;
-  color: var(--text-title-blue-france);
+  color: #1f6146;
 }
 
 .bannerContent {
