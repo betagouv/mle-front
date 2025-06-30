@@ -13,7 +13,8 @@
     "cookies": "Gestion des cookies",
     "sitemap": "Plan du site",
     "notFound": "Page non trouvée",
-    "budget": "Budget Mon Logement Étudiant"
+    "budget": "Budget Mon Logement Étudiant",
+    "privacyPolicy": "Politique de confidentialité"
   },
   "loading": {
     "card": "Chargement de la carte..."
