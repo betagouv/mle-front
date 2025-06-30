@@ -83,6 +83,13 @@ export const FooterComponent = async () => {
   const bottomItems: FooterProps['bottomItems'] = [
     {
       linkProps: {
+        href: '/politique-de-confidentialite',
+        title: 'Politique de confidentialité',
+      },
+      text: 'Politique de confidentialité',
+    },
+    {
+      linkProps: {
         href: '/budget',
         title: 'Budget Mon Logement Étudiant',
       },
