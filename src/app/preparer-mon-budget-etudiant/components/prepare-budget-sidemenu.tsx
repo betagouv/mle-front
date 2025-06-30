@@ -44,7 +44,7 @@ export const PrepareBudgetSidemenu = () => {
   ]
 
   return (
-    <div className={fr.cx('fr-col-md-4')}>
+    <div className={clsx(fr.cx('fr-col-md-4'), classes.sideMenuContainer)}>
       <SideMenu
         className={clsx(fr.cx('fr-px-4w', 'fr-py-5w'), classes.sideMenu)}
         align="left"
@@ -61,7 +61,15 @@ export const PrepareBudgetSidemenu = () => {
 }
 
 const useStyles = tss.create({
+  sideMenuContainer: {
+    [fr.breakpoints.down('md')]: {
+      borderBottom: `1px solid ${fr.colors.decisions.border.default.grey.default}`,
+    },
+  },
   sideMenu: {
+    [fr.breakpoints.down('md')]: {
+      boxShadow: 'none',
+    },
     height: '100%',
   },
   innerMenu: {

@@ -13,7 +13,8 @@
     "cookies": "Gestion des cookies",
     "sitemap": "Plan du site",
     "notFound": "Page non trouvée",
-    "budget": "Budget Mon Logement Étudiant"
+    "budget": "Budget Mon Logement Étudiant",
+    "privacyPolicy": "Politique de confidentialité"
   },
   "loading": {
     "card": "Chargement de la carte..."
@@ -179,7 +180,7 @@
           "item3": "Anticiper les imprévus",
           "item4": "Mieux planifier vos projets (voyage, permis, matériel...)",
           "item5": "Garder l'esprit tranquille pour vos études",
-          "item6": "💡 Bon à savoir : de nombreux services (Crous, CAF, ADIL...) peuvent vous accompagner gratuitement."
+          "item6": "💡 Bon à savoir : votre établissement d’enseignement supérieur, ainsi que les Crous peuvent vous accompagner. D’autres services (CAF, ADIL, centre communal d’action sociale…) peuvent aussi vous aider au besoin. "
         }
       },
       "item1": {
@@ -190,10 +191,10 @@
           "cta": "Simuler mes aides"
         },
         "list": {
-          "title": "Revenus possibles :",
-          "item1": "Bourse sur critères sociaux (Crous)",
-          "item2": "Aides au logement (APL ou ALS via la CAF)",
-          "item3": "Soutien familial",
+          "title": "Ressources possibles :",
+          "item1": "Soutien familial",
+          "item2": "Bourse sur critères sociaux (Crous)",
+          "item3": "Aides au logement (APL ou ALS via la CAF)",
           "item4": "Salaire d'un job étudiant",
           "item5": "Stages ou alternance rémunérés",
           "item6": "Aides régionales, départementales ou municipales",
@@ -207,26 +208,25 @@
         "list": {
           "title": "Exemples de charges fixes :",
           "item1": "Loyer + charges",
-          "item2": "Abonnement Internet et mobile",
-          "item3": "Transports en commun ou frais de carburant",
-          "item4": "Assurance habitation, santé, responsabilité civile",
-          "item5": "Frais de scolarité ou d'inscription",
-          "item6": "Abonnements divers (streaming, sport, presse...)"
+          "item2": "Courses alimentaires",
+          "item3": "Abonnement Internet et mobile",
+          "item4": "Transports en commun ou frais de carburant",
+          "item5": "Assurance habitation, santé, responsabilité civile",
+          "item6": "Frais de scolarité ou d'inscription"
         },
-        "descriptionSubList": "🎯 Objectif : ces dépenses ne doivent pas dépasser 50 % de vos revenus mensuels."
+        "descriptionSubList": "Ces estimations ont été faites en s’appuyant sur les réponses des étudiants « décohabitants » et « indépendants » de l’enquête Repère Condition de Vie - 2023 de l’OVE."
       },
       "item3": {
         "title": "3. Estimer vos dépenses variables",
-        "description": "Ce sont celles qui changent chaque mois et que vous pouvez ajuster.",
+        "description": "Il est important de bien identifier les différentes dépenses et d’avoir une fourchette de coût estimative. Certaines de ces dépenses peuvent varier en fonction des territoires, c’est le cas des dépenses de loyer, de transports ou d’alimentation. Il est également important de distinguer les dépenses récurrentes et obligatoires, qui reviennent généralement chaque mois et les dépenses variables.Ce sont celles qui changent chaque mois et que vous pouvez ajuster.",
         "list": {
           "title": "Incluez notamment :",
-          "item1": "Courses alimentaires",
+          "item1": "Abonnements divers (streaming, sport, presse...)",
           "item2": "Sorties, loisirs, activités sportives",
           "item3": "Restaurants, cafés",
-          "item4": "Petits achats (vêtements, livres, fournitures...)",
+          "item4": "Petits achats (vêtements, livres, fournitures)",
           "item5": "Dépenses imprévues"
-        },
-        "descriptionSubList": "📌 Gardez une marge de manœuvre pour éviter les mauvaises surprises."
+        }
       },
       "item4": {
         "title": "4. Anticiper les dépenses exceptionnelles",

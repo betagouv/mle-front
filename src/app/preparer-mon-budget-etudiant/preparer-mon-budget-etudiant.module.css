@@ -1,7 +1,13 @@
 .mainContainer {
+  display: block;
   background-color: white;
-  display: flex;
   box-shadow: 0px 4px 12px 0px #00001229;
+}
+
+@media (min-width: 768px) {
+  .mainContainer {
+    display: flex;
+  }
 }
 
 .imageHero {
