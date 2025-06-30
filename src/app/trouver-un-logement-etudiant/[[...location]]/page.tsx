@@ -47,7 +47,7 @@ export default async function FindStudentAccommodationPage({
   const routeCategoryKey = params?.location?.[0] || ''
   const routeLocation = decodeURIComponent(params?.location?.[1] || '')
   if (params && (params?.location?.length < 2 || params?.location?.length > 2)) {
-    redirect(`/trouver-un-logement-etudiant?vue=carte`)
+    redirect(`/trouver-un-logement-etudiant`)
   }
 
   const territories = await getTerritories(routeLocation)
@@ -55,7 +55,7 @@ export default async function FindStudentAccommodationPage({
     (territory) => territory.name === routeLocation,
   )
   if (routeCategoryKey && routeLocation && !territory) {
-    redirect(`/trouver-un-logement-etudiant?vue=carte`)
+    redirect(`/trouver-un-logement-etudiant`)
   }
 
   const territoryBbox = territory?.bbox

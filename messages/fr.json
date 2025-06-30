@@ -31,8 +31,8 @@
     "login": "Se connecter",
     "tally": "Donnez votre avis",
     "banner": {
-      "title": "Lancement de la plateforme :",
-      "description": "de nouvelles résidences étudiantes sont ajoutées régulièrement, restez connecté !",
+      "title": "Lancement de la plateforme",
+      "description": "Site en phase d'expérimentation, n'hésitez pas à donner votre avis pour nous aider à améliorer le service.",
       "close": "Fermer"
     }
   },
@@ -237,8 +237,7 @@
           "item3": "Dépenses médicales non prises en charge",
           "item4": "Billets de train pour rentrer chez vous",
           "item5": "Caution ou frais d’agence pour un logement"
-        },
-        "descriptionSubList": "💼 Astuce : mettez de côté 5 à 10 % de vos revenus chaque mois, si possible."
+        }
       },
       "item5": {
         "title": "5. Les aides à ne pas oublier",
