@@ -36,8 +36,8 @@ jobs:
     executor: node
     steps:
       - checkout
-      - skip/skip_unchanged:
-          paths: pnpm-lock.yaml
+      # - skip/skip_unchanged:
+      #     paths: pnpm-lock.yaml
       - install_dependencies
       - run:
           name: 'Fetch dependencies'
