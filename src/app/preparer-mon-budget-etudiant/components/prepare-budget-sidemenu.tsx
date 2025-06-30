@@ -65,6 +65,11 @@ const useStyles = tss.create({
     [fr.breakpoints.down('md')]: {
       borderBottom: `1px solid ${fr.colors.decisions.border.default.grey.default}`,
     },
+    [fr.breakpoints.up('md')]: {
+      position: 'sticky',
+      top: '1rem',
+      alignSelf: 'flex-start',
+    },
   },
   sideMenu: {
     [fr.breakpoints.down('md')]: {

@@ -3,13 +3,21 @@ import styles from './prepare-budget-chart.module.css'
 export default function PrepareBudgetChart() {
   return (
     <svg className={styles.chart} width="688" height="419" viewBox="0 0 688 419" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect y="-0.000976562" width="688" height="418.742" fill="url(#pattern0_1891_133232)" />
+      <rect y="-0.000976562" width="688" height="418.742" fill="url(#pattern0_1925_129253)" />
+      <rect x="100" y="156" width="56" height="31" fill="white" />
+      <rect x="156" y="58" width="56" height="31" fill="white" />
+      <rect x="321" y="37" width="56" height="31" fill="white" />
+      <rect x="454" y="83" width="56" height="31" fill="white" />
+      <rect x="479" y="247" width="56" height="31" fill="white" />
+      <rect x="423" y="376" width="56" height="31" fill="white" />
+      <rect x="164" y="376" width="56" height="31" fill="white" />
+      <rect x="241" y="187" width="161" height="76" fill="white" />
       <defs>
-        <pattern id="pattern0_1891_133232" patternContentUnits="objectBoundingBox" width="1" height="1">
-          <use xlinkHref="#image0_1891_133232" transform="matrix(0.000504145 0 0 0.000828319 -0.118717 -0.0735017)" />
+        <pattern id="pattern0_1925_129253" patternContentUnits="objectBoundingBox" width="1" height="1">
+          <use xlinkHref="#image0_1925_129253" transform="matrix(0.000504145 0 0 0.000828319 -0.118717 -0.0735017)" />
         </pattern>
         <image
-          id="image0_1891_133232"
+          id="image0_1925_129253"
           width="2348"
           height="1296"
           preserveAspectRatio="none"

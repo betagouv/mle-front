@@ -12,9 +12,10 @@ interface OwnerDetailsProps {
   externalUrl: string | undefined
   title: string
   location: string
+  available: boolean
 }
 
-export const OwnerDetails = async ({ nbTotalApartments, owner, externalUrl, title, location }: OwnerDetailsProps) => {
+export const OwnerDetails = async ({ nbTotalApartments, available, owner, externalUrl, title, location }: OwnerDetailsProps) => {
   const t = await getTranslations('accomodation')
   const ownerUrl = externalUrl || owner?.url
   return (
@@ -33,7 +34,7 @@ export const OwnerDetails = async ({ nbTotalApartments, owner, externalUrl, titl
         )}
       </div>
       <div className={styles.sidebarOwner}>
-        {!!ownerUrl && (
+        {!!ownerUrl && available && (
           <>
             <span className={fr.cx('fr-text--sm', 'fr-m-0')}>{t('sidebar.hasAvailableAccommodation')}</span>
             <Button linkProps={{ href: ownerUrl }} priority="primary" size="large" className={styles.sidebarOwnerButton}>
