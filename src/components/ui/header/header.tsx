@@ -1,5 +1,4 @@
 import { fr } from '@codegouvfr/react-dsfr'
-import Badge from '@codegouvfr/react-dsfr/Badge'
 import { Button } from '@codegouvfr/react-dsfr/Button'
 import { Header } from '@codegouvfr/react-dsfr/Header'
 import { getTranslations } from 'next-intl/server'
@@ -44,9 +43,7 @@ export const HeaderComponent: FC = async () => {
         serviceTitle={
           <>
             {t('header.title')}
-            <Badge className={fr.cx('fr-ml-1w')} severity="success" noIcon>
-              Beta
-            </Badge>
+            <span className={fr.cx('fr-ml-1w', 'fr-badge', 'fr-badge--success', 'fr-badge--no-icon')}>Beta</span>
           </>
         }
         // navigation={<HeaderNavigation academies={academies} />}

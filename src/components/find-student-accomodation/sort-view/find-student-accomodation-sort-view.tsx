@@ -19,7 +19,7 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
   const [queryStates, setQueryStates] = useQueryStates({
     bbox: parseAsString,
     ['recherche-par-carte']: parseAsBoolean.withDefault(false),
-    vue: parseAsString,
+    vue: parseAsString.withDefault('grille'),
   })
   const t = useTranslations('findAccomodation.filters')
   const { data: accommodations } = useAccomodations({ initialData: data })

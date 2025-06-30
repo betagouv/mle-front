@@ -54,7 +54,7 @@ export const HeaderNavigation: FC = () => {
     {
       isActive: pathname === '/trouver-un-logement-etudiant',
       linkProps: {
-        href: '/trouver-un-logement-etudiant?vue=carte',
+        href: '/trouver-un-logement-etudiant',
         target: '_self',
       },
       text: t('findAccommodation'),
@@ -65,7 +65,7 @@ export const HeaderNavigation: FC = () => {
     //     categories: academiesColumns.map((academyColumn) => ({
     //       categoryMainLink: { linkProps: { href: '/par-academies', target: '_self' }, text: '' },
     //       links: academyColumn.map((academy) => ({
-    //         linkProps: { href: `/trouver-un-logement-etudiant/academie/${academy.name}?vue=carte`, target: '_self' },
+    //         linkProps: { href: `/trouver-un-logement-etudiant/academie/${academy.name}`, target: '_self' },
     //         text: academy.name,
     //       })),
     //     })),
