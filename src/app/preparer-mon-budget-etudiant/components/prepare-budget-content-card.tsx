@@ -1,6 +1,7 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
+import PrepareBudgetChart from '~/app/preparer-mon-budget-etudiant/components/prepare-budget-chart'
 import styles from './prepare-budget-content-card.module.css'
 
 interface PrepareBudgetContentCardProps {
@@ -26,20 +27,23 @@ export default async function PrepareBudgetContentCard({
         <h3 className={fr.cx('fr-mb-0')}>{t('title')}</h3>
         <p className={fr.cx('fr-mb-0')}>{t('description')}</p>
         <div className={styles.content}>
-          <div>
-            {t.has('list.title') && <h4 className={clsx(fr.cx('fr-mb-0'), 'fr-h7')}>{t('list.title')}</h4>}
+          <div className={styles.contentContainer}>
             <div>
-              {items.length > 0 && (
-                <ul className={styles.list}>
-                  {items.map((item, index) => (
-                    <li key={index}>{item.label}</li>
-                  ))}
-                </ul>
-              )}
-              {t.has('descriptionSubList') && <p className={fr.cx('fr-mb-0')}>{t('descriptionSubList')}</p>}
+              {t.has('list.title') && <h4 className={clsx(fr.cx('fr-mb-0'), 'fr-h7')}>{t('list.title')}</h4>}
+              <div>
+                {items.length > 0 && (
+                  <ul className={styles.list}>
+                    {items.map((item, index) => (
+                      <li key={index}>{item.label}</li>
+                    ))}
+                  </ul>
+                )}
+                {t.has('descriptionSubList') && <p className={fr.cx('fr-mb-0')}>{t('descriptionSubList')}</p>}
+              </div>
             </div>
+            {children}
           </div>
-          {children}
+          <div>{id === 'definir-vos-ressources-mensuelles' && <PrepareBudgetChart />}</div>
         </div>
       </div>
     </div>
