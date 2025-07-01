@@ -204,7 +204,7 @@
       },
       "item2": {
         "title": "2. Identifier vos charges fixes",
-        "description": "Ce sont les dépenses récurrentes, souvent incontournables. Elles varient selon votre situation (ville, logement, transport…).",
+        "description": "Il est important de bien identifier les différentes dépenses et d’avoir une fourchette de coût estimative. Certaines de ces dépenses peuvent varier en fonction des territoires, c’est le cas des dépenses de loyer, de transports ou d’alimentation. Il est également important de distinguer les dépenses récurrentes et obligatoires, qui reviennent généralement chaque mois et les dépenses variables. <br /><br />Les charges fixes sont les dépenses récurrentes, souvent incontournables. Elles varient selon votre situation (ville, logement, transport…).",
         "list": {
           "title": "Exemples de charges fixes :",
           "item1": "Loyer + charges",
@@ -218,7 +218,7 @@
       },
       "item3": {
         "title": "3. Estimer vos dépenses variables",
-        "description": "Il est important de bien identifier les différentes dépenses et d’avoir une fourchette de coût estimative. Certaines de ces dépenses peuvent varier en fonction des territoires, c’est le cas des dépenses de loyer, de transports ou d’alimentation. Il est également important de distinguer les dépenses récurrentes et obligatoires, qui reviennent généralement chaque mois et les dépenses variables.Ce sont celles qui changent chaque mois et que vous pouvez ajuster.",
+        "description": "Ce sont celles qui changent chaque mois et que vous pouvez ajuster.",
         "list": {
           "title": "Incluez notamment :",
           "item1": "Abonnements divers (streaming, sport, presse...)",
