@@ -29,16 +29,11 @@ export const OwnerDetails = async ({
 }: OwnerDetailsProps) => {
   const t = await getTranslations('accomodation')
   const ownerUrl = externalUrl || owner?.url
-  const badgeAvailability =
-    nbAvailable > 0 ? (
-      <Badge severity="success" noIcon>
-        {nbAvailable} DISPONIBLE{sPluriel(nbAvailable)}
-      </Badge>
-    ) : (
-      <Badge severity="error" noIcon>
-        AUCUNE DISPONIBILITÉ
-      </Badge>
-    )
+  const badgeAvailability = nbAvailable > 0 && (
+    <Badge severity="success" noIcon>
+      {nbAvailable} DISPONIBLE{sPluriel(nbAvailable)}
+    </Badge>
+  )
 
   return (
     <div className={styles.sidebarCard}>
