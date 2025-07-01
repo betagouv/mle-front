@@ -29,12 +29,15 @@ export default async function LogementPage({ params }: { params: { slug: string 
   ]
 
   const breadCrumbTitle = commonT('breadcrumbs.accommodationTitle', { name, city })
-  const nbAvailable =
-    (accommodation.nb_t1_available || 0) +
-    (accommodation.nb_t1_bis_available || 0) +
-    (accommodation.nb_t2_available || 0) +
-    (accommodation.nb_t3_available || 0) +
-    (accommodation.nb_t4_more_available || 0)
+  const nbAvailable = [
+    accommodation.nb_t1_available,
+    accommodation.nb_t1_bis_available,
+    accommodation.nb_t2_available,
+    accommodation.nb_t3_available,
+    accommodation.nb_t4_more_available,
+  ]
+    .filter((value): value is number => value !== null && value !== undefined)
+    .reduce((sum, value) => sum + value, 0)
   return (
     <div className={fr.cx('fr-container')}>
       <DynamicBreadcrumb title={breadCrumbTitle} />
