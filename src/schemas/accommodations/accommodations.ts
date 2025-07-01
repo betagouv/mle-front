@@ -74,10 +74,15 @@ export const ZAccomodationDetails = z.object({
   nb_accessible_apartments: z.number().nullable(),
   nb_coliving_apartments: z.number().nullable(),
   nb_t1: z.number().nullable(),
+  nb_t1_available: z.number().nullable(),
   nb_t1_bis: z.number().nullable(),
+  nb_t1_bis_available: z.number().nullable(),
   nb_t2: z.number().nullable(),
+  nb_t2_available: z.number().nullable(),
   nb_t3: z.number().nullable(),
+  nb_t3_available: z.number().nullable(),
   nb_t4_more: z.number().nullable(),
+  nb_t4_more_available: z.number().nullable(),
   nb_total_apartments: z.number().nullable(),
   owner: z
     .object({

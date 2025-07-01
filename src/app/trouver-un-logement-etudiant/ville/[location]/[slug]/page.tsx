@@ -22,7 +22,6 @@ export default async function LogementPage({ params }: { params: { slug: string 
   const { coordinates } = geom
   const [longitude, latitude] = coordinates
   const nearbyAccommodations = await getAccommodations({ center: `${longitude},${latitude}` })
-
   const tags: Array<{ iconId?: FrIconClassName | RiIconClassName; label: string }> = [
     ...(accommodation.nb_t1 || accommodation.nb_t1_bis ? [{ iconId: 'ri-user-line' as RiIconClassName, label: t('tags.studio') }] : []),
     ...(accommodation.nb_coliving_apartments ? [{ iconId: 'ri-group-line' as RiIconClassName, label: t('tags.shared') }] : []),
@@ -30,6 +29,12 @@ export default async function LogementPage({ params }: { params: { slug: string 
   ]
 
   const breadCrumbTitle = commonT('breadcrumbs.accommodationTitle', { name, city })
+  const nbAvailable =
+    (accommodation.nb_t1_available || 0) +
+    (accommodation.nb_t1_bis_available || 0) +
+    (accommodation.nb_t2_available || 0) +
+    (accommodation.nb_t3_available || 0) +
+    (accommodation.nb_t4_more_available || 0)
   return (
     <div className={fr.cx('fr-container')}>
       <DynamicBreadcrumb title={breadCrumbTitle} />
@@ -61,6 +66,7 @@ export default async function LogementPage({ params }: { params: { slug: string 
         <div className={fr.cx('fr-col-sm-4')}>
           <OwnerDetails
             owner={owner}
+            nbAvailable={nbAvailable}
             available={available}
             nbTotalApartments={nb_total_apartments}
             externalUrl={external_url}

@@ -1,9 +1,11 @@
 import { fr } from '@codegouvfr/react-dsfr'
+import Badge from '@codegouvfr/react-dsfr/Badge'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { getTranslations } from 'next-intl/server'
 import Image from 'next/image'
 import { OwnerDetailsActions } from '~/components/find-student-accomodation/owner-details/owner-details-actions'
 import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
+import { sPluriel } from '~/utils/sPluriel'
 import styles from './owner-details.module.css'
 
 interface OwnerDetailsProps {
@@ -13,11 +15,31 @@ interface OwnerDetailsProps {
   title: string
   location: string
   available: boolean
+  nbAvailable: number
 }
 
-export const OwnerDetails = async ({ nbTotalApartments, available, owner, externalUrl, title, location }: OwnerDetailsProps) => {
+export const OwnerDetails = async ({
+  nbTotalApartments,
+  nbAvailable,
+  available,
+  owner,
+  externalUrl,
+  title,
+  location,
+}: OwnerDetailsProps) => {
   const t = await getTranslations('accomodation')
   const ownerUrl = externalUrl || owner?.url
+  const badgeAvailability =
+    nbAvailable > 0 ? (
+      <Badge severity="success" noIcon>
+        {nbAvailable} DISPONIBLE{sPluriel(nbAvailable)}
+      </Badge>
+    ) : (
+      <Badge severity="error" noIcon>
+        AUCUNE DISPONIBILITÉ
+      </Badge>
+    )
+
   return (
     <div className={styles.sidebarCard}>
       <div className={styles.sidebarHeader}>
@@ -26,6 +48,7 @@ export const OwnerDetails = async ({ nbTotalApartments, available, owner, extern
         ) : (
           <h3 className={styles.sidebarTitle}>{t('sidebar.accommodationsNoCount')}</h3>
         )}
+        {badgeAvailability}
         <span>{t('sidebar.proposedBy')}</span>
         {owner?.image_base64 ? (
           <Image src={owner.image_base64} alt={owner.name} width={201} height={90} quality={100} />

@@ -1,11 +1,11 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
+import Link from 'next/link'
 import { FaqQuestionsAnswers } from '~/components/faq/faq-questions-answers'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import { TFaqQuestionsAnswers } from '~/schemas/faq/faq-questions-answers'
 import styles from './faq.module.css'
-import Link from 'next/link'
 
 export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
   {
