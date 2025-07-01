@@ -84,7 +84,10 @@ export default function PolitiqueDeConfidentialite() {
           </p>
           <ul className={fr.cx('fr-ml-6w', 'fr-mb-2w')}>
             <li>
-              DPO : <span style={{ textDecoration: 'underline dotted' }}>(email)</span>
+              DPO :&nbsp;
+              <a href="mailto:clara@monlogementetudiant.beta.gouv.fr" className={fr.cx('fr-link')}>
+                clara@monlogementetudiant.beta.gouv.fr
+              </a>
             </li>
             <li>
               À la CNIL :&nbsp;
