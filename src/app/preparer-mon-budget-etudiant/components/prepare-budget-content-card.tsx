@@ -25,7 +25,7 @@ export default async function PrepareBudgetContentCard({
     <div id={id} className={clsx(fr.cx('fr-py-4w'), withBorder && styles.border)}>
       <div className={styles.container}>
         <h3 className={fr.cx('fr-mb-0')}>{t('title')}</h3>
-        <p className={fr.cx('fr-mb-0')}>{t('description')}</p>
+        <p className={fr.cx('fr-mb-0')} dangerouslySetInnerHTML={{ __html: t.raw('description') }} />
         <div className={styles.content}>
           <div className={styles.contentContainer}>
             <div>

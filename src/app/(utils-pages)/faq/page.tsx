@@ -5,6 +5,7 @@ import { FaqQuestionsAnswers } from '~/components/faq/faq-questions-answers'
 import { DynamicBreadcrumb } from '~/components/ui/breadcrumb'
 import { TFaqQuestionsAnswers } from '~/schemas/faq/faq-questions-answers'
 import styles from './faq.module.css'
+import Link from 'next/link'
 
 export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
   {
@@ -19,12 +20,15 @@ export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
               réservées aux étudiants, elles proposent des loyers encadrés, souvent inférieurs aux prix du marché. L’accès est priorisé pour
               les étudiants aux revenus modestes (ex. : boursiers du Crous).
             </p>
-            <p className={styles.italic}>Inclut : résidences Crous, logements gérés par des associations ou bailleurs sociaux.</p>
+            <p className={styles.italic}>
+              Inclut : résidences Crous, logements sociaux gérés directement par les organismes HLM ou bien par des associations.
+            </p>
           </li>
           <li>
             <p>
-              <span className={fr.cx('fr-text--bold')}>Résidences services étudiantes</span>&nbsp;: également réservées aux étudiants, mais
-              avec des loyers non encadrés.
+              <span className={fr.cx('fr-text--bold')}>Résidences services étudiantes</span>&nbsp également réservées aux étudiants, mais
+              avec des loyers non encadrés aujourd’hui. À l’avenir, une offre de résidences-services à loyers intermédiaires (entre les
+              loyers du parc locatif social et les loyers du marché locatif libre) se développera.
             </p>
           </li>
           <li>
@@ -82,6 +86,14 @@ export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
           </li>
         </ul>
         <p className={clsx(styles.italic, fr.cx('fr-m-0'))}>⚠️ Vérifiez toujours précisément ce que couvrent les charges avant de signer.</p>
+        <p className={styles.italic}>
+          Attention ! Le contrat de location et les quittances doivent toujours bien distinguer le montant du loyer (qui peut être encadré
+          s’il s’agit de logements locatifs sociaux ou intermédiaires) et le montant des charges locatives récupérables dont la liste
+          limitative est définie par décret. Vous pouvez trouver ces informations sur
+          <Link target="_blank" href="https://www.service-public.fr/particuliers/vosdroits/F947" className={fr.cx('fr-link')}>
+            &nbsp;https://www.service-public.fr/particuliers/vosdroits/F947
+          </Link>
+        </p>
       </>
     ),
   },
@@ -125,7 +137,8 @@ export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
           </li>
         </ul>
         <p className={clsx(styles.italic, fr.cx('fr-m-0'))}>
-          👉 Un logement mal noté (E à G) peut être mal isolé, coûteux à chauffer et inconfortable en été.
+          👉 Un logement mal noté (E ou F : les logements en G sont interdits à la location depuis janvier 2025, sauf dérogations
+          particulières) peut être mal isolé, coûteux à chauffer et inconfortable en été.
         </p>
       </>
     ),
@@ -134,8 +147,12 @@ export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
     question: 'Où puis-je trouver ce type de logement étudiant ?',
     answer: (
       <p className={fr.cx('fr-m-0')}>
-        Les résidences universitaires conventionnées et autres logements sociaux sont listés dans la section "Trouver un logement étudiant"
-        sur monlogementetudiant.beta.gouv.fr
+        Les résidences universitaires conventionnées et autres logements sociaux sont listés dans la section{' '}
+        <span className={styles.italic}>"Trouver un logement étudiant"</span>
+        &nbsp;sur&nbsp;
+        <Link href="https://monlogementetudiant.beta.gouv.fr" className={fr.cx('fr-link')}>
+          monlogementetudiant.beta.gouv.fr
+        </Link>
       </p>
     ),
   },
@@ -143,33 +160,28 @@ export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
     question: 'Quelles aides financières puis-je obtenir pour payer mon loyer ?',
     answer: (
       <>
-        <p>Plusieurs dispositifs peuvent vous aider à alléger le coût du logement :</p>
-        <ul>
-          <li>
-            <p>
-              <span className={fr.cx('fr-text--bold')}>APL (Aide Personnalisée au Logement)</span>&nbsp;: versée par la CAF selon vos
-              ressources, le type de logement et le loyer.
-            </p>
-          </li>
-          <li>
-            <p>
-              <span className={fr.cx('fr-text--bold')}>ALS (Allocation de Logement Sociale)</span>&nbsp;: si vous n'êtes pas éligible à
-              l'APL.
-            </p>
-          </li>
-          <li>
-            <p>
-              <span className={fr.cx('fr-text--bold')}>FSL (Fonds de solidarité pour le logement) </span>&nbsp;: aide ponctuelle en cas de
-              difficultés.
-            </p>
-          </li>
-          <li>
-            <p className={fr.cx('fr-m-0')}>
-              <span className={fr.cx('fr-text--bold')}>Aides locales</span>&nbsp;: certaines régions ou villes proposent des aides
-              spécifiques (renseignez-vous auprès de votre mairie ou région).
-            </p>
-          </li>
-        </ul>
+        <p>Les aides personnelles au logement de la CAF peuvent vous aider à payer votre loyer.</p>
+        <p>
+          Pour trouver plus d’informations vous pouvez aller sur&nbsp;
+          <Link
+            target="_blank"
+            href="https://www.caf.fr/allocataires/aides-et-demarches/droits-et-prestations/logement/les-aides-personnelles-au-logement"
+            className={fr.cx('fr-link')}
+          >
+            https://www.caf.fr/allocataires/aides-et-demarches/droits-et-prestations/logement/les-aides-personnelles-au-logement
+          </Link>
+          &nbsp;et&nbsp;
+          <Link target="_blank" href="https://www.service-public.fr/particuliers/vosdroits/N20360" className={fr.cx('fr-link')}>
+            https://www.service-public.fr/particuliers/vosdroits/N20360
+          </Link>
+        </p>
+        <p>D'autres aides peuvent exister (aides locales).</p>
+        <p>
+          Vous pouvez les tester sur notre simulateur:{' '}
+          <Link href="/simuler-mes-aides-au-logement" className={fr.cx('fr-link')}>
+            Simuler mes aides au logement
+          </Link>
+        </p>
       </>
     ),
   },
@@ -184,7 +196,10 @@ export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
         <ul>
           <li>
             <p>
-              <span className={fr.cx('fr-text--bold')}>La grantie Visale</span>&nbsp;(gratuite et publique)
+              <span className={fr.cx('fr-text--bold')}>La grantie Visale</span>&nbsp;(gratuite et publique)&nbsp;
+              <Link target="_blank" href="https://www.visale.fr/" className={fr.cx('fr-link')}>
+                https://www.visale.fr/
+              </Link>
             </p>
           </li>
           <li>
@@ -207,7 +222,10 @@ export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
             <p>Une pièce d'identité</p>
           </li>
           <li>
-            <p>Un justificatif de situation étudiante (certificat de scolarité)</p>
+            <p>
+              Un justificatif de situation étudiante (certificat de scolarité) uniquement pour les logements étudiants (résidences
+              universitaires, résidences-services dédiées, pas dans le parc locatif libre)
+            </p>
           </li>
           <li>
             <p>Les trois dernières quittances de loyer ou une attestation d’hébergement</p>
@@ -232,7 +250,7 @@ export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
             <p>L'état des lieux d'entrée</p>
           </li>
           <li>
-            <p>Ce qui couvre exactement les charges</p>
+            <p>Ce que couvrent exactement les charges</p>
           </li>
           <li>
             <p>La durée du bail et les modalités de résiliation</p>
