@@ -15,7 +15,7 @@ interface OwnerDetailsProps {
   title: string
   location: string
   available: boolean
-  nbAvailable: number
+  nbAvailable: number | null
 }
 
 export const OwnerDetails = async ({
@@ -30,14 +30,14 @@ export const OwnerDetails = async ({
   const t = await getTranslations('accomodation')
   const ownerUrl = externalUrl || owner?.url
   let badgeAvailability = null
-  if (nbAvailable > 0) {
+  if (!!nbAvailable && nbAvailable > 0) {
     badgeAvailability = (
       <Badge severity="success" noIcon>
         {nbAvailable} DISPONIBLE{sPluriel(nbAvailable)}
       </Badge>
     )
   }
-  if (!!nbAvailable && nbAvailable === 0) {
+  if (nbAvailable === 0) {
     badgeAvailability = (
       <Badge severity="error" noIcon>
         AUCUNE DISPONIBILITÉ
