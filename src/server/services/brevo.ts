@@ -17,6 +17,7 @@ export async function sendTemplateEmail({ to, templateId, params }: TemplateEmai
     body: JSON.stringify({
       to: [{ email: to }],
       templateId,
+      replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
       ...(params && { params }),
     }),
   })
