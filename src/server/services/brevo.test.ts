@@ -35,6 +35,7 @@ describe('brevo service', () => {
       expect(body).toEqual({
         to: [{ email: 'user@test.com' }],
         templateId: 2,
+        replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
         params: { MAGIC_LINK: 'https://example.com/magic' },
       })
     })
@@ -51,7 +52,11 @@ describe('brevo service', () => {
       await sendTemplateEmail({ to: 'user@test.com', templateId: 40 })
 
       const body = JSON.parse(fetchMock.mock.calls[0][1].body)
-      expect(body).toEqual({ to: [{ email: 'user@test.com' }], templateId: 40 })
+      expect(body).toEqual({
+        to: [{ email: 'user@test.com' }],
+        templateId: 40,
+        replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      })
       expect(body.params).toBeUndefined()
     })
 
@@ -115,7 +120,11 @@ describe('brevo service', () => {
       await sendOwnerWelcomeEmail('owner@test.com')
 
       const body = JSON.parse(fetchMock.mock.calls[0][1].body)
-      expect(body).toEqual({ to: [{ email: 'owner@test.com' }], templateId: 40 })
+      expect(body).toEqual({
+        to: [{ email: 'owner@test.com' }],
+        templateId: 40,
+        replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      })
       expect(body.params).toBeUndefined()
     })
   })
