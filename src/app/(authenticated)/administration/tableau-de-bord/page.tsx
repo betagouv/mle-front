@@ -81,6 +81,8 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      <KeyFigures data={data} isLoading={isLoading} />
+
       <MyLinkedOwners />
 
       <div className={clsx(styles.grid2, 'fr-mb-3w')}>
@@ -279,6 +281,82 @@ function LinkSelfToOwnerDialog({ userId }: { userId: string }) {
         </Button>
       </div>
     </linkSelfToOwnerModal.Component>
+  )
+}
+
+function KeyFigures({ data, isLoading }: { data: ReturnType<typeof useAdminStats>['data']; isLoading: boolean }) {
+  const fmt = (n: number) => n.toLocaleString('fr-FR')
+
+  const crousBlocks = [
+    {
+      title: 'Résidences intégrées',
+      icon: 'fr-icon-home-4-line fr-icon--sm',
+      total: data?.residences.total ?? 0,
+      crous: data?.residences.crous ?? 0,
+      autres: data?.residences.autres ?? 0,
+    },
+    {
+      title: 'Logements intégrés',
+      icon: 'ri-hotel-line',
+      total: data?.logements.total ?? 0,
+      crous: data?.logements.crous ?? 0,
+      autres: data?.logements.autres ?? 0,
+    },
+  ]
+
+  const dispoLines = [
+    { label: 'Avec dispo', value: data?.disponibilite.avecDispo ?? 0 },
+    { label: '0 logement dispo', value: data?.disponibilite.sansDispo ?? 0 },
+    { label: 'Non renseignée', value: data?.disponibilite.nonRenseignee ?? 0 },
+  ]
+
+  return (
+    <>
+      <div className={clsx(styles.grid2, 'fr-mb-3w')}>
+        {crousBlocks.map((block) => (
+          <div key={block.title} className={styles.card}>
+            <div className={styles.cardHeader}>
+              <span className={styles.cardTitle}>
+                <span className={clsx(block.icon, 'fr-mr-1w')} aria-hidden="true" />
+                {block.title}
+              </span>
+            </div>
+            <div className={styles.kpiRow}>
+              <div className={styles.kpiItem}>
+                <div className={styles.kpiValue}>{isLoading ? '-' : fmt(block.total)}</div>
+                <div className={styles.kpiLabel}>Total</div>
+              </div>
+              <div className={styles.kpiItem}>
+                <div className={styles.kpiValue}>{isLoading ? '-' : fmt(block.crous)}</div>
+                <div className={styles.kpiLabel}>CROUS</div>
+              </div>
+              <div className={styles.kpiItem}>
+                <div className={styles.kpiValue}>{isLoading ? '-' : fmt(block.autres)}</div>
+                <div className={styles.kpiLabel}>Autres</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="fr-mb-3w">
+        <div className={styles.card}>
+          <div className={styles.cardHeader}>
+            <span className={styles.cardTitle}>
+              <span className="ri-calendar-check-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
+              Disponibilité des résidences
+            </span>
+          </div>
+          <div className={styles.kpiRow}>
+            {dispoLines.map((line) => (
+              <div key={line.label} className={styles.kpiItem}>
+                <div className={styles.kpiValue}>{isLoading ? '-' : fmt(line.value)}</div>
+                <div className={styles.kpiLabel}>{line.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
 
