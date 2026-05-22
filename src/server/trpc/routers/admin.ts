@@ -596,24 +596,65 @@ const residencesRouter = createTRPCRouter({
 
 const statsRouter = createTRPCRouter({
   overview: adminProcedure.query(async () => {
-    const [usersCount, ownersCount, accommodationsCount, apartmentsStats] = await Promise.all([
-      db
-        .select({
-          total: count(),
-          admins: sql<number>`count(*) filter (where role = 'admin')`.mapWith(Number),
-          ownerUsers: sql<number>`count(*) filter (where role = 'owner')`.mapWith(Number),
-          students: sql<number>`count(*) filter (where role = 'user')`.mapWith(Number),
-        })
-        .from(user),
-      db.select({ count: count() }).from(owners),
-      db.select({ count: count() }).from(accommodations),
-      db
-        .select({
-          totalApartments: sql<number>`coalesce(sum(coalesce(nb_total_apartments, 0)), 0)::int`,
-          availableApartments: sql<number>`coalesce(sum(${nbAvailableApartmentsSum}), 0)::int`,
-        })
-        .from(accommodations),
-    ])
+    const isCrous = sql`exists (select 1 from accommodation_externalsource where accommodation_id = ${accommodations.id} and source = 'crous')`
+
+    const availCols = [
+      accommodations.nbT1Available,
+      accommodations.nbT1BisAvailable,
+      accommodations.nbT2Available,
+      accommodations.nbT3Available,
+      accommodations.nbT4Available,
+      accommodations.nbT5Available,
+      accommodations.nbT6Available,
+      accommodations.nbT7MoreAvailable,
+    ]
+    const isAvailable = sql`(${sql.join(
+      availCols.map((c) => sql`${c} > 0`),
+      sql` OR `,
+    )})`
+    const isUnknown = sql`(${sql.join(
+      availCols.map((c) => sql`${c} IS NULL`),
+      sql` AND `,
+    )})`
+
+    const [usersCount, ownersCount, accommodationsCount, apartmentsStats, residencesBreakdown, logementsBreakdown, availabilityBreakdown] =
+      await Promise.all([
+        db
+          .select({
+            total: count(),
+            admins: sql<number>`count(*) filter (where role = 'admin')`.mapWith(Number),
+            ownerUsers: sql<number>`count(*) filter (where role = 'owner')`.mapWith(Number),
+            students: sql<number>`count(*) filter (where role = 'user')`.mapWith(Number),
+          })
+          .from(user),
+        db.select({ count: count() }).from(owners),
+        db.select({ count: count() }).from(accommodations),
+        db
+          .select({
+            totalApartments: sql<number>`coalesce(sum(coalesce(nb_total_apartments, 0)), 0)::int`,
+            availableApartments: sql<number>`coalesce(sum(${nbAvailableApartmentsSum}), 0)::int`,
+          })
+          .from(accommodations),
+        db
+          .select({
+            crous: sql<number>`count(*) filter (where ${isCrous})`.mapWith(Number),
+            autres: sql<number>`count(*) filter (where not ${isCrous})`.mapWith(Number),
+          })
+          .from(accommodations),
+        db
+          .select({
+            crous: sql<number>`coalesce(sum(coalesce(nb_total_apartments, 0)) filter (where ${isCrous}), 0)::int`.mapWith(Number),
+            autres: sql<number>`coalesce(sum(coalesce(nb_total_apartments, 0)) filter (where not ${isCrous}), 0)::int`.mapWith(Number),
+          })
+          .from(accommodations),
+        db
+          .select({
+            avecDispo: sql<number>`count(*) filter (where ${isAvailable})`.mapWith(Number),
+            sansDispo: sql<number>`count(*) filter (where not ${isAvailable} and not ${isUnknown})`.mapWith(Number),
+            nonRenseignee: sql<number>`count(*) filter (where ${isUnknown})`.mapWith(Number),
+          })
+          .from(accommodations),
+      ])
 
     const totalApartments = apartmentsStats[0]?.totalApartments ?? 0
     const availableApartments = apartmentsStats[0]?.availableApartments ?? 0
@@ -632,6 +673,21 @@ const statsRouter = createTRPCRouter({
         total: totalApartments,
         available: availableApartments,
         occupied: totalApartments - availableApartments,
+      },
+      residences: {
+        total: accommodationsCount[0]?.count ?? 0,
+        crous: residencesBreakdown[0]?.crous ?? 0,
+        autres: residencesBreakdown[0]?.autres ?? 0,
+      },
+      logements: {
+        total: totalApartments,
+        crous: logementsBreakdown[0]?.crous ?? 0,
+        autres: logementsBreakdown[0]?.autres ?? 0,
+      },
+      disponibilite: {
+        avecDispo: availabilityBreakdown[0]?.avecDispo ?? 0,
+        sansDispo: availabilityBreakdown[0]?.sansDispo ?? 0,
+        nonRenseignee: availabilityBreakdown[0]?.nonRenseignee ?? 0,
       },
     }
   }),
