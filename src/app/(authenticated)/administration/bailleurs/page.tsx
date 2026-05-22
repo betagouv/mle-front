@@ -26,6 +26,7 @@ type OwnerRow = {
   url: string | null
   imageBase64: string | null
   accommodationCount: number
+  nbTotalApartments: number
   userCount: number
   availableApartments: number
 }
@@ -77,6 +78,11 @@ const columns: ColumnDef<OwnerRow, unknown>[] = [
   {
     accessorKey: 'accommodationCount',
     header: 'Résidences',
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'nbTotalApartments',
+    header: 'Logements',
     enableSorting: true,
   },
   {
@@ -195,12 +201,16 @@ export default function OwnersPage() {
                       <div className={styles.gCardStatLbl}>Résidence{sPluriel(owner.accommodationCount)}</div>
                     </div>
                     <div>
-                      <div className={styles.gCardStatVal}>{owner.userCount}</div>
-                      <div className={styles.gCardStatLbl}>Utilisateur{sPluriel(owner.userCount)}</div>
+                      <div className={styles.gCardStatVal}>{owner.nbTotalApartments}</div>
+                      <div className={styles.gCardStatLbl}>Logement{sPluriel(owner.nbTotalApartments)}</div>
                     </div>
                     <div>
                       <div className={styles.gCardStatVal}>{owner.availableApartments}</div>
                       <div className={styles.gCardStatLbl}>Disponible{sPluriel(owner.availableApartments)}</div>
+                    </div>
+                    <div>
+                      <div className={styles.gCardStatVal}>{owner.userCount}</div>
+                      <div className={styles.gCardStatLbl}>Utilisateur{sPluriel(owner.userCount)}</div>
                     </div>
                   </div>
                   <div className={styles.gCardBottom}>

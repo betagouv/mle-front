@@ -312,6 +312,7 @@ const ownersRouter = createTRPCRouter({
             url: owners.url,
             image: owners.image,
             accommodationCount: sql<number>`(SELECT count(*)::int FROM accommodation_accommodation WHERE owner_id = "account_owner"."id")`,
+            nbTotalApartments: sql<number>`(SELECT coalesce(sum(coalesce(nb_total_apartments, 0)), 0)::int FROM accommodation_accommodation WHERE owner_id = "account_owner"."id")`,
             userCount: sql<number>`(SELECT count(*)::int FROM "user" WHERE owner_id = "account_owner"."id")`,
             availableApartments: sql<number>`(
               WITH available_counts AS (
