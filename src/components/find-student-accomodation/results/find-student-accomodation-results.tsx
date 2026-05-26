@@ -69,7 +69,8 @@ export const FindStudentAccomodationResultsContent: FC<FindStudentAccomodationRe
     }
   }, [accommodations?.results.features.length])
 
-  const { classes } = useStyles({ view: queryStates.vue })
+  const hasNoResults = !isFetching && !!accommodations && accommodations.count === 0
+  const { classes } = useStyles({ view: queryStates.vue, hasNoResults })
 
   const AccomodationsMap = useMemo(
     () =>
@@ -160,7 +161,7 @@ export const FindStudentAccomodationResultsContent: FC<FindStudentAccomodationRe
   )
 }
 
-const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) => ({
+const useStyles = tss.withParams<{ view: string | null; hasNoResults: boolean }>().create(({ view, hasNoResults }) => ({
   '@keyframes pulse': {
     '0%, 100%': {
       opacity: 1,
@@ -196,7 +197,7 @@ const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) =>
   },
   mapContainer: {
     width: '100%',
-    height: 'calc(100vh - 20px)',
+    height: hasNoResults ? '350px' : 'calc(100vh - 20px)',
     minHeight: '300px',
     position: 'sticky',
     top: '1rem',

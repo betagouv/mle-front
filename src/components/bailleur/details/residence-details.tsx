@@ -34,9 +34,7 @@ export const ResidenceDetails = () => {
                 }
                 nativeInputProps={register('name')}
                 state={errors.name ? 'error' : 'info'}
-                stateRelatedMessage={
-                  errors.name?.message ?? "Le terme « Résidence » n'est conservé que s'il est suivi d'un article ; sinon, il est supprimé."
-                }
+                stateRelatedMessage={errors.name?.message ?? t('accommodationNameHint')}
               />
             </div>
             <div className="fr-col-12 fr-col-md-6">
@@ -53,7 +51,7 @@ export const ResidenceDetails = () => {
                 stateRelatedMessage={errors.residence_type?.message}
               >
                 <option value="" disabled hidden>
-                  Sélectionnez un type
+                  {t('selectResidenceType')}
                 </option>
                 {Object.values(EResidenceType).map((value) => (
                   <option key={value} value={value}>
@@ -80,16 +78,16 @@ export const ResidenceDetails = () => {
               }}
               options={[
                 {
-                  label: 'Résidence exclusivement étudiante',
-                  hintText: 'Étudiants y compris stagiaires, alternants et étudiants salariés.',
+                  label: t('targetAudienceEtudiantsLabel'),
+                  hintText: t('targetAudienceEtudiantsHint'),
                   nativeInputProps: {
                     ...register('target_audience'),
                     value: ETargetAudience.ETUDIANTS,
                   },
                 },
                 {
-                  label: 'Résidence pour étudiants et jeunes actifs',
-                  hintText: 'Étudiants, alternants, stagiaires et jeunes salariés.',
+                  label: t('targetAudienceMixteLabel'),
+                  hintText: t('targetAudienceMixteHint'),
                   nativeInputProps: {
                     ...register('target_audience'),
                     value: ETargetAudience.MIXTE,

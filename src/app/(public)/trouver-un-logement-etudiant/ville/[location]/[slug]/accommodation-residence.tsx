@@ -163,10 +163,12 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
                         {accommodation.min && accommodation.max && accommodation.min !== accommodation.max
                           ? `De ${accommodation.min} à ${accommodation.max} €`
                           : `${accommodation.min} €`}
-                        {isPerPersonTypology(accommodation.type) ? ' par personne' : ''}
                       </span>
                     </div>
-                    <span className="fr-text--xs fr-mb-0">{t('charges')}</span>
+                    <div className="fr-flex fr-direction-column">
+                      {isPerPersonTypology(accommodation.type) && <span className="fr-text--xs fr-mb-0">{t('perPerson')}</span>}
+                      <span className="fr-text--xs fr-mb-0">{t('charges')}</span>
+                    </div>
                   </div>
                 </div>
               ))}

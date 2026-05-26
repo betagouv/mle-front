@@ -33,7 +33,7 @@ export const FindStudentAccommodationBanner = async ({ territory, categoryKey }:
           ),
       })}
       title={title}
-      className="fr-mb-4w"
+      className="fr-mb-4w fr-mt-2w"
     />
   )
 }
