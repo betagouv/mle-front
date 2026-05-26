@@ -9,6 +9,7 @@ import { Controller, useFormContext } from 'react-hook-form'
 import { EResidenceType, RESIDENCE_TYPE_LABELS } from '~/enums/residence-type'
 import { ETargetAudience } from '~/enums/target-audience'
 import { TUpdateResidence } from '~/schemas/accommodations/update-residence'
+import styles from './residence-details.module.css'
 
 export const ResidenceDetails = () => {
   const {
@@ -63,39 +64,56 @@ export const ResidenceDetails = () => {
             </div>
           </div>
 
-          <RadioButtons
-            legend={
-              <>
-                {t('targetAudience')} <span className="fr-text-default--error">*</span>
-              </>
-            }
-            name="target_audience"
-            state={errors.target_audience ? 'error' : undefined}
-            stateRelatedMessage={errors.target_audience?.message}
-            className="fr-mb-0"
-            classes={{
-              content: 'fr-flex fr-flex-gap-6v',
-              inputGroup: 'fr-mb-0 fr-mt-0 fr-border fr-p-2w fr-col',
-            }}
-            options={[
-              {
-                label: 'Uniquement pour étudiants',
-                hintText: 'Étudiants y compris stagiaires, alternants et étudiants salariés.',
-                nativeInputProps: {
-                  ...register('target_audience'),
-                  value: ETargetAudience.ETUDIANTS,
+          <div className={styles.radioGrid}>
+            <RadioButtons
+              legend={
+                <>
+                  {t('targetAudience')} <span className="fr-text-default--error">*</span>
+                </>
+              }
+              name="target_audience"
+              state={errors.target_audience ? 'error' : undefined}
+              stateRelatedMessage={errors.target_audience?.message}
+              className="fr-mb-0"
+              classes={{
+                inputGroup: 'fr-my-0 fr-border fr-p-1w',
+              }}
+              options={[
+                {
+                  label: 'Résidence exclusivement étudiante',
+                  hintText: 'Étudiants y compris stagiaires, alternants et étudiants salariés.',
+                  nativeInputProps: {
+                    ...register('target_audience'),
+                    value: ETargetAudience.ETUDIANTS,
+                  },
                 },
-              },
-              {
-                label: 'Étudiants et jeunes actifs',
-                hintText: 'Étudiants, alternants, stagiaires et jeunes salariés.',
-                nativeInputProps: {
-                  ...register('target_audience'),
-                  value: ETargetAudience.MIXTE,
+                {
+                  label: 'Résidence pour étudiants et jeunes actifs',
+                  hintText: 'Étudiants, alternants, stagiaires et jeunes salariés.',
+                  nativeInputProps: {
+                    ...register('target_audience'),
+                    value: ETargetAudience.MIXTE,
+                  },
                 },
-              },
-            ]}
-          />
+                {
+                  label: t('targetAudienceDiffusEtudiantsLabel'),
+                  hintText: t('targetAudienceDiffusEtudiantsHint'),
+                  nativeInputProps: {
+                    ...register('target_audience'),
+                    value: ETargetAudience.DIFFUS_ETUDIANTS,
+                  },
+                },
+                {
+                  label: t('targetAudienceDiffusMixteLabel'),
+                  hintText: t('targetAudienceDiffusMixteHint'),
+                  nativeInputProps: {
+                    ...register('target_audience'),
+                    value: ETargetAudience.DIFFUS_MIXTE,
+                  },
+                },
+              ]}
+            />
+          </div>
 
           <div>
             <div className="fr-py-2w fr-flex fr-justify-content-space-between fr-align-items-center fr-border-bottom">

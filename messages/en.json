@@ -244,6 +244,16 @@
     "simulator": "Des aides au logement peuvent diminuer le coût du logement.",
     "simulatorDescription": "Effectuez une simulation pour savoir si vous êtes éligible.",
     "simulatorButton": "Simulateur",
+    "fjtRsjaNoticeText": "Les Foyers de Jeunes Travailleurs (FJT) et les Résidences Sociales Jeunes Actifs (RSJA) n'ont pas vocation à accueillir prioritairement des étudiants,",
+    "fjtRsjaNoticeDescription": "mais des jeunes actifs en situation appelant des réponses davantage sociales (de façon privilégiée de 16 à 25 ans pour les FJT, de 18 à 30 ans pour les RSJA).",
+    "fjtRsjaLearnMore": "En savoir plus",
+    "fjtRsjaModalTitle": "FJT et RSJA",
+    "fjtRsjaModalParagraph1": "Cependant, en fonction des places disponibles, il est possible pour des étudiants d'y être acceptés. Les étudiants alternants et salariés peuvent être considérés comme des jeunes actifs.",
+    "fjtRsjaModalParagraph2": "En tout état de cause, au-delà du public-socle des FJT, la circulaire CNAF du 14 octobre 2020 précise que les jeunes âgés de 26 à 30 ans, les jeunes étudiants non-salariés ou les jeunes scolarisés (notamment les lycéens) et les apprentis de moins de 16 ans devront représenter globalement, au maximum, 35 % du public logé en FJT au cours de l'année.",
+    "fjtRsjaModalClose": "J'ai compris",
+    "diffusMixteNoticeTitle": "Ces logements étudiants sont situés dans une ou plusieurs résidences de logement social où vivent aussi des familles.",
+    "diffusMixteNoticeDescription": "Il ne s'agit pas de résidences étudiantes dédiées : seuls certains logements peuvent être attribués à des étudiants.",
+    "diffusEtudiantsNoticeTitle": "Ces logements étudiants sont situés dans une ou plusieurs résidences de logement social dédiées uniquement aux étudiants.",
     "card": {
       "availability": "Disponibilité",
       "noAvailability": "Aucune disponibilité",
@@ -893,8 +903,8 @@
     "summary": {
       "title": "Résumé du budget",
       "subtitle": "Résultats de votre simulation en équivalent mensuel",
-      "totalIncome": "Revenus totaux mensuels",
-      "totalExpenses": "Dépenses totales mensuelles",
+      "totalIncome": "Revenus totaux mensualisés",
+      "totalExpenses": "Dépenses totales mensualisées",
       "remainingBalance": "Solde restant",
       "savingsRate": "Taux d'épargne : {rate} %",
       "expensesBreakdown": "Répartition des dépenses",
@@ -1189,6 +1199,10 @@
         "socialHousing": "Une demande de logement social est nécessaire.",
         "accommodationType": "Type de résidence",
         "targetAudience": "Public dans la résidence",
+        "targetAudienceDiffusEtudiantsLabel": "Diffus - uniquement étudiants",
+        "targetAudienceDiffusEtudiantsHint": "Logements étudiants au sein d'une résidence de logement social, attribués uniquement à des étudiants.",
+        "targetAudienceDiffusMixteLabel": "Diffus - étudiants et jeunes actifs",
+        "targetAudienceDiffusMixteHint": "Logements étudiants au sein d'une résidence de logement social, pour étudiants et jeunes actifs.",
         "typologyTab": {
           "housingType": "Type de logement",
           "selectType": "Sélectionnez un type",
@@ -1216,16 +1230,16 @@
       }
     },
     "feedback": {
-      "title": "What do you think of the manager space?",
-      "ratingQuestion": "On a scale from 1 to 5, how satisfied are you?",
-      "commentLabel": "Comments, suggestions or issues (optional)",
-      "submit": "Send",
-      "close": "Close",
-      "ariaBanner": "Give your feedback on the manager space",
-      "ariaRating": "Satisfaction rating",
-      "ratingRequired": "Please select a rating.",
-      "successToast": "Thanks for your feedback!",
-      "errorToast": "Failed to send"
+      "title": "Que pensez-vous de l'espace gestionnaire ?",
+      "ratingQuestion": "Sur une échelle de 1 à 5, quel est votre niveau de satisfaction ?",
+      "commentLabel": "Commentaires, suggestions ou difficultés (facultatif)",
+      "submit": "Envoyer",
+      "close": "Fermer",
+      "ariaBanner": "Donner votre avis sur l'espace gestionnaire",
+      "ariaRating": "Note de satisfaction",
+      "ratingRequired": "Veuillez sélectionner une note.",
+      "successToast": "Merci pour votre retour !",
+      "errorToast": "Erreur lors de l'envoi"
     }
   }
 }

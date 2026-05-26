@@ -1,0 +1,2 @@
+CREATE TYPE "public"."target_audience" AS ENUM('etudiants', 'mixte-etudiants-jeunes-actifs', 'diffus-etudiants', 'diffus-mixte-etudiants-jeunes-actifs');--> statement-breakpoint
+ALTER TABLE "accommodation_accommodation" ALTER COLUMN "target_audience" SET DATA TYPE "public"."target_audience" USING "target_audience"::"public"."target_audience";

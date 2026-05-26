@@ -1,5 +1,6 @@
 import path from 'node:path'
 import { and, eq, sql } from 'drizzle-orm'
+import { ETargetAudience } from '~/enums/target-audience'
 import { ZUpdateResidence } from '~/schemas/accommodations/update-residence'
 import type { TImportJobResidence, TImportJobSummary } from '~/schemas/import-jobs'
 import { db } from '~/server/db'
@@ -428,7 +429,7 @@ export async function executeCsvImport(
         name,
         description: row.description?.trim() || null,
         residenceType: normalizeEnum(row.residence_type),
-        target_audience: (normalizeEnum(row.target_audience) ?? 'etudiants') as 'etudiants' | 'mixte-etudiants-jeunes-actifs',
+        target_audience: (normalizeEnum(row.target_audience) ?? 'etudiants') as ETargetAudience,
         published: true,
         nbT1: toDigit(row.nb_t1),
         nbT1Bis: toDigit(row.nb_t1_bis),
