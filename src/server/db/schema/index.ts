@@ -1,6 +1,6 @@
 export { academies } from './academies'
 export { accommodationAddresses } from './accommodation-addresses'
-export { accommodations } from './accommodations'
+export { accommodations, targetAudienceEnum } from './accommodations'
 export { activityLog } from './activity-log'
 export { adminOwnerLinks } from './admin-owner-links'
 export { account, session, user, verification } from './auth'

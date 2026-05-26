@@ -90,3 +90,13 @@
   margin-right: 0 !important;
   color: #5757ad;
 }
+
+.diffusIcon::before {
+  --icon-size: 1.5rem !important;
+  color: #5757ad;
+}
+
+.fjtIcon::before {
+  --icon-size: 1.5rem !important;
+  color: #5757ad;
+}

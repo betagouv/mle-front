@@ -314,7 +314,7 @@ const command: ImportCommand = {
         const accommodationData = {
           name: item.name,
           residenceType: 'residence-etudiante',
-          target_audience: 'etudiants',
+          target_audience: 'etudiants' as const,
           published: true,
           nbT1: typology.nbT1,
           nbT1Bis: typology.nbT1Bis,
