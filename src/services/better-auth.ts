@@ -71,6 +71,12 @@ export const auth = betterAuth({
   plugins: [
     magicLink({
       sendMagicLink: async ({ email, url }) => {
+        const usr = await db.query.user.findFirst({
+          where: eq(schema.user.email, email),
+          columns: { role: true },
+        })
+        // Only send magic links to owners and admins, never to students (role 'user')
+        if (!usr || usr.role === 'user') return
         await sendMagicLinkEmail(email, url)
       },
     }),
