@@ -50,15 +50,6 @@ export const OwnerDetails = async ({
     <AvailabilityBadge nbAvailable={nbAvailable} noAvailabilityText={t('card.noAvailability')} availabilityText={t('card.availability')} />
   )
 
-  const waitingListBadge = (
-    <WaitingListBadge
-      acceptWaitingList={acceptWaitingList}
-      nbAvailable={nbAvailable}
-      waitingListText={t('waitingList')}
-      className={styles.otherBadge}
-    />
-  )
-
   return (
     <div className={styles.sidebarCard}>
       <div className={clsx(styles.sidebarHeader, 'fr-mb-2w')}>
@@ -74,10 +65,7 @@ export const OwnerDetails = async ({
           <h3 className="fr-m-0">{owner?.name}</h3>
         )}
       </div>
-      <div className="fr-flex fr-flex-gap-2v fr-direction-column fr-align-items-center fr-justify-content-center">
-        {badgeAvailability}
-        {waitingListBadge}
-      </div>
+      <div className="fr-flex fr-align-items-center fr-justify-content-center">{badgeAvailability}</div>
       <span className="fr-text--xs fr-mb-0">{t('sidebar.updatedAt', { date: formatDayjs(updatedAt, 'DD MMMM YYYY', locale) })}</span>
 
       {(nbAvailable === null || nbAvailable === undefined) && (
@@ -98,6 +86,12 @@ export const OwnerDetails = async ({
         acceptDossierFacile={acceptDossierFacile}
       />
       <div className={styles.sidebarOwner}>
+        <WaitingListBadge
+          acceptWaitingList={acceptWaitingList}
+          nbAvailable={nbAvailable}
+          waitingListText={t('waitingList')}
+          className="fr-mb-1w fr-width-full"
+        />
         {!!ownerUrl && (
           <ConsultOfferButton
             href={ownerUrl}

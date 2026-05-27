@@ -85,13 +85,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
   )
 
   const waitingListBadge = (
-    <WaitingListBadge
-      acceptWaitingList={accept_waiting_list}
-      nbAvailable={nbAvailable}
-      waitingListText={t('waitingList')}
-      className={styles.otherBadge}
-      as="span"
-    />
+    <WaitingListBadge acceptWaitingList={accept_waiting_list} nbAvailable={nbAvailable} waitingListText={t('waitingList')} />
   )
 
   const badgeProps = price_min
@@ -137,12 +131,8 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
           {!!nb_total_apartments && (
             <span className={clsx('ri-community-line', styles.description)}>{`${nb_total_apartments} logements`}</span>
           )}
-          {!!badgeAvailability && (
-            <>
-              <br />
-              {badgeAvailability}
-            </>
-          )}
+          {badgeAvailability && <div className="fr-mt-1v">{badgeAvailability}</div>}
+          {waitingListBadge}
           {(nbAvailable === null || nbAvailable === undefined) && (
             <>
               <br />
@@ -166,7 +156,6 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
           {showFavorite && <SaveAccommodationFavoriteButton slug={accomodation.properties.slug} user={user} />}
         </div>
       }
-      end={waitingListBadge}
       endDetail={<span className={clsx('ri-arrow-right-line fr-text-title--blue-france', styles.arrow)} />}
       size="small"
       title={<span className="fr-text-title--blue-france fr-mb-0">{name}</span>}

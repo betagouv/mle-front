@@ -1,21 +1,16 @@
-import { Badge } from '@codegouvfr/react-dsfr/Badge'
+import Alert from '@codegouvfr/react-dsfr/Alert'
 
 interface WaitingListBadgeProps {
   acceptWaitingList: boolean
   nbAvailable: number | null
   waitingListText: string
   className?: string
-  as?: 'span' | 'p'
 }
 
-export function WaitingListBadge({ acceptWaitingList, nbAvailable, waitingListText, className, as }: WaitingListBadgeProps) {
+export function WaitingListBadge({ acceptWaitingList, nbAvailable, waitingListText, className }: WaitingListBadgeProps) {
   if (!acceptWaitingList || (nbAvailable !== null && nbAvailable !== undefined && nbAvailable > 0)) {
     return null
   }
 
-  return (
-    <Badge className={className} severity="warning" noIcon as={as}>
-      <span className="fr-text--uppercase fr-mb-0">{waitingListText}</span>
-    </Badge>
-  )
+  return <Alert description={waitingListText} severity="info" small className={className} />
 }
