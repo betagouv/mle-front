@@ -333,7 +333,7 @@ function calculateLocaPass(input: HelpSimulatorFormData): AidResult {
     })
   }
 
-  if (input.status === 'student') {
+  if (input.status === 'student' || input.status === 'lyceen') {
     return buildAidResult('loca-pass', {
       isEligible: false,
       ineligibilityReason: 'Réservé aux étudiants salariés et aux apprentis',

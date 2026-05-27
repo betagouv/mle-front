@@ -180,7 +180,7 @@ export const HelpSimulatorStep1: FC = () => {
             <RequiredLabel>
               {currentYear === 'terminale'
                 ? "L'année prochaine, allez-vous étudier dans une zone différente de votre lieu de résidence actuel ?"
-                : "L'année prochaine, allez-vous étudier dans une région différente de votre lieu de résidence actuel ?"}
+                : "L'année prochaine, allez-vous entrer en Master 1 dans une région différente de votre lieu de résidence actuel ?"}
             </RequiredLabel>
           }
           name="changingRegion"
