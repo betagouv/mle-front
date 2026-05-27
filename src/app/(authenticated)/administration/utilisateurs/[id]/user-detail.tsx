@@ -3,6 +3,7 @@
 import Button from '@codegouvfr/react-dsfr/Button'
 import Input from '@codegouvfr/react-dsfr/Input'
 import { createModal } from '@codegouvfr/react-dsfr/Modal'
+import ToggleSwitch from '@codegouvfr/react-dsfr/ToggleSwitch'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useDebounce } from 'use-debounce'
@@ -12,6 +13,8 @@ import { RoleBadge } from '~/components/administration/role-badge'
 import { UserForm, UserFormData } from '~/components/administration/user-form'
 import { createToast } from '~/components/ui/createToast'
 import { useAdminDeleteUser } from '~/hooks/use-admin-delete-user'
+import { useAdminResetUserPassword } from '~/hooks/use-admin-reset-user-password'
+import { useAdminSetEmailVerified } from '~/hooks/use-admin-set-email-verified'
 import { useAdminUpdateUser } from '~/hooks/use-admin-update-user'
 import { useAdminUser } from '~/hooks/use-admin-user'
 import { useTRPC, useTRPCClient } from '~/server/trpc/client'
@@ -21,10 +24,17 @@ const deleteUserModal = createModal({
   isOpenedByDefault: false,
 })
 
+const resetPasswordModal = createModal({
+  id: 'reset-password-modal',
+  isOpenedByDefault: false,
+})
+
 export function UserDetail({ id }: { id: string }) {
   const { data: userData, isLoading } = useAdminUser(id)
   const updateUser = useAdminUpdateUser()
   const deleteUser = useAdminDeleteUser()
+  const setEmailVerified = useAdminSetEmailVerified()
+  const resetPassword = useAdminResetUserPassword()
 
   if (isLoading) return <p>Chargement...</p>
   if (!userData) return <p>Utilisateur non trouvé</p>
@@ -93,9 +103,25 @@ export function UserDetail({ id }: { id: string }) {
 
           <div className="fr-card fr-card--no-border fr-p-3w">
             <h2 className="fr-h5 fr-mb-2w">Zone de danger</h2>
-            <Button priority="tertiary" onClick={() => deleteUserModal.open()} disabled={deleteUser.isPending}>
-              {"Supprimer l'utilisateur"}
-            </Button>
+            <ToggleSwitch
+              label="Compte activé"
+              checked={userData.emailVerified}
+              onChange={(checked) => setEmailVerified.mutate({ id, emailVerified: checked })}
+              disabled={setEmailVerified.isPending}
+              showCheckedHint={false}
+            />
+            <div className="fr-flex fr-flex-gap-2v fr-mt-2w">
+              <Button
+                priority="tertiary"
+                onClick={() => resetPasswordModal.open()}
+                disabled={resetPassword.isPending || !userData.hasPassword}
+              >
+                {userData.hasPassword ? 'Réinitialiser le mot de passe' : 'Aucun mot de passe'}
+              </Button>
+              <Button priority="tertiary" onClick={() => deleteUserModal.open()} disabled={deleteUser.isPending}>
+                {"Supprimer l'utilisateur"}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -116,6 +142,24 @@ export function UserDetail({ id }: { id: string }) {
       >
         Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.
       </deleteUserModal.Component>
+
+      <resetPasswordModal.Component
+        title="Réinitialiser le mot de passe"
+        buttons={[
+          {
+            children: 'Annuler',
+            doClosesModal: true,
+          },
+          {
+            children: 'Réinitialiser',
+            onClick: () => resetPassword.mutate(id),
+            doClosesModal: true,
+          },
+        ]}
+      >
+        Le mot de passe sera supprimé et toutes les sessions actives seront invalidées. L'utilisateur devra utiliser "Mot de passe oublié"
+        pour se reconnecter.
+      </resetPasswordModal.Component>
     </>
   )
 }
