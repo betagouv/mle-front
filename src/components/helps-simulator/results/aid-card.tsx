@@ -22,7 +22,7 @@ const AID_LINKS: Record<string, string> = {
   visale: 'https://www.visale.fr/',
   'mobili-jeune': 'https://mobilijeune.actionlogement.fr/eligibilite',
   'loca-pass': 'https://www.actionlogement.fr/l-avance-loca-pass',
-  'crous-mobilite-parcoursup': 'https://www.messervices.etudiant.gouv.fr',
+  'crous-mobilite-parcoursup': 'https://amp.etudiant.gouv.fr/',
   'crous-mobilite-master': 'https://www.service-public.gouv.fr/particuliers/vosdroits/F34343',
 }
 
