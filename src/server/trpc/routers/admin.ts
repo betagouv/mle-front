@@ -10,7 +10,7 @@ import { accommodationAddresses } from '~/server/db/schema/accommodation-address
 import { accommodations } from '~/server/db/schema/accommodations'
 import { activityLog } from '~/server/db/schema/activity-log'
 import { adminOwnerLinks } from '~/server/db/schema/admin-owner-links'
-import { user } from '~/server/db/schema/auth'
+import { account, session, user } from '~/server/db/schema/auth'
 import { cities } from '~/server/db/schema/cities'
 import { eventStats } from '~/server/db/schema/event-stats'
 import { importJobs } from '~/server/db/schema/import-jobs'
@@ -94,16 +94,22 @@ const usersRouter = createTRPCRouter({
     }),
 
   getById: adminProcedure.input(z.object({ id: z.string() })).query(async ({ input }) => {
-    const result = await db.query.user.findFirst({
-      where: eq(user.id, input.id),
-      with: { owner: true, adminOwnerLinks: { with: { owner: true } } },
-    })
+    const [result, credentialAccount] = await Promise.all([
+      db.query.user.findFirst({
+        where: eq(user.id, input.id),
+        with: { owner: true, adminOwnerLinks: { with: { owner: true } } },
+      }),
+      db.query.account.findFirst({
+        where: and(eq(account.userId, input.id), eq(account.providerId, 'credential')),
+        columns: { password: true },
+      }),
+    ])
 
     if (!result) {
       throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('userNotFound') })
     }
 
-    return result
+    return { ...result, hasPassword: credentialAccount?.password != null }
   }),
 
   create: adminProcedure
@@ -266,6 +272,40 @@ const usersRouter = createTRPCRouter({
     }
 
     return deleted
+  }),
+
+  setEmailVerified: adminProcedure.input(z.object({ id: z.string(), emailVerified: z.boolean() })).mutation(async ({ input }) => {
+    const [updated] = await db
+      .update(user)
+      .set({ emailVerified: input.emailVerified, updatedAt: new Date() })
+      .where(eq(user.id, input.id))
+      .returning()
+
+    if (!updated) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('userNotFound') })
+    }
+
+    if (!input.emailVerified) {
+      await db.delete(session).where(eq(session.userId, input.id))
+    }
+
+    return updated
+  }),
+
+  resetPassword: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
+    const usr = await db.query.user.findFirst({ where: eq(user.id, input.id) })
+    if (!usr) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('userNotFound') })
+    }
+
+    await db
+      .update(account)
+      .set({ password: null, updatedAt: new Date() })
+      .where(and(eq(account.userId, input.id), eq(account.providerId, 'credential')))
+
+    await db.delete(session).where(eq(session.userId, input.id))
+
+    return { success: true }
   }),
 
   myLinkedOwners: adminProcedure.query(async ({ ctx }) => {

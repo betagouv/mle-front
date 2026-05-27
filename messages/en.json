@@ -1022,7 +1022,13 @@
     "ownerCreated": "Gestionnaire créé avec succès",
     "ownerCreateError": "Erreur lors de la création du gestionnaire",
     "ownerDeleted": "Gestionnaire supprimé",
-    "ownerDeleteError": "Erreur lors de la suppression du gestionnaire"
+    "ownerDeleteError": "Erreur lors de la suppression du gestionnaire",
+    "userActivated": "Compte activé",
+    "userActivateError": "Erreur lors de l'activation du compte",
+    "userDeactivated": "Compte désactivé",
+    "userDeactivateError": "Erreur lors de la désactivation du compte",
+    "userPasswordReset": "Mot de passe réinitialisé",
+    "userPasswordResetError": "Erreur lors de la réinitialisation du mot de passe"
   },
   "trpc": {
     "admin": {
