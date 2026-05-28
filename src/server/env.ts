@@ -73,6 +73,10 @@ const envSchema = z.object({
   IBAIL_API_HOST: requiredInProdUrl,
   IBAIL_API_AUTH_KEY: requiredInProd,
   IBAIL_API_AUTH_SECRET: requiredInProd,
+
+  // Crisp Helpdesk
+  CRISP_BASIC_AUTH: requiredInProd,
+  CRISP_BASE_URL: requiredInProdUrl,
 })
 
 export const env = envSchema.parse(process.env)

@@ -47,6 +47,7 @@
     "jose": "^6.2.3",
     "leaflet": "^1.9.4",
     "leaflet-defaulticon-compatibility": "^0.1.2",
+    "marked": "^18.0.3",
     "next": "^16.2.6",
     "next-intl": "^4.11.0",
     "nuqs": "^2.8.9",

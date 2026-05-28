@@ -2,12 +2,14 @@ import Breadcrumb from '@codegouvfr/react-dsfr/Breadcrumb'
 import DocumentSearch from '@codegouvfr/react-dsfr/picto/DocumentSearch'
 import { ContactTeamButton } from '~/components/bailleur/contact-team-button'
 import { FaqQuestionsAnswers } from '~/components/faq/faq-questions-answers'
+import { getCrispFaqArticles } from '~/server/services/crisp-helpdesk'
 import { buildHref } from '~/utils/preserve-query-params'
 
 type SearchParams = { ownerId?: string }
 
 export default async function CentreDAidePage({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const awaitedSearchParams = await searchParams
+  const faqArticles = await getCrispFaqArticles()
   return (
     <div className="fr-container fr-pb-12w">
       <Breadcrumb
@@ -23,7 +25,7 @@ export default async function CentreDAidePage({ searchParams }: { searchParams: 
         <ContactTeamButton />
       </div>
       <div className="fr-mt-2w">
-        <FaqQuestionsAnswers />
+        <FaqQuestionsAnswers contents={faqArticles} />
       </div>
     </div>
   )
