@@ -293,7 +293,7 @@ const usersRouter = createTRPCRouter({
   }),
 
   resetPassword: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
-    const usr = await db.query.user.findFirst({ where: eq(user.id, input.id) })
+    const usr = await db.query.user.findFirst({ where: and(eq(user.id, input.id), eq(user.role, 'user')) })
     if (!usr) {
       throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('userNotFound') })
     }

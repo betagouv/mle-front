@@ -13,9 +13,8 @@ export const useAdminSetEmailVerified = () => {
 
   return useMutation({
     mutationFn: (data: { id: string; emailVerified: boolean }) => trpcClient.admin.users.setEmailVerified.mutate(data),
-    onSuccess: async (updated, variables) => {
-      await queryClient.invalidateQueries({ queryKey: trpc.admin.users.list.queryKey() })
-      await queryClient.invalidateQueries({ queryKey: trpc.admin.users.getById.queryKey({ id: updated.id }) })
+    onSuccess: async (_updated, variables) => {
+      await queryClient.invalidateQueries({ queryKey: trpc.admin.users.pathKey() })
       createToast({ priority: 'success', message: variables.emailVerified ? t('userActivated') : t('userDeactivated') })
     },
     onError: (_error, variables) => {
