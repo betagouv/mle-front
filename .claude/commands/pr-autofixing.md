@@ -15,11 +15,7 @@ Address and fix open review comments on the current PR for this repository.
 
 3. For each comment, read the full relevant file before making any change. Understand the schema (Drizzle), imports, and existing patterns before editing.
 
-4. Apply the fixes. Common patterns in this codebase:
-   - `and(eq(...), eq(...))` for compound Drizzle WHERE clauses (`and` is imported from `drizzle-orm`)
-   - `trpc.admin.<router>.pathKey()` to invalidate an entire tRPC namespace instead of individual queries
-   - `Promise.all([...])` when running multiple async invalidations in parallel
-   - Drizzle schema is in `src/server/db/schema/auth.ts` and sibling files — check field names there before using them
+4. Apply the fixes. Read `CLAUDE.md` at the repo root for the full project conventions (Zod, env vars, security, UI, tRPC, Drizzle, imports). All fixes must comply with these rules.
 
 5. After all fixes are applied, run format and lint:
    ```
