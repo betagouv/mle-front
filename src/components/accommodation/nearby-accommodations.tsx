@@ -18,7 +18,7 @@ export const NearbyAccommodations = ({
   nearbyAccommodations: TGetAccomodationsResponse
   accommodation: TAccomodationDetails
 }) => {
-  const nearbyFeatures = nearbyAccommodations.results.features.filter((feature) => feature.id !== accommodation.id)
+  const nearbyFeatures = nearbyAccommodations.results.filter((feature) => feature.id !== accommodation.id)
   if (nearbyFeatures.length === 0) {
     return null
   }
@@ -29,21 +29,21 @@ export const NearbyAccommodations = ({
   const maxIndex = nearbyFeatures.length - 1
   const handlePrevious = () => setCurrentIndex((prev) => (prev > 0 ? prev - 1 : maxIndex))
   const handleNext = () => setCurrentIndex((prev) => (prev < maxIndex ? prev + 1 : 0))
-  const currentFeature = nearbyFeatures[currentIndex]?.properties
-  const hasImage = !!currentFeature?.images_urls?.[0]
-  const nbTotalApartments = currentFeature?.nb_total_apartments
+  const currentFeature = nearbyFeatures[currentIndex]
+  const hasImage = !!currentFeature?.imagesUrls?.[0]
+  const nbTotalApartments = currentFeature?.nbTotalApartments
 
   const cardProps = {
     background: true,
     border: true,
-    badge: currentFeature.price_min ? <Badge severity="new" noIcon>{`${currentFeature.price_min}€`}</Badge> : undefined,
+    badge: currentFeature.priceMin ? <Badge severity="new" noIcon>{`${currentFeature.priceMin}€`}</Badge> : undefined,
     desc: <>{nbTotalApartments && <span className={fr.cx('ri-community-line')}>{`${nbTotalApartments} logements`}</span>}</>,
     enlargeLink: true,
     horizontal: true,
     ...(hasImage
       ? {
           imageAlt: `Image de la résidence ${currentFeature?.name}`,
-          imageUrl: currentFeature?.images_urls?.[0] ?? '',
+          imageUrl: currentFeature?.imagesUrls?.[0] ?? '',
         }
       : {}),
     linkProps: {

@@ -32,7 +32,7 @@ export const SaveAccommodationFavoriteButton = ({ slug, withLabel = false, user 
     trackEvent({ category: 'Favoris', action: 'suppression favori', name: slug })
   }
 
-  if (favorites?.find((favorite) => favorite.accommodation.properties.slug === slug)) {
+  if (favorites?.find((favorite) => favorite.accommodation.slug === slug)) {
     if (withLabel) {
       return (
         <Button

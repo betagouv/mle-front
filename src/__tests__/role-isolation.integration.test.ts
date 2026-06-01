@@ -20,18 +20,18 @@ describe('student cannot access bailleur routes', () => {
     await expect(
       authenticatedCaller.bailleur.create({
         name: 'Résidence Test',
-        addresses: [{ address: '1 rue de la Paix', city: 'Paris', postal_code: '75001' }],
-        external_url: 'https://example.com',
+        addresses: [{ address: '1 rue de la Paix', city: 'Paris', postalCode: '75001' }],
+        externalUrl: 'https://example.com',
         typologies: [
           {
-            type: 'T1',
-            price_min: 400,
-            price_max: 600,
-            superficie_min: 15,
-            superficie_max: 25,
+            type: 't1',
+            priceMin: 400,
+            priceMax: 600,
+            superficieMin: 15,
+            superficieMax: 25,
             colocation: false,
-            nb_total: 10,
-            nb_available: 5,
+            nbTotal: 10,
+            nbAvailable: 5,
           },
         ],
       }),
@@ -48,14 +48,7 @@ describe('student cannot access bailleur routes', () => {
     await expect(
       authenticatedCaller.bailleur.updateAvailability({
         slug: 'any-slug',
-        nb_t1_available: 1,
-        nb_t1_bis_available: null,
-        nb_t2_available: null,
-        nb_t3_available: null,
-        nb_t4_available: null,
-        nb_t5_available: null,
-        nb_t6_available: null,
-        nb_t7_more_available: null,
+        availability: [{ type: 't1', nbAvailable: 1 }],
       }),
     ).rejects.toThrow('Owner or admin role required')
   })

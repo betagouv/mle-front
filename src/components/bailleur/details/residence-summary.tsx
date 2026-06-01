@@ -36,7 +36,7 @@ export const ResidenceSummary = () => {
             </>
           }
           textArea
-          nativeTextAreaProps={{ rows: 2, ...register('rental_charges_details') }}
+          nativeTextAreaProps={{ rows: 2, ...register('rentalChargesDetails') }}
         />
       </div>
     </div>

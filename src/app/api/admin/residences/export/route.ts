@@ -1,11 +1,14 @@
-import { and, eq } from 'drizzle-orm'
+import { and, eq, inArray } from 'drizzle-orm'
 import { NextRequest } from 'next/server'
+import { TYPOLOGIES } from '~/schemas/accommodations/typology'
 import { db } from '~/server/db'
 import { accommodationAddresses } from '~/server/db/schema/accommodation-addresses'
+import { accommodationTypologies } from '~/server/db/schema/accommodation-typologies'
 import { accommodations } from '~/server/db/schema/accommodations'
 import { cities } from '~/server/db/schema/cities'
 import { departments } from '~/server/db/schema/departments'
 import { owners } from '~/server/db/schema/owners'
+import { typologiesByType } from '~/server/lib/typologies'
 import { getServerSession } from '~/services/better-auth'
 import { calculateAvailability } from '~/utils/calculateAvailability'
 import { getRegionByDepartmentCode } from '~/utils/french-regions'
@@ -43,55 +46,8 @@ export async function GET(request: NextRequest) {
       nbTotalApartments: accommodations.nbTotalApartments,
       nbAccessibleApartments: accommodations.nbAccessibleApartments,
       nbColivingApartments: accommodations.nbColivingApartments,
-      nbT1: accommodations.nbT1,
-      nbT1Bis: accommodations.nbT1Bis,
-      nbT2: accommodations.nbT2,
-      nbT3: accommodations.nbT3,
-      nbT4: accommodations.nbT4,
-      nbT5: accommodations.nbT5,
-      nbT6: accommodations.nbT6,
-      nbT7More: accommodations.nbT7More,
-      nbT1Available: accommodations.nbT1Available,
-      nbT1BisAvailable: accommodations.nbT1BisAvailable,
-      nbT2Available: accommodations.nbT2Available,
-      nbT3Available: accommodations.nbT3Available,
-      nbT4Available: accommodations.nbT4Available,
-      nbT5Available: accommodations.nbT5Available,
-      nbT6Available: accommodations.nbT6Available,
-      nbT7MoreAvailable: accommodations.nbT7MoreAvailable,
       priceMin: accommodations.priceMin,
-      priceMinT1: accommodations.priceMinT1,
-      priceMaxT1: accommodations.priceMaxT1,
-      priceMinT1Bis: accommodations.priceMinT1Bis,
-      priceMaxT1Bis: accommodations.priceMaxT1Bis,
-      priceMinT2: accommodations.priceMinT2,
-      priceMaxT2: accommodations.priceMaxT2,
-      priceMinT3: accommodations.priceMinT3,
-      priceMaxT3: accommodations.priceMaxT3,
-      priceMinT4: accommodations.priceMinT4,
-      priceMaxT4: accommodations.priceMaxT4,
-      priceMinT5: accommodations.priceMinT5,
-      priceMaxT5: accommodations.priceMaxT5,
-      priceMinT6: accommodations.priceMinT6,
-      priceMaxT6: accommodations.priceMaxT6,
-      priceMinT7More: accommodations.priceMinT7More,
-      priceMaxT7More: accommodations.priceMaxT7More,
-      superficieMinT1: accommodations.superficieMinT1,
-      superficieMaxT1: accommodations.superficieMaxT1,
-      superficieMinT1Bis: accommodations.superficieMinT1Bis,
-      superficieMaxT1Bis: accommodations.superficieMaxT1Bis,
-      superficieMinT2: accommodations.superficieMinT2,
-      superficieMaxT2: accommodations.superficieMaxT2,
-      superficieMinT3: accommodations.superficieMinT3,
-      superficieMaxT3: accommodations.superficieMaxT3,
-      superficieMinT4: accommodations.superficieMinT4,
-      superficieMaxT4: accommodations.superficieMaxT4,
-      superficieMinT5: accommodations.superficieMinT5,
-      superficieMaxT5: accommodations.superficieMaxT5,
-      superficieMinT6: accommodations.superficieMinT6,
-      superficieMaxT6: accommodations.superficieMaxT6,
-      superficieMinT7More: accommodations.superficieMinT7More,
-      superficieMaxT7More: accommodations.superficieMaxT7More,
+      priceMax: accommodations.priceMax,
       laundryRoom: accommodations.laundryRoom,
       commonAreas: accommodations.commonAreas,
       bikeStorage: accommodations.bikeStorage,
@@ -126,31 +82,32 @@ export async function GET(request: NextRequest) {
     .where(where)
     .orderBy(accommodations.name)
 
-  const enriched = results.map((row) => {
-    const availability = {
-      nb_t1_available: row.nbT1Available,
-      nb_t1_bis_available: row.nbT1BisAvailable,
-      nb_t2_available: row.nbT2Available,
-      nb_t3_available: row.nbT3Available,
-      nb_t4_available: row.nbT4Available,
-      nb_t5_available: row.nbT5Available,
-      nb_t6_available: row.nbT6Available,
-      nb_t7_more_available: row.nbT7MoreAvailable,
+  const accIds = results.map((r) => r.id)
+  const typologyRows =
+    accIds.length > 0 ? await db.select().from(accommodationTypologies).where(inArray(accommodationTypologies.accommodationId, accIds)) : []
+  const typologiesByAccommodation = new Map<number, (typeof typologyRows)[number][]>()
+  for (const tRow of typologyRows) {
+    const list = typologiesByAccommodation.get(tRow.accommodationId) ?? []
+    list.push(tRow)
+    typologiesByAccommodation.set(tRow.accommodationId, list)
+  }
+
+  const enriched = results.map((rawRow) => {
+    const byType = typologiesByType(typologiesByAccommodation.get(rawRow.id) ?? [])
+    // Flatten typologies back into per-typology columns for the CSV (admins expect flat columns).
+    const flat: Record<string, number | null> = {}
+    for (const { type } of TYPOLOGIES) {
+      const t = byType[type]
+      flat[`nb_${type}`] = t?.nbTotal ?? null
+      flat[`nb_${type}_available`] = t?.nbAvailable ?? null
+      flat[`price_min_${type}`] = t?.priceMin ?? null
+      flat[`price_max_${type}`] = t?.priceMax ?? null
+      flat[`superficie_min_${type}`] = t?.superficieMin ?? null
+      flat[`superficie_max_${type}`] = t?.superficieMax ?? null
     }
-    const stock = {
-      nb_t1: row.nbT1,
-      nb_t1_bis: row.nbT1Bis,
-      nb_t2: row.nbT2,
-      nb_t3: row.nbT3,
-      nb_t4: row.nbT4,
-      nb_t5: row.nbT5,
-      nb_t6: row.nbT6,
-      nb_t7_more: row.nbT7More,
-    }
-    const disponibiliteRenseignee = Object.values(availability).some((v) => v !== null && v !== undefined)
-    const nbLogementsDisponibles = calculateAvailability(availability, stock)
-    const region = getRegionByDepartmentCode(row.departmentCode)
-    return { ...row, region, disponibiliteRenseignee, nbLogementsDisponibles }
+    const nbLogementsDisponibles = calculateAvailability(byType)
+    const region = getRegionByDepartmentCode(rawRow.departmentCode)
+    return { ...rawRow, ...flat, region, disponibiliteRenseignee: nbLogementsDisponibles != null, nbLogementsDisponibles }
   })
 
   // region est calculée hors select : on la replace juste après departmentName pour regrouper les colonnes territoire

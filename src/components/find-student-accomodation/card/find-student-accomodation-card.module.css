@@ -14,6 +14,10 @@
   color: #666666;
 }
 
+.badgeLine {
+  display: block;
+}
+
 .arrow::before {
   --icon-size: 1.5rem !important;
   margin-right: 0rem !important;

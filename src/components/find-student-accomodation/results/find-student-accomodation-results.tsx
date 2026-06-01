@@ -64,10 +64,10 @@ export const FindStudentAccomodationResultsContent: FC<FindStudentAccomodationRe
   })
 
   useEffect(() => {
-    if (accommodations?.results?.features && accommodations.results.features.length < 6) {
+    if (accommodations?.results && accommodations.results.length < 6) {
       window.scrollTo({ behavior: 'smooth', top: 0 })
     }
-  }, [accommodations?.results.features.length])
+  }, [accommodations?.results.length])
 
   const hasNoResults = !isFetching && !!accommodations && accommodations.count === 0
   const { classes } = useStyles({ view: queryStates.vue, hasNoResults })
@@ -93,12 +93,10 @@ export const FindStudentAccomodationResultsContent: FC<FindStudentAccomodationRe
       <div className={classes.container}>
         <div className={classes.accomodationsContainer}>
           <div className={classes.accommodationGrid}>
-            {(accommodations?.results.features || []).map((accommodation) => (
+            {(accommodations?.results || []).map((accommodation) => (
               <AccomodationCard key={accommodation.id} accomodation={accommodation} user={user} />
             ))}
-            {!accommodations?.results.features?.length &&
-              isFetching &&
-              Array.from({ length: 24 }).map((_, index) => <CardSkeleton key={index} />)}
+            {!accommodations?.results?.length && isFetching && Array.from({ length: 24 }).map((_, index) => <CardSkeleton key={index} />)}
           </div>
 
           {!isFetching && accommodations?.count === 0 && (
@@ -109,11 +107,11 @@ export const FindStudentAccomodationResultsContent: FC<FindStudentAccomodationRe
             </div>
           )}
 
-          {accommodations && accommodations.count > accommodations.page_size && (
+          {accommodations && accommodations.count > accommodations.pageSize && (
             <div className={classes.paginationContainer}>
               <Pagination
                 showFirstLast={false}
-                count={Math.ceil(accommodations.count / accommodations.page_size)}
+                count={Math.ceil(accommodations.count / accommodations.pageSize)}
                 defaultPage={queryStates.page ?? 1}
                 getPageLinkProps={(page: number) => {
                   const params = new URLSearchParams()

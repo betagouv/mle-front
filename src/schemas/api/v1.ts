@@ -116,46 +116,40 @@ export const ZSlugParam = z.object({
 
 // --- Réponses ---
 
-/** Feature GeoJSON d'une résidence (iso UI), `updated_at` en string ISO pour le JSON. */
-export const ZApiAccommodationFeature = z
-  .object({
-    geometry: ZAccomodation.shape.geometry,
-    id: ZAccomodation.shape.id,
-    properties: ZAccomodation.shape.properties.extend({
-      updated_at: z.string().openapi({ description: 'Date de dernière mise à jour (ISO 8601).' }),
-    }),
-  })
-  .openapi('AccommodationFeature')
+/** Résidence (objet plat camelCase, `updatedAt` en string ISO pour le JSON). */
+export const ZApiAccommodation = ZAccomodation.extend({
+  updatedAt: z.string().openapi({ description: 'Date de dernière mise à jour (ISO 8601).' }),
+}).openapi('Accommodation')
 
 export const ZApiAccommodationsResponse = z
   .object({
     count: z.number().openapi({ description: 'Nombre total de résidences correspondant aux filtres.' }),
     next: z.string().nullable().openapi({ description: 'Numéro de page suivant, ou null.' }),
     previous: z.string().nullable().openapi({ description: 'Numéro de page précédent, ou null.' }),
-    min_price: z.number().nullable().openapi({ description: 'Loyer minimum observé sur le jeu de résultats.' }),
-    max_price: z.number().nullable().openapi({ description: 'Loyer maximum observé sur le jeu de résultats.' }),
-    page_size: z.number(),
-    results: z.object({ features: z.array(ZApiAccommodationFeature) }),
+    minPrice: z.number().nullable().openapi({ description: 'Loyer minimum observé sur le jeu de résultats.' }),
+    maxPrice: z.number().nullable().openapi({ description: 'Loyer maximum observé sur le jeu de résultats.' }),
+    pageSize: z.number(),
+    results: z.array(ZApiAccommodation),
   })
   .openapi('AccommodationsResponse')
 
 export const ZApiAccommodationDetail = ZAccomodationDetails.extend({
-  updated_at: z.string().openapi({ description: 'Date de dernière mise à jour (ISO 8601).' }),
+  updatedAt: z.string().openapi({ description: 'Date de dernière mise à jour (ISO 8601).' }),
   addresses: z
     .array(
       z.object({
         address: z.string(),
         city: z.string(),
-        postal_code: z.string(),
-        is_main: z.boolean(),
+        postalCode: z.string(),
+        isMain: z.boolean(),
         latitude: z.number().nullable(),
         longitude: z.number().nullable(),
       }),
     )
     .optional(),
-  city_slug: z.string().nullable(),
-  city_bbox: ZBbox.shape.bbox,
-  department_code: z.string().nullable(),
+  citySlug: z.string().nullable(),
+  cityBbox: ZBbox.shape.bbox,
+  departmentCode: z.string().nullable(),
 }).openapi('AccommodationDetail')
 
 export const ZApiCity = ZTerritories.shape.cities.element.openapi('City')

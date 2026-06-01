@@ -23,11 +23,11 @@ type ResidenceCardProps = {
 export const ResidenceCard: FC<ResidenceCardProps> = ({ accomodation, href }) => {
   const t = useTranslations('findAccomodation.card')
   const { classes } = useStyles()
-  const { city, images_urls, name, nb_total_apartments, postal_code, published } = accomodation.properties
-  const accommodationsTypes = accomodation.properties.nb_coliving_apartments ? [t('individual'), t('colocation')] : [t('individual')]
+  const { city, imagesUrls, name, nbTotalApartments, postalCode, published } = accomodation
+  const accommodationsTypes = accomodation.nbColivingApartments ? [t('individual'), t('colocation')] : [t('individual')]
   const imageProps =
-    images_urls && images_urls.length > 0
-      ? { imageComponent: <FindStudentAccommodationImageCard image={images_urls[0]} name={name} /> }
+    imagesUrls && imagesUrls.length > 0
+      ? { imageComponent: <FindStudentAccommodationImageCard image={imagesUrls[0]} name={name} /> }
       : {
           imageComponent: <FindStudentAccommodationPlaceholderImageCard id={accomodation.id} />,
         }
@@ -48,7 +48,7 @@ export const ResidenceCard: FC<ResidenceCardProps> = ({ accomodation, href }) =>
         ),
       }
 
-  const redirectUri = href ?? `/trouver-un-logement-etudiant/ville/${encodeURIComponent(city)}/${accomodation.properties.slug}`
+  const redirectUri = href ?? `/trouver-un-logement-etudiant/ville/${encodeURIComponent(city)}/${accomodation.slug}`
   return (
     <Card
       {...badgeProps}
@@ -65,9 +65,7 @@ export const ResidenceCard: FC<ResidenceCardProps> = ({ accomodation, href }) =>
         <>
           <span className={clsx('ri-group-line', classes.description)}>{accommodationsTypes.join(' • ')}</span>
           <br />
-          {nb_total_apartments && (
-            <span className={clsx('ri-community-line', classes.description)}>{`${nb_total_apartments} logements`}</span>
-          )}
+          {nbTotalApartments && <span className={clsx('ri-community-line', classes.description)}>{`${nbTotalApartments} logements`}</span>}
         </>
       }
       footer={
@@ -78,7 +76,7 @@ export const ResidenceCard: FC<ResidenceCardProps> = ({ accomodation, href }) =>
       start={
         <ul className="fr-tags-group">
           <li>
-            <Tag>{`${city} (${postal_code})`}</Tag>
+            <Tag>{`${city} (${postalCode})`}</Tag>
           </li>
         </ul>
       }

@@ -14,16 +14,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: 'weekly',
     priority: 0.8,
   }))
-  const { count, page_size } = await getAccommodations({})
-  const nbPages = Math.ceil(count / page_size)
+  const { count, pageSize } = await getAccommodations({})
+  const nbPages = Math.ceil(count / pageSize)
 
   const accommodationPagePromises = Array.from({ length: nbPages }, (_, i) => getAccommodations({ page: String(i + 1) }))
 
   const allAccommodationPages = await Promise.all(accommodationPagePromises)
-  const allFeatures = allAccommodationPages.flatMap((page) => page.results.features)
+  const allFeatures = allAccommodationPages.flatMap((page) => page.results)
 
   const accommodations: MetadataRoute.Sitemap = allFeatures.map((feature) => ({
-    url: `${baseUrl}/trouver-un-logement-etudiant/ville/${feature.properties.city.replace(' ', '-').toLowerCase()}/${feature.properties.slug}`,
+    url: `${baseUrl}/trouver-un-logement-etudiant/ville/${feature.city.replace(' ', '-').toLowerCase()}/${feature.slug}`,
     lastModified,
     changeFrequency: 'weekly',
     priority: 0.8,

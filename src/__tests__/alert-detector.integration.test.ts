@@ -39,8 +39,8 @@ async function setupCity() {
   return createCity({ departmentId: department.id, name: 'Paris', slug: 'paris-test', boundary: CITY_BOUNDARY })
 }
 
-function setAvailability(accommodationId: number, nbT1Available: number | null) {
-  return getTestDb().update(accommodations).set({ nbT1Available }).where(eq(accommodations.id, accommodationId))
+function setAvailability(accommodationId: number, nbAvailableApartments: number | null) {
+  return getTestDb().update(accommodations).set({ nbAvailableApartments }).where(eq(accommodations.id, accommodationId))
 }
 
 function jobsFor(accommodationId: number) {
@@ -50,7 +50,7 @@ function jobsFor(accommodationId: number) {
 describe('detectAlertJobs', () => {
   it('1er run (snapshot vide) : enregistre la baseline sans créer de job', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 5 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     const result = await detectAlertJobs()
@@ -63,7 +63,7 @@ describe('detectAlertJobs', () => {
 
   it('hausse 0 → x sur une résidence en zone d’une alerte active : crée un job pending', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     const alert = await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     await detectAlertJobs() // baseline (0)
@@ -96,7 +96,7 @@ describe('detectAlertJobs', () => {
 
   it('alerte avec notifications désactivées : la hausse est détectée mais aucun job créé', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: false })
 
     await detectAlertJobs()
@@ -110,7 +110,7 @@ describe('detectAlertJobs', () => {
 
   it('baisse de dispo (x → y, y < x) : aucun déclenchement', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 5 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     await detectAlertJobs() // baseline (5)
@@ -123,7 +123,7 @@ describe('detectAlertJobs', () => {
 
   it('re-notification : après un job sent, une nouvelle hausse x → y crée un nouveau job (index partiel)', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     await detectAlertJobs() // baseline (0)
@@ -146,7 +146,7 @@ describe('detectAlertJobs', () => {
 
   it('prix d’entrée au-dessus du plafond de l’alerte : hausse détectée mais hors matching', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 600, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 600, nbAvailableApartments: 0 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     await detectAlertJobs()
@@ -160,7 +160,7 @@ describe('detectAlertJobs', () => {
 
   it('échec définitif (#2) : un job failed terminal ne bloque pas une nouvelle hausse', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     await detectAlertJobs() // baseline (0)
@@ -182,7 +182,7 @@ describe('detectAlertJobs', () => {
 
   it('échec réessayable (#2) : une nouvelle hausse ne crée pas de doublon (coalescence)', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     await detectAlertJobs() // baseline (0)
@@ -201,7 +201,7 @@ describe('detectAlertJobs', () => {
 
   it('alerte sans territoire (#3) : ignorée par le détecteur (pas de spam national)', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     // Alerte active mais SANS territoire (cityId / departmentId / academyId tous null).
     await createAlert({ userId: 'student-1', maxPrice: 500, receiveNotifications: true })
 
@@ -222,7 +222,7 @@ describe('detectAlertJobs', () => {
       geom: POINT_INSIDE,
       published: true,
       priceMin: 400,
-      nbT1Available: 0,
+      nbAvailableApartments: 0,
       ownerId: crous.id,
     })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
@@ -238,8 +238,8 @@ describe('detectAlertJobs', () => {
 
   it('scopé (mode événementiel) : ne traite que les accommodationIds passés', async () => {
     const city = await setupCity()
-    const accomA = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
-    const accomB = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accomA = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
+    const accomB = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     await detectAlertJobs() // baseline (A et B à 0)
@@ -257,7 +257,7 @@ describe('detectAlertJobs', () => {
 
   it('scopé avec liste vide : aucun traitement', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     await detectAlertJobs()
@@ -273,7 +273,7 @@ describe('detectAlertJobs', () => {
 describe('enqueueJobsForNewAlert (flux pull à la création d’alerte)', () => {
   it('stock déjà disponible qui matche : enfile un job pending', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 5 })
     const alert = await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     const created = await enqueueJobsForNewAlert(alert.id)
@@ -299,7 +299,7 @@ describe('enqueueJobsForNewAlert (flux pull à la création d’alerte)', () => 
 
   it('alerte sans territoire : aucun job (pas de spam national)', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 5 })
     const alert = await createAlert({ userId: 'student-1', maxPrice: 500, receiveNotifications: true })
 
     const created = await enqueueJobsForNewAlert(alert.id)
@@ -310,7 +310,7 @@ describe('enqueueJobsForNewAlert (flux pull à la création d’alerte)', () => 
 
   it('alerte en opt-out (receiveNotifications=false) : aucun job', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 5 })
     const alert = await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: false })
 
     const created = await enqueueJobsForNewAlert(alert.id)
@@ -321,7 +321,7 @@ describe('enqueueJobsForNewAlert (flux pull à la création d’alerte)', () => 
 
   it('prix d’entrée au-dessus du plafond : aucun job', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 600, nbT1Available: 5 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 600, nbAvailableApartments: 5 })
     const alert = await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     const created = await enqueueJobsForNewAlert(alert.id)
@@ -332,7 +332,7 @@ describe('enqueueJobsForNewAlert (flux pull à la création d’alerte)', () => 
 
   it('idempotence : un second appel ne crée pas de doublon (index unique partiel)', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 5 })
     const alert = await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     expect(await enqueueJobsForNewAlert(alert.id)).toBe(1)
@@ -344,7 +344,7 @@ describe('enqueueJobsForNewAlert (flux pull à la création d’alerte)', () => 
 describe('backfillAlertJobs (vague initiale pour les alertes existantes)', () => {
   it('enfile un job par couple alerte active × stock dispo qui matche', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 5 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
     await createAlert({ userId: 'student-2', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
@@ -357,7 +357,7 @@ describe('backfillAlertJobs (vague initiale pour les alertes existantes)', () =>
 
   it('dry-run : compte les jobs candidats sans rien écrire', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 5 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     const { jobsCreated } = await backfillAlertJobs({ dryRun: true })
@@ -368,7 +368,7 @@ describe('backfillAlertJobs (vague initiale pour les alertes existantes)', () =>
 
   it('ne touche pas le snapshot (le détecteur reste muet juste après)', async () => {
     const city = await setupCity()
-    await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 5 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     await backfillAlertJobs()
@@ -380,7 +380,7 @@ describe('backfillAlertJobs (vague initiale pour les alertes existantes)', () =>
 
   it('exclut les alertes opt-out et sans territoire', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 5 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: false }) // opt-out
     await createAlert({ userId: 'student-2', maxPrice: 500, receiveNotifications: true }) // sans territoire
     await createAlert({ userId: 'student-3', cityId: city.id, maxPrice: 500, receiveNotifications: true }) // éligible
@@ -394,7 +394,7 @@ describe('backfillAlertJobs (vague initiale pour les alertes existantes)', () =>
 
   it('idempotent : un second run ne crée pas de doublon', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 5 })
     await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
 
     expect((await backfillAlertJobs()).jobsCreated).toBe(1)
@@ -404,7 +404,7 @@ describe('backfillAlertJobs (vague initiale pour les alertes existantes)', () =>
 
   it('inclut les favoris avec dispo > 0', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 5 })
     await createUser({ id: 'student-fav' })
     await createFavoriteAccommodation({ userId: 'student-fav', accommodationId: accom.id })
 
@@ -420,7 +420,7 @@ describe('backfillAlertJobs (vague initiale pour les alertes existantes)', () =>
 
   it('ne crée pas de job favori pour une résidence sans dispo', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     await createUser({ id: 'student-fav' })
     await createFavoriteAccommodation({ userId: 'student-fav', accommodationId: accom.id })
 
@@ -434,7 +434,7 @@ describe('backfillAlertJobs (vague initiale pour les alertes existantes)', () =>
 describe('detectAlertJobs — favoris', () => {
   it("hausse de dispo d'une résidence favorite : crée un job source=favorite", async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     await createUser({ id: 'student-fav' })
     await createFavoriteAccommodation({ userId: 'student-fav', accommodationId: accom.id })
 
@@ -455,7 +455,7 @@ describe('detectAlertJobs — favoris', () => {
 
   it('hausse détectée : crée à la fois un job alerte et un job favori', async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     await createAlert({ userId: 'student-alert', cityId: city.id, maxPrice: 500, receiveNotifications: true })
     await createUser({ id: 'student-fav' })
     await createFavoriteAccommodation({ userId: 'student-fav', accommodationId: accom.id })
@@ -472,7 +472,7 @@ describe('detectAlertJobs — favoris', () => {
 
   it("job favori : idempotent (onConflictDoNothing sur l'index partiel)", async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     await createUser({ id: 'student-fav' })
     await createFavoriteAccommodation({ userId: 'student-fav', accommodationId: accom.id })
 
@@ -489,7 +489,7 @@ describe('detectAlertJobs — favoris', () => {
 
   it("suppression d'un favori annule les jobs pending correspondants", async () => {
     const city = await setupCity()
-    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbAvailableApartments: 0 })
     await createUser({ id: 'student-fav' })
     await createFavoriteAccommodation({ userId: 'student-fav', accommodationId: accom.id })
 

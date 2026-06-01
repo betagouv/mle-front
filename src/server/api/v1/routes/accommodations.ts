@@ -20,7 +20,7 @@ const listRoute = createRoute({
   tags: ['Résidences'],
   summary: 'Lister les résidences',
   description:
-    "Liste paginée des résidences publiées (FeatureCollection GeoJSON), identique à ce qu'affiche la carte. " +
+    "Liste paginée des résidences publiées (objets plats avec typologies + coordonnées), identique à ce qu'affiche la carte. " +
     'Les filtres de localisation (villes, départements, académies) sont géométriques (ST_Within).',
   security,
   request: { query: ZAccommodationsListQuery },
@@ -121,7 +121,7 @@ accommodationsApp.openapi(detailRoute, async (c) => {
   const { slug } = c.req.valid('param')
   try {
     const d = await publicCaller.accommodations.getBySlug({ slug })
-    return c.json({ ...d, updated_at: d.updated_at instanceof Date ? d.updated_at.toISOString() : String(d.updated_at) }, 200)
+    return c.json({ ...d, updatedAt: d.updatedAt instanceof Date ? d.updatedAt.toISOString() : String(d.updatedAt) }, 200)
   } catch (error) {
     if (error instanceof TRPCError && error.code === 'NOT_FOUND') {
       return c.json({ error: 'Résidence introuvable.' }, 404)

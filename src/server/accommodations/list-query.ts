@@ -1,14 +1,17 @@
-import { and, eq, notInArray, or, type SQL, sql } from 'drizzle-orm'
+import { and, eq, inArray, notInArray, or, type SQL, sql } from 'drizzle-orm'
 import { EResidenceType } from '~/enums/residence-type'
 import { ETargetAudience } from '~/enums/target-audience'
+import type { TAccomodation, TTypologiesRecord } from '~/schemas/accommodations/accommodations'
 import { db } from '~/server/db'
 import { academies } from '~/server/db/schema/academies'
 import { accommodationAddresses } from '~/server/db/schema/accommodation-addresses'
+import { accommodationTypologies } from '~/server/db/schema/accommodation-typologies'
 import { accommodations } from '~/server/db/schema/accommodations'
 import { cities } from '~/server/db/schema/cities'
 import { departments } from '~/server/db/schema/departments'
 import { externalSources } from '~/server/db/schema/external-sources'
 import { owners } from '~/server/db/schema/owners'
+import { typologiesByType } from '~/server/lib/typologies'
 
 /**
  * Query builders partagés pour lister les accommodations.
@@ -16,41 +19,18 @@ import { owners } from '~/server/db/schema/owners'
  * Ce module est la source de vérité de la requête « liste de résidences » : il est consommé à la fois
  * par le router tRPC interne (`accommodationsRouter`) et par l'API publique REST v1, garantissant que
  * les deux surfaces renvoient exactement le même contenu (iso carte).
+ *
+ * Modèle de données : les typologies vivent dans la table `accommodation_typologies`. Le tri/pagination
+ * et les bornes de prix s'appuient sur les agrégats dénormalisés maintenus à l'écriture sur
+ * `accommodation` (`nbAvailableApartments`, `priceMin`, `priceMax`) ; le détail par typologie est
+ * hydraté par lot après la requête (`rowsToAccommodationDTOs`).
  */
 
-const availabilityCols = [
-  accommodations.nbT1Available,
-  accommodations.nbT1BisAvailable,
-  accommodations.nbT2Available,
-  accommodations.nbT3Available,
-  accommodations.nbT4Available,
-  accommodations.nbT5Available,
-  accommodations.nbT6Available,
-  accommodations.nbT7MoreAvailable,
-] as const
+// Raw column names used inside CTE ordering (no table qualification).
+// Backed by the denormalized parent aggregate (NULL = availability unknown).
+const totalAvailable = sql<number>`COALESCE("nbAvailableApartments", 0)`
 
-// Raw column names used inside CTE ordering (no table qualification)
-const totalAvailable = sql<number>`(
-  COALESCE("nbT1Available", 0) +
-  COALESCE("nbT1BisAvailable", 0) +
-  COALESCE("nbT2Available", 0) +
-  COALESCE("nbT3Available", 0) +
-  COALESCE("nbT4Available", 0) +
-  COALESCE("nbT5Available", 0) +
-  COALESCE("nbT6Available", 0) +
-  COALESCE("nbT7MoreAvailable", 0)
-)`
-
-const unknownAvailability = sql<boolean>`(
-  "nbT1Available" IS NULL AND
-  "nbT1BisAvailable" IS NULL AND
-  "nbT2Available" IS NULL AND
-  "nbT3Available" IS NULL AND
-  "nbT4Available" IS NULL AND
-  "nbT5Available" IS NULL AND
-  "nbT6Available" IS NULL AND
-  "nbT7MoreAvailable" IS NULL
-)`
+const unknownAvailability = sql<boolean>`"nbAvailableApartments" IS NULL`
 
 const priorityOrder = sql`CASE
   WHEN ${totalAvailable} > 0 THEN 1
@@ -61,16 +41,8 @@ const priorityOrder = sql`CASE
   ELSE 6
 END`
 
-export const priceMaxComputed = sql<number | null>`GREATEST(
-  ${accommodations.priceMaxT1},
-  ${accommodations.priceMaxT1Bis},
-  ${accommodations.priceMaxT2},
-  ${accommodations.priceMaxT3},
-  ${accommodations.priceMaxT4},
-  ${accommodations.priceMaxT5},
-  ${accommodations.priceMaxT6},
-  ${accommodations.priceMaxT7More}
-)`
+// Denormalized parent aggregate (MAX of typology priceMax), maintained on write.
+export const priceMaxComputed = sql<number | null>`${accommodations.priceMax}`
 
 export const crousExistsCondition = sql`EXISTS (SELECT 1 FROM ${externalSources} WHERE ${externalSources.accommodationId} = ${accommodations.id} AND ${externalSources.source} = 'crous')`
 
@@ -108,8 +80,7 @@ export const applyCommonListFilters = async (conditions: SQL[], input: TCommonLi
   }
 
   if (onlyWithAvailability) {
-    const orAvailable = availabilityCols.map((col) => sql`${col} > 0`)
-    conditions.push(sql`(${sql.join(orAvailable, sql` OR `)})`)
+    conditions.push(sql`${accommodations.nbAvailableApartments} > 0`)
   }
 
   if (priceMax != null) {
@@ -220,26 +191,8 @@ export const listAccommodationsWithConditions = async ({
 
     db
       .select({
-        minPrice: sql<number | null>`MIN(LEAST(
-              NULLIF(${accommodations.priceMinT1}, 0),
-              NULLIF(${accommodations.priceMinT1Bis}, 0),
-              NULLIF(${accommodations.priceMinT2}, 0),
-              NULLIF(${accommodations.priceMinT3}, 0),
-              NULLIF(${accommodations.priceMinT4}, 0),
-              NULLIF(${accommodations.priceMinT5}, 0),
-              NULLIF(${accommodations.priceMinT6}, 0),
-              NULLIF(${accommodations.priceMinT7More}, 0)
-            ))`,
-        maxPrice: sql<number | null>`MAX(GREATEST(
-              NULLIF(${accommodations.priceMaxT1}, 0),
-              NULLIF(${accommodations.priceMaxT1Bis}, 0),
-              NULLIF(${accommodations.priceMaxT2}, 0),
-              NULLIF(${accommodations.priceMaxT3}, 0),
-              NULLIF(${accommodations.priceMaxT4}, 0),
-              NULLIF(${accommodations.priceMaxT5}, 0),
-              NULLIF(${accommodations.priceMaxT6}, 0),
-              NULLIF(${accommodations.priceMaxT7More}, 0)
-            ))`,
+        minPrice: sql<number | null>`MIN(NULLIF(${accommodations.priceMin}, 0))`,
+        maxPrice: sql<number | null>`MAX(NULLIF(${accommodations.priceMax}, 0))`,
       })
       .from(accommodations)
       .innerJoin(accommodationAddresses, eq(accommodationAddresses.accommodationId, accommodations.id))
@@ -263,55 +216,8 @@ export const listAccommodationsWithConditions = async ({
           ${accommodations.nbTotalApartments} as "nbTotalApartments",
           ${accommodations.nbAccessibleApartments} as "nbAccessibleApartments",
           ${accommodations.nbColivingApartments} as "nbColivingApartments",
-          ${accommodations.nbT1} as "nbT1",
-          ${accommodations.nbT1Bis} as "nbT1Bis",
-          ${accommodations.nbT2} as "nbT2",
-          ${accommodations.nbT3} as "nbT3",
-          ${accommodations.nbT4} as "nbT4",
-          ${accommodations.nbT5} as "nbT5",
-          ${accommodations.nbT6} as "nbT6",
-          ${accommodations.nbT7More} as "nbT7More",
-          ${accommodations.nbT1Available} as "nbT1Available",
-          ${accommodations.nbT1BisAvailable} as "nbT1BisAvailable",
-          ${accommodations.nbT2Available} as "nbT2Available",
-          ${accommodations.nbT3Available} as "nbT3Available",
-          ${accommodations.nbT4Available} as "nbT4Available",
-          ${accommodations.nbT5Available} as "nbT5Available",
-          ${accommodations.nbT6Available} as "nbT6Available",
-          ${accommodations.nbT7MoreAvailable} as "nbT7MoreAvailable",
+          ${accommodations.nbAvailableApartments} as "nbAvailableApartments",
           ${accommodations.priceMin} as "priceMin",
-          ${accommodations.priceMinT1} as "priceMinT1",
-          ${accommodations.priceMaxT1} as "priceMaxT1",
-          ${accommodations.priceMinT1Bis} as "priceMinT1Bis",
-          ${accommodations.priceMaxT1Bis} as "priceMaxT1Bis",
-          ${accommodations.priceMinT2} as "priceMinT2",
-          ${accommodations.priceMaxT2} as "priceMaxT2",
-          ${accommodations.priceMinT3} as "priceMinT3",
-          ${accommodations.priceMaxT3} as "priceMaxT3",
-          ${accommodations.priceMinT4} as "priceMinT4",
-          ${accommodations.priceMaxT4} as "priceMaxT4",
-          ${accommodations.priceMinT5} as "priceMinT5",
-          ${accommodations.priceMaxT5} as "priceMaxT5",
-          ${accommodations.priceMinT6} as "priceMinT6",
-          ${accommodations.priceMaxT6} as "priceMaxT6",
-          ${accommodations.priceMinT7More} as "priceMinT7More",
-          ${accommodations.priceMaxT7More} as "priceMaxT7More",
-          ${accommodations.superficieMinT1} as "superficieMinT1",
-          ${accommodations.superficieMaxT1} as "superficieMaxT1",
-          ${accommodations.superficieMinT1Bis} as "superficieMinT1Bis",
-          ${accommodations.superficieMaxT1Bis} as "superficieMaxT1Bis",
-          ${accommodations.superficieMinT2} as "superficieMinT2",
-          ${accommodations.superficieMaxT2} as "superficieMaxT2",
-          ${accommodations.superficieMinT3} as "superficieMinT3",
-          ${accommodations.superficieMaxT3} as "superficieMaxT3",
-          ${accommodations.superficieMinT4} as "superficieMinT4",
-          ${accommodations.superficieMaxT4} as "superficieMaxT4",
-          ${accommodations.superficieMinT5} as "superficieMinT5",
-          ${accommodations.superficieMaxT5} as "superficieMaxT5",
-          ${accommodations.superficieMinT6} as "superficieMinT6",
-          ${accommodations.superficieMaxT6} as "superficieMaxT6",
-          ${accommodations.superficieMinT7More} as "superficieMinT7More",
-          ${accommodations.superficieMaxT7More} as "superficieMaxT7More",
           ${priceMaxComputed} as "priceMaxComputed",
           ${accommodations.acceptWaitingList} as "acceptWaitingList",
           ${accommodations.scholarshipHoldersPriority} as "scholarshipHoldersPriority",
@@ -354,106 +260,79 @@ export const listAccommodationsWithConditions = async ({
   const count = countResult[0]?.count ?? 0
   const totalPages = Math.ceil(count / pageSize)
 
+  const rows = Array.isArray(results) ? results : (results as { rows: Record<string, unknown>[] }).rows
+
   return {
     count,
-    page_size: pageSize,
-    min_price: priceBounds[0]?.minPrice != null ? Number(priceBounds[0].minPrice) : null,
-    max_price: priceBounds[0]?.maxPrice != null ? Number(priceBounds[0].maxPrice) : null,
+    pageSize,
+    minPrice: priceBounds[0]?.minPrice != null ? Number(priceBounds[0].minPrice) : null,
+    maxPrice: priceBounds[0]?.maxPrice != null ? Number(priceBounds[0].maxPrice) : null,
     crousCounts: crousCountsResult?.[0] ? { crous: crousCountsResult[0].crous, others: crousCountsResult[0].others } : undefined,
     next: page < totalPages ? String(page + 1) : null,
     previous: page > 1 ? String(page - 1) : null,
-    results: {
-      features: (Array.isArray(results) ? results : (results as { rows: Record<string, unknown>[] }).rows).map(mapToGeoJsonFeature),
-    },
+    results: await rowsToAccommodationDTOs(rows),
   }
 }
 
-export function mapToGeoJsonFeature(row: Record<string, unknown>) {
-  // bigint columns come back as strings from raw SQL queries (db.execute) but as numbers from typed selects
+/**
+ * Batch-fetch typology rows for a page of result rows and map each to the flat accommodation DTO.
+ * Search ranking/pagination stays in the raw CTE (which uses the parent aggregates); this only
+ * hydrates the typologies (keyed object) for the page being returned.
+ */
+export async function rowsToAccommodationDTOs(rows: Record<string, unknown>[]): Promise<TAccomodation[]> {
+  const ids = rows.map((r) => (typeof r.id === 'string' ? Number(r.id) : (r.id as number)))
+  const typologyRows =
+    ids.length > 0 ? await db.select().from(accommodationTypologies).where(inArray(accommodationTypologies.accommodationId, ids)) : []
+  const byAccommodation = new Map<number, (typeof typologyRows)[number][]>()
+  for (const t of typologyRows) {
+    const list = byAccommodation.get(t.accommodationId) ?? []
+    list.push(t)
+    byAccommodation.set(t.accommodationId, list)
+  }
+  return rows.map((r) => {
+    const id = typeof r.id === 'string' ? Number(r.id) : (r.id as number)
+    return toAccommodationDTO(r, typologiesByType(byAccommodation.get(id) ?? []))
+  })
+}
+
+/**
+ * Map a row (from the search CTE or a typed select sharing the same key names) plus its keyed
+ * typologies object into the flat accommodation DTO. No GeoJSON wrapper: coordinates inline.
+ * bigint id comes back as a string from raw SQL (db.execute) but as a number from typed selects.
+ */
+export function toAccommodationDTO(row: Record<string, unknown>, typologies: TTypologiesRecord): TAccomodation {
   const id = typeof row.id === 'string' ? Number(row.id) : (row.id as number)
   return {
-    geometry: {
-      type: 'Point' as const,
-      coordinates: [row.lng as number, row.lat as number],
-    },
     id,
-    properties: {
-      id,
-      name: row.name as string,
-      slug: row.slug as string,
-      address: (row.address as string) ?? '',
-      city: row.city as string,
-      city_slug: row.citySlug as string,
-      postal_code: row.postalCode as string,
-      residence_type: toResidenceType((row.residenceType as string | null) ?? null),
-      target_audience: toTargetAudience((row.targetAudience as string | null) ?? null),
-      published: row.published as boolean,
-      accept_waiting_list: (row.acceptWaitingList as boolean) ?? false,
-      images_urls: (row.imagesUrls as string[]) ?? null,
-      description: (row.description as string) ?? null,
-      rental_charges_details: (row.rentalChargesDetails as string) ?? null,
-      external_url: (row.externalUrl as string) ?? undefined,
-      virtual_tour_url: (row.virtualTourUrl as string) ?? null,
-      updated_at: row.updatedAt as Date,
-      scholarship_holders_priority: (row.scholarshipHoldersPriority as boolean) ?? false,
-      social_housing_required: (row.socialHousingRequired as boolean) ?? false,
-      wifi: (row.wifi as boolean) ?? false,
-      nb_total_apartments: row.nbTotalApartments as number | null,
-      nb_accessible_apartments: row.nbAccessibleApartments as number | null,
-      nb_coliving_apartments: row.nbColivingApartments as number | null,
-      nb_t1: row.nbT1 as number | null,
-      nb_t1_bis: row.nbT1Bis as number | null,
-      nb_t2: row.nbT2 as number | null,
-      nb_t3: row.nbT3 as number | null,
-      nb_t4: row.nbT4 as number | null,
-      nb_t5: row.nbT5 as number | null,
-      nb_t6: row.nbT6 as number | null,
-      nb_t7_more: row.nbT7More as number | null,
-      nb_t1_available: row.nbT1Available as number | null,
-      nb_t1_bis_available: row.nbT1BisAvailable as number | null,
-      nb_t2_available: row.nbT2Available as number | null,
-      nb_t3_available: row.nbT3Available as number | null,
-      nb_t4_available: row.nbT4Available as number | null,
-      nb_t5_available: row.nbT5Available as number | null,
-      nb_t6_available: row.nbT6Available as number | null,
-      nb_t7_more_available: row.nbT7MoreAvailable as number | null,
-      price_min: row.priceMin as number | null,
-      price_min_t1: row.priceMinT1 as number | null,
-      price_min_t1_bis: row.priceMinT1Bis as number | null,
-      price_min_t2: row.priceMinT2 as number | null,
-      price_min_t3: row.priceMinT3 as number | null,
-      price_min_t4: row.priceMinT4 as number | null,
-      price_min_t5: row.priceMinT5 as number | null,
-      price_min_t6: row.priceMinT6 as number | null,
-      price_min_t7_more: row.priceMinT7More as number | null,
-      price_max: row.priceMaxComputed as number | null,
-      price_max_t1: row.priceMaxT1 as number | null,
-      price_max_t1_bis: row.priceMaxT1Bis as number | null,
-      price_max_t2: row.priceMaxT2 as number | null,
-      price_max_t3: row.priceMaxT3 as number | null,
-      price_max_t4: row.priceMaxT4 as number | null,
-      price_max_t5: row.priceMaxT5 as number | null,
-      price_max_t6: row.priceMaxT6 as number | null,
-      price_max_t7_more: row.priceMaxT7More as number | null,
-      superficie_min_t1: row.superficieMinT1 as number | null,
-      superficie_max_t1: row.superficieMaxT1 as number | null,
-      superficie_min_t1_bis: row.superficieMinT1Bis as number | null,
-      superficie_max_t1_bis: row.superficieMaxT1Bis as number | null,
-      superficie_min_t2: row.superficieMinT2 as number | null,
-      superficie_max_t2: row.superficieMaxT2 as number | null,
-      superficie_min_t3: row.superficieMinT3 as number | null,
-      superficie_max_t3: row.superficieMaxT3 as number | null,
-      superficie_min_t4: row.superficieMinT4 as number | null,
-      superficie_max_t4: row.superficieMaxT4 as number | null,
-      superficie_min_t5: row.superficieMinT5 as number | null,
-      superficie_max_t5: row.superficieMaxT5 as number | null,
-      superficie_min_t6: row.superficieMinT6 as number | null,
-      superficie_max_t6: row.superficieMaxT6 as number | null,
-      superficie_min_t7_more: row.superficieMinT7More as number | null,
-      superficie_max_t7_more: row.superficieMaxT7More as number | null,
-      owner_name: (row.ownerName as string) ?? null,
-      owner_url: (row.ownerUrl as string) ?? null,
-    },
+    name: row.name as string,
+    slug: row.slug as string,
+    citySlug: (row.citySlug as string) ?? undefined,
+    address: (row.address as string) ?? '',
+    city: row.city as string,
+    postalCode: row.postalCode as string,
+    residenceType: toResidenceType((row.residenceType as string | null) ?? null),
+    targetAudience: toTargetAudience((row.targetAudience as string | null) ?? null),
+    published: row.published as boolean,
+    acceptWaitingList: (row.acceptWaitingList as boolean) ?? false,
+    imagesUrls: (row.imagesUrls as string[]) ?? null,
+    description: (row.description as string) ?? null,
+    rentalChargesDetails: (row.rentalChargesDetails as string) ?? null,
+    externalUrl: (row.externalUrl as string) ?? undefined,
+    virtualTourUrl: (row.virtualTourUrl as string) ?? null,
+    updatedAt: row.updatedAt as Date,
+    scholarshipHoldersPriority: (row.scholarshipHoldersPriority as boolean) ?? false,
+    socialHousingRequired: (row.socialHousingRequired as boolean) ?? false,
+    wifi: (row.wifi as boolean) ?? false,
+    latitude: (row.lat as number | null) ?? null,
+    longitude: (row.lng as number | null) ?? null,
+    nbTotalApartments: (row.nbTotalApartments as number | null) ?? null,
+    nbAccessibleApartments: (row.nbAccessibleApartments as number | null) ?? null,
+    nbColivingApartments: (row.nbColivingApartments as number | null) ?? null,
+    priceMin: (row.priceMin as number | null) ?? null,
+    priceMax: (row.priceMaxComputed as number | null) ?? null,
+    ownerName: (row.ownerName as string) ?? null,
+    ownerUrl: (row.ownerUrl as string) ?? null,
+    typologies,
   }
 }
 
@@ -461,8 +340,8 @@ export function mapToGeoJsonFeature(row: Record<string, unknown>) {
  * Requête haut-niveau consommée par l'API publique REST v1 (`GET /v1/accommodations`).
  *
  * Elle reprend la logique du router tRPC `accommodations.list` (mêmes filtres communs, même shape de
- * sortie GeoJSON) mais en remplaçant le scope mono-ville par le filtre de localisation multi-territoire
- * de `resolveLocationConditions`. `bbox` / `center` restent disponibles comme scopes géométriques
+ * sortie) mais en remplaçant le scope mono-ville par le filtre de localisation multi-territoire de
+ * `resolveLocationConditions`. `bbox` / `center` restent disponibles comme scopes géométriques
  * alternatifs, avec la même priorité que le router.
  *
  * Le filtre CROUS est tri-état, plus adapté à un consommateur d'API que le binaire de la carte :

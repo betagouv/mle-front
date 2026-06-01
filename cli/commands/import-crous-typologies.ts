@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm'
 import * as XLSX from 'xlsx'
 import { closeDb, db } from '~/server/db'
 import { accommodations } from '~/server/db/schema'
+import { mergeTypologiesFromFlat, omitFlatTypologyFields } from '~/server/lib/typologies'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import {
   buildDisplaySourceId,
@@ -42,7 +43,8 @@ type Options = {
   replace?: boolean
 }
 
-const COUNT_FIELDS: Record<TypoCategory, keyof typeof accommodations.$inferSelect> = {
+// Flat camelCase keys consumed by the typology bridge (mergeTypologiesFromFlat), not DB columns.
+const COUNT_FIELDS: Record<TypoCategory, string> = {
   t1: 'nbT1',
   t1bis: 'nbT1Bis',
   t2: 'nbT2',
@@ -189,7 +191,9 @@ export async function importCrousTypologies(filePath: string, options: Options) 
     if (!options.dryRun && pendingUpdates.length > 0) {
       await db.transaction(async (tx) => {
         for (const { id, update } of pendingUpdates) {
-          await tx.update(accommodations).set(update).where(eq(accommodations.id, id))
+          await tx.update(accommodations).set(omitFlatTypologyFields(update)).where(eq(accommodations.id, id))
+          // Merge the new typology counts into existing child rows (prices/surfaces preserved).
+          await mergeTypologiesFromFlat(tx, id, update)
         }
       })
     }

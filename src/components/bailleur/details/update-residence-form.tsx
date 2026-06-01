@@ -19,131 +19,71 @@ import { ETargetAudience } from '~/enums/target-audience'
 import { useUpdateResidenceDetails } from '~/hooks/use-update-residence-details'
 import { trackEvent } from '~/lib/tracking'
 import { TAccomodationMy } from '~/schemas/accommodations/accommodations'
-import { createUpdateResidenceSchema, TUpdateResidence } from '~/schemas/accommodations/update-residence'
+import { TYPOLOGIES } from '~/schemas/accommodations/typology'
+import { TUpdateResidence, ZUpdateResidence } from '~/schemas/accommodations/update-residence'
 import { formatRelativeTime } from '~/utils/formatRelativeTime'
 import { sanitizeHTML } from '~/utils/sanitize-html'
 import styles from './update-residence-form.module.css'
 
 export const UpdateResidenceForm = ({ accommodation }: { accommodation: TAccomodationMy }) => {
-  const { properties } = accommodation
-  const { city } = properties
-  const redirectUri = `/trouver-un-logement-etudiant/ville/${encodeURIComponent(city)}/${accommodation.properties.slug}`
+  const { city } = accommodation
+  const redirectUri = `/trouver-un-logement-etudiant/ville/${encodeURIComponent(city)}/${accommodation.slug}`
 
-  const updateMutation = useUpdateResidenceDetails(accommodation.properties.slug)
+  const updateMutation = useUpdateResidenceDetails(accommodation.slug)
+
+  // Build the typologies array (form input model) from the keyed `typologies` object.
+  const typologyDefaults = TYPOLOGIES.filter(({ type }) => !!accommodation.typologies[type]).map(({ type }) => {
+    const v = accommodation.typologies[type]!
+    return {
+      type,
+      priceMin: v.priceMin ?? 0,
+      priceMax: v.priceMax ?? 0,
+      superficieMin: v.superficieMin ?? 0,
+      superficieMax: v.superficieMax ?? 0,
+      nbTotal: v.nbTotal ?? 0,
+      nbAvailable: v.nbAvailable ?? 0,
+      colocation: v.colocation,
+    }
+  })
+
   const form = useForm<TUpdateResidence>({
-    resolver: zodResolver(
-      createUpdateResidenceSchema({
-        nb_t1: accommodation.properties.nb_t1,
-        nb_t1_bis: accommodation.properties.nb_t1_bis,
-        nb_t2: accommodation.properties.nb_t2,
-        nb_t3: accommodation.properties.nb_t3,
-        nb_t4: accommodation.properties.nb_t4,
-        nb_t5: accommodation.properties.nb_t5,
-        nb_t6: accommodation.properties.nb_t6,
-        nb_t7_more: accommodation.properties.nb_t7_more,
-        superficie_min_t1: accommodation.properties.superficie_min_t1,
-        superficie_max_t1: accommodation.properties.superficie_max_t1,
-        superficie_min_t1_bis: accommodation.properties.superficie_min_t1_bis,
-        superficie_max_t1_bis: accommodation.properties.superficie_max_t1_bis,
-        superficie_min_t2: accommodation.properties.superficie_min_t2,
-        superficie_max_t2: accommodation.properties.superficie_max_t2,
-        superficie_min_t3: accommodation.properties.superficie_min_t3,
-        superficie_max_t3: accommodation.properties.superficie_max_t3,
-        superficie_min_t4: accommodation.properties.superficie_min_t4,
-        superficie_max_t4: accommodation.properties.superficie_max_t4,
-        superficie_min_t5: accommodation.properties.superficie_min_t5,
-        superficie_max_t5: accommodation.properties.superficie_max_t5,
-        superficie_min_t6: accommodation.properties.superficie_min_t6,
-        superficie_max_t6: accommodation.properties.superficie_max_t6,
-        superficie_min_t7_more: accommodation.properties.superficie_min_t7_more,
-        superficie_max_t7_more: accommodation.properties.superficie_max_t7_more,
-      }),
-    ),
+    resolver: zodResolver(ZUpdateResidence),
     defaultValues: {
-      name: accommodation.properties.name || '',
-      residence_type: (accommodation.properties.residence_type as EResidenceType) || '',
-      target_audience: (accommodation.properties.target_audience as ETargetAudience) || '',
-      addresses: accommodation.properties.addresses?.map((a) => ({
+      name: accommodation.name || '',
+      residenceType: (accommodation.residenceType as EResidenceType) || '',
+      targetAudience: (accommodation.targetAudience as ETargetAudience) || '',
+      addresses: accommodation.addresses?.map((a) => ({
         address: a.address || '',
         city: a.city || '',
-        postal_code: a.postal_code || '',
+        postalCode: a.postalCode || '',
       })),
-      description: accommodation.properties.description || '',
-      rental_charges_details: accommodation.properties.rental_charges_details || '',
-      external_url: accommodation.properties.external_url || '',
-      virtual_tour_url: accommodation.properties.virtual_tour_url || '',
-      accept_waiting_list: accommodation.properties.accept_waiting_list || false,
+      description: accommodation.description || '',
+      rentalChargesDetails: accommodation.rentalChargesDetails || '',
+      externalUrl: accommodation.externalUrl || '',
+      virtualTourUrl: accommodation.virtualTourUrl || '',
+      acceptWaitingList: accommodation.acceptWaitingList || false,
 
-      nb_t1: accommodation.properties.nb_t1 ?? null,
-      nb_t1_available: accommodation.properties.nb_t1_available ?? null,
-      nb_t1_bis: accommodation.properties.nb_t1_bis ?? null,
-      nb_t1_bis_available: accommodation.properties.nb_t1_bis_available ?? null,
-      nb_t2: accommodation.properties.nb_t2 ?? null,
-      nb_t2_available: accommodation.properties.nb_t2_available ?? null,
-      nb_t3: accommodation.properties.nb_t3 ?? null,
-      nb_t3_available: accommodation.properties.nb_t3_available ?? null,
-      nb_t4: accommodation.properties.nb_t4 ?? null,
-      nb_t4_available: accommodation.properties.nb_t4_available ?? null,
-      nb_t5: accommodation.properties.nb_t5 ?? null,
-      nb_t5_available: accommodation.properties.nb_t5_available ?? null,
-      nb_t6: accommodation.properties.nb_t6 ?? null,
-      nb_t6_available: accommodation.properties.nb_t6_available ?? null,
-      nb_t7_more: accommodation.properties.nb_t7_more ?? null,
-      nb_t7_more_available: accommodation.properties.nb_t7_more_available ?? null,
+      typologies: typologyDefaults,
 
-      price_min_t1: accommodation.properties.price_min_t1 ?? null,
-      price_max_t1: accommodation.properties.price_max_t1 ?? null,
-      price_min_t1_bis: accommodation.properties.price_min_t1_bis ?? null,
-      price_max_t1_bis: accommodation.properties.price_max_t1_bis ?? null,
-      price_min_t2: accommodation.properties.price_min_t2 ?? null,
-      price_max_t2: accommodation.properties.price_max_t2 ?? null,
-      price_min_t3: accommodation.properties.price_min_t3 ?? null,
-      price_max_t3: accommodation.properties.price_max_t3 ?? null,
-      price_min_t4: accommodation.properties.price_min_t4 ?? null,
-      price_max_t4: accommodation.properties.price_max_t4 ?? null,
-      price_min_t5: accommodation.properties.price_min_t5 ?? null,
-      price_max_t5: accommodation.properties.price_max_t5 ?? null,
-      price_min_t6: accommodation.properties.price_min_t6 ?? null,
-      price_max_t6: accommodation.properties.price_max_t6 ?? null,
-      price_min_t7_more: accommodation.properties.price_min_t7_more ?? null,
-      price_max_t7_more: accommodation.properties.price_max_t7_more ?? null,
-
-      superficie_min_t1: accommodation.properties.superficie_min_t1 ?? null,
-      superficie_max_t1: accommodation.properties.superficie_max_t1 ?? null,
-      superficie_min_t1_bis: accommodation.properties.superficie_min_t1_bis ?? null,
-      superficie_max_t1_bis: accommodation.properties.superficie_max_t1_bis ?? null,
-      superficie_min_t2: accommodation.properties.superficie_min_t2 ?? null,
-      superficie_max_t2: accommodation.properties.superficie_max_t2 ?? null,
-      superficie_min_t3: accommodation.properties.superficie_min_t3 ?? null,
-      superficie_max_t3: accommodation.properties.superficie_max_t3 ?? null,
-      superficie_min_t4: accommodation.properties.superficie_min_t4 ?? null,
-      superficie_max_t4: accommodation.properties.superficie_max_t4 ?? null,
-      superficie_min_t5: accommodation.properties.superficie_min_t5 ?? null,
-      superficie_max_t5: accommodation.properties.superficie_max_t5 ?? null,
-      superficie_min_t6: accommodation.properties.superficie_min_t6 ?? null,
-      superficie_max_t6: accommodation.properties.superficie_max_t6 ?? null,
-      superficie_min_t7_more: accommodation.properties.superficie_min_t7_more ?? null,
-      superficie_max_t7_more: accommodation.properties.superficie_max_t7_more ?? null,
-
-      refrigerator: accommodation.properties.refrigerator || false,
-      laundry_room: accommodation.properties.laundry_room || false,
-      bathroom: accommodation.properties.bathroom || undefined,
-      kitchen_type: accommodation.properties.kitchen_type || undefined,
-      microwave: accommodation.properties.microwave || false,
-      secure_access: accommodation.properties.secure_access || false,
-      parking: accommodation.properties.parking || false,
-      common_areas: accommodation.properties.common_areas || false,
-      bike_storage: accommodation.properties.bike_storage || false,
-      desk: accommodation.properties.desk || false,
-      residence_manager: accommodation.properties.residence_manager || false,
-      cooking_plates: accommodation.properties.cooking_plates || false,
-      wifi: accommodation.properties.wifi || false,
-      images_urls: accommodation.properties.images_urls || [],
-      published: accommodation.properties.published,
-      scholarship_holders_priority: accommodation.properties.scholarship_holders_priority || false,
-      social_housing_required: accommodation.properties.social_housing_required || false,
-      nb_accessible_apartments: accommodation.properties.nb_accessible_apartments ?? null,
-      nb_coliving_apartments: accommodation.properties.nb_coliving_apartments ?? null,
+      refrigerator: accommodation.refrigerator || false,
+      laundryRoom: accommodation.laundryRoom || false,
+      bathroom: accommodation.bathroom || undefined,
+      kitchenType: accommodation.kitchenType || undefined,
+      microwave: accommodation.microwave || false,
+      secureAccess: accommodation.secureAccess || false,
+      parking: accommodation.parking || false,
+      commonAreas: accommodation.commonAreas || false,
+      bikeStorage: accommodation.bikeStorage || false,
+      desk: accommodation.desk || false,
+      residenceManager: accommodation.residenceManager || false,
+      cookingPlates: accommodation.cookingPlates || false,
+      wifi: accommodation.wifi || false,
+      imagesUrls: accommodation.imagesUrls || [],
+      published: accommodation.published,
+      scholarshipHoldersPriority: accommodation.scholarshipHoldersPriority || false,
+      socialHousingRequired: accommodation.socialHousingRequired || false,
+      nbAccessibleApartments: accommodation.nbAccessibleApartments ?? null,
+      nbColivingApartments: accommodation.nbColivingApartments ?? null,
     },
   })
 
@@ -153,7 +93,7 @@ export const UpdateResidenceForm = ({ accommodation }: { accommodation: TAccomod
       description: data.description ? sanitizeHTML(data.description) : data.description,
     }
     await updateMutation.mutateAsync(sanitizedData)
-    trackEvent({ category: 'Espace Gestionnaire', action: 'mise a jour residence', name: accommodation.properties.slug })
+    trackEvent({ category: 'Espace Gestionnaire', action: 'mise a jour residence', name: accommodation.slug })
   }
 
   return (
@@ -161,10 +101,10 @@ export const UpdateResidenceForm = ({ accommodation }: { accommodation: TAccomod
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="fr-flex fr-direction-row fr-justify-content-space-between fr-align-items-md-center fr-flex-gap-4v">
           <div className="fr-flex fr-flex-gap-2v fr-align-items-center">
-            <h1 className="fr-mb-0">{accommodation.properties.name}</h1>
-            <Tag>{`${city} (${accommodation.properties.postal_code})`}</Tag>
+            <h1 className="fr-mb-0">{accommodation.name}</h1>
+            <Tag>{`${city} (${accommodation.postalCode})`}</Tag>
           </div>
-          <UpdateResidencePublication onSubmit={onSubmit} slug={accommodation.properties.slug} />
+          <UpdateResidencePublication onSubmit={onSubmit} slug={accommodation.slug} />
         </div>
         <div className="fr-flex fr-direction-md-row fr-direction-column fr-justify-content-space-between fr-py-4w fr-flex-gap-4v">
           <div className={clsx(styles.container, 'fr-col-md-8 boxShadow')}>
@@ -178,7 +118,7 @@ export const UpdateResidenceForm = ({ accommodation }: { accommodation: TAccomod
           </div>
           <div className={clsx(styles.container, styles.stickyColumn, 'fr-width-full boxShadow')}>
             <div className="fr-flex fr-justify-content-center fr-p-6w">
-              <span className="fr-mb-0 fr-text--xs">Dernière modification {formatRelativeTime(accommodation.properties.updated_at)}</span>
+              <span className="fr-mb-0 fr-text--xs">Dernière modification {formatRelativeTime(accommodation.updatedAt)}</span>
             </div>
             <ResidenceRedirection className="fr-border-top" />
             <div className="fr-flex fr-flex-gap-4v fr-justify-content-center fr-p-2w fr-p-md-4w">
@@ -190,8 +130,7 @@ export const UpdateResidenceForm = ({ accommodation }: { accommodation: TAccomod
                 linkProps={{
                   href: redirectUri,
                   target: '_blank',
-                  onClick: () =>
-                    trackEvent({ category: 'Espace Gestionnaire', action: 'decouvrir-offre', name: accommodation.properties.slug }),
+                  onClick: () => trackEvent({ category: 'Espace Gestionnaire', action: 'decouvrir-offre', name: accommodation.slug }),
                 }}
               >
                 Voir la fiche

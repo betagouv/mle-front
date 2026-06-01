@@ -22,7 +22,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.list({})
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('published-with-geom')
+    expect(result.results[0].slug).toBe('published-with-geom')
   })
 
   it('filters by bbox', async () => {
@@ -37,7 +37,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.list({ bbox: '2.0,48.5,3.0,49.0' })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('inside-bbox')
+    expect(result.results[0].slug).toBe('inside-bbox')
   })
 
   it('filters by city radius using listExpandedByCity (outside boundary, within radius)', async () => {
@@ -76,7 +76,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.listExpandedByCity({ city: 'paris' })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('near-paris')
+    expect(result.results[0].slug).toBe('near-paris')
   })
 
   it('listExpandedByCity excludes accommodations inside the city boundary', async () => {
@@ -115,7 +115,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.listExpandedByCity({ city: 'toulouse' })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('near-toulouse')
+    expect(result.results[0].slug).toBe('near-toulouse')
   })
 
   it('listExpandedByCity never returns accommodations from the same city regardless of pagination', async () => {
@@ -156,7 +156,7 @@ describe('accommodations.list', () => {
 
     // Call without excludeIds — boundary exclusion alone must filter all in-city results
     const result = await caller.accommodations.listExpandedByCity({ city: 'marseille' })
-    expect(result.results.features.every((f) => f.properties.slug === 'near-marseille-outside')).toBe(true)
+    expect(result.results.every((f) => f.slug === 'near-marseille-outside')).toBe(true)
     expect(result.count).toBe(1)
   })
 
@@ -204,7 +204,7 @@ describe('accommodations.list', () => {
       excludeIds: [excluded.id],
     })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('near-lyon-kept')
+    expect(result.results[0].slug).toBe('near-lyon-kept')
   })
 
   it('listExpandedByCity applies filters to results outside the city', async () => {
@@ -248,7 +248,7 @@ describe('accommodations.list', () => {
       isAccessible: true,
     })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('near-nantes-accessible')
+    expect(result.results[0].slug).toBe('near-nantes-accessible')
   })
 
   it('cityId combined with other filters', async () => {
@@ -293,7 +293,7 @@ describe('accommodations.list', () => {
       isAccessible: true,
     })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('bordeaux-cheap-accessible')
+    expect(result.results[0].slug).toBe('bordeaux-cheap-accessible')
   })
 
   it('filters by isAccessible', async () => {
@@ -310,7 +310,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.list({ isAccessible: true })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('accessible')
+    expect(result.results[0].slug).toBe('accessible')
   })
 
   it('filters by hasColiving', async () => {
@@ -327,7 +327,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.list({ hasColiving: true })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('coliving')
+    expect(result.results[0].slug).toBe('coliving')
   })
 
   it('filters by priceMax', async () => {
@@ -344,7 +344,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.list({ priceMax: 500 })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('cheap')
+    expect(result.results[0].slug).toBe('cheap')
   })
 
   it('filters by viewCrous=true (only crous)', async () => {
@@ -361,7 +361,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.list({ viewCrous: true })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('crous-residence')
+    expect(result.results[0].slug).toBe('crous-residence')
   })
 
   it('excludes crous when viewCrous is false', async () => {
@@ -378,7 +378,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.list({ viewCrous: false })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('non-crous-res')
+    expect(result.results[0].slug).toBe('non-crous-res')
   })
 
   it('excludes crous when viewCrous is not specified (default false)', async () => {
@@ -395,7 +395,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.list({})
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('non-crous-default')
+    expect(result.results[0].slug).toBe('non-crous-default')
   })
 
   it('filters by cityId (spatial — strict city boundary)', async () => {
@@ -432,7 +432,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.list({ cityId: city.id })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('in-lille')
+    expect(result.results[0].slug).toBe('in-lille')
   })
 
   it('cityId takes priority over bbox', async () => {
@@ -473,7 +473,7 @@ describe('accommodations.list', () => {
       bbox: '2.9,50.5,3.2,50.7',
     })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('in-city-boundary')
+    expect(result.results[0].slug).toBe('in-city-boundary')
   })
 
   it('cityId with unknown id returns no results', async () => {
@@ -516,7 +516,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.list({ academyId: academy.id })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('in-academy')
+    expect(result.results[0].slug).toBe('in-academy')
   })
 
   it('orders by priority (available first)', async () => {
@@ -534,8 +534,8 @@ describe('accommodations.list', () => {
     })
 
     const result = await caller.accommodations.list({})
-    expect(result.results.features[0].properties.slug).toBe('has-availability')
-    expect(result.results.features[1].properties.slug).toBe('no-availability')
+    expect(result.results[0].slug).toBe('has-availability')
+    expect(result.results[1].slug).toBe('no-availability')
   })
 
   it('paginates correctly', async () => {
@@ -548,12 +548,12 @@ describe('accommodations.list', () => {
 
     const page1 = await caller.accommodations.list({ page: 1, pageSize: 2 })
     expect(page1.count).toBe(5)
-    expect(page1.page_size).toBe(2)
-    expect(page1.results.features).toHaveLength(2)
+    expect(page1.pageSize).toBe(2)
+    expect(page1.results).toHaveLength(2)
     expect(page1.next).toBe('2')
 
     const page3 = await caller.accommodations.list({ page: 3, pageSize: 2 })
-    expect(page3.results.features).toHaveLength(1)
+    expect(page3.results).toHaveLength(1)
     expect(page3.next).toBeNull()
     expect(page3.previous).toBe('2')
   })
@@ -575,8 +575,8 @@ describe('accommodations.list', () => {
     })
 
     const result = await caller.accommodations.list({})
-    expect(result.min_price).toBe(150)
-    expect(result.max_price).toBe(600)
+    expect(result.minPrice).toBe(150)
+    expect(result.maxPrice).toBe(600)
   })
 
   it('filters by ownerSlug', async () => {
@@ -600,7 +600,7 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.list({ ownerSlug: 'promologis' })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('owned-by-promologis')
+    expect(result.results[0].slug).toBe('owned-by-promologis')
   })
 
   it('filters by ownerSlug — count and price bounds reflect the filter', async () => {
@@ -622,8 +622,8 @@ describe('accommodations.list', () => {
 
     const result = await caller.accommodations.list({ ownerSlug: 'bailleur-prix' })
     expect(result.count).toBe(1)
-    expect(result.min_price).toBe(200)
-    expect(result.max_price).toBe(400)
+    expect(result.minPrice).toBe(200)
+    expect(result.maxPrice).toBe(400)
   })
 
   it('falls back to all accommodations when ownerSlug does not match any owner', async () => {
@@ -640,7 +640,7 @@ describe('accommodations.list', () => {
     expect(result.count).toBe(2)
   })
 
-  it('returns GeoJSON format', async () => {
+  it('returns flat accommodation DTOs with inline coordinates', async () => {
     const owner = await createOwner({ name: 'CROUS', slug: 'crous', url: 'https://crous.fr' })
     await createAccommodation({
       slug: 'geojson-test',
@@ -649,12 +649,12 @@ describe('accommodations.list', () => {
     })
 
     const result = await caller.accommodations.list({})
-    const feature = result.results.features[0]
-    expect(feature.geometry.type).toBe('Point')
-    expect(feature.geometry.coordinates).toHaveLength(2)
+    const feature = result.results[0]
+    expect(feature.longitude).toBeCloseTo(2.35)
+    expect(feature.latitude).toBeCloseTo(48.85)
     expect(feature.id).toBeTypeOf('number')
-    expect(feature.properties.owner_name).toBe('CROUS')
-    expect(feature.properties.owner_url).toBe('https://crous.fr')
+    expect(feature.ownerName).toBe('CROUS')
+    expect(feature.ownerUrl).toBe('https://crous.fr')
   })
 })
 
@@ -675,7 +675,7 @@ describe('accommodations.list — filter combinations', () => {
 
     const result = await caller.accommodations.list({ onlyWithAvailability: true })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('available')
+    expect(result.results[0].slug).toBe('available')
   })
 
   it('combines isAccessible and hasColiving (intersection)', async () => {
@@ -700,7 +700,7 @@ describe('accommodations.list — filter combinations', () => {
 
     const result = await caller.accommodations.list({ isAccessible: true, hasColiving: true })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('accessible-and-coliving')
+    expect(result.results[0].slug).toBe('accessible-and-coliving')
   })
 
   it('combines priceMax and viewCrous', async () => {
@@ -726,7 +726,7 @@ describe('accommodations.list — filter combinations', () => {
 
     const result = await caller.accommodations.list({ viewCrous: true, priceMax: 500 })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('crous-cheap')
+    expect(result.results[0].slug).toBe('crous-cheap')
   })
 
   it('stacks all filters together', async () => {
@@ -768,7 +768,7 @@ describe('accommodations.list — filter combinations', () => {
       onlyWithAvailability: true,
     })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.slug).toBe('matches-all')
+    expect(result.results[0].slug).toBe('matches-all')
   })
 })
 
@@ -796,23 +796,22 @@ describe('accommodations.getBySlug', () => {
     expect(result.name).toBe('Résidence Détail')
     expect(result.description).toBe('A nice residence')
     expect(result.address).toBe('42 rue de la Paix')
-    expect(result.residence_type).toBe('residence-universitaire-conventionnee')
-    expect(result.nb_total_apartments).toBe(100)
-    expect(result.price_min_t1).toBe(200)
-    expect(result.price_max_t1).toBe(400)
-    expect(result.laundry_room).toBe(true)
+    expect(result.residenceType).toBe('residence-universitaire-conventionnee')
+    expect(result.nbTotalApartments).toBe(100)
+    expect(result.typologies.t1?.priceMin).toBe(200)
+    expect(result.typologies.t1?.priceMax).toBe(400)
+    expect(result.laundryRoom).toBe(true)
     expect(result.wifi).toBe(true)
     expect(result.parking).toBe(false)
-    expect(result.geom.type).toBe('Point')
-    expect(result.geom.coordinates).toEqual([2.35, 48.85])
+    expect(result.longitude).toBeCloseTo(2.35)
+    expect(result.latitude).toBeCloseTo(48.85)
     expect(result.owner).toEqual({
       name: 'CROUS',
       slug: 'crous',
       url: 'https://crous.fr',
-      landing_url: null,
-      image_base64: null,
-      accept_dossier_facile_applications: false,
-      landing_url: null,
+      imageBase64: null,
+      acceptDossierFacileApplications: false,
+      landingUrl: null,
     })
   })
 
@@ -835,15 +834,15 @@ describe('accommodations.getBySlug', () => {
     })
 
     const result = await caller.accommodations.getBySlug({ slug: 'amenities-test' })
-    expect(result.laundry_room).toBe(true)
-    expect(result.common_areas).toBe(true)
-    expect(result.bike_storage).toBe(false)
+    expect(result.laundryRoom).toBe(true)
+    expect(result.commonAreas).toBe(true)
+    expect(result.bikeStorage).toBe(false)
     expect(result.parking).toBe(true)
-    expect(result.secure_access).toBe(true)
-    expect(result.residence_manager).toBe(true)
-    expect(result.kitchen_type).toBe('private')
+    expect(result.secureAccess).toBe(true)
+    expect(result.residenceManager).toBe(true)
+    expect(result.kitchenType).toBe('private')
     expect(result.desk).toBe(true)
-    expect(result.cooking_plates).toBe(true)
+    expect(result.cookingPlates).toBe(true)
     expect(result.microwave).toBe(false)
     expect(result.refrigerator).toBe(true)
     expect(result.bathroom).toBe('private')
@@ -862,11 +861,11 @@ describe('accommodations.getBySlug', () => {
     })
 
     const result = await caller.accommodations.getBySlug({ slug: 'prices-test' })
-    expect(result.price_min_t1).toBe(200)
-    expect(result.price_max_t1).toBe(400)
-    expect(result.price_min_t2).toBe(300)
-    expect(result.price_max_t2).toBe(600)
-    expect(result.price_max).toBe(800)
+    expect(result.typologies.t1?.priceMin).toBe(200)
+    expect(result.typologies.t1?.priceMax).toBe(400)
+    expect(result.typologies.t2?.priceMin).toBe(300)
+    expect(result.typologies.t2?.priceMax).toBe(600)
+    expect(result.priceMax).toBe(800)
   })
 
   it('throws NOT_FOUND for unknown slug', async () => {

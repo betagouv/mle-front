@@ -16,8 +16,9 @@ export const FindStudentAccommodationPrice = ({ pageSize, widget }: FindStudentA
   const t = useTranslations('findAccomodation')
   const { data, isLoading } = useAccomodations({ pageSize })
 
-  // Borne haute = max des résultats de la recherche, arrondi à la centaine supérieure.
-  const max = data?.max_price ? Math.ceil(data.max_price / 100) * 100 : undefined
+  const step = 50
+  const min = data?.minPrice ? Math.floor(data.minPrice / step) * step : undefined
+  const max = data?.maxPrice ? Math.ceil(data.maxPrice / 100) * 100 : undefined
 
   const [queryStates, setQueryStates] = useQueryStates({
     prix: parseAsInteger,

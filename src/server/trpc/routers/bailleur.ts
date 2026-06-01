@@ -4,7 +4,7 @@ import { sanitize } from 'isomorphic-dompurify'
 import { SignJWT } from 'jose'
 
 import { z } from 'zod'
-import { transformTypologiesToFlat, ZCreateResidence } from '~/schemas/accommodations/create-residence'
+import { ZCreateResidence } from '~/schemas/accommodations/create-residence'
 import { ZUpdateResidence } from '~/schemas/accommodations/update-residence'
 import { ZUpdateResidenceList } from '~/schemas/accommodations/update-residence-list'
 import { zCreateBailleurUser, zUpdateBailleurUser } from '~/schemas/bailleur-users/bailleur-user-form'
@@ -12,24 +12,25 @@ import { getOwnerForUser } from '~/server/bailleur/get-owner-for-user'
 import { ADMIN_ONLY_PERMISSIONS, canGrantAdministratorRights } from '~/server/bailleur/permissions'
 import { db } from '~/server/db'
 import { accommodationAddresses } from '~/server/db/schema/accommodation-addresses'
+import { accommodationTypologies } from '~/server/db/schema/accommodation-typologies'
 import { accommodations } from '~/server/db/schema/accommodations'
 import { user } from '~/server/db/schema/auth'
 import { cities } from '~/server/db/schema/cities'
 import { dossierFacileApplications, dossierFacileDocuments, dossierFacileTenants } from '~/server/db/schema/dossier-facile'
 import { owners } from '~/server/db/schema/owners'
+import { persistTypologies, typologyAggregates } from '~/server/lib/typologies'
 import { classifyActions, computeDiff } from '~/server/services/accommodation-diff'
 import { logActivity } from '~/server/services/activity-logger'
 import { triggerAlertDetection } from '~/server/services/alert-detection-trigger'
 import { sendOwnerWelcomeEmail, syncBrevoDataUpdated } from '~/server/services/brevo'
-import { computeDerivedFields, generateSlug, geocodeAddress } from '~/server/trpc/utils/accommodation-helpers'
-import { AVAILABILITY_FIELD_MAP, mapFields, UPDATE_FIELD_MAP } from '~/server/trpc/utils/field-mapping'
+import { generateSlug, geocodeAddress } from '~/server/trpc/utils/accommodation-helpers'
 import { resolveCityId } from '~/server/trpc/utils/resolve-city'
 import { getJwtSecret } from '~/server/utils/jwt-secret'
 import { findAvailableSlug } from '~/server/utils/slug'
 import { normalizeAccommodationName } from '~/utils/normalize-accommodation-name'
 import { RICH_TEXT_ALLOWED_ATTR, RICH_TEXT_ALLOWED_TAGS } from '~/utils/sanitize-config'
 import { bailleurProcedure, createTRPCRouter, ownerProcedure } from '../init'
-import { mapToGeoJsonFeature, priceMaxComputed } from './accommodations'
+import { priceMaxComputed, rowsToAccommodationDTOs } from './accommodations'
 
 async function verifyOwnerAccess(userId: string, accommodationSlug: string) {
   const usr = await db.query.user.findFirst({
@@ -96,18 +97,6 @@ async function verifyOwnership(slug: string, userId: string) {
 
 const PAGE_SIZE = 20
 
-const TYPOLOGY_COUNT_FIELDS = ['nb_t1', 'nb_t1_bis', 'nb_t2', 'nb_t3', 'nb_t4', 'nb_t5', 'nb_t6', 'nb_t7_more'] as const
-const PRICE_MIN_FIELDS = [
-  'price_min_t1',
-  'price_min_t1_bis',
-  'price_min_t2',
-  'price_min_t3',
-  'price_min_t4',
-  'price_min_t5',
-  'price_min_t6',
-  'price_min_t7_more',
-] as const
-
 function hasOwnField<T extends string>(fields: Record<string, unknown>, key: T) {
   return Object.hasOwn(fields, key)
 }
@@ -127,55 +116,7 @@ const accommodationSelectFields = {
   nbTotalApartments: accommodations.nbTotalApartments,
   nbAccessibleApartments: accommodations.nbAccessibleApartments,
   nbColivingApartments: accommodations.nbColivingApartments,
-  nbT1: accommodations.nbT1,
-  nbT1Bis: accommodations.nbT1Bis,
-  nbT2: accommodations.nbT2,
-  nbT3: accommodations.nbT3,
-  nbT4: accommodations.nbT4,
-  nbT5: accommodations.nbT5,
-  nbT6: accommodations.nbT6,
-  nbT7More: accommodations.nbT7More,
-  nbT1Available: accommodations.nbT1Available,
-  nbT1BisAvailable: accommodations.nbT1BisAvailable,
-  nbT2Available: accommodations.nbT2Available,
-  nbT3Available: accommodations.nbT3Available,
-  nbT4Available: accommodations.nbT4Available,
-  nbT5Available: accommodations.nbT5Available,
-  nbT6Available: accommodations.nbT6Available,
-  nbT7MoreAvailable: accommodations.nbT7MoreAvailable,
   priceMin: accommodations.priceMin,
-  priceMinT1: accommodations.priceMinT1,
-  priceMaxT1: accommodations.priceMaxT1,
-  priceMinT1Bis: accommodations.priceMinT1Bis,
-  priceMaxT1Bis: accommodations.priceMaxT1Bis,
-  priceMinT2: accommodations.priceMinT2,
-  priceMaxT2: accommodations.priceMaxT2,
-  priceMinT3: accommodations.priceMinT3,
-  priceMaxT3: accommodations.priceMaxT3,
-  priceMinT4: accommodations.priceMinT4,
-  priceMaxT4: accommodations.priceMaxT4,
-  priceMinT5: accommodations.priceMinT5,
-  priceMaxT5: accommodations.priceMaxT5,
-  priceMinT6: accommodations.priceMinT6,
-  priceMaxT6: accommodations.priceMaxT6,
-  priceMinT7More: accommodations.priceMinT7More,
-  priceMaxT7More: accommodations.priceMaxT7More,
-  superficieMinT1: accommodations.superficieMinT1,
-  superficieMaxT1: accommodations.superficieMaxT1,
-  superficieMinT1Bis: accommodations.superficieMinT1Bis,
-  superficieMaxT1Bis: accommodations.superficieMaxT1Bis,
-  superficieMinT2: accommodations.superficieMinT2,
-  superficieMaxT2: accommodations.superficieMaxT2,
-  superficieMinT3: accommodations.superficieMinT3,
-  superficieMaxT3: accommodations.superficieMaxT3,
-  superficieMinT4: accommodations.superficieMinT4,
-  superficieMaxT4: accommodations.superficieMaxT4,
-  superficieMinT5: accommodations.superficieMinT5,
-  superficieMaxT5: accommodations.superficieMaxT5,
-  superficieMinT6: accommodations.superficieMinT6,
-  superficieMaxT6: accommodations.superficieMaxT6,
-  superficieMinT7More: accommodations.superficieMinT7More,
-  superficieMaxT7More: accommodations.superficieMaxT7More,
   priceMaxComputed,
   acceptWaitingList: accommodations.acceptWaitingList,
   scholarshipHoldersPriority: accommodations.scholarshipHoldersPriority,
@@ -208,12 +149,12 @@ export const bailleurRouter = createTRPCRouter({
       if (!owner) {
         return {
           count: 0,
-          page_size: PAGE_SIZE,
+          pageSize: PAGE_SIZE,
           next: null,
           previous: null,
-          min_price: null,
-          max_price: null,
-          results: { features: [] },
+          minPrice: null,
+          maxPrice: null,
+          results: [],
         }
       }
 
@@ -225,18 +166,7 @@ export const bailleurRouter = createTRPCRouter({
       }
 
       if (input.hasAvailability) {
-        conditions.push(
-          or(
-            gt(accommodations.nbT1Available, 0),
-            gt(accommodations.nbT1BisAvailable, 0),
-            gt(accommodations.nbT2Available, 0),
-            gt(accommodations.nbT3Available, 0),
-            gt(accommodations.nbT4Available, 0),
-            gt(accommodations.nbT5Available, 0),
-            gt(accommodations.nbT6Available, 0),
-            gt(accommodations.nbT7MoreAvailable, 0),
-          )!,
-        )
+        conditions.push(gt(accommodations.nbAvailableApartments, 0))
       }
 
       const where = and(...conditions)
@@ -284,19 +214,17 @@ export const bailleurRouter = createTRPCRouter({
 
       return {
         count,
-        page_size: PAGE_SIZE,
+        pageSize: PAGE_SIZE,
         next: input.page < totalPages ? String(input.page + 1) : null,
         previous: input.page > 1 ? String(input.page - 1) : null,
-        min_price: priceBounds[0]?.minPrice != null ? Number(priceBounds[0].minPrice) : null,
-        max_price: priceBounds[0]?.maxPrice != null ? Number(priceBounds[0].maxPrice) : null,
-        results: {
-          features: results.map(mapToGeoJsonFeature),
-        },
+        minPrice: priceBounds[0]?.minPrice != null ? Number(priceBounds[0].minPrice) : null,
+        maxPrice: priceBounds[0]?.maxPrice != null ? Number(priceBounds[0].maxPrice) : null,
+        results: await rowsToAccommodationDTOs(results as unknown as Record<string, unknown>[]),
       }
     }),
   create: bailleurProcedure('manage_residences')
     .input(
-      ZCreateResidence.omit({ images_files: true }).extend({
+      ZCreateResidence.omit({ imagesFiles: true }).extend({
         name: z.string().min(1, 'Le nom de la résidence est requis'),
         ownerId: z.number().int().positive().optional(),
       }),
@@ -309,108 +237,61 @@ export const bailleurRouter = createTRPCRouter({
       }
 
       const { typologies, name, addresses, ...fields } = input
-      const flatTypologies = transformTypologiesToFlat(typologies)
 
       const slug = await findAvailableSlug(generateSlug(name), db, accommodations)
 
-      // Compute derived fields from flat typologies
-      const derived = computeDerivedFields({ ...flatTypologies })
+      // Denormalized aggregates computed from the typology array (child rows persisted below).
+      const aggregates = typologyAggregates(typologies)
 
       const insertValues: typeof accommodations.$inferInsert = {
         name: normalizeAccommodationName(name),
         slug,
-        residenceType: fields.residence_type ?? null,
-        targetAudience: fields.target_audience ?? null,
+        residenceType: fields.residenceType ?? null,
+        targetAudience: fields.targetAudience ?? null,
         description: fields.description
           ? sanitize(fields.description, { ALLOWED_TAGS: RICH_TEXT_ALLOWED_TAGS, ALLOWED_ATTR: RICH_TEXT_ALLOWED_ATTR })
           : null,
-        rentalChargesDetails: fields.rental_charges_details ?? null,
-        externalUrl: fields.external_url || null,
-        acceptWaitingList: fields.accept_waiting_list ?? false,
+        rentalChargesDetails: fields.rentalChargesDetails ?? null,
+        externalUrl: fields.externalUrl || null,
+        acceptWaitingList: fields.acceptWaitingList ?? false,
         published: fields.published ?? false,
-        scholarshipHoldersPriority: fields.scholarship_holders_priority ?? false,
-        socialHousingRequired: fields.social_housing_required ?? false,
+        scholarshipHoldersPriority: fields.scholarshipHoldersPriority ?? false,
+        socialHousingRequired: fields.socialHousingRequired ?? false,
         ownerId: owner.id,
-        nbTotalApartments: derived.nbTotalApartments,
-        priceMin: derived.priceMin,
-        imagesCount: derived.imagesCount,
+        nbTotalApartments: aggregates.nbTotalApartments,
+        priceMin: aggregates.priceMin,
+        priceMax: aggregates.priceMax,
+        nbAvailableApartments: aggregates.nbAvailableApartments,
+        imagesCount: 0,
         imagesUrls: [],
-        // Typology counts
-        nbT1: flatTypologies.nb_t1 as number | null,
-        nbT1Bis: flatTypologies.nb_t1_bis as number | null,
-        nbT2: flatTypologies.nb_t2 as number | null,
-        nbT3: flatTypologies.nb_t3 as number | null,
-        nbT4: flatTypologies.nb_t4 as number | null,
-        nbT5: flatTypologies.nb_t5 as number | null,
-        nbT6: flatTypologies.nb_t6 as number | null,
-        nbT7More: flatTypologies.nb_t7_more as number | null,
-        // Availability
-        nbT1Available: flatTypologies.nb_t1_available as number | null,
-        nbT1BisAvailable: flatTypologies.nb_t1_bis_available as number | null,
-        nbT2Available: flatTypologies.nb_t2_available as number | null,
-        nbT3Available: flatTypologies.nb_t3_available as number | null,
-        nbT4Available: flatTypologies.nb_t4_available as number | null,
-        nbT5Available: flatTypologies.nb_t5_available as number | null,
-        nbT6Available: flatTypologies.nb_t6_available as number | null,
-        nbT7MoreAvailable: flatTypologies.nb_t7_more_available as number | null,
-        // Pricing
-        priceMinT1: flatTypologies.price_min_t1 as number | null,
-        priceMaxT1: flatTypologies.price_max_t1 as number | null,
-        priceMinT1Bis: flatTypologies.price_min_t1_bis as number | null,
-        priceMaxT1Bis: flatTypologies.price_max_t1_bis as number | null,
-        priceMinT2: flatTypologies.price_min_t2 as number | null,
-        priceMaxT2: flatTypologies.price_max_t2 as number | null,
-        priceMinT3: flatTypologies.price_min_t3 as number | null,
-        priceMaxT3: flatTypologies.price_max_t3 as number | null,
-        priceMinT4: flatTypologies.price_min_t4 as number | null,
-        priceMaxT4: flatTypologies.price_max_t4 as number | null,
-        priceMinT5: flatTypologies.price_min_t5 as number | null,
-        priceMaxT5: flatTypologies.price_max_t5 as number | null,
-        priceMinT6: flatTypologies.price_min_t6 as number | null,
-        priceMaxT6: flatTypologies.price_max_t6 as number | null,
-        priceMinT7More: flatTypologies.price_min_t7_more as number | null,
-        priceMaxT7More: flatTypologies.price_max_t7_more as number | null,
-        // Superficie
-        superficieMinT1: flatTypologies.superficie_min_t1 as number | null,
-        superficieMaxT1: flatTypologies.superficie_max_t1 as number | null,
-        superficieMinT1Bis: flatTypologies.superficie_min_t1_bis as number | null,
-        superficieMaxT1Bis: flatTypologies.superficie_max_t1_bis as number | null,
-        superficieMinT2: flatTypologies.superficie_min_t2 as number | null,
-        superficieMaxT2: flatTypologies.superficie_max_t2 as number | null,
-        superficieMinT3: flatTypologies.superficie_min_t3 as number | null,
-        superficieMaxT3: flatTypologies.superficie_max_t3 as number | null,
-        superficieMinT4: flatTypologies.superficie_min_t4 as number | null,
-        superficieMaxT4: flatTypologies.superficie_max_t4 as number | null,
-        superficieMinT5: flatTypologies.superficie_min_t5 as number | null,
-        superficieMaxT5: flatTypologies.superficie_max_t5 as number | null,
-        superficieMinT6: flatTypologies.superficie_min_t6 as number | null,
-        superficieMaxT6: flatTypologies.superficie_max_t6 as number | null,
-        superficieMinT7More: flatTypologies.superficie_min_t7_more as number | null,
-        superficieMaxT7More: flatTypologies.superficie_max_t7_more as number | null,
-        // Amenities (defaults)
+        // Independent (caller-set) aggregates, not derived from typologies
         nbAccessibleApartments: 0,
         nbColivingApartments: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       }
 
-      const [created] = await db
-        .insert(accommodations)
-        .values(insertValues)
-        .returning({ id: accommodations.id, slug: accommodations.slug, name: accommodations.name })
+      const created = await db.transaction(async (tx) => {
+        const [row] = await tx
+          .insert(accommodations)
+          .values(insertValues)
+          .returning({ id: accommodations.id, slug: accommodations.slug, name: accommodations.name })
+        await persistTypologies(tx, row.id, typologies)
+        return row
+      })
 
       // Geocode + resolve cities in parallel, then batch insert
       const resolved = await Promise.all(
         addresses.map(async (addr, i) => {
           const [coords, cityId] = await Promise.all([
-            geocodeAddress(addr.address, addr.city, addr.postal_code),
-            resolveCityId(addr.postal_code, addr.city),
+            geocodeAddress(addr.address, addr.city, addr.postalCode),
+            resolveCityId(addr.postalCode, addr.city),
           ])
           const values: typeof accommodationAddresses.$inferInsert = {
             accommodationId: created.id,
             isMain: i === 0,
             address: addr.address,
-            postalCode: addr.postal_code,
+            postalCode: addr.postalCode,
             cityId,
           }
           if (coords) {
@@ -440,13 +321,14 @@ export const bailleurRouter = createTRPCRouter({
   update: bailleurProcedure('manage_residences')
     .input(z.object({ slug: z.string() }).merge(ZUpdateResidence))
     .mutation(async ({ ctx, input }) => {
-      const { slug, addresses: inputAddresses, ...fields } = input
+      const { slug, addresses: inputAddresses, typologies, ...fields } = input
       const { owner, accommodationId } = await verifyOwnership(slug, ctx.session.user.id)
 
       // Snapshot current state for diff
       const [snapshot] = await db.select().from(accommodations).where(eq(accommodations.slug, slug)).limit(1)
 
-      const camelFields = mapFields(fields, UPDATE_FIELD_MAP)
+      // Input fields are already camelCase = DB column names, so no snake→camel mapping is needed.
+      const camelFields: Record<string, unknown> = { ...fields }
       if (typeof camelFields.name === 'string') {
         camelFields.name = normalizeAccommodationName(camelFields.name)
       }
@@ -457,32 +339,19 @@ export const bailleurRouter = createTRPCRouter({
         })
       }
       const userProvidedKeys = new Set(Object.keys(camelFields))
+      const parentSet: Record<string, unknown> = { ...camelFields }
 
-      const hasTypologyCountUpdate = TYPOLOGY_COUNT_FIELDS.some((key) => hasOwnField(fields, key))
-      const hasPriceMinUpdate = PRICE_MIN_FIELDS.some((key) => hasOwnField(fields, key))
-      const hasImagesUpdate = hasOwnField(fields, 'images_urls')
+      if (hasOwnField(fields, 'imagesUrls')) {
+        parentSet.imagesCount = fields.imagesUrls?.length ?? 0
+      }
 
-      if (hasTypologyCountUpdate) {
-        const derived = computeDerivedFields(fields)
-        camelFields.nbTotalApartments = derived.nbTotalApartments ?? snapshot?.nbTotalApartments ?? null
-      }
-      if (hasPriceMinUpdate) {
-        const currentPrices = {
-          price_min_t1: snapshot?.priceMinT1,
-          price_min_t1_bis: snapshot?.priceMinT1Bis,
-          price_min_t2: snapshot?.priceMinT2,
-          price_min_t3: snapshot?.priceMinT3,
-          price_min_t4: snapshot?.priceMinT4,
-          price_min_t5: snapshot?.priceMinT5,
-          price_min_t6: snapshot?.priceMinT6,
-          price_min_t7_more: snapshot?.priceMinT7More,
-        }
-        const derived = computeDerivedFields({ ...currentPrices, ...fields })
-        camelFields.priceMin = derived.priceMin
-      }
-      if (hasImagesUpdate) {
-        const derived = computeDerivedFields(fields)
-        camelFields.imagesCount = derived.imagesCount
+      // When typologies are provided, refresh the denormalized parent aggregates.
+      if (typologies) {
+        const aggregates = typologyAggregates(typologies)
+        parentSet.nbTotalApartments = aggregates.nbTotalApartments
+        parentSet.priceMin = aggregates.priceMin
+        parentSet.priceMax = aggregates.priceMax
+        parentSet.nbAvailableApartments = aggregates.nbAvailableApartments
       }
 
       // Handle addresses update
@@ -491,14 +360,14 @@ export const bailleurRouter = createTRPCRouter({
         const resolved = await Promise.all(
           inputAddresses.map(async (addr, i) => {
             const [coords, cityId] = await Promise.all([
-              geocodeAddress(addr.address, addr.city, addr.postal_code),
-              resolveCityId(addr.postal_code, addr.city),
+              geocodeAddress(addr.address, addr.city, addr.postalCode),
+              resolveCityId(addr.postalCode, addr.city),
             ])
             const values: typeof accommodationAddresses.$inferInsert = {
               accommodationId,
               isMain: i === 0,
               address: addr.address,
-              postalCode: addr.postal_code,
+              postalCode: addr.postalCode,
               cityId,
             }
             if (coords) {
@@ -511,13 +380,17 @@ export const bailleurRouter = createTRPCRouter({
         await db.insert(accommodationAddresses).values(resolved)
       }
 
-      camelFields.updatedAt = new Date()
+      parentSet.updatedAt = new Date()
 
-      const [updated] = await db
-        .update(accommodations)
-        .set(camelFields)
-        .where(eq(accommodations.slug, slug))
-        .returning({ slug: accommodations.slug, name: accommodations.name })
+      const updated = await db.transaction(async (tx) => {
+        if (typologies) await persistTypologies(tx, accommodationId, typologies)
+        const [row] = await tx
+          .update(accommodations)
+          .set(parentSet)
+          .where(eq(accommodations.slug, slug))
+          .returning({ slug: accommodations.slug, name: accommodations.name })
+        return row
+      })
 
       if (snapshot) {
         const diff = computeDiff(snapshot as Record<string, unknown>, camelFields, userProvidedKeys)
@@ -535,8 +408,9 @@ export const bailleurRouter = createTRPCRouter({
         }
       }
 
-      const availabilityTouched = Object.values(AVAILABILITY_FIELD_MAP).some((camelKey) => camelKey in camelFields)
-      if (availabilityTouched) {
+      // Les disponibilités passent désormais par les typologies : on redéclenche la détection d'alertes
+      // dès qu'un lot de typologies est fourni (superset sûr — la détection recompute de toute façon).
+      if (typologies !== undefined) {
         await triggerAlertDetection([accommodationId])
       }
 
@@ -546,41 +420,53 @@ export const bailleurRouter = createTRPCRouter({
   updateAvailability: bailleurProcedure('manage_availability')
     .input(z.object({ slug: z.string() }).merge(ZUpdateResidenceList))
     .mutation(async ({ ctx, input }) => {
-      const { slug, ...availFields } = input
+      const { slug, availability } = input
       const { owner, accommodationId } = await verifyOwnership(slug, ctx.session.user.id)
 
-      // Snapshot current state for diff
-      const [snapshot] = await db.select().from(accommodations).where(eq(accommodations.slug, slug)).limit(1)
+      // Overlay the new availability onto the current typology rows by type, then recompute aggregates.
+      const currentRows = await db
+        .select()
+        .from(accommodationTypologies)
+        .where(eq(accommodationTypologies.accommodationId, accommodationId))
+      const availByType = new Map(availability.map((a) => [a.type, a.nbAvailable]))
+      const newTypologies = currentRows.map((r) => ({
+        type: r.type,
+        priceMin: r.priceMin,
+        priceMax: r.priceMax,
+        superficieMin: r.superficieMin,
+        superficieMax: r.superficieMax,
+        nbTotal: r.nbTotal,
+        nbAvailable: availByType.has(r.type) ? (availByType.get(r.type) ?? null) : r.nbAvailable,
+        colocation: r.colocation,
+      }))
+      const aggregates = typologyAggregates(newTypologies)
 
-      const camelFields = mapFields(availFields, AVAILABILITY_FIELD_MAP)
-
-      const setFields = {
-        ...camelFields,
-        updatedAt: new Date(),
-      }
-
-      const [updated] = await db
-        .update(accommodations)
-        .set(setFields)
-        .where(eq(accommodations.slug, slug))
-        .returning({ slug: accommodations.slug, name: accommodations.name })
-
-      if (snapshot) {
-        const userKeys = new Set(Object.keys(camelFields))
-        const diff = computeDiff(snapshot as Record<string, unknown>, setFields, userKeys)
-        for (const { action, diff: actionDiff } of classifyActions(diff)) {
-          await logActivity({
-            userId: ctx.session.user.id,
-            userName: ctx.session.user.name,
-            action,
-            entityType: 'accommodation',
-            entityName: updated.name,
-            ownerId: owner?.id,
-            ownerName: owner?.name,
-            metadata: { slug: updated.slug, diff: actionDiff },
+      const updated = await db.transaction(async (tx) => {
+        await persistTypologies(tx, accommodationId, newTypologies)
+        const [row] = await tx
+          .update(accommodations)
+          .set({
+            nbTotalApartments: aggregates.nbTotalApartments,
+            priceMin: aggregates.priceMin,
+            priceMax: aggregates.priceMax,
+            nbAvailableApartments: aggregates.nbAvailableApartments,
+            updatedAt: new Date(),
           })
-        }
-      }
+          .where(eq(accommodations.slug, slug))
+          .returning({ slug: accommodations.slug, name: accommodations.name })
+        return row
+      })
+
+      await logActivity({
+        userId: ctx.session.user.id,
+        userName: ctx.session.user.name,
+        action: 'accommodation.availability_updated',
+        entityType: 'accommodation',
+        entityName: updated.name,
+        ownerId: owner?.id,
+        ownerName: owner?.name,
+        metadata: { slug: updated.slug },
+      })
 
       // Sync Brevo : si toutes les résidences du owner ont au moins une dispo renseignée
       try {
@@ -589,12 +475,7 @@ export const bailleurRouter = createTRPCRouter({
         const residencesWithoutAvailability = await db
           .select({ slug: accommodations.slug })
           .from(accommodations)
-          .where(
-            and(
-              eq(accommodations.ownerId, owner.id),
-              sql`coalesce(${accommodations.nbT1Available}, ${accommodations.nbT1BisAvailable}, ${accommodations.nbT2Available}, ${accommodations.nbT3Available}, ${accommodations.nbT4Available}, ${accommodations.nbT5Available}, ${accommodations.nbT6Available}, ${accommodations.nbT7MoreAvailable}) IS NULL`,
-            ),
-          )
+          .where(and(eq(accommodations.ownerId, owner.id), sql`${accommodations.nbAvailableApartments} IS NULL`))
           .limit(1)
 
         if (residencesWithoutAvailability.length === 0) {
@@ -757,7 +638,7 @@ export const bailleurRouter = createTRPCRouter({
           tenant: tenantDocs.filter((d) => d.ownerType === 'tenant').map(({ url: _url, ...rest }) => rest),
           guarantor: tenantDocs.filter((d) => d.ownerType === 'guarantor').map(({ url: _url, ...rest }) => rest),
         },
-        accommodation: mapToGeoJsonFeature(accommodation as unknown as Record<string, unknown>),
+        accommodation: (await rowsToAccommodationDTOs([accommodation as unknown as Record<string, unknown>]))[0],
       }
     }),
 

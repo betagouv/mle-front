@@ -7,6 +7,7 @@ import { IMPORT_JOB_TYPES, ZImportJobType } from '~/schemas/import-jobs'
 import { BAILLEUR_PERMISSIONS, BAILLEUR_ROLES } from '~/server/bailleur/permissions'
 import { db } from '~/server/db'
 import { accommodationAddresses } from '~/server/db/schema/accommodation-addresses'
+import { accommodationTypologies } from '~/server/db/schema/accommodation-typologies'
 import { accommodations } from '~/server/db/schema/accommodations'
 import { activityLog } from '~/server/db/schema/activity-log'
 import { adminOwnerLinks } from '~/server/db/schema/admin-owner-links'
@@ -25,12 +26,7 @@ import { consumersRouter } from './admin-consumers'
 
 const PAGE_SIZE = 20
 
-const nbAvailableApartmentsSum = sql<number>`(
-  coalesce(nb_t1_available, 0) + coalesce(nb_t1_bis_available, 0) +
-  coalesce(nb_t2_available, 0) + coalesce(nb_t3_available, 0) +
-  coalesce(nb_t4_available, 0) + coalesce(nb_t5_available, 0) +
-  coalesce(nb_t6_available, 0) + coalesce(nb_t7_more_available, 0)
-)::int`
+const nbAvailableApartmentsSum = sql<number>`coalesce(nb_available_apartments, 0)::int`
 const getAdminErrorTranslations = () => getTranslations('trpc.admin.errors')
 
 const usersRouter = createTRPCRouter({
@@ -548,22 +544,40 @@ const ownersRouter = createTRPCRouter({
   }),
 
   stats: adminProcedure.input(z.object({ ownerId: z.number() })).query(async ({ input }) => {
-    const result = await db
-      .select({
-        nbT1: sql<number>`coalesce(sum(coalesce(nb_t1, 0)), 0)::int`,
-        nbT1Bis: sql<number>`coalesce(sum(coalesce(nb_t1_bis, 0)), 0)::int`,
-        nbT2: sql<number>`coalesce(sum(coalesce(nb_t2, 0)), 0)::int`,
-        nbT3: sql<number>`coalesce(sum(coalesce(nb_t3, 0)), 0)::int`,
-        nbT4: sql<number>`coalesce(sum(coalesce(nb_t4, 0)), 0)::int`,
-        nbT5: sql<number>`coalesce(sum(coalesce(nb_t5, 0)), 0)::int`,
-        nbT6: sql<number>`coalesce(sum(coalesce(nb_t6, 0)), 0)::int`,
-        nbT7More: sql<number>`coalesce(sum(coalesce(nb_t7_more, 0)), 0)::int`,
-        nbColiving: sql<number>`coalesce(sum(coalesce(nb_coliving_apartments, 0)), 0)::int`,
-      })
-      .from(accommodations)
-      .where(eq(accommodations.ownerId, input.ownerId))
+    const typeCount = (type: string) =>
+      sql<number>`coalesce(sum(coalesce(${accommodationTypologies.nbTotal}, 0)) FILTER (WHERE ${accommodationTypologies.type} = ${type}), 0)::int`
+    const [typologyStats, colivingStats] = await Promise.all([
+      db
+        .select({
+          nbT1: typeCount('t1'),
+          nbT1Bis: typeCount('t1_bis'),
+          nbT2: typeCount('t2'),
+          nbT3: typeCount('t3'),
+          nbT4: typeCount('t4'),
+          nbT5: typeCount('t5'),
+          nbT6: typeCount('t6'),
+          nbT7More: typeCount('t7_more'),
+        })
+        .from(accommodationTypologies)
+        .innerJoin(accommodations, eq(accommodations.id, accommodationTypologies.accommodationId))
+        .where(eq(accommodations.ownerId, input.ownerId)),
+      db
+        .select({ nbColiving: sql<number>`coalesce(sum(coalesce(nb_coliving_apartments, 0)), 0)::int` })
+        .from(accommodations)
+        .where(eq(accommodations.ownerId, input.ownerId)),
+    ])
 
-    return result[0]!
+    return {
+      nbT1: typologyStats[0]?.nbT1 ?? 0,
+      nbT1Bis: typologyStats[0]?.nbT1Bis ?? 0,
+      nbT2: typologyStats[0]?.nbT2 ?? 0,
+      nbT3: typologyStats[0]?.nbT3 ?? 0,
+      nbT4: typologyStats[0]?.nbT4 ?? 0,
+      nbT5: typologyStats[0]?.nbT5 ?? 0,
+      nbT6: typologyStats[0]?.nbT6 ?? 0,
+      nbT7More: typologyStats[0]?.nbT7More ?? 0,
+      nbColiving: colivingStats[0]?.nbColiving ?? 0,
+    }
   }),
 })
 
@@ -645,24 +659,8 @@ const statsRouter = createTRPCRouter({
   overview: adminProcedure.query(async () => {
     const isCrous = sql`exists (select 1 from external_source where accommodation_id = ${accommodations.id} and source = 'crous')`
 
-    const availCols = [
-      accommodations.nbT1Available,
-      accommodations.nbT1BisAvailable,
-      accommodations.nbT2Available,
-      accommodations.nbT3Available,
-      accommodations.nbT4Available,
-      accommodations.nbT5Available,
-      accommodations.nbT6Available,
-      accommodations.nbT7MoreAvailable,
-    ]
-    const isAvailable = sql`(${sql.join(
-      availCols.map((c) => sql`${c} > 0`),
-      sql` OR `,
-    )})`
-    const isUnknown = sql`(${sql.join(
-      availCols.map((c) => sql`${c} IS NULL`),
-      sql` AND `,
-    )})`
+    const isAvailable = sql`(${accommodations.nbAvailableApartments} > 0)`
+    const isUnknown = sql`(${accommodations.nbAvailableApartments} IS NULL)`
 
     const [usersCount, ownersCount, accommodationsCount, apartmentsStats, residencesBreakdown, logementsBreakdown, availabilityBreakdown] =
       await Promise.all([

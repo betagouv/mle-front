@@ -24,7 +24,7 @@ const AddressAutocompleteRow = ({ index, onRemove, isMain }: { index: number; on
 
   const selectedAddress = watch(`addresses.${index}.address`)
   const selectedCity = watch(`addresses.${index}.city`)
-  const selectedPostalCode = watch(`addresses.${index}.postal_code`)
+  const selectedPostalCode = watch(`addresses.${index}.postalCode`)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -37,13 +37,13 @@ const AddressAutocompleteRow = ({ index, onRemove, isMain }: { index: number; on
     setInputValue(suggestion.label)
     setValue(`addresses.${index}.address`, suggestion.address, { shouldValidate: true })
     setValue(`addresses.${index}.city`, suggestion.city, { shouldValidate: true })
-    setValue(`addresses.${index}.postal_code`, suggestion.postalCode, { shouldValidate: true })
+    setValue(`addresses.${index}.postalCode`, suggestion.postalCode, { shouldValidate: true })
     setShowSuggestions(false)
     clearSuggestions()
   }
 
   const addressErrors = errors.addresses?.[index]
-  const hasAddressError = addressErrors?.address || addressErrors?.city || addressErrors?.postal_code
+  const hasAddressError = addressErrors?.address || addressErrors?.city || addressErrors?.postalCode
 
   const label = isMain ? (
     <>
@@ -132,7 +132,7 @@ export const CreateResidenceLocation = () => {
           />
         ))}
 
-        <Button type="button" priority="secondary" iconId="ri-add-line" onClick={() => append({ address: '', city: '', postal_code: '' })}>
+        <Button type="button" priority="secondary" iconId="ri-add-line" onClick={() => append({ address: '', city: '', postalCode: '' })}>
           {t('addAddress')}
         </Button>
       </div>

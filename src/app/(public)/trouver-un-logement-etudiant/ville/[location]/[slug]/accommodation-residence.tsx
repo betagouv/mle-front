@@ -18,99 +18,40 @@ type AccommodationResidenceProps = {
 
 export const AccommodationResidence = async ({ accommodation }: AccommodationResidenceProps) => {
   const t = await getTranslations('accomodation')
-  const { social_housing_required } = accommodation
-  const socialHousingApplicationLink = getSocialHousingApplicationLink(accommodation.department_code)
+  const { socialHousingRequired } = accommodation
+  const socialHousingApplicationLink = getSocialHousingApplicationLink(accommodation.departmentCode)
 
-  const accommodationsTiles = [
-    {
-      type: 'T1',
-      min: accommodation.price_min_t1,
-      max: accommodation.price_max_t1,
-      superficieMin: accommodation.superficie_min_t1,
-      superficieMax: accommodation.superficie_max_t1,
-      enabled: !!accommodation.nb_t1 && accommodation.price_min_t1,
-      title: t('studio', { type: 'T1' }),
-      tooltip: t('tooltip.t1'),
-    },
-    {
-      type: 'T1bis',
-      min: accommodation.price_min_t1_bis,
-      max: accommodation.price_max_t1_bis,
-      superficieMin: accommodation.superficie_min_t1_bis,
-      superficieMax: accommodation.superficie_max_t1_bis,
-      enabled: !!accommodation.nb_t1_bis && accommodation.price_min_t1_bis,
-      title: t('studio', { type: 'T1bis' }),
-      tooltip: t('tooltip.t1bis'),
-    },
-    {
-      type: 'T2',
-      min: accommodation.price_min_t2,
-      max: accommodation.price_max_t2,
-      superficieMin: accommodation.superficie_min_t2,
-      superficieMax: accommodation.superficie_max_t2,
-      enabled: !!accommodation.nb_t2 && accommodation.price_min_t2,
-      title: t('studio', { type: 'T2' }),
-      tooltip: t('tooltip.t2'),
-    },
-    {
-      type: 'T3',
-      min: accommodation.price_min_t3,
-      max: accommodation.price_max_t3,
-      superficieMin: accommodation.superficie_min_t3,
-      superficieMax: accommodation.superficie_max_t3,
-      enabled: !!accommodation.nb_t3 && accommodation.price_min_t3,
-      title: t('appartement', { type: 'T3' }),
-      tooltip: t('tooltip.t3'),
-    },
-    {
-      type: 'T4',
-      min: accommodation.price_min_t4,
-      max: accommodation.price_max_t4,
-      superficieMin: accommodation.superficie_min_t4,
-      superficieMax: accommodation.superficie_max_t4,
-      enabled: !!accommodation.nb_t4 && accommodation.price_min_t4,
-      title: t('appartement', { type: 'T4' }),
-      tooltip: t('tooltip.t4'),
-    },
-    {
-      type: 'T5',
-      min: accommodation.price_min_t5,
-      max: accommodation.price_max_t5,
-      superficieMin: accommodation.superficie_min_t5,
-      superficieMax: accommodation.superficie_max_t5,
-      enabled: !!accommodation.nb_t5 && accommodation.price_min_t5,
-      title: t('appartement', { type: 'T5' }),
-      tooltip: t('tooltip.t5'),
-    },
-    {
-      type: 'T6',
-      min: accommodation.price_min_t6,
-      max: accommodation.price_max_t6,
-      superficieMin: accommodation.superficie_min_t6,
-      superficieMax: accommodation.superficie_max_t6,
-      enabled: !!accommodation.nb_t6 && accommodation.price_min_t6,
-      title: t('appartement', { type: 'T6' }),
-      tooltip: t('tooltip.t6'),
-    },
-    {
-      type: 'T7+',
-      min: accommodation.price_min_t7_more,
-      max: accommodation.price_max_t7_more,
-      superficieMin: accommodation.superficie_min_t7_more,
-      superficieMax: accommodation.superficie_max_t7_more,
-      enabled: !!accommodation.nb_t7_more && accommodation.price_min_t7_more,
-      title: t('appartement', { type: 'T7+' }),
-      tooltip: t('tooltip.t7'),
-    },
-  ]
+  const tileDefs = [
+    { suffix: 't1', type: 'T1', title: t('studio', { type: 'T1' }), tooltip: t('tooltip.t1') },
+    { suffix: 't1_bis', type: 'T1bis', title: t('studio', { type: 'T1bis' }), tooltip: t('tooltip.t1bis') },
+    { suffix: 't2', type: 'T2', title: t('studio', { type: 'T2' }), tooltip: t('tooltip.t2') },
+    { suffix: 't3', type: 'T3', title: t('appartement', { type: 'T3' }), tooltip: t('tooltip.t3') },
+    { suffix: 't4', type: 'T4', title: t('appartement', { type: 'T4' }), tooltip: t('tooltip.t4') },
+    { suffix: 't5', type: 'T5', title: t('appartement', { type: 'T5' }), tooltip: t('tooltip.t5') },
+    { suffix: 't6', type: 'T6', title: t('appartement', { type: 'T6' }), tooltip: t('tooltip.t6') },
+    { suffix: 't7_more', type: 'T7+', title: t('appartement', { type: 'T7+' }), tooltip: t('tooltip.t7') },
+  ] as const
+  const accommodationsTiles = tileDefs.map(({ suffix, type, title, tooltip }) => {
+    const v = accommodation.typologies[suffix]
+    return {
+      type,
+      title,
+      tooltip,
+      min: v?.priceMin ?? null,
+      max: v?.priceMax ?? null,
+      superficieMin: v?.superficieMin ?? null,
+      superficieMax: v?.superficieMax ?? null,
+      enabled: !!v?.nbTotal && !!v?.priceMin,
+    }
+  })
 
   const hasAccommodations = accommodationsTiles.some((tile) => tile.enabled)
 
   if (!hasAccommodations) {
     return (
       <div className={styles.section}>
-        {accommodation.nb_total_apartments ? (
-          <h4>{t('availableAccommodationsCount', { count: accommodation.nb_total_apartments })}</h4>
+        {accommodation.nbTotalApartments ? (
+          <h4>{t('availableAccommodationsCount', { count: accommodation.nbTotalApartments })}</h4>
         ) : (
           <h4>{t('availableAccommodations')}</h4>
         )}{' '}
@@ -127,8 +68,8 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
   return (
     <div className={styles.section}>
       <div className={styles.sectionContent}>
-        {accommodation.nb_total_apartments ? (
-          <h4 className="fr-mb-0">{t('availableAccommodationsCount', { count: accommodation.nb_total_apartments })}</h4>
+        {accommodation.nbTotalApartments ? (
+          <h4 className="fr-mb-0">{t('availableAccommodationsCount', { count: accommodation.nbTotalApartments })}</h4>
         ) : (
           <h4 className="fr-mb-0">{t('availableAccommodations')}</h4>
         )}
@@ -173,16 +114,16 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
                 </div>
               ))}
             </div>
-            {accommodation.rental_charges_details && (
+            {accommodation.rentalChargesDetails && (
               <div className="fr-mt-3w fr-px-2w">
                 <p className="fr-text--sm fr-mb-0 fr-text--bold">
                   <span className="ri-building-line" aria-hidden />
                   {t('rentalChargesDetails')}
                 </p>
-                <p className="fr-text--sm fr-mb-0 fr-text-mention--grey">{accommodation.rental_charges_details}</p>
+                <p className="fr-text--sm fr-mb-0 fr-text-mention--grey">{accommodation.rentalChargesDetails}</p>
               </div>
             )}
-            {social_housing_required && (
+            {socialHousingRequired && (
               <div>
                 <hr className="fr-mt-3w fr-mb-0" />
                 <span className="ri-information-line fr-text--sm fr-mb-0">
@@ -203,24 +144,24 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
             )}
           </div>
         </div>
-        {!!accommodation.target_audience &&
-          [ETargetAudience.DIFFUS_MIXTE, ETargetAudience.DIFFUS_ETUDIANTS].includes(accommodation.target_audience) && (
+        {!!accommodation.targetAudience &&
+          [ETargetAudience.DIFFUS_MIXTE, ETargetAudience.DIFFUS_ETUDIANTS].includes(accommodation.targetAudience) && (
             <div className="fr-flex fr-direction-column fr-direction-md-row fr-align-items-md-center fr-flex-gap-2v fr-border fr-border-radius--8 fr-px-3w fr-py-2w">
               <span className={clsx('ri-community-line fr-hidden fr-unhidden-sm', styles.diffusIcon)} aria-hidden />
               <p className="fr-mb-0 fr-flex fr-direction-column">
                 <span className="fr-text--bold">
-                  {accommodation.target_audience === ETargetAudience.DIFFUS_MIXTE
+                  {accommodation.targetAudience === ETargetAudience.DIFFUS_MIXTE
                     ? t('diffusMixteNoticeTitle')
                     : t('diffusEtudiantsNoticeTitle')}
                 </span>
-                {accommodation.target_audience === ETargetAudience.DIFFUS_MIXTE && (
+                {accommodation.targetAudience === ETargetAudience.DIFFUS_MIXTE && (
                   <span className="fr-mb-0">{t('diffusMixteNoticeDescription')}</span>
                 )}
               </p>
             </div>
           )}
-        {(accommodation.residence_type === EResidenceType.JEUNES_TRAVAILLEURS ||
-          accommodation.residence_type === EResidenceType.SOCIALE_JEUNES_ACTIFS) && <FjtRsjaNotice />}
+        {(accommodation.residenceType === EResidenceType.JEUNES_TRAVAILLEURS ||
+          accommodation.residenceType === EResidenceType.SOCIALE_JEUNES_ACTIFS) && <FjtRsjaNotice />}
         <div className="fr-flex fr-direction-column fr-direction-md-row fr-justify-content-space-between fr-align-items-md-center fr-flex-gap-2v fr-border fr-border-radius--8 fr-px-3w fr-py-2w">
           <span className={clsx('ri-calculator-line fr-hidden fr-unhidden-sm', styles.simulatorIcon)} aria-hidden />
           <p className="fr-mb-0 fr-flex fr-direction-column">

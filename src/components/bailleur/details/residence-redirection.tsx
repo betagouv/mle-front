@@ -18,13 +18,13 @@ export const ResidenceRedirection = ({ className }: { className?: string }) => {
           <span className="fr-mb-0 fr-text--xs fr-text-mention--grey">URL de la page de résidence</span>
         </div>
         <textarea
-          className={`fr-input fr-mt-2w ${errors.external_url ? 'fr-input--error' : ''}`}
+          className={`fr-input fr-mt-2w ${errors.externalUrl ? 'fr-input--error' : ''}`}
           aria-describedby={'Redirection fiche de la résidence'}
           id="accommodation-redirection"
           rows={2}
-          {...register('external_url')}
+          {...register('externalUrl')}
         />
-        {errors.external_url && <p className="fr-error-text fr-mt-1v">{errors.external_url.message}</p>}
+        {errors.externalUrl && <p className="fr-error-text fr-mt-1v">{errors.externalUrl.message}</p>}
       </div>
     </div>
   )

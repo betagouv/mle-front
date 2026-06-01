@@ -13,15 +13,15 @@ import { TUpdateResidence } from '~/schemas/accommodations/update-residence'
 
 export const ResidencePictures = ({ accommodation }: { accommodation: TAccomodationMy }) => {
   const { control, watch, setValue } = useFormContext<TUpdateResidence>()
-  const watchedImages = watch('images_urls')
+  const watchedImages = watch('imagesUrls')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [fileError, setFileError] = useState<string | null>(null)
   const t = useTranslations('toast')
 
-  const uploadMutation = useUploadResidenceImages(accommodation.properties.slug, accommodation.properties.name)
-  const deleteMutation = useDeleteResidenceImage(accommodation.properties.slug, accommodation.properties.name)
-  const updateMutation = useUpdateResidenceDetails(accommodation.properties.slug)
+  const uploadMutation = useUploadResidenceImages(accommodation.slug, accommodation.name)
+  const deleteMutation = useDeleteResidenceImage(accommodation.slug, accommodation.name)
+  const updateMutation = useUpdateResidenceDetails(accommodation.slug)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
@@ -39,7 +39,7 @@ export const ResidencePictures = ({ accommodation }: { accommodation: TAccomodat
         { files, currentImages: watchedImages || [] },
         {
           onSuccess: (data) => {
-            setValue('images_urls', data.images_urls || [])
+            setValue('imagesUrls', data.imagesUrls || [])
             setSelectedFiles([])
             if (fileInputRef.current) {
               fileInputRef.current.value = ''
@@ -60,7 +60,7 @@ export const ResidencePictures = ({ accommodation }: { accommodation: TAccomodat
     const newImages = currentImages.filter((_, i) => i !== index)
     deleteMutation.mutate(newImages, {
       onSuccess: () => {
-        setValue('images_urls', newImages)
+        setValue('imagesUrls', newImages)
       },
     })
   }
@@ -71,11 +71,11 @@ export const ResidencePictures = ({ accommodation }: { accommodation: TAccomodat
     ;[newImages[index], newImages[newIndex]] = [newImages[newIndex], newImages[index]]
     updateMutation.mutate(
       {
-        images_urls: newImages,
+        imagesUrls: newImages,
       },
       {
         onSuccess: () => {
-          setValue('images_urls', newImages)
+          setValue('imagesUrls', newImages)
         },
       },
     )
@@ -121,7 +121,7 @@ export const ResidencePictures = ({ accommodation }: { accommodation: TAccomodat
           </div>
         </div>
         <Controller
-          name="images_urls"
+          name="imagesUrls"
           control={control}
           render={({ field }) => (
             <>

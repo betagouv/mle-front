@@ -34,7 +34,7 @@ const AddressAutocompleteRow = ({
 
   const selectedAddress = watch(`addresses.${index}.address`)
   const selectedCity = watch(`addresses.${index}.city`)
-  const selectedPostalCode = watch(`addresses.${index}.postal_code`)
+  const selectedPostalCode = watch(`addresses.${index}.postalCode`)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -47,13 +47,13 @@ const AddressAutocompleteRow = ({
     setInputValue(suggestion.label)
     setValue(`addresses.${index}.address`, suggestion.address, { shouldValidate: true })
     setValue(`addresses.${index}.city`, suggestion.city, { shouldValidate: true })
-    setValue(`addresses.${index}.postal_code`, suggestion.postalCode, { shouldValidate: true })
+    setValue(`addresses.${index}.postalCode`, suggestion.postalCode, { shouldValidate: true })
     setShowSuggestions(false)
     clearSuggestions()
   }
 
   const addressErrors = errors.addresses?.[index]
-  const hasAddressError = addressErrors?.address || addressErrors?.city || addressErrors?.postal_code
+  const hasAddressError = addressErrors?.address || addressErrors?.city || addressErrors?.postalCode
 
   const label = isMain ? 'Adresse' : `Adresse n\u00B0${index + 1}`
 
@@ -114,8 +114,8 @@ const AddressAutocompleteRow = ({
 }
 
 export const ResidenceLocation = ({ accommodation }: { accommodation: TAccomodationMy }) => {
-  const { geometry } = accommodation
-  const [longitude, latitude] = geometry.coordinates
+  const latitude = accommodation.latitude ?? 0
+  const longitude = accommodation.longitude ?? 0
 
   const { control } = useFormContext<TUpdateResidence>()
   const { fields, append, remove } = useFieldArray({
@@ -136,7 +136,7 @@ export const ResidenceLocation = ({ accommodation }: { accommodation: TAccomodat
           index={index}
           isMain={index === 0}
           onRemove={index > 0 ? () => remove(index) : undefined}
-          initialValue={field.address ? `${field.address} ${field.postal_code} ${field.city}` : ''}
+          initialValue={field.address ? `${field.address} ${field.postalCode} ${field.city}` : ''}
         />
       ))}
 
@@ -145,7 +145,7 @@ export const ResidenceLocation = ({ accommodation }: { accommodation: TAccomodat
         priority="secondary"
         iconId="ri-add-line"
         className="fr-mb-2w"
-        onClick={() => append({ address: '', city: '', postal_code: '' })}
+        onClick={() => append({ address: '', city: '', postalCode: '' })}
       >
         Ajouter une adresse
       </Button>

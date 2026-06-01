@@ -19,7 +19,7 @@ export const useCreateResidence = () => {
 
   return useMutation({
     mutationFn: async (data: TCreateResidence) => {
-      const { images_files, ...fields } = data
+      const { imagesFiles, ...fields } = data
 
       const result = await trpcClient.bailleur.create.mutate({
         ...fields,
@@ -27,9 +27,9 @@ export const useCreateResidence = () => {
         ownerId: ownerId ?? undefined,
       })
 
-      if (images_files?.length && result.slug) {
+      if (imagesFiles?.length && result.slug) {
         const formData = new FormData()
-        images_files.forEach((file) => formData.append('images', file))
+        imagesFiles.forEach((file) => formData.append('images', file))
 
         const uploadResponse = await fetch(`/api/accommodations/my/${result.slug}/upload/`, {
           method: 'POST',
@@ -38,11 +38,11 @@ export const useCreateResidence = () => {
 
         if (uploadResponse.ok) {
           const uploadData = await uploadResponse.json()
-          const imageUrls: string[] = uploadData.images_urls || []
+          const imageUrls: string[] = uploadData.imagesUrls || []
           if (imageUrls.length > 0) {
             await trpcClient.bailleur.update.mutate({
               slug: result.slug,
-              images_urls: imageUrls,
+              imagesUrls: imageUrls,
               name: fields.name,
             })
           }

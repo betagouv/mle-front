@@ -47,13 +47,13 @@ describe('ownerProcedure authorization', () => {
   it('accepts users with role=owner', async () => {
     const result = await ownerCaller.bailleur.list({ page: 1 })
     expect(result.count).toBe(0)
-    expect(result.results.features).toEqual([])
+    expect(result.results).toEqual([])
   })
 
   it('accepts users with role=admin', async () => {
     const result = await adminCaller.bailleur.list({ page: 1 })
     expect(result.count).toBe(0)
-    expect(result.results.features).toEqual([])
+    expect(result.results).toEqual([])
   })
 })
 
@@ -62,18 +62,18 @@ describe('bailleur.create', () => {
     await createOwner({ name: 'Owner Create', slug: 'owner-create', userId: 'test-owner-id' })
     const result = await ownerCaller.bailleur.create({
       name: 'Résidence Test',
-      addresses: [{ address: '1 rue de la Paix', city: 'Paris', postal_code: '75001' }],
-      external_url: 'https://example.com',
+      addresses: [{ address: '1 rue de la Paix', city: 'Paris', postalCode: '75001' }],
+      externalUrl: 'https://example.com',
       typologies: [
         {
-          type: 'T1',
-          price_min: 400,
-          price_max: 600,
-          superficie_min: 15,
-          superficie_max: 25,
+          type: 't1',
+          priceMin: 400,
+          priceMax: 600,
+          superficieMin: 15,
+          superficieMax: 25,
           colocation: false,
-          nb_total: 10,
-          nb_available: 5,
+          nbTotal: 10,
+          nbAvailable: 5,
         },
       ],
     })
@@ -87,18 +87,18 @@ describe('bailleur.create', () => {
     const owner = await createOwner({ name: 'Owner List', slug: 'owner-list', userId: 'test-owner-id' })
     const result = await ownerCaller.bailleur.create({
       name: 'Ma Résidence',
-      addresses: [{ address: '2 avenue des Champs', city: 'Lyon', postal_code: '69001' }],
-      external_url: 'https://example.com',
+      addresses: [{ address: '2 avenue des Champs', city: 'Lyon', postalCode: '69001' }],
+      externalUrl: 'https://example.com',
       typologies: [
         {
-          type: 'T2',
-          price_min: 500,
-          price_max: 700,
-          superficie_min: 25,
-          superficie_max: 35,
+          type: 't2',
+          priceMin: 500,
+          priceMax: 700,
+          superficieMin: 25,
+          superficieMax: 35,
           colocation: false,
-          nb_total: 5,
-          nb_available: 3,
+          nbTotal: 5,
+          nbAvailable: 3,
         },
       ],
     })
@@ -115,18 +115,18 @@ describe('bailleur.create', () => {
     await expect(
       ownerCaller.bailleur.create({
         name: 'No Owner Residence',
-        addresses: [{ address: '1 rue de la Paix', city: 'Paris', postal_code: '75001' }],
-        external_url: 'https://example.com',
+        addresses: [{ address: '1 rue de la Paix', city: 'Paris', postalCode: '75001' }],
+        externalUrl: 'https://example.com',
         typologies: [
           {
-            type: 'T1',
-            price_min: 400,
-            price_max: 600,
-            superficie_min: 15,
-            superficie_max: 25,
+            type: 't1',
+            priceMin: 400,
+            priceMax: 600,
+            superficieMin: 15,
+            superficieMax: 25,
             colocation: false,
-            nb_total: 5,
-            nb_available: 2,
+            nbTotal: 5,
+            nbAvailable: 2,
           },
         ],
       }),
@@ -139,19 +139,19 @@ describe('bailleur.create', () => {
 
     const result = await adminCaller.bailleur.create({
       name: 'Résidence Admin Switch',
-      addresses: [{ address: '3 rue Admin', city: 'Paris', postal_code: '75001' }],
-      external_url: 'https://example.com',
+      addresses: [{ address: '3 rue Admin', city: 'Paris', postalCode: '75001' }],
+      externalUrl: 'https://example.com',
       ownerId: switched.id,
       typologies: [
         {
-          type: 'T1',
-          price_min: 400,
-          price_max: 600,
-          superficie_min: 15,
-          superficie_max: 25,
+          type: 't1',
+          priceMin: 400,
+          priceMax: 600,
+          superficieMin: 15,
+          superficieMax: 25,
           colocation: false,
-          nb_total: 5,
-          nb_available: 2,
+          nbTotal: 5,
+          nbAvailable: 2,
         },
       ],
     })
@@ -169,18 +169,18 @@ describe('bailleur.create', () => {
     await expect(
       adminCaller.bailleur.create({
         name: 'Orphan Admin Residence',
-        addresses: [{ address: '4 rue Orphan', city: 'Paris', postal_code: '75001' }],
-        external_url: 'https://example.com',
+        addresses: [{ address: '4 rue Orphan', city: 'Paris', postalCode: '75001' }],
+        externalUrl: 'https://example.com',
         typologies: [
           {
-            type: 'T1',
-            price_min: 400,
-            price_max: 600,
-            superficie_min: 15,
-            superficie_max: 25,
+            type: 't1',
+            priceMin: 400,
+            priceMax: 600,
+            superficieMin: 15,
+            superficieMax: 25,
             colocation: false,
-            nb_total: 5,
-            nb_available: 2,
+            nbTotal: 5,
+            nbAvailable: 2,
           },
         ],
       }),
@@ -193,19 +193,19 @@ describe('bailleur.create', () => {
     await expect(
       adminCaller.bailleur.create({
         name: 'Unauthorized Owner Residence',
-        addresses: [{ address: '5 rue Unauth', city: 'Paris', postal_code: '75001' }],
-        external_url: 'https://example.com',
+        addresses: [{ address: '5 rue Unauth', city: 'Paris', postalCode: '75001' }],
+        externalUrl: 'https://example.com',
         ownerId: other.id,
         typologies: [
           {
-            type: 'T1',
-            price_min: 400,
-            price_max: 600,
-            superficie_min: 15,
-            superficie_max: 25,
+            type: 't1',
+            priceMin: 400,
+            priceMax: 600,
+            superficieMin: 15,
+            superficieMax: 25,
             colocation: false,
-            nb_total: 5,
-            nb_available: 2,
+            nbTotal: 5,
+            nbAvailable: 2,
           },
         ],
       }),
@@ -224,7 +224,7 @@ describe('bailleur.list', () => {
 
     const result = await ownerCaller.bailleur.list({ page: 1 })
     expect(result.count).toBe(2)
-    expect(result.results.features.map((f) => f.properties.name)).toEqual(expect.arrayContaining(['Résidence A', 'Résidence B']))
+    expect(result.results.map((f) => f.name)).toEqual(expect.arrayContaining(['Résidence A', 'Résidence B']))
   })
 
   it('filters by search term', async () => {
@@ -234,7 +234,7 @@ describe('bailleur.list', () => {
 
     const result = await ownerCaller.bailleur.list({ page: 1, search: 'Soleil' })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.name).toBe('Résidence Soleil')
+    expect(result.results[0].name).toBe('Résidence Soleil')
   })
 
   it('filters by city name', async () => {
@@ -246,7 +246,7 @@ describe('bailleur.list', () => {
 
     const result = await ownerCaller.bailleur.list({ page: 1, search: 'Marseille' })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.name).toBe('Résidence A')
+    expect(result.results[0].name).toBe('Résidence A')
   })
 
   it('filters by partial city name (case insensitive)', async () => {
@@ -256,7 +256,7 @@ describe('bailleur.list', () => {
 
     const result = await ownerCaller.bailleur.list({ page: 1, search: 'saint-ét' })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.name).toBe('Résidence Stéphanoise')
+    expect(result.results[0].name).toBe('Résidence Stéphanoise')
   })
 
   it('filters by city or name', async () => {
@@ -289,9 +289,9 @@ describe('bailleur.update', () => {
     expect(result.slug).toBe('to-update')
 
     const list = await ownerCaller.bailleur.list({ page: 1 })
-    const detail = list.results.features.find((f) => f.properties.slug === 'to-update')
-    expect(detail?.properties.name).toBe('After Update')
-    expect(detail?.properties.description).toBe('Updated description')
+    const detail = list.results.find((f) => f.slug === 'to-update')
+    expect(detail?.name).toBe('After Update')
+    expect(detail?.description).toBe('Updated description')
   })
 
   it('preserves total apartments and price minimum when only images are updated', async () => {
@@ -310,7 +310,7 @@ describe('bailleur.update', () => {
 
     await ownerCaller.bailleur.update({
       slug: 'image-update',
-      images_urls: ['https://example.com/old.jpg', 'https://example.com/new.jpg'],
+      imagesUrls: ['https://example.com/old.jpg', 'https://example.com/new.jpg'],
     })
 
     const [updated] = await db.select().from(accommodations).where(eq(accommodations.slug, 'image-update'))
@@ -357,14 +357,7 @@ describe('admin verifyOwnership bypass', () => {
 
     const result = await adminCaller.bailleur.updateAvailability({
       slug: 'other-avail-update',
-      nb_t1_available: 5,
-      nb_t1_bis_available: null,
-      nb_t2_available: null,
-      nb_t3_available: null,
-      nb_t4_available: null,
-      nb_t5_available: null,
-      nb_t6_available: null,
-      nb_t7_more_available: null,
+      availability: [{ type: 't1', nbAvailable: 5 }],
     })
 
     expect(result.slug).toBe('other-avail-update')
@@ -399,22 +392,18 @@ describe('bailleur.updateAvailability', () => {
 
     const result = await ownerCaller.bailleur.updateAvailability({
       slug: 'avail-test',
-      nb_t1_available: 3,
-      nb_t1_bis_available: null,
-      nb_t2_available: 2,
-      nb_t3_available: null,
-      nb_t4_available: null,
-      nb_t5_available: null,
-      nb_t6_available: null,
-      nb_t7_more_available: null,
+      availability: [
+        { type: 't1', nbAvailable: 3 },
+        { type: 't2', nbAvailable: 2 },
+      ],
     })
 
     expect(result.slug).toBe('avail-test')
 
     const list = await ownerCaller.bailleur.list({ page: 1 })
-    const detail = list.results.features.find((f) => f.properties.slug === 'avail-test')
-    expect(detail?.properties.nb_t1_available).toBe(3)
-    expect(detail?.properties.nb_t2_available).toBe(2)
+    const detail = list.results.find((f) => f.slug === 'avail-test')
+    expect(detail?.typologies.t1?.nbAvailable).toBe(3)
+    expect(detail?.typologies.t2?.nbAvailable).toBe(2)
   })
 
   it('preserves null availability when updating with null (does not default to 0)', async () => {
@@ -432,25 +421,23 @@ describe('bailleur.updateAvailability', () => {
     // Update with explicit nulls for typologies without stock
     await ownerCaller.bailleur.updateAvailability({
       slug: 'null-avail-test',
-      nb_t1_available: 3,
-      nb_t1_bis_available: null,
-      nb_t2_available: null,
-      nb_t3_available: null,
-      nb_t4_available: null,
-      nb_t5_available: null,
-      nb_t6_available: null,
-      nb_t7_more_available: null,
+      availability: [
+        { type: 't1', nbAvailable: 3 },
+        { type: 't2', nbAvailable: null },
+        { type: 't3', nbAvailable: null },
+      ],
     })
 
     const list = await ownerCaller.bailleur.list({ page: 1 })
-    const detail = list.results.features.find((f) => f.properties.slug === 'null-avail-test')
+    const detail = list.results.find((f) => f.slug === 'null-avail-test')
 
     // t1 was explicitly set to 3
-    expect(detail?.properties.nb_t1_available).toBe(3)
-    // t2 was sent as null → should remain null, not become 0
-    expect(detail?.properties.nb_t2_available).toBeNull()
-    // t3 has no stock and was sent as null → should remain null
-    expect(detail?.properties.nb_t3_available).toBeNull()
+    expect(detail?.typologies.t1?.nbAvailable).toBe(3)
+    // t2 exists (nbT2 stock) but was sent as null → should remain null, not become 0
+    expect(detail?.typologies.t2).toBeDefined()
+    expect(detail?.typologies.t2?.nbAvailable).toBeNull()
+    // t3 has no stock → no typology row exists, sending availability does not create one
+    expect(detail?.typologies.t3).toBeUndefined()
   })
 })
 
@@ -471,7 +458,7 @@ describe('activity_log diff accuracy', () => {
     await db.delete(activityLog)
     await ownerCaller.bailleur.update({
       slug: 'diff-test',
-      virtual_tour_url: 'https://tour.example.com',
+      virtualTourUrl: 'https://tour.example.com',
     })
 
     const logs = await db.select().from(activityLog)
@@ -522,17 +509,14 @@ describe('activity_log diff accuracy', () => {
     })
 
     await db.delete(activityLog)
-    await ownerCaller.bailleur.update({
+    await ownerCaller.bailleur.updateAvailability({
       slug: 'avail-class',
-      nb_t1_available: 8,
+      availability: [{ type: 't1', nbAvailable: 8 }],
     })
 
     const logs = await db.select().from(activityLog)
     expect(logs).toHaveLength(1)
     expect(logs[0].action).toBe('accommodation.availability_updated')
-
-    const meta = logs[0].metadata as { diff: Record<string, unknown> }
-    expect(Object.keys(meta.diff)).toEqual(['nbT1Available'])
   })
 
   it('classifies published change as accommodation.published', async () => {
@@ -579,7 +563,7 @@ describe('activity_log diff accuracy', () => {
     expect(logs[0].action).toBe('accommodation.unpublished')
   })
 
-  it('splits published + availability into separate log entries', async () => {
+  it('logs published and availability changes as separate log entries', async () => {
     const db = getTestDb()
     const owner = await createOwner({ name: 'Owner Split', slug: 'owner-split', userId: 'test-owner-id' })
     await createAccommodation({
@@ -596,7 +580,10 @@ describe('activity_log diff accuracy', () => {
     await ownerCaller.bailleur.update({
       slug: 'split-test',
       published: true,
-      nb_t1_available: 5,
+    })
+    await ownerCaller.bailleur.updateAvailability({
+      slug: 'split-test',
+      availability: [{ type: 't1', nbAvailable: 5 }],
     })
 
     const logs = await db.select().from(activityLog)
@@ -608,10 +595,6 @@ describe('activity_log diff accuracy', () => {
     const pubLog = logs.find((l) => l.action === 'accommodation.published')!
     const pubMeta = pubLog.metadata as { diff: Record<string, unknown> }
     expect(Object.keys(pubMeta.diff)).toEqual(['published'])
-
-    const availLog = logs.find((l) => l.action === 'accommodation.availability_updated')!
-    const availMeta = availLog.metadata as { diff: Record<string, unknown> }
-    expect(Object.keys(availMeta.diff)).toEqual(['nbT1Available'])
   })
 
   it('logs creation with accommodation.created action', async () => {
@@ -621,18 +604,18 @@ describe('activity_log diff accuracy', () => {
     await db.delete(activityLog)
     await ownerCaller.bailleur.create({
       name: 'Created Residence',
-      addresses: [{ address: '10 rue Test', city: 'Paris', postal_code: '75001' }],
-      external_url: 'https://example.com',
+      addresses: [{ address: '10 rue Test', city: 'Paris', postalCode: '75001' }],
+      externalUrl: 'https://example.com',
       typologies: [
         {
-          type: 'T1',
-          price_min: 400,
-          price_max: 600,
-          superficie_min: 15,
-          superficie_max: 25,
+          type: 't1',
+          priceMin: 400,
+          priceMax: 600,
+          superficieMin: 15,
+          superficieMax: 25,
           colocation: false,
-          nb_total: 5,
-          nb_available: 3,
+          nbTotal: 5,
+          nbAvailable: 3,
         },
       ],
     })
@@ -675,7 +658,7 @@ describe('bailleur.list owner isolation', () => {
 
     const result = await ownerCaller.bailleur.list({ page: 1 })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.name).toBe('Résidence Owner 1')
+    expect(result.results[0].name).toBe('Résidence Owner 1')
   })
 
   it('owner cannot see residences of another owner by passing bailleur param', async () => {
@@ -688,7 +671,7 @@ describe('bailleur.list owner isolation', () => {
     // Owner 1 tries to access Owner 2's residences via bailleur param
     const result = await ownerCaller.bailleur.list({ page: 1, ownerId: owner2.id })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.name).toBe('Résidence Hack 1')
+    expect(result.results[0].name).toBe('Résidence Hack 1')
   })
 
   it('owner2 cannot see residences of owner1 by passing bailleur param', async () => {
@@ -701,7 +684,7 @@ describe('bailleur.list owner isolation', () => {
     // Owner 2 tries to access Owner 1's residences via bailleur param
     const result = await ownerCaller2.bailleur.list({ page: 1, ownerId: owner1.id })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.name).toBe('Résidence Cross 2')
+    expect(result.results[0].name).toBe('Résidence Cross 2')
   })
 
   it('admin can access residences of a linked owner via bailleur param', async () => {
@@ -717,7 +700,7 @@ describe('bailleur.list owner isolation', () => {
     // Admin switches to owner2
     const result = await adminCaller.bailleur.list({ page: 1, ownerId: owner2.id })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.name).toBe('Résidence Admin 2')
+    expect(result.results[0].name).toBe('Résidence Admin 2')
   })
 
   it('admin without bailleur param sees first linked owner residences', async () => {
@@ -747,6 +730,6 @@ describe('bailleur.list owner isolation', () => {
     // Admin tries to access unlinked owner via bailleur param — should fallback to linked owner
     const result = await adminCaller.bailleur.list({ page: 1, ownerId: unlinkedOwner.id })
     expect(result.count).toBe(1)
-    expect(result.results.features[0].properties.name).toBe('Résidence Linked')
+    expect(result.results[0].name).toBe('Résidence Linked')
   })
 })

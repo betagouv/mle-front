@@ -46,13 +46,13 @@ export const CreateResidenceAccommodationList = () => {
   const handleAddTypology = () => {
     append({
       type: '' as TCreateResidence['typologies'][number]['type'],
-      price_min: undefined as unknown as number,
-      price_max: undefined as unknown as number,
-      superficie_min: undefined as unknown as number,
-      superficie_max: undefined as unknown as number,
+      priceMin: undefined as unknown as number,
+      priceMax: undefined as unknown as number,
+      superficieMin: undefined as unknown as number,
+      superficieMax: undefined as unknown as number,
       colocation: false,
-      nb_total: undefined as unknown as number,
-      nb_available: undefined as unknown as number,
+      nbTotal: undefined as unknown as number,
+      nbAvailable: undefined as unknown as number,
     })
     setSelectedTabId(`tab-${fields.length}`)
   }

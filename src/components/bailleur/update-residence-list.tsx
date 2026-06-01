@@ -4,9 +4,10 @@ import Button from '@codegouvfr/react-dsfr/Button'
 import Input from '@codegouvfr/react-dsfr/Input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { FC } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
+import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
 import { useUpdateAccommodation } from '~/hooks/use-update-accommodation'
 import { TAccomodation } from '~/schemas/accommodations/accommodations'
+import { getTypologyLabel, TYPOLOGIES, type TypologyType } from '~/schemas/accommodations/typology'
 import { createUpdateResidenceListSchema, TUpdateResidenceList } from '~/schemas/accommodations/update-residence-list'
 import { sPluriel } from '~/utils/sPluriel'
 import styles from './update-residence-list.module.css'
@@ -17,33 +18,24 @@ interface UpdateResidenceListProps {
 }
 
 export const UpdateResidenceList: FC<UpdateResidenceListProps> = ({ accommodation, children }) => {
-  const { mutateAsync: updateAccommodation, isPending } = useUpdateAccommodation(accommodation.properties.slug)
+  const { mutateAsync: updateAccommodation, isPending } = useUpdateAccommodation(accommodation.slug)
+  const { typologies } = accommodation
+
+  // Only typologies that have stock are editable.
+  const editableTypes = TYPOLOGIES.filter(({ type }) => ((typologies[type]?.nbTotal ?? 0) as number) > 0).map(({ type }) => type)
+  const existingTotals = Object.fromEntries(TYPOLOGIES.map(({ type }) => [type, typologies[type]?.nbTotal ?? null])) as Partial<
+    Record<TypologyType, number | null>
+  >
+
   const form = useForm<TUpdateResidenceList>({
     defaultValues: {
-      nb_t1_available: accommodation.properties.nb_t1_available,
-      nb_t1_bis_available: accommodation.properties.nb_t1_bis_available,
-      nb_t2_available: accommodation.properties.nb_t2_available,
-      nb_t3_available: accommodation.properties.nb_t3_available,
-      nb_t4_available: accommodation.properties.nb_t4_available,
-      nb_t5_available: accommodation.properties.nb_t5_available,
-      nb_t6_available: accommodation.properties.nb_t6_available,
-      nb_t7_more_available: accommodation.properties.nb_t7_more_available,
+      availability: editableTypes.map((type) => ({ type, nbAvailable: typologies[type]?.nbAvailable ?? null })),
     },
-    resolver: zodResolver(
-      createUpdateResidenceListSchema({
-        nb_t1: accommodation.properties.nb_t1,
-        nb_t1_bis: accommodation.properties.nb_t1_bis,
-        nb_t2: accommodation.properties.nb_t2,
-        nb_t3: accommodation.properties.nb_t3,
-        nb_t4: accommodation.properties.nb_t4,
-        nb_t5: accommodation.properties.nb_t5,
-        nb_t6: accommodation.properties.nb_t6,
-        nb_t7_more: accommodation.properties.nb_t7_more,
-      }),
-    ),
+    resolver: zodResolver(createUpdateResidenceListSchema(existingTotals)),
   })
 
-  const { formState, handleSubmit, register } = form
+  const { formState, handleSubmit, register, control } = form
+  const { fields } = useFieldArray({ control, name: 'availability' })
 
   const onSubmit = async (data: TUpdateResidenceList) => {
     await updateAccommodation(data)
@@ -57,37 +49,29 @@ export const UpdateResidenceList: FC<UpdateResidenceListProps> = ({ accommodatio
             <div className="fr-flex fr-direction-column">
               {children}
               <div className={styles.inputGrid}>
-                {[
-                  { key: 'nb_t1_available', stock: accommodation.properties.nb_t1, label: 'Studio T1' },
-                  { key: 'nb_t1_bis_available', stock: accommodation.properties.nb_t1_bis, label: 'Studio T1 Bis' },
-                  { key: 'nb_t2_available', stock: accommodation.properties.nb_t2, label: 'Studio T2' },
-                  { key: 'nb_t3_available', stock: accommodation.properties.nb_t3, label: 'Logement T3' },
-                  { key: 'nb_t4_available', stock: accommodation.properties.nb_t4, label: 'Logement T4' },
-                  { key: 'nb_t5_available', stock: accommodation.properties.nb_t5, label: 'Logement T5' },
-                  { key: 'nb_t6_available', stock: accommodation.properties.nb_t6, label: 'Logement T6' },
-                  { key: 'nb_t7_more_available', stock: accommodation.properties.nb_t7_more, label: 'Logement T7+' },
-                ]
-                  .filter(({ stock }) => !!stock && stock > 0)
-                  .map(({ key, label, stock }) => (
-                    <div key={key}>
+                {fields.map((field, index) => {
+                  const stock = typologies[field.type]?.nbTotal ?? 0
+                  return (
+                    <div key={field.id}>
                       <div className="fr-flex fr-justify-content-space-between">
-                        <span className="fr-text--bold">{label}</span>
+                        <span className="fr-text--bold">{getTypologyLabel(field.type)}</span>
                         <span className="fr-text--xs fr-mb-0">
-                          {stock} logement{sPluriel(stock ?? 0)}
+                          {stock} logement{sPluriel(stock)}
                         </span>
                       </div>
                       <Input
                         label="Disponibles"
-                        state={formState.errors[key as keyof typeof formState.errors] ? 'error' : undefined}
-                        stateRelatedMessage={formState.errors[key as keyof typeof formState.errors]?.message}
+                        state={formState.errors.availability?.[index]?.nbAvailable ? 'error' : undefined}
+                        stateRelatedMessage={formState.errors.availability?.[index]?.nbAvailable?.message}
                         nativeInputProps={{
-                          ...register(key as keyof TUpdateResidenceList, { valueAsNumber: true }),
+                          ...register(`availability.${index}.nbAvailable`, { valueAsNumber: true }),
                           type: 'number',
                           min: 0,
                         }}
                       />
                     </div>
-                  ))}
+                  )
+                })}
               </div>
             </div>
 

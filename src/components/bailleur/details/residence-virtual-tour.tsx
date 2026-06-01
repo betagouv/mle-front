@@ -16,7 +16,7 @@ export const ResidenceVirtualTour = () => {
             Giraffe360)
           </span>
         </div>
-        <textarea className="fr-input fr-mt-2w" id="accommodation-virtual-tour" rows={6} {...register('virtual_tour_url')} />
+        <textarea className="fr-input fr-mt-2w" id="accommodation-virtual-tour" rows={6} {...register('virtualTourUrl')} />
       </div>
     </div>
   )

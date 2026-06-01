@@ -1,3 +1,5 @@
+import type { TTypologiesRecord } from '~/schemas/accommodations/accommodations'
+
 export const APARTMENT_TYPES = ['t1', 't1_bis', 't2', 't3', 't4', 't5', 't6', 't7_more'] as const
 export type ApartmentType = (typeof APARTMENT_TYPES)[number]
 
@@ -12,26 +14,7 @@ export const APARTMENT_TYPE_LABELS: Record<ApartmentType, string> = {
   t7_more: 'T7+',
 }
 
-export function getAvailableApartmentTypes(accommodation: {
-  nb_t1_available: number | null
-  nb_t1_bis_available: number | null
-  nb_t2_available: number | null
-  nb_t3_available: number | null
-  nb_t4_available: number | null
-  nb_t5_available: number | null
-  nb_t6_available: number | null
-  nb_t7_more_available: number | null
-}): ApartmentType[] {
-  const mapping: Record<ApartmentType, number | null> = {
-    t1: accommodation.nb_t1_available,
-    t1_bis: accommodation.nb_t1_bis_available,
-    t2: accommodation.nb_t2_available,
-    t3: accommodation.nb_t3_available,
-    t4: accommodation.nb_t4_available,
-    t5: accommodation.nb_t5_available,
-    t6: accommodation.nb_t6_available,
-    t7_more: accommodation.nb_t7_more_available,
-  }
-
-  return APARTMENT_TYPES.filter((type) => (mapping[type] ?? 0) > 0)
+/** Apartment types that currently have availability (> 0). */
+export function getAvailableApartmentTypes(typologies: TTypologiesRecord): ApartmentType[] {
+  return APARTMENT_TYPES.filter((type) => (typologies[type]?.nbAvailable ?? 0) > 0)
 }

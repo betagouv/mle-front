@@ -40,8 +40,8 @@ describe('favorites.list', () => {
     await createFavoriteAccommodation({ userId: 'test-user-id', accommodationId: accom2.id })
 
     const result = await authenticatedCaller.favorites.list()
-    expect(result[0].accommodation.properties.slug).toBe('fav-new')
-    expect(result[1].accommodation.properties.slug).toBe('fav-old')
+    expect(result[0].accommodation.slug).toBe('fav-new')
+    expect(result[1].accommodation.slug).toBe('fav-old')
   })
 })
 

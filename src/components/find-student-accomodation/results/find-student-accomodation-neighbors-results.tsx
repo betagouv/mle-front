@@ -59,7 +59,7 @@ export const FindStudentAccomodationNeighborsResults: FC<FindStudentAccomodation
     enabled: !!cityName,
   })
 
-  const expandedFeatures = expandedAccommodations?.results.features || []
+  const expandedFeatures = expandedAccommodations?.results || []
   const showLoadingState = !expandedAccommodations
 
   if (!cityName || (!showLoadingState && !isFetching && expandedFeatures.length === 0)) {

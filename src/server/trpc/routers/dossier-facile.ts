@@ -5,36 +5,13 @@ import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { APARTMENT_TYPES } from '~/enums/apartment-type'
 import { db } from '~/server/db'
-import { accommodations, dossierFacileApplications, dossierFacileTenants } from '~/server/db/schema'
+import { accommodations, accommodationTypologies, dossierFacileApplications, dossierFacileTenants } from '~/server/db/schema'
 import { buildDossierFacileAuthorizationUrl, validateDossierFacileConfig } from '~/server/services/dossier-facile/sync'
 import { getJwtSecret } from '~/server/utils/jwt-secret'
 import { createTRPCRouter, userProcedure } from '../init'
 
 const STATE_COOKIE_NAME = 'df_oauth_state'
 const STATE_TTL_SECONDS = 600 // 10 minutes
-
-type ApartmentType = (typeof APARTMENT_TYPES)[number]
-
-const availabilityKey: Record<
-  ApartmentType,
-  | 'nbT1Available'
-  | 'nbT1BisAvailable'
-  | 'nbT2Available'
-  | 'nbT3Available'
-  | 'nbT4Available'
-  | 'nbT5Available'
-  | 'nbT6Available'
-  | 'nbT7MoreAvailable'
-> = {
-  t1: 'nbT1Available',
-  t1_bis: 'nbT1BisAvailable',
-  t2: 'nbT2Available',
-  t3: 'nbT3Available',
-  t4: 'nbT4Available',
-  t5: 'nbT5Available',
-  t6: 'nbT6Available',
-  t7_more: 'nbT7MoreAvailable',
-}
 
 export const dossierFacileRouter = createTRPCRouter({
   connectUrl: userProcedure
@@ -116,8 +93,12 @@ export const dossierFacileRouter = createTRPCRouter({
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Accommodation not found' })
       }
 
-      const key = availabilityKey[input.apartmentType]
-      const availableCount = accommodation[key]
+      const [typology] = await db
+        .select({ nbAvailable: accommodationTypologies.nbAvailable })
+        .from(accommodationTypologies)
+        .where(and(eq(accommodationTypologies.accommodationId, accommodation.id), eq(accommodationTypologies.type, input.apartmentType)))
+        .limit(1)
+      const availableCount = typology?.nbAvailable
       if (!availableCount || availableCount <= 0) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'This apartment type is not available' })
       }

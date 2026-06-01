@@ -6,8 +6,8 @@ import styles from './logement.module.css'
 type AddressItem = {
   address: string
   city: string
-  postal_code: string
-  is_main: boolean
+  postalCode: string
+  isMain: boolean
 }
 
 type AccommodationLocalisationProps = {
@@ -18,20 +18,20 @@ type AccommodationLocalisationProps = {
 export const AccommodationLocalisation = async ({ addresses, positions }: AccommodationLocalisationProps) => {
   const t = await getTranslations('accomodation')
 
-  const sorted = [...addresses].sort((a, b) => Number(b.is_main) - Number(a.is_main))
+  const sorted = [...addresses].sort((a, b) => Number(b.isMain) - Number(a.isMain))
 
   return (
     <div className={styles.locationContent}>
       <div className={styles.locationInfo}>
         <h4>{t('location.title')}</h4>
         {sorted.map((a, i) => (
-          <div key={`${a.address}-${a.postal_code}-${i}`} className="fr-flex fr-direction-column">
+          <div key={`${a.address}-${a.postalCode}-${i}`} className="fr-flex fr-direction-column">
             {a.address && <span>{a.address}</span>}
             <Link
               className="fr-link fr-link--no-underline fr-text--underline"
               href={`/trouver-un-logement-etudiant/ville/${encodeURIComponent(a.city)}`}
             >
-              {a.postal_code} {a.city}
+              {a.postalCode} {a.city}
             </Link>
           </div>
         ))}
