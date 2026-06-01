@@ -28,7 +28,7 @@ export const favoritesRouter = createTRPCRouter({
         citySlug: cities.slug,
         postalCode: accommodationAddresses.postalCode,
         residenceType: accommodations.residenceType,
-        targetAudience: accommodations.target_audience,
+        targetAudience: accommodations.targetAudience,
         published: accommodations.published,
         nbTotalApartments: accommodations.nbTotalApartments,
         nbAccessibleApartments: accommodations.nbAccessibleApartments,

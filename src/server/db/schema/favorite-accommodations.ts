@@ -1,11 +1,14 @@
-import { bigint, index, pgTable, timestamp, unique, varchar } from 'drizzle-orm/pg-core'
+import { bigint, index, pgTable, text, timestamp, unique } from 'drizzle-orm/pg-core'
 import { accommodations } from './accommodations'
+import { user } from './auth'
 
 export const favoriteAccommodations = pgTable(
-  'accommodation_favoriteaccommodation',
+  'favorite_accommodation',
   {
     id: bigint({ mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
-    userId: varchar('user_id', { length: 255 }).notNull(),
+    userId: text('user_id')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
     accommodationId: bigint('accommodation_id', { mode: 'number' })
       .notNull()
       .references(() => accommodations.id, { onDelete: 'cascade' }),

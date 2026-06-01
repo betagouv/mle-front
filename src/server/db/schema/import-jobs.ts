@@ -2,7 +2,7 @@ import { index, integer, jsonb, pgTable, text, timestamp, varchar } from 'drizzl
 import type { TImportJobStatus, TImportJobSummary, TImportJobType } from '~/schemas/import-jobs'
 
 export const importJobs = pgTable(
-  'import_jobs',
+  'import_job',
   {
     id: integer().primaryKey().generatedByDefaultAsIdentity(),
     type: varchar({ length: 20 }).notNull().$type<TImportJobType>(),

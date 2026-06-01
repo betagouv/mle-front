@@ -9,14 +9,14 @@ export const targetAudienceEnum = pgEnum('target_audience', [
 ])
 
 export const accommodations = pgTable(
-  'accommodation_accommodation',
+  'accommodation',
   {
     id: bigint({ mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
     name: varchar({ length: 200 }).notNull(),
     slug: varchar({ length: 255 }).notNull().unique(),
     description: text(),
     residenceType: varchar('residence_type', { length: 100 }),
-    target_audience: targetAudienceEnum('target_audience'),
+    targetAudience: targetAudienceEnum('target_audience'),
     published: boolean().notNull(),
 
     // Apartment counts

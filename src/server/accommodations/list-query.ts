@@ -258,7 +258,7 @@ export const listAccommodationsWithConditions = async ({
           ${cities.slug} as "citySlug",
           ${accommodationAddresses.postalCode} as "postalCode",
           ${accommodations.residenceType} as "residenceType",
-          ${accommodations.target_audience} as "targetAudience",
+          ${accommodations.targetAudience} as "targetAudience",
           ${accommodations.published} as published,
           ${accommodations.nbTotalApartments} as "nbTotalApartments",
           ${accommodations.nbAccessibleApartments} as "nbAccessibleApartments",

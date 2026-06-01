@@ -71,7 +71,7 @@ const usersRouter = createTRPCRouter({
             lastname: user.lastname,
             createdAt: user.createdAt,
             lastLoginAt: sql<Date | null>`(SELECT max(created_at) FROM "session" WHERE user_id = "user"."id")`,
-            favoritesCount: sql<number>`(SELECT count(*)::int FROM accommodation_favoriteaccommodation WHERE user_id = "user"."id")`,
+            favoritesCount: sql<number>`(SELECT count(*)::int FROM favorite_accommodation WHERE user_id = "user"."id")`,
             alertsCount: sql<number>`(SELECT count(*)::int FROM student_alert WHERE user_id = "user"."id")`,
             ownerId: user.ownerId,
             ownerName: owners.name,
@@ -354,14 +354,14 @@ const ownersRouter = createTRPCRouter({
             slug: owners.slug,
             url: owners.url,
             image: owners.image,
-            accommodationCount: sql<number>`(SELECT count(*)::int FROM accommodation_accommodation WHERE owner_id = "account_owner"."id")`,
-            nbTotalApartments: sql<number>`(SELECT coalesce(sum(coalesce(nb_total_apartments, 0)), 0)::int FROM accommodation_accommodation WHERE owner_id = "account_owner"."id")`,
-            userCount: sql<number>`(SELECT count(*)::int FROM "user" WHERE owner_id = "account_owner"."id")`,
+            accommodationCount: sql<number>`(SELECT count(*)::int FROM accommodation WHERE owner_id = "owner"."id")`,
+            nbTotalApartments: sql<number>`(SELECT coalesce(sum(coalesce(nb_total_apartments, 0)), 0)::int FROM accommodation WHERE owner_id = "owner"."id")`,
+            userCount: sql<number>`(SELECT count(*)::int FROM "user" WHERE owner_id = "owner"."id")`,
             availableApartments: sql<number>`(
               WITH available_counts AS (
                 SELECT ${nbAvailableApartmentsSum} as total_available
-                FROM accommodation_accommodation
-                WHERE owner_id = "account_owner"."id"
+                FROM accommodation
+                WHERE owner_id = "owner"."id"
               )
               SELECT coalesce(sum(total_available), 0)::int FROM available_counts
             )`,
@@ -643,7 +643,7 @@ const residencesRouter = createTRPCRouter({
 
 const statsRouter = createTRPCRouter({
   overview: adminProcedure.query(async () => {
-    const isCrous = sql`exists (select 1 from accommodation_externalsource where accommodation_id = ${accommodations.id} and source = 'crous')`
+    const isCrous = sql`exists (select 1 from external_source where accommodation_id = ${accommodations.id} and source = 'crous')`
 
     const availCols = [
       accommodations.nbT1Available,
@@ -870,45 +870,45 @@ const ownerUsageRouter = createTRPCRouter({
         nbLogins: sql<number>`(
           SELECT count(*)::int FROM "session" s
           INNER JOIN "user" u ON s.user_id = u.id
-          WHERE u.owner_id = "account_owner"."id" AND u.role != 'admin'
+          WHERE u.owner_id = "owner"."id" AND u.role != 'admin'
           AND s.created_at >= ${input.from}::date
           AND s.created_at < (${input.to}::date + 1)
         )`,
         lastLogin: sql<string | null>`(
           SELECT max(s.created_at)::text FROM "session" s
           INNER JOIN "user" u ON s.user_id = u.id
-          WHERE u.owner_id = "account_owner"."id" AND u.role != 'admin'
+          WHERE u.owner_id = "owner"."id" AND u.role != 'admin'
         )`,
         nbActions: sql<number>`(
           SELECT count(*)::int FROM activity_log
-          WHERE owner_id = "account_owner"."id"
+          WHERE owner_id = "owner"."id"
           AND created_at >= ${input.from}::date
           AND created_at < (${input.to}::date + 1)
         )`,
         nbCreated: sql<number>`(
           SELECT count(*)::int FROM activity_log
-          WHERE owner_id = "account_owner"."id" AND action = 'accommodation.created'
+          WHERE owner_id = "owner"."id" AND action = 'accommodation.created'
           AND created_at >= ${input.from}::date
           AND created_at < (${input.to}::date + 1)
         )`,
         nbUpdated: sql<number>`(
           SELECT count(*)::int FROM activity_log
-          WHERE owner_id = "account_owner"."id" AND action = 'accommodation.updated'
+          WHERE owner_id = "owner"."id" AND action = 'accommodation.updated'
           AND created_at >= ${input.from}::date
           AND created_at < (${input.to}::date + 1)
         )`,
         nbAvailabilityUpdated: sql<number>`(
           SELECT count(*)::int FROM activity_log
-          WHERE owner_id = "account_owner"."id" AND action = 'accommodation.availability_updated'
+          WHERE owner_id = "owner"."id" AND action = 'accommodation.availability_updated'
           AND created_at >= ${input.from}::date
           AND created_at < (${input.to}::date + 1)
         )`,
         nbAccommodations: sql<number>`(
-          SELECT count(*)::int FROM accommodation_accommodation WHERE owner_id = "account_owner"."id"
+          SELECT count(*)::int FROM accommodation WHERE owner_id = "owner"."id"
         )`,
         nbDepublished: sql<number>`(
-          SELECT count(*)::int FROM accommodation_accommodation
-          WHERE owner_id = "account_owner"."id" AND published = false
+          SELECT count(*)::int FROM accommodation
+          WHERE owner_id = "owner"."id" AND published = false
         )`,
       })
       .from(owners)

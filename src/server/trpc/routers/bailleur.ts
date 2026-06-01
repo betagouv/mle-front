@@ -122,7 +122,7 @@ const accommodationSelectFields = {
   city: cities.name,
   postalCode: accommodationAddresses.postalCode,
   residenceType: accommodations.residenceType,
-  targetAudience: accommodations.target_audience,
+  targetAudience: accommodations.targetAudience,
   published: accommodations.published,
   nbTotalApartments: accommodations.nbTotalApartments,
   nbAccessibleApartments: accommodations.nbAccessibleApartments,
@@ -320,7 +320,7 @@ export const bailleurRouter = createTRPCRouter({
         name: normalizeAccommodationName(name),
         slug,
         residenceType: fields.residence_type ?? null,
-        target_audience: fields.target_audience ?? null,
+        targetAudience: fields.target_audience ?? null,
         description: fields.description
           ? sanitize(fields.description, { ALLOWED_TAGS: RICH_TEXT_ALLOWED_TAGS, ALLOWED_ATTR: RICH_TEXT_ALLOWED_ATTR })
           : null,
