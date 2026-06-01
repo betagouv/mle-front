@@ -1,10 +1,10 @@
 'use client'
 
-import Pagination from '@codegouvfr/react-dsfr/Pagination'
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 import { ActivityItem } from '~/components/administration/activity-item'
+import { Pagination } from '~/components/ui/pagination'
 import { useTRPC } from '~/server/trpc/client'
 import { ACTION_LABELS, ALL_ACTIONS } from '~/utils/activity-actions'
 import styles from '../administration.module.css'

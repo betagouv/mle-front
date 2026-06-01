@@ -1,12 +1,12 @@
 'use client'
 
 import { Input } from '@codegouvfr/react-dsfr/Input'
-import Pagination from '@codegouvfr/react-dsfr/Pagination'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs'
 import type { ReactNode } from 'react'
+import { Pagination } from '~/components/ui/pagination'
 import { useOwnerStatistics } from '~/hooks/use-owner-statistics'
 import { sPluriel } from '~/utils/sPluriel'
 import styles from './engagement-statistics.module.css'
