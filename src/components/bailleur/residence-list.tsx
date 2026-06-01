@@ -61,7 +61,7 @@ export const ResidenceList: FC = () => {
     ownerId: parseAsInteger,
   })
 
-  const accommodationsList = accommodations?.results.features || []
+  const accommodationsList = accommodations?.results || []
 
   if (isLoading) {
     return <ResidenceListSkeleton />
@@ -81,26 +81,7 @@ export const ResidenceList: FC = () => {
       <div className="fr-flex fr-direction-column fr-flex-gap-6v">
         {accommodations?.count &&
           accommodationsList.map((accommodation, index) => {
-            const {
-              nb_t1_available,
-              nb_t1_bis_available,
-              nb_t2_available,
-              nb_t3_available,
-              nb_t4_available,
-              nb_t5_available,
-              nb_t6_available,
-              nb_t7_more_available,
-            } = accommodation.properties
-            const nbAvailable = calculateAvailability({
-              nb_t1_available,
-              nb_t1_bis_available,
-              nb_t2_available,
-              nb_t3_available,
-              nb_t4_available,
-              nb_t5_available,
-              nb_t6_available,
-              nb_t7_more_available,
-            })
+            const nbAvailable = calculateAvailability(accommodation.typologies)
 
             const badgeAvailability = (
               <AvailabilityBadge
@@ -122,13 +103,13 @@ export const ResidenceList: FC = () => {
                 <ResidenceCard
                   key={index}
                   accomodation={accommodation}
-                  href={buildHref(`/bailleur/residences/${accommodation.properties.slug}`, { ownerId: queryStates.ownerId?.toString() })}
+                  href={buildHref(`/bailleur/residences/${accommodation.slug}`, { ownerId: queryStates.ownerId?.toString() })}
                 />
                 <UpdateResidenceList accommodation={accommodation}>
                   <div className="fr-flex fr-justify-content-space-between">
-                    {!!accommodation.properties.nb_total_apartments && (
+                    {!!accommodation.nbTotalApartments && (
                       <span className="fr-text-mention--grey fr-text--xl fr-mb-0">
-                        {accommodation.properties.nb_total_apartments} logement{sPluriel(accommodation.properties.nb_total_apartments ?? 0)}
+                        {accommodation.nbTotalApartments} logement{sPluriel(accommodation.nbTotalApartments ?? 0)}
                       </span>
                     )}
                     {badgeAvailability}
@@ -139,10 +120,10 @@ export const ResidenceList: FC = () => {
             )
           })}
       </div>
-      {accommodations && accommodations.count > accommodations.page_size && (
+      {accommodations && accommodations.count > accommodations.pageSize && (
         <Pagination
           showFirstLast={false}
-          count={Math.ceil(accommodations.count / accommodations.page_size)}
+          count={Math.ceil(accommodations.count / accommodations.pageSize)}
           defaultPage={queryStates.page ?? 1}
           className="fr-flex fr-justify-content-center fr-align-items-center fr-py-2w"
           getPageLinkProps={(page: number) => {

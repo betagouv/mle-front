@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm'
 import * as XLSX from 'xlsx'
 import { closeDb, db } from '~/server/db'
 import { accommodations } from '~/server/db/schema'
+import { mergeTypologiesFromFlat, omitFlatTypologyFields } from '~/server/lib/typologies'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import {
   buildDisplaySourceId,
@@ -45,10 +46,8 @@ type Options = {
   limit?: number
 }
 
-const SURFACE_FIELDS: Record<
-  TypoCategory,
-  { min: keyof typeof accommodations.$inferSelect; max: keyof typeof accommodations.$inferSelect }
-> = {
+// Flat camelCase keys consumed by the typology bridge (mergeTypologiesFromFlat), not DB columns.
+const SURFACE_FIELDS: Record<TypoCategory, { min: string; max: string }> = {
   t1: { min: 'superficieMinT1', max: 'superficieMaxT1' },
   t1bis: { min: 'superficieMinT1Bis', max: 'superficieMaxT1Bis' },
   t2: { min: 'superficieMinT2', max: 'superficieMaxT2' },
@@ -160,7 +159,9 @@ export async function importCrousSurfaces(filePath: string, options: Options) {
     if (!options.dryRun && pendingUpdates.length > 0) {
       await db.transaction(async (tx) => {
         for (const { id, update } of pendingUpdates) {
-          await tx.update(accommodations).set(update).where(eq(accommodations.id, id))
+          await tx.update(accommodations).set(omitFlatTypologyFields(update)).where(eq(accommodations.id, id))
+          // Merge the new surface bounds into existing typology child rows (counts/prices preserved).
+          await mergeTypologiesFromFlat(tx, id, update)
         }
       })
     }

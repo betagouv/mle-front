@@ -24,67 +24,30 @@ export function DashboardResidences({ accommodations, page, ownerId }: Dashboard
     <div className={styles.statisticsContainer}>
       <span className="fr-h5">{t('dashboard.statistics.title')}</span>
       <div className={styles.statisticsGrid}>
-        {accommodations.results.features.map((res, index) => {
-          const {
-            nb_t1_available,
-            nb_t1_bis_available,
-            nb_t2_available,
-            nb_t3_available,
-            nb_t4_available,
-            nb_t5_available,
-            nb_t6_available,
-            nb_t7_more_available,
-            nb_t1,
-            nb_t1_bis,
-            nb_t2,
-            nb_t3,
-            nb_t4,
-            nb_t5,
-            nb_t6,
-            nb_t7_more,
-          } = res.properties
-          const calculatedAvailability = calculateAvailability(
-            {
-              nb_t1_available,
-              nb_t1_bis_available,
-              nb_t2_available,
-              nb_t3_available,
-              nb_t4_available,
-              nb_t5_available,
-              nb_t6_available,
-              nb_t7_more_available,
-            },
-            { nb_t1, nb_t1_bis, nb_t2, nb_t3, nb_t4, nb_t5, nb_t6, nb_t7_more },
-          )
-          const available = calculatedAvailability
-          const total = res.properties.nb_total_apartments || 0
+        {accommodations.results.map((res, index) => {
+          const available = calculateAvailability(res.typologies)
+          const total = res.nbTotalApartments || 0
 
           return (
             <div key={index} className={clsx('fr-px-3w fr-py-2w', styles.statisticsCard)}>
               <div>
                 <div className="fr-flex fr-justify-content-space-between fr-align-items-center">
-                  <Link
-                    className="fr-link fr-link--no-underline"
-                    href={buildHref(`/bailleur/residences/${res.properties.slug}`, { ownerId })}
-                  >
-                    <span className="fr-text--bold fr-text-title--blue-france fr-text--lg">{res.properties.name}</span>
+                  <Link className="fr-link fr-link--no-underline" href={buildHref(`/bailleur/residences/${res.slug}`, { ownerId })}>
+                    <span className="fr-text--bold fr-text-title--blue-france fr-text--lg">{res.name}</span>
                   </Link>
-                  {!res.properties.published && (
+                  {!res.published && (
                     <Badge severity="warning" noIcon>
                       Dépubliée
                     </Badge>
                   )}
                 </div>
                 <p className="fr-text--xs fr-mb-0 fr-mt-1v fr-text-mention--grey">
-                  {res.properties.postal_code} {res.properties.city}
+                  {res.postalCode} {res.city}
                 </p>
               </div>
               <ResidenceChart available={available} total={total} />
               <div className="fr-flex fr-justify-content-end">
-                <Link
-                  className="fr-link fr-link--no-underline"
-                  href={buildHref(`/bailleur/residences/${res.properties.slug}`, { ownerId })}
-                >
+                <Link className="fr-link fr-link--no-underline" href={buildHref(`/bailleur/residences/${res.slug}`, { ownerId })}>
                   <span className="ri-arrow-right-line fr-text-title--blue-france ri-xl" />
                 </Link>
               </div>
@@ -92,10 +55,10 @@ export function DashboardResidences({ accommodations, page, ownerId }: Dashboard
           )
         })}
       </div>
-      {accommodations.count > accommodations.page_size && (
+      {accommodations.count > accommodations.pageSize && (
         <Pagination
           showFirstLast={false}
-          count={Math.ceil(accommodations.count / accommodations.page_size)}
+          count={Math.ceil(accommodations.count / accommodations.pageSize)}
           defaultPage={page}
           className="fr-flex fr-justify-content-center fr-align-items-center fr-py-2w"
           getPageLinkProps={(p: number) => ({

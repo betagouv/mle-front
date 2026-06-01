@@ -62,7 +62,7 @@ export default async function WidgetLogementsPage({
       ownerSlug: parsedParams.gestionnaire ?? undefined,
     }
     const mainData = queryClient.getQueryData(trpc.accommodations.list.queryOptions(mainQueryInput).queryKey)
-    const excludeIds = mainData?.results.features.map((f) => f.id) ?? []
+    const excludeIds = mainData?.results.map((f) => f.id) ?? []
 
     await queryClient.prefetchQuery(
       trpc.accommodations.listExpandedByCity.queryOptions({

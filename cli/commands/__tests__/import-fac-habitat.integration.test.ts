@@ -5,7 +5,14 @@ import { and, eq } from 'drizzle-orm'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createAccommodation, createExternalSource, createOwner } from '../../../src/__tests__/fixtures/factories'
 import { getTestDb } from '../../../src/__tests__/helpers/test-db'
-import { accommodationAddresses, accommodations, externalSources, owners } from '../../../src/server/db/schema'
+import { accommodationAddresses, accommodations, accommodationTypologies, externalSources, owners } from '../../../src/server/db/schema'
+import { typologiesByType } from '../../../src/server/lib/typologies'
+
+async function loadTypologies(accommodationId: number) {
+  return typologiesByType(
+    await getTestDb().select().from(accommodationTypologies).where(eq(accommodationTypologies.accommodationId, accommodationId)),
+  )
+}
 
 const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)
@@ -92,10 +99,11 @@ describe('import-fac-habitat integration', () => {
     expect(addr.postalCode).toBe('75001')
     expect(created!.residenceType).toBe('residence-etudiante')
     expect(created!.published).toBe(true)
-    expect(created!.nbT1).toBe(10)
-    expect(created!.nbT2).toBe(5)
-    expect(created!.priceMinT1).toBe(400)
-    expect(created!.priceMaxT1).toBe(500)
+    const typos = await loadTypologies(created!.id)
+    expect(typos.t1?.nbTotal).toBe(10)
+    expect(typos.t2?.nbTotal).toBe(5)
+    expect(typos.t1?.priceMin).toBe(400)
+    expect(typos.t1?.priceMax).toBe(500)
     expect(created!.laundryRoom).toBe(true)
     expect(created!.parking).toBe(false)
     expect(created!.residenceManager).toBe(true)
@@ -138,7 +146,7 @@ describe('import-fac-habitat integration', () => {
 
     const acc = await db.select().from(accommodations).where(eq(accommodations.id, sources[0].accommodationId))
     expect(acc[0].name).toBe('Résidence Lune Rénovée')
-    expect(acc[0].nbT1).toBe(20)
+    expect((await loadTypologies(acc[0].id)).t1?.nbTotal).toBe(20)
   })
 
   it('creates owner if it does not exist', async () => {
@@ -196,13 +204,14 @@ describe('import-fac-habitat integration', () => {
     const accs = await db.select().from(accommodations)
     const acc = accs.find((a) => a.externalReference === '100')
     expect(acc).toBeDefined()
-    expect(acc!.nbT1Bis).toBe(7) // 3 + 2 + 1 + 1
-    expect(acc!.nbT2).toBe(3) // 2 + 1
-    expect(acc!.nbT3).toBe(6) // 4 + 2
-    expect(acc!.nbT5).toBe(3) // 1 + 2
-    expect(acc!.priceMinT1Bis).toBe(300) // min(350, 300, 400)
-    expect(acc!.priceMaxT1Bis).toBe(550) // max(500, 450, 550)
-    expect(acc!.priceMinT2).toBe(600) // min(600, 650, 700)
+    const typos = await loadTypologies(acc!.id)
+    expect(typos.t1_bis?.nbTotal).toBe(7) // 3 + 2 + 1 + 1
+    expect(typos.t2?.nbTotal).toBe(3) // 2 + 1
+    expect(typos.t3?.nbTotal).toBe(6) // 4 + 2
+    expect(typos.t5?.nbTotal).toBe(3) // 1 + 2
+    expect(typos.t1_bis?.priceMin).toBe(300) // min(350, 300, 400)
+    expect(typos.t1_bis?.priceMax).toBe(550) // max(500, 450, 550)
+    expect(typos.t2?.priceMin).toBe(600) // min(600, 650, 700)
   })
 
   it('dry-run does not modify the database', async () => {
@@ -311,9 +320,11 @@ describe('import-fac-habitat integration', () => {
 
     const [acc] = await db.select().from(accommodations).where(eq(accommodations.externalReference, '9001'))
     expect(acc).toBeDefined()
-    expect(acc!.nbT1BisAvailable).toBe(5)
-    expect(acc!.nbT2Available).toBe(0)
-    expect(acc!.nbT3Available).toBeNull()
+    const typos = await loadTypologies(acc!.id)
+    expect(typos.t1_bis?.nbAvailable).toBe(5)
+    expect(typos.t2?.nbAvailable).toBe(0)
+    // t3 has no stock → no typology row exists
+    expect(typos.t3).toBeUndefined()
   })
 
   it('slug must not change on re-import with same name', async () => {

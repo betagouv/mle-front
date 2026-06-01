@@ -10,7 +10,14 @@ import {
   createOwner,
 } from '../../../src/__tests__/fixtures/factories'
 import { getTestDb } from '../../../src/__tests__/helpers/test-db'
-import { accommodationAddresses, accommodations, externalSources } from '../../../src/server/db/schema'
+import { accommodationAddresses, accommodations, accommodationTypologies, externalSources } from '../../../src/server/db/schema'
+import { typologiesByType } from '../../../src/server/lib/typologies'
+
+async function loadTypologies(accommodationId: number) {
+  return typologiesByType(
+    await getTestDb().select().from(accommodationTypologies).where(eq(accommodationTypologies.accommodationId, accommodationId)),
+  )
+}
 
 const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)
@@ -155,12 +162,13 @@ describe('import-arpej-ibail integration', () => {
     expect(result.created).toBe(1)
 
     const [created] = await db.select().from(accommodations).where(eq(accommodations.name, 'Résidence Alexandre Manceau'))
-    expect(created!.nbT1).toBe(259)
-    expect(created!.nbT1Available).toBe(1)
-    expect(created!.priceMinT1).toBe(381)
+    const typos = await loadTypologies(created!.id)
+    expect(typos.t1?.nbTotal).toBe(259)
+    expect(typos.t1?.nbAvailable).toBe(1)
+    expect(typos.t1?.priceMin).toBe(381)
     expect(created!.priceMin).toBe(381)
-    expect(created!.superficieMinT1).toBe(18)
-    expect(created!.superficieMaxT1).toBe(48)
+    expect(typos.t1?.superficieMin).toBe(18)
+    expect(typos.t1?.superficieMax).toBe(48)
     expect(created!.imagesUrls).toEqual(['https://s3.example.com/test.jpg'])
     expect(created!.externalUrl).toBe('https://www.arpej.fr/fr/residence/alexandre-manceau-residence-etudiante-palaiseau/')
   })
@@ -214,8 +222,9 @@ describe('import-arpej-ibail integration', () => {
     expect(result.created).toBe(1)
 
     const [created] = await db.select().from(accommodations).where(eq(accommodations.name, 'Résidence Jacky Dodin'))
-    expect(created!.nbT1).toBe(149)
-    expect(created!.nbT1Available).toBe(4)
+    const typos = await loadTypologies(created!.id)
+    expect(typos.t1?.nbTotal).toBe(149)
+    expect(typos.t1?.nbAvailable).toBe(4)
     expect(created!.nbTotalApartments).toBe(149)
   })
 
@@ -275,8 +284,9 @@ describe('import-arpej-ibail integration', () => {
     expect(updated!.description).toBe('Description existante')
     expect(updated!.imagesUrls).toEqual(['https://s3.example.com/existing.jpg'])
     expect(updated!.imagesCount).toBe(1)
-    expect(updated!.nbT1Available).toBe(0)
-    expect(updated!.priceMinT1).toBe(500)
+    const typos = await loadTypologies(updated!.id)
+    expect(typos.t1?.nbAvailable).toBe(0)
+    expect(typos.t1?.priceMin).toBe(500)
   })
 
   it('does not wipe existing scalar values when API sends null or omits fields', async () => {
@@ -344,14 +354,15 @@ describe('import-arpej-ibail integration', () => {
     expect(result.updated).toBe(1)
 
     const [updated] = await db.select().from(accommodations).where(eq(accommodations.id, existing.id))
-    expect(updated!.nbT1).toBe(42)
-    expect(updated!.nbT1Available).toBe(7)
+    const typos = await loadTypologies(updated!.id)
+    expect(typos.t1?.nbTotal).toBe(42)
+    expect(typos.t1?.nbAvailable).toBe(7)
     expect(updated!.nbTotalApartments).toBe(42)
     expect(updated!.priceMin).toBe(430)
-    expect(updated!.priceMinT1).toBe(430)
-    expect(updated!.priceMaxT1).toBe(610)
-    expect(updated!.superficieMinT1).toBe(18)
-    expect(updated!.superficieMaxT1).toBe(32)
+    expect(typos.t1?.priceMin).toBe(430)
+    expect(typos.t1?.priceMax).toBe(610)
+    expect(typos.t1?.superficieMin).toBe(18)
+    expect(typos.t1?.superficieMax).toBe(32)
   })
 
   it('updates existing accommodation on re-import without changing its name', async () => {

@@ -87,7 +87,7 @@ export const getStudentAccommodationPageContext = cache(
         ownerSlug: parsedParams.gestionnaire ?? undefined,
       }
       const mainData = queryClient.getQueryData(trpc.accommodations.list.queryOptions(serverQueryInput).queryKey)
-      const excludeIds = (mainData as { results: { features: { id: number }[] } } | undefined)?.results.features.map((f) => f.id) ?? []
+      const excludeIds = (mainData as { results: { id: number }[] } | undefined)?.results.map((a) => a.id) ?? []
 
       await queryClient.prefetchQuery(
         trpc.accommodations.listExpandedByCity.queryOptions({

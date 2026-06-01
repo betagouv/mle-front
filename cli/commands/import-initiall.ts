@@ -1,6 +1,7 @@
 import { and, eq, sql } from 'drizzle-orm'
 import { db } from '~/server/db'
 import { ensureCity, geocodeAddress } from '~/server/lib/import/geocoder'
+import { omitFlatTypologyFields, syncTypologiesFromFlat } from '~/server/lib/typologies'
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
 import { generateAccommodationKey, uploadFile } from '../../src/server/services/s3'
 import { computeDerivedFields, generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
@@ -236,7 +237,7 @@ const command: ImportCommand = {
         const accommodationData = {
           name,
           published: true,
-          target_audience: residence.acf.residence_for_students_only ? ('etudiants' as const) : null,
+          targetAudience: residence.acf.residence_for_students_only ? ('etudiants' as const) : null,
           nbT1: typology.nbT1,
           nbT1Bis: typology.nbT1Bis,
           nbT2: typology.nbT2,
@@ -267,7 +268,8 @@ const command: ImportCommand = {
 
         if (existingSource[0]) {
           const accommodationId = existingSource[0].accommodationId
-          await db.update(accommodations).set(accommodationData).where(eq(accommodations.id, accommodationId))
+          await db.update(accommodations).set(omitFlatTypologyFields(accommodationData)).where(eq(accommodations.id, accommodationId))
+          await syncTypologiesFromFlat(db, accommodationId, accommodationData)
           await db.delete(accommodationAddresses).where(eq(accommodationAddresses.accommodationId, accommodationId))
           await db.insert(accommodationAddresses).values({ accommodationId, isMain: true, ...addressData })
           result.updated++
@@ -276,8 +278,9 @@ const command: ImportCommand = {
           const slug = await findAvailableSlug(generateSlug(name), db, accommodations)
           const [newAccommodation] = await db
             .insert(accommodations)
-            .values({ ...accommodationData, slug, createdAt: new Date() })
+            .values(omitFlatTypologyFields({ ...accommodationData, slug, createdAt: new Date() }))
             .returning({ id: accommodations.id })
+          await syncTypologiesFromFlat(db, newAccommodation.id, accommodationData)
 
           await db.insert(accommodationAddresses).values({ accommodationId: newAccommodation.id, isMain: true, ...addressData })
 

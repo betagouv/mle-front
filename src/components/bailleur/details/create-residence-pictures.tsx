@@ -12,7 +12,7 @@ export const CreateResidencePictures = () => {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [fileError, setFileError] = useState<string | null>(null)
   const t = useTranslations('toast')
-  const selectedFiles = watch('images_files') || []
+  const selectedFiles = watch('imagesFiles') || []
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || [])
@@ -24,7 +24,7 @@ export const CreateResidencePictures = () => {
         setFileError(validationError)
         return
       }
-      setValue('images_files', [...selectedFiles, ...files])
+      setValue('imagesFiles', [...selectedFiles, ...files])
     }
 
     if (fileInputRef.current) {
@@ -34,7 +34,7 @@ export const CreateResidencePictures = () => {
 
   const handleRemoveFile = (index: number) => {
     const newFiles = selectedFiles.filter((_, i) => i !== index)
-    setValue('images_files', newFiles)
+    setValue('imagesFiles', newFiles)
   }
 
   return (

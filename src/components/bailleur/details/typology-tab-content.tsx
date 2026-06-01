@@ -17,7 +17,7 @@ type TypologyTabContentProps =
       index: number
       typologyType?: string
       usedTypes?: string[]
-      onDelete: () => void
+      onDelete?: () => void
     }
   | {
       mode: 'update'

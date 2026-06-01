@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, reverseGeocode } from '~/server/lib/import/geocoder'
+import { omitFlatTypologyFields, syncTypologiesFromFlat } from '~/server/lib/typologies'
 import { sanitizeHTML } from '~/utils/sanitize-html'
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
 import { computeDerivedFields, generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
@@ -366,7 +367,7 @@ const command: ImportCommand = {
           name,
           description: item.description_residence ? sanitizeHTML(item.description_residence) : null,
           residenceType: 'residence-etudiante',
-          target_audience: 'etudiants' as const,
+          targetAudience: 'etudiants' as const,
           published: true,
           available: true,
           nbTotalApartments: derived.nbTotalApartments,
@@ -419,18 +420,22 @@ const command: ImportCommand = {
         }
         if (existing) {
           // UPDATE — keep existing slug, images, etc.
-          const [updated] = await db.update(accommodations).set(baseFields).where(eq(accommodations.id, existing.id)).returning({
-            slug: accommodations.slug,
-            priceMinT1: accommodations.priceMinT1,
-            name: accommodations.name,
-          })
+          const [updated] = await db
+            .update(accommodations)
+            .set(omitFlatTypologyFields(baseFields))
+            .where(eq(accommodations.id, existing.id))
+            .returning({
+              slug: accommodations.slug,
+              name: accommodations.name,
+            })
+          await syncTypologiesFromFlat(db, existing.id, baseFields)
 
           // Upsert address
           await db.delete(accommodationAddresses).where(eq(accommodationAddresses.accommodationId, existing.id))
           await db.insert(accommodationAddresses).values({ accommodationId: existing.id, isMain: true, ...addressData })
 
           if (options.verbose) {
-            console.log(`    Mise à jour id=${existing.id}, name =${updated.name} slug=${updated.slug} priceMinT1=${updated.priceMinT1}`)
+            console.log(`    Mise à jour id=${existing.id}, name =${updated.name} slug=${updated.slug}`)
           }
 
           // Backfill/update external_sources if needed.
@@ -450,13 +455,16 @@ const command: ImportCommand = {
           const slug = await findAvailableSlug(generateSlug(name), db, accommodations)
           const [created] = await db
             .insert(accommodations)
-            .values({
-              ...baseFields,
-              slug,
-              imagesCount: 0,
-              createdAt: new Date(),
-            })
+            .values(
+              omitFlatTypologyFields({
+                ...baseFields,
+                slug,
+                imagesCount: 0,
+                createdAt: new Date(),
+              }),
+            )
             .returning({ id: accommodations.id, slug: accommodations.slug })
+          await syncTypologiesFromFlat(db, created.id, baseFields)
 
           await db.insert(accommodationAddresses).values({ accommodationId: created.id, isMain: true, ...addressData })
 

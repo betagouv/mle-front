@@ -24,12 +24,9 @@ export const FindStudentAccomodationResultsSections: FC<FindStudentAccomodationR
 }) => {
   const { data: accommodations, isFetching } = useAccomodations()
   const [page] = useQueryState('page', parseAsInteger.withDefault(1))
-  const totalPages = accommodations ? Math.ceil(accommodations.count / accommodations.page_size) : 1
+  const totalPages = accommodations ? Math.ceil(accommodations.count / accommodations.pageSize) : 1
   const isLastPage = page >= totalPages
-  const mainAccommodationIds = useMemo(
-    () => (accommodations?.results.features || []).map((feature) => feature.id),
-    [accommodations?.results.features],
-  )
+  const mainAccommodationIds = useMemo(() => (accommodations?.results || []).map((feature) => feature.id), [accommodations?.results])
   return (
     <>
       <FindStudentAccomodationResultsContent
@@ -40,7 +37,7 @@ export const FindStudentAccomodationResultsSections: FC<FindStudentAccomodationR
         isFetching={isFetching}
       />
       {showNeighbors && isLastPage && (
-        <div className={clsx(accommodations && accommodations.count <= accommodations.page_size && 'fr-mt-4w')}>
+        <div className={clsx(accommodations && accommodations.count <= accommodations.pageSize && 'fr-mt-4w')}>
           <FindStudentAccomodationNeighborsResults territory={territory} user={user} mainAccommodationIds={mainAccommodationIds} />
         </div>
       )}

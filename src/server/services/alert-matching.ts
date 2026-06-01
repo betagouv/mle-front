@@ -22,25 +22,15 @@ export type AlertMatchInput = {
 
 /**
  * Disponibilité totale courante d'une résidence :
- *   - NULL  si tous les compteurs `nb_t*_available` sont NULL (non-renseignée)
+ *   - NULL  si la dispo n'est pas renseignée (aucune typologie n'a de `nbAvailable`)
  *   - sinon la somme des logements disponibles tous types confondus.
  *
- * Mutualisée : le détecteur (delta vs snapshot) et le flux d'amorçage à la création
- * d'alerte (`dispo > 0`) s'appuient sur exactement la même définition.
+ * Depuis le passage aux typologies, cette valeur est dénormalisée sur `accommodation`
+ * (`nbAvailableApartments`, maintenue à l'écriture, NULL = non-renseignée) : le détecteur
+ * (delta vs snapshot) et le flux d'amorçage à la création d'alerte (`dispo > 0`) s'appuient
+ * sur exactement la même définition.
  */
-export const accommodationAvailableCount = sql<number | null>`
-  CASE WHEN ${accommodations.nbT1Available} IS NULL AND ${accommodations.nbT1BisAvailable} IS NULL
-        AND ${accommodations.nbT2Available} IS NULL AND ${accommodations.nbT3Available} IS NULL
-        AND ${accommodations.nbT4Available} IS NULL AND ${accommodations.nbT5Available} IS NULL
-        AND ${accommodations.nbT6Available} IS NULL AND ${accommodations.nbT7MoreAvailable} IS NULL
-       THEN NULL
-       ELSE (
-         coalesce(${accommodations.nbT1Available}, 0) + coalesce(${accommodations.nbT1BisAvailable}, 0) +
-         coalesce(${accommodations.nbT2Available}, 0) + coalesce(${accommodations.nbT3Available}, 0) +
-         coalesce(${accommodations.nbT4Available}, 0) + coalesce(${accommodations.nbT5Available}, 0) +
-         coalesce(${accommodations.nbT6Available}, 0) + coalesce(${accommodations.nbT7MoreAvailable}, 0)
-       )::int
-  END`
+export const accommodationAvailableCount = sql<number | null>`${accommodations.nbAvailableApartments}`
 
 /**
  * Construit la condition d'intersection spatiale pour le niveau de territoire de l'alerte

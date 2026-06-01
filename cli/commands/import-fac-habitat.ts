@@ -6,6 +6,7 @@ import SftpClient from 'ssh2-sftp-client'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, geocodeAddress } from '~/server/lib/import/geocoder'
+import { omitFlatTypologyFields, syncTypologiesFromFlat } from '~/server/lib/typologies'
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
 import { computeDerivedFields, generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '../../src/server/utils/slug'
@@ -314,7 +315,7 @@ const command: ImportCommand = {
         const accommodationData = {
           name: item.name,
           residenceType: 'residence-etudiante',
-          target_audience: 'etudiants' as const,
+          targetAudience: 'etudiants' as const,
           published: true,
           nbT1: typology.nbT1,
           nbT1Bis: typology.nbT1Bis,
@@ -382,7 +383,8 @@ const command: ImportCommand = {
 
         if (existingSource[0]) {
           const accommodationId = existingSource[0].accommodationId
-          await db.update(accommodations).set(accommodationData).where(eq(accommodations.id, accommodationId))
+          await db.update(accommodations).set(omitFlatTypologyFields(accommodationData)).where(eq(accommodations.id, accommodationId))
+          await syncTypologiesFromFlat(db, accommodationId, accommodationData)
           await db.delete(accommodationAddresses).where(eq(accommodationAddresses.accommodationId, accommodationId))
           await db.insert(accommodationAddresses).values({ accommodationId, isMain: true, ...addressData })
           result.updated++
@@ -396,8 +398,9 @@ const command: ImportCommand = {
           const slug = await findAvailableSlug(generateSlug(item.name), db, accommodations)
           const [newAccommodation] = await db
             .insert(accommodations)
-            .values({ ...accommodationData, slug, createdAt: new Date() })
+            .values(omitFlatTypologyFields({ ...accommodationData, slug, createdAt: new Date() }))
             .returning({ id: accommodations.id })
+          await syncTypologiesFromFlat(db, newAccommodation.id, accommodationData)
 
           await db.insert(accommodationAddresses).values({ accommodationId: newAccommodation.id, isMain: true, ...addressData })
 

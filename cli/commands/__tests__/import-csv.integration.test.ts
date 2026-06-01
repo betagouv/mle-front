@@ -5,7 +5,14 @@ import { and, eq } from 'drizzle-orm'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createAccommodation, createExternalSource, createOwner } from '../../../src/__tests__/fixtures/factories'
 import { getTestDb } from '../../../src/__tests__/helpers/test-db'
-import { accommodationAddresses, accommodations, externalSources, owners } from '../../../src/server/db/schema'
+import { accommodationAddresses, accommodations, accommodationTypologies, externalSources, owners } from '../../../src/server/db/schema'
+import { typologiesByType } from '../../../src/server/lib/typologies'
+
+async function loadTypologies(accommodationId: number) {
+  return typologiesByType(
+    await getTestDb().select().from(accommodationTypologies).where(eq(accommodationTypologies.accommodationId, accommodationId)),
+  )
+}
 
 const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)
@@ -230,11 +237,12 @@ describe('import-csv integration', () => {
     expect(addr.postalCode).toBe('75001')
     expect(created!.residenceType).toBe('residence-etudiante')
     expect(created!.published).toBe(true)
-    expect(created!.nbT1).toBe(10)
-    expect(created!.nbT1Bis).toBe(5)
-    expect(created!.nbT2).toBe(3)
-    expect(created!.priceMinT1).toBe(400)
-    expect(created!.priceMaxT1).toBe(500)
+    const typos = await loadTypologies(created!.id)
+    expect(typos.t1?.nbTotal).toBe(10)
+    expect(typos.t1_bis?.nbTotal).toBe(5)
+    expect(typos.t2?.nbTotal).toBe(3)
+    expect(typos.t1?.priceMin).toBe(400)
+    expect(typos.t1?.priceMax).toBe(500)
     expect(created!.priceMin).toBe(400)
     expect(created!.nbTotalApartments).toBe(20)
     expect(created!.nbAccessibleApartments).toBe(2)
@@ -299,7 +307,7 @@ describe('import-csv integration', () => {
     expect(sources).toHaveLength(1)
 
     const acc = await db.select().from(accommodations).where(eq(accommodations.id, sources[0].accommodationId))
-    expect(acc[0].nbT1).toBe(20)
+    expect((await loadTypologies(acc[0].id)).t1?.nbTotal).toBe(20)
   })
 
   it('uses lat/lng from CSV when present', async () => {
@@ -433,9 +441,10 @@ describe('import-csv integration', () => {
     await command.execute({ file: filePath, source: 'test-digit' })
 
     const accs = await db.select().from(accommodations)
-    expect(accs[0].priceMinT1).toBe(400)
-    expect(accs[0].priceMaxT1).toBe(500)
-    expect(accs[0].nbT1).toBe(10)
+    const digitTypos = await loadTypologies(accs[0].id)
+    expect(digitTypos.t1?.priceMin).toBe(400)
+    expect(digitTypos.t1?.priceMax).toBe(500)
+    expect(digitTypos.t1?.nbTotal).toBe(10)
   })
 
   it('handles pictures with S3 URLs from current bucket (kept as-is)', async () => {

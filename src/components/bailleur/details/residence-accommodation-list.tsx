@@ -3,170 +3,74 @@
 import Tabs from '@codegouvfr/react-dsfr/Tabs'
 import { useTranslations } from 'next-intl'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { useFieldArray, useFormContext } from 'react-hook-form'
 import { AvailabilityBadge } from '~/components/shared/availability-badge'
 import { useIsAdmin } from '~/hooks/use-is-admin'
 import { TAccomodationMy } from '~/schemas/accommodations/accommodations'
-import { TYPOLOGIES } from '~/schemas/accommodations/create-residence'
+import { TYPOLOGIES, TYPOLOGY_TYPES } from '~/schemas/accommodations/typology'
+import { TUpdateResidence } from '~/schemas/accommodations/update-residence'
 import { calculateAvailability } from '~/utils/calculateAvailability'
 import { TypologyTabContent } from './typology-tab-content'
 
-type NewTypology = { id: number; fieldSuffix: string | null }
-
 export const ResidenceAccommodationList = ({ accommodation }: { accommodation: TAccomodationMy }) => {
   const isAdmin = useIsAdmin()
-  const isImported = accommodation.properties.is_imported
+  const isImported = accommodation.isImported
   const t = useTranslations('findAccomodation.card')
   const tTypology = useTranslations('bailleur.residences.details.typologyTab')
   const {
-    setValue,
+    control,
     watch,
     formState: { errors },
-  } = useFormContext()
-  const [newTypologies, setNewTypologies] = useState<NewTypology[]>([])
-  const [nextId, setNextId] = useState(1)
+  } = useFormContext<TUpdateResidence>()
 
-  // Calculer le premier onglet disponible
-  const getInitialTabId = () => {
-    const { nb_t1, nb_t1_bis, nb_t2, nb_t3, nb_t4, nb_t5, nb_t6, nb_t7_more } = accommodation.properties
-    const typologyData = [
-      { fieldSuffix: 't1', total: nb_t1 },
-      { fieldSuffix: 't1_bis', total: nb_t1_bis },
-      { fieldSuffix: 't2', total: nb_t2 },
-      { fieldSuffix: 't3', total: nb_t3 },
-      { fieldSuffix: 't4', total: nb_t4 },
-      { fieldSuffix: 't5', total: nb_t5 },
-      { fieldSuffix: 't6', total: nb_t6 },
-      { fieldSuffix: 't7_more', total: nb_t7_more },
-    ]
-    const firstWithData = typologyData.find((t) => t.total !== null && t.total >= 1)
-    return firstWithData ? `tab-${firstWithData.fieldSuffix}` : 'tab-add'
-  }
+  const watchedTypologies = watch('typologies')
+  const { fields, append, remove } = useFieldArray({ control, name: 'typologies' })
 
+  const getInitialTabId = () => (fields.length > 0 ? 'tab-0' : 'tab-add')
   const [selectedTabId, setSelectedTabId] = useQueryState('typology', parseAsString.withDefault(getInitialTabId()))
 
-  const nbAvailable = calculateAvailability({
-    nb_t1_available: accommodation.properties.nb_t1_available,
-    nb_t1_bis_available: accommodation.properties.nb_t1_bis_available,
-    nb_t2_available: accommodation.properties.nb_t2_available,
-    nb_t3_available: accommodation.properties.nb_t3_available,
-    nb_t4_available: accommodation.properties.nb_t4_available,
-    nb_t5_available: accommodation.properties.nb_t5_available,
-    nb_t6_available: accommodation.properties.nb_t6_available,
-    nb_t7_more_available: accommodation.properties.nb_t7_more_available,
-  })
+  const nbAvailable = calculateAvailability(accommodation.typologies)
+  const usedTypes = watchedTypologies?.map((t) => t.type).filter(Boolean) ?? []
 
-  // Observer les valeurs du formulaire pour les totaux (réactif aux changements)
-  const formTotals: Record<string, number | null> = {
-    t1: watch('nb_t1'),
-    t1_bis: watch('nb_t1_bis'),
-    t2: watch('nb_t2'),
-    t3: watch('nb_t3'),
-    t4: watch('nb_t4'),
-    t5: watch('nb_t5'),
-    t6: watch('nb_t6'),
-    t7_more: watch('nb_t7_more'),
+  const sortedFieldsWithIndex = fields
+    .map((field, originalIndex) => ({ field, originalIndex, type: watchedTypologies?.[originalIndex]?.type }))
+    .sort((a, b) => {
+      const indexA = TYPOLOGIES.findIndex((t) => t.type === a.type)
+      const indexB = TYPOLOGIES.findIndex((t) => t.type === b.type)
+      if (indexA === -1) return 1
+      if (indexB === -1) return -1
+      return indexA - indexB
+    })
+
+  const canAddMore = fields.length < TYPOLOGY_TYPES.length && (!isImported || isAdmin)
+
+  const handleAddTypology = () => {
+    append({
+      type: '' as NonNullable<TUpdateResidence['typologies']>[number]['type'],
+      priceMin: undefined as unknown as number,
+      priceMax: undefined as unknown as number,
+      superficieMin: undefined as unknown as number,
+      superficieMax: undefined as unknown as number,
+      colocation: false,
+      nbTotal: undefined as unknown as number,
+      nbAvailable: undefined as unknown as number,
+    })
+    setSelectedTabId(`tab-${fields.length}`)
   }
 
-  // Typologies existantes (basé sur les valeurs du formulaire, réactif aux suppressions)
-  const existingTypologies = TYPOLOGIES.filter((typo) => formTotals[typo.fieldSuffix] != null && formTotals[typo.fieldSuffix]! >= 1)
-
-  // FieldSuffixes déjà utilisés (existants + nouveaux avec type sélectionné)
-  const usedFieldSuffixes = [
-    ...existingTypologies.map((t) => t.fieldSuffix),
-    ...newTypologies.filter((t) => t.fieldSuffix !== null).map((t) => t.fieldSuffix as string),
-  ]
-
-  // Toutes les typologies visibles, triées selon l'ordre de TYPOLOGIES
-  const sortedVisibleTypologies = TYPOLOGIES.filter((typo) => usedFieldSuffixes.includes(typo.fieldSuffix))
-
-  // Typologies disponibles pour ajout
-  const availableTypologies = TYPOLOGIES.filter((typo) => !usedFieldSuffixes.includes(typo.fieldSuffix))
-
-  const canAddMore = availableTypologies.length > 0 && (!isImported || isAdmin)
-
-  const handleAddNewTypology = () => {
-    const newId = nextId
-    setNewTypologies((prev) => [...prev, { id: newId, fieldSuffix: null }])
-    setNextId((prev) => prev + 1)
-    setSelectedTabId(`tab-new-${newId}`)
+  const handleRemoveTypology = (index: number) => {
+    remove(index)
+    if (fields.length > 1) setSelectedTabId(`tab-${index > 0 ? index - 1 : 0}`)
   }
 
-  const handleTypeSelect = (newTypologyId: number, fieldSuffix: string) => {
-    setNewTypologies((prev) => prev.map((t) => (t.id === newTypologyId ? { ...t, fieldSuffix } : t)))
-    setSelectedTabId(`tab-${fieldSuffix}`)
+  const hasTypologyError = (index: number) => {
+    const typologyErrors = errors.typologies
+    return !!typologyErrors?.[index] && Object.keys(typologyErrors[index] ?? {}).length > 0
   }
+  const hasAnyTypologyError = fields.some((_, index) => hasTypologyError(index))
 
-  const handleTabChange = (tabId: string) => {
-    if (tabId === 'tab-add') {
-      handleAddNewTypology()
-    } else {
-      setSelectedTabId(tabId)
-    }
-  }
-
-  const handleDeleteExistingTypology = (fieldSuffix: string) => {
-    // Mettre les champs à null dans le formulaire (l'onglet disparaîtra automatiquement via watch)
-    const fields = [
-      `nb_${fieldSuffix}`,
-      `nb_${fieldSuffix}_available`,
-      `price_min_${fieldSuffix}`,
-      `price_max_${fieldSuffix}`,
-      `superficie_min_${fieldSuffix}`,
-      `superficie_max_${fieldSuffix}`,
-    ]
-    for (const field of fields) {
-      setValue(field, null)
-    }
-
-    // Sélectionner le premier onglet disponible après suppression
-    const remainingTypologies = sortedVisibleTypologies.filter((t) => t.fieldSuffix !== fieldSuffix)
-    if (remainingTypologies.length > 0) {
-      setSelectedTabId(`tab-${remainingTypologies[0].fieldSuffix}`)
-    } else if (newTypologies.length > 0) {
-      setSelectedTabId(`tab-new-${newTypologies[0].id}`)
-    } else {
-      setSelectedTabId('tab-add')
-    }
-  }
-
-  const handleDeleteNewTypology = (id: number) => {
-    setNewTypologies((prev) => prev.filter((t) => t.id !== id))
-    // Sélectionner un autre onglet
-    if (sortedVisibleTypologies.length > 0) {
-      setSelectedTabId(`tab-${sortedVisibleTypologies[0].fieldSuffix}`)
-    } else {
-      setSelectedTabId('tab-add')
-    }
-  }
-
-  const hasAnyTypologyError = sortedVisibleTypologies.some((typo) => {
-    const fieldNames = [
-      `nb_${typo.fieldSuffix}`,
-      `nb_${typo.fieldSuffix}_available`,
-      `price_min_${typo.fieldSuffix}`,
-      `price_max_${typo.fieldSuffix}`,
-      `superficie_min_${typo.fieldSuffix}`,
-      `superficie_max_${typo.fieldSuffix}`,
-    ]
-    return fieldNames.some((field) => errors[field])
-  })
-
-  const hasTypologyError = (fieldSuffix: string) => {
-    const fieldNames = [
-      `nb_${fieldSuffix}`,
-      `nb_${fieldSuffix}_available`,
-      `price_min_${fieldSuffix}`,
-      `price_max_${fieldSuffix}`,
-      `superficie_min_${fieldSuffix}`,
-      `superficie_max_${fieldSuffix}`,
-    ]
-    return fieldNames.some((field) => errors[field])
-  }
-
-  const tabLabel = (label: string, fieldSuffix: string) =>
-    hasTypologyError(fieldSuffix) ? (
+  const tabLabel = (label: string, index: number) =>
+    hasTypologyError(index) ? (
       <span>
         {label} <span style={{ color: 'var(--text-default-error)', fontWeight: 'bold' }}>●</span>
       </span>
@@ -174,81 +78,49 @@ export const ResidenceAccommodationList = ({ accommodation }: { accommodation: T
       label
     )
 
-  // Construire les tabs
   const tabs = [
-    // Onglets triés selon l'ordre de TYPOLOGIES
-    ...sortedVisibleTypologies.map((typo) => ({
-      tabId: `tab-${typo.fieldSuffix}`,
-      label: tabLabel(typo.type, typo.fieldSuffix),
+    ...sortedFieldsWithIndex.map(({ originalIndex, type }) => ({
+      tabId: `tab-${originalIndex}`,
+      label: tabLabel(type || 'Nouveau', originalIndex),
     })),
-    // Onglets nouveaux (sans type sélectionné)
-    ...newTypologies
-      .filter((t) => t.fieldSuffix === null)
-      .map((t) => ({
-        tabId: `tab-new-${t.id}`,
-        label: 'Nouveau',
-      })),
-    // Onglet Ajouter
     ...(canAddMore ? [{ tabId: 'tab-add', label: 'Ajouter' }] : []),
   ]
 
-  const validTabIds = tabs.map((t) => t.tabId)
-  useEffect(() => {
-    if (selectedTabId && !validTabIds.includes(selectedTabId)) {
-      const firstValidTab = validTabIds[0] || 'tab-add'
-      setSelectedTabId(firstValidTab)
-    }
-  }, [selectedTabId, validTabIds, setSelectedTabId])
-
-  const badgeAvailability = (
-    <AvailabilityBadge
-      nbAvailable={nbAvailable}
-      noAvailabilityText={t('noAvailability')}
-      availabilityText={t('availability')}
-      unknownAvailabilityText={t('unknownAvailability')}
-      as="span"
-      context="owner"
-    />
-  )
+  const handleTabChange = (tabId: string) => {
+    if (tabId === 'tab-add') handleAddTypology()
+    else setSelectedTabId(tabId)
+  }
 
   return (
     <div className="fr-border-bottom">
       <div className="fr-p-2w fr-p-md-6w">
         <div className="fr-flex fr-justify-content-space-between fr-align-items-center fr-mb-2w">
-          <h3 className="fr-mb-0">{accommodation.properties.nb_total_apartments} logements</h3>
-          {badgeAvailability}
+          <h3 className="fr-mb-0">{accommodation.nbTotalApartments} logements</h3>
+          <AvailabilityBadge
+            nbAvailable={nbAvailable}
+            noAvailabilityText={t('noAvailability')}
+            availabilityText={t('availability')}
+            unknownAvailabilityText={t('unknownAvailability')}
+            as="span"
+            context="owner"
+          />
         </div>
 
         {hasAnyTypologyError && <p className="fr-error-text fr-mb-2w">{tTypology('tabsHaveErrors')}</p>}
 
         <div>
           <Tabs selectedTabId={selectedTabId} onTabChange={handleTabChange} tabs={tabs}>
-            {/* Onglets triés selon l'ordre de TYPOLOGIES */}
-            {sortedVisibleTypologies.map((typo) => (
-              <div key={typo.fieldSuffix} className={selectedTabId === `tab-${typo.fieldSuffix}` ? '' : 'fr-hidden'}>
+            {sortedFieldsWithIndex.map(({ field, originalIndex }) => (
+              <div key={field.id} className={selectedTabId === `tab-${originalIndex}` ? '' : 'fr-hidden'}>
                 <TypologyTabContent
-                  mode="update"
-                  fieldSuffix={typo.fieldSuffix}
-                  typologyType={typo.type}
-                  isImported={isImported}
-                  onDelete={!isImported || isAdmin ? () => handleDeleteExistingTypology(typo.fieldSuffix) : undefined}
+                  mode="create"
+                  index={originalIndex}
+                  typologyType={watchedTypologies?.[originalIndex]?.type}
+                  usedTypes={usedTypes}
+                  onDelete={!isImported || isAdmin ? () => handleRemoveTypology(originalIndex) : undefined}
                 />
               </div>
             ))}
-            {/* Onglets nouveaux (sans type sélectionné) */}
-            {newTypologies
-              .filter((t) => t.fieldSuffix === null)
-              .map((t) => (
-                <div key={`new-${t.id}`} className={selectedTabId === `tab-new-${t.id}` ? '' : 'fr-hidden'}>
-                  <TypologyTabContent
-                    mode="update-new"
-                    fieldSuffix={null}
-                    availableTypes={availableTypologies.map((typ) => ({ type: typ.type, fieldSuffix: typ.fieldSuffix }))}
-                    onTypeSelect={(fieldSuffix) => handleTypeSelect(t.id, fieldSuffix)}
-                    onDelete={() => handleDeleteNewTypology(t.id)}
-                  />
-                </div>
-              ))}
           </Tabs>
         </div>
       </div>

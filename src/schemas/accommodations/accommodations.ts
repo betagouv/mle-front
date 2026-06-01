@@ -1,188 +1,117 @@
 import { z } from 'zod'
 import { EResidenceType } from '~/enums/residence-type'
 import { ETargetAudience } from '~/enums/target-audience'
-
-export const ZGeometry = z.object({
-  coordinates: z.array(z.number()),
-  type: z.string(),
-})
+import { TYPOLOGY_TYPES } from './typology'
 
 const ZAccommodationAddress = z.object({
   address: z.string(),
   city: z.string(),
-  postal_code: z.string(),
-  is_main: z.boolean(),
+  postalCode: z.string(),
+  isMain: z.boolean(),
 })
+
+/** One typology in the keyed `typologies` object (indexed by typology type = suffix). */
+export const ZTypologyView = z.object({
+  priceMin: z.number().nullable(),
+  priceMax: z.number().nullable(),
+  superficieMin: z.number().nullable(),
+  superficieMax: z.number().nullable(),
+  nbTotal: z.number().nullable(),
+  nbAvailable: z.number().nullable(),
+  colocation: z.boolean(),
+})
+export type TTypologyView = z.infer<typeof ZTypologyView>
+
+/** Keyed typologies object: `{ t1: {...}, t3: {...} }` (only present typologies). */
+export const ZTypologiesRecord = z.partialRecord(z.enum(TYPOLOGY_TYPES), ZTypologyView)
+export type TTypologiesRecord = z.infer<typeof ZTypologiesRecord>
 
 const ZBaseAccommodationInfo = z.object({
   id: z.number(),
   address: z.string().max(255),
   city: z.string(),
-  postal_code: z.string().max(5),
+  citySlug: z.string().optional(),
+  postalCode: z.string().max(5),
   addresses: z.array(ZAccommodationAddress).optional(),
-  department_code: z.string().max(3).optional(),
+  departmentCode: z.string().max(3).optional(),
   name: z.string().max(250),
-  residence_type: z.enum(EResidenceType).nullable(),
-  target_audience: z.enum(ETargetAudience).nullable(),
+  residenceType: z.enum(EResidenceType).nullable(),
+  targetAudience: z.enum(ETargetAudience).nullable(),
   slug: z.string().max(250),
-  accept_waiting_list: z.boolean(),
-  images_urls: z.array(z.string()).nullable(),
+  acceptWaitingList: z.boolean(),
+  imagesUrls: z.array(z.string()).nullable(),
   description: z.string().nullable(),
-  rental_charges_details: z.string().nullable(),
-  external_url: z.string().optional(),
-  virtual_tour_url: z.string().nullable(),
-  updated_at: z.date(),
+  rentalChargesDetails: z.string().nullable(),
+  externalUrl: z.string().optional(),
+  virtualTourUrl: z.string().nullable(),
+  updatedAt: z.date(),
   published: z.boolean(),
-  scholarship_holders_priority: z.boolean(),
-  social_housing_required: z.boolean(),
+  scholarshipHoldersPriority: z.boolean(),
+  socialHousingRequired: z.boolean(),
   wifi: z.boolean(),
-  is_imported: z.boolean().optional(),
+  isImported: z.boolean().optional(),
+  // Inline coordinates (replaces the GeoJSON geometry wrapper).
+  latitude: z.number().nullable(),
+  longitude: z.number().nullable(),
 })
 
-const ZApartmentCounts = z.object({
-  nb_accessible_apartments: z.number().nullable(),
-  nb_coliving_apartments: z.number().nullable(),
-  nb_total_apartments: z.number().nullable(),
-  nb_t1: z.number().nullable(),
-  nb_t1_bis: z.number().nullable(),
-  nb_t2: z.number().nullable(),
-  nb_t3: z.number().nullable(),
-  nb_t4: z.number().nullable(),
-  nb_t5: z.number().nullable(),
-  nb_t6: z.number().nullable(),
-  nb_t7_more: z.number().nullable(),
-})
-
-const ZApartmentAvailability = z.object({
-  nb_t1_available: z.number().nullable(),
-  nb_t1_bis_available: z.number().nullable(),
-  nb_t2_available: z.number().nullable(),
-  nb_t3_available: z.number().nullable(),
-  nb_t4_available: z.number().nullable(),
-  nb_t5_available: z.number().nullable(),
-  nb_t6_available: z.number().nullable(),
-  nb_t7_more_available: z.number().nullable(),
+/** Denormalized aggregates kept on the parent (typology detail lives in `typologies`). */
+const ZAggregates = z.object({
+  nbAccessibleApartments: z.number().nullable(),
+  nbColivingApartments: z.number().nullable(),
+  nbTotalApartments: z.number().nullable(),
+  priceMin: z.number().nullable(),
+  priceMax: z.number().nullable(),
 })
 
 const ZOwnerInfo = z.object({
-  owner_name: z.string().max(150).nullable(),
-  owner_url: z.string().max(500).nullable(),
-})
-
-const ZPricing = z.object({
-  price_min: z.number().nullable(),
-  price_min_t1: z.number().nullable(),
-  price_min_t1_bis: z.number().nullable(),
-  price_min_t2: z.number().nullable(),
-  price_min_t3: z.number().nullable(),
-  price_min_t4: z.number().nullable(),
-  price_min_t5: z.number().nullable(),
-  price_min_t6: z.number().nullable(),
-  price_min_t7_more: z.number().nullable(),
-  price_max: z.number().nullable(),
-  price_max_t1: z.number().nullable(),
-  price_max_t1_bis: z.number().nullable(),
-  price_max_t2: z.number().nullable(),
-  price_max_t3: z.number().nullable(),
-  price_max_t4: z.number().nullable(),
-  price_max_t5: z.number().nullable(),
-  price_max_t6: z.number().nullable(),
-  price_max_t7_more: z.number().nullable(),
-})
-
-const ZSuperficie = z.object({
-  superficie_min_t1: z.number().nullable(),
-  superficie_max_t1: z.number().nullable(),
-  superficie_min_t1_bis: z.number().nullable(),
-  superficie_max_t1_bis: z.number().nullable(),
-  superficie_min_t2: z.number().nullable(),
-  superficie_max_t2: z.number().nullable(),
-  superficie_min_t3: z.number().nullable(),
-  superficie_max_t3: z.number().nullable(),
-  superficie_min_t4: z.number().nullable(),
-  superficie_max_t4: z.number().nullable(),
-  superficie_min_t5: z.number().nullable(),
-  superficie_max_t5: z.number().nullable(),
-  superficie_min_t6: z.number().nullable(),
-  superficie_max_t6: z.number().nullable(),
-  superficie_min_t7_more: z.number().nullable(),
-  superficie_max_t7_more: z.number().nullable(),
+  ownerName: z.string().max(150).nullable(),
+  ownerUrl: z.string().max(500).nullable(),
 })
 
 const ZAmenities = z.object({
   refrigerator: z.boolean().nullable(),
-  laundry_room: z.boolean().nullable(),
+  laundryRoom: z.boolean().nullable(),
   bathroom: z.enum(['private', 'shared']).nullable(),
-  kitchen_type: z.enum(['private', 'shared']).nullable(),
+  kitchenType: z.enum(['private', 'shared']).nullable(),
   microwave: z.boolean().nullable(),
-  secure_access: z.boolean().nullable(),
+  secureAccess: z.boolean().nullable(),
   parking: z.boolean().nullable(),
-  common_areas: z.boolean().nullable(),
-  bike_storage: z.boolean().nullable(),
+  commonAreas: z.boolean().nullable(),
+  bikeStorage: z.boolean().nullable(),
   desk: z.boolean().nullable(),
-  residence_manager: z.boolean().nullable(),
-  cooking_plates: z.boolean().nullable(),
+  residenceManager: z.boolean().nullable(),
+  cookingPlates: z.boolean().nullable(),
 })
 
-export const ZAccomodation = z.object({
-  geometry: ZGeometry,
-  id: z.number(),
-  properties: ZBaseAccommodationInfo.extend(ZApartmentCounts.shape)
-    .extend(ZApartmentAvailability.shape)
-    .extend(ZOwnerInfo.shape)
-    .extend(ZPricing.shape)
-    .extend(ZSuperficie.shape),
-})
-
+// Flat accommodation object (no more { geometry, properties } GeoJSON wrapper).
+export const ZAccomodation = ZBaseAccommodationInfo.extend(ZAggregates.shape)
+  .extend(ZOwnerInfo.shape)
+  .extend({ typologies: ZTypologiesRecord })
 export type TAccomodation = z.infer<typeof ZAccomodation>
 
-export const ZAccomodationCard = ZAccomodation.pick({ id: true, geometry: true, properties: true })
+export const ZAccomodationCard = ZAccomodation
 export type TAccomodationCard = z.infer<typeof ZAccomodationCard>
 
-export const ZAccomodationDetails = ZBaseAccommodationInfo.extend(ZApartmentCounts.shape)
-  .extend(ZApartmentAvailability.shape)
-  .extend(ZPricing.shape)
-  .extend(ZSuperficie.shape)
-  .extend(ZAmenities.shape)
-  .extend({
-    geom: ZGeometry,
-    owner: z
-      .object({
-        image_base64: z.string().nullable(),
-        name: z.string().max(150),
-        slug: z.string().max(250),
-        url: z.string().max(500),
-        landing_url: z.string().max(500).nullable(),
-        accept_dossier_facile_applications: z.boolean(),
-      })
-      .nullable(),
-    external_url: z.string().optional(),
-    description: z.string().nullable(),
-  })
+export const ZAccomodationDetails = ZAccomodation.extend(ZAmenities.shape).extend({
+  owner: z
+    .object({
+      imageBase64: z.string().nullable(),
+      name: z.string().max(150),
+      slug: z.string().max(250),
+      url: z.string().max(500),
+      landingUrl: z.string().max(500).nullable(),
+      acceptDossierFacileApplications: z.boolean(),
+    })
+    .nullable(),
+})
 export type TAccomodationDetails = z.infer<typeof ZAccomodationDetails>
 
-export const ZPrepareStudentLifeAccommodationResidence = ZAccomodationDetails.pick({
-  nb_t1: true,
-  nb_t1_bis: true,
-  nb_t2: true,
-  nb_t3: true,
-  nb_t4: true,
-  nb_t5: true,
-  nb_t6: true,
-  nb_t7_more: true,
-}).extend({
+export const ZPrepareStudentLifeAccommodationResidence = z.object({
+  typologies: ZTypologiesRecord,
   location: z.string().max(250),
 })
 export type TPrepareStudentLifeAccommodationResidence = z.infer<typeof ZPrepareStudentLifeAccommodationResidence>
 
-export const ZAccomodationMy = z.object({
-  geometry: ZGeometry,
-  properties: ZBaseAccommodationInfo.extend(ZApartmentCounts.shape)
-    .extend(ZApartmentAvailability.shape)
-    .extend(ZOwnerInfo.shape)
-    .extend(ZPricing.shape)
-    .extend(ZSuperficie.shape)
-    .extend(ZAmenities.shape)
-    .extend({ is_imported: z.boolean() }),
-})
+export const ZAccomodationMy = ZAccomodation.extend(ZAmenities.shape).extend({ isImported: z.boolean() })
 export type TAccomodationMy = z.infer<typeof ZAccomodationMy>

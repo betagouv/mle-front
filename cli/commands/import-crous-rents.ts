@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm'
 import * as XLSX from 'xlsx'
 import { closeDb, db } from '~/server/db'
 import { accommodations } from '~/server/db/schema'
+import { mergeTypologiesFromFlat, omitFlatTypologyFields } from '~/server/lib/typologies'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import {
   buildDisplaySourceId,
@@ -45,17 +46,17 @@ type Options = {
   limit?: number
 }
 
-const RENT_FIELDS: Record<TypoCategory, { min: keyof typeof accommodations.$inferSelect; max: keyof typeof accommodations.$inferSelect }> =
-  {
-    t1: { min: 'priceMinT1', max: 'priceMaxT1' },
-    t1bis: { min: 'priceMinT1Bis', max: 'priceMaxT1Bis' },
-    t2: { min: 'priceMinT2', max: 'priceMaxT2' },
-    t3: { min: 'priceMinT3', max: 'priceMaxT3' },
-    t4: { min: 'priceMinT4', max: 'priceMaxT4' },
-    t5: { min: 'priceMinT5', max: 'priceMaxT5' },
-    t6: { min: 'priceMinT6', max: 'priceMaxT6' },
-    t7more: { min: 'priceMinT7More', max: 'priceMaxT7More' },
-  }
+// Flat camelCase keys consumed by the typology bridge (mergeTypologiesFromFlat), not DB columns.
+const RENT_FIELDS: Record<TypoCategory, { min: string; max: string }> = {
+  t1: { min: 'priceMinT1', max: 'priceMaxT1' },
+  t1bis: { min: 'priceMinT1Bis', max: 'priceMaxT1Bis' },
+  t2: { min: 'priceMinT2', max: 'priceMaxT2' },
+  t3: { min: 'priceMinT3', max: 'priceMaxT3' },
+  t4: { min: 'priceMinT4', max: 'priceMaxT4' },
+  t5: { min: 'priceMinT5', max: 'priceMaxT5' },
+  t6: { min: 'priceMinT6', max: 'priceMaxT6' },
+  t7more: { min: 'priceMinT7More', max: 'priceMaxT7More' },
+}
 
 function loadExpectedRents(filePath: string, limit?: number): ExpectedResidenceRents[] {
   const workbook = XLSX.readFile(filePath)
@@ -158,7 +159,9 @@ export async function importCrousRents(filePath: string, options: Options) {
     if (!options.dryRun && pendingUpdates.length > 0) {
       await db.transaction(async (tx) => {
         for (const { id, update } of pendingUpdates) {
-          await tx.update(accommodations).set(update).where(eq(accommodations.id, id))
+          await tx.update(accommodations).set(omitFlatTypologyFields(update)).where(eq(accommodations.id, id))
+          // Merge the new rent bounds into existing typology child rows (counts/surfaces preserved).
+          await mergeTypologiesFromFlat(tx, id, update)
         }
       })
     }

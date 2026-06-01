@@ -14,6 +14,7 @@ import {
   FindStudentAccommodationPlaceholderImageCard,
 } from '~/components/find-student-accomodation/card/find-student-accommodation-image-card'
 import { AvailabilityBadge } from '~/components/shared/availability-badge'
+import { TooltipHoverOnly } from '~/components/tooltip-hover-only'
 import { trackEvent } from '~/lib/tracking'
 import { TUser } from '~/lib/types'
 import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
@@ -41,68 +42,39 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
   const router = useRouter()
   const [selectedAccommodation] = useQueryState('id', parseAsString)
   const t = useTranslations('findAccomodation.card')
-  const {
-    city,
-    images_urls,
-    name,
-    nb_total_apartments,
-    nb_t1_available,
-    nb_t1_bis_available,
-    nb_t2_available,
-    nb_t3_available,
-    nb_t4_available,
-    nb_t5_available,
-    nb_t6_available,
-    nb_t7_more_available,
-    postal_code,
-    price_min,
-    accept_waiting_list,
-  } = accomodation.properties
-  const nbAvailable = calculateAvailability({
-    nb_t1_available,
-    nb_t1_bis_available,
-    nb_t2_available,
-    nb_t3_available,
-    nb_t4_available,
-    nb_t5_available,
-    nb_t6_available,
-    nb_t7_more_available,
-  })
-  const nbIndividualApartments = (accomodation.properties.nb_total_apartments || 0) - (accomodation.properties.nb_coliving_apartments || 0)
+  const { city, imagesUrls, name, nbTotalApartments, postalCode, priceMin, acceptWaitingList } = accomodation
+  const nbAvailable = calculateAvailability(accomodation.typologies)
+  const nbIndividualApartments = (accomodation.nbTotalApartments || 0) - (accomodation.nbColivingApartments || 0)
   const accommodationsTypes = [
     ...(nbIndividualApartments > 0 ? [t('individual')] : []),
-    ...(accomodation.properties.nb_coliving_apartments ? [t('colocation')] : []),
+    ...(accomodation.nbColivingApartments ? [t('colocation')] : []),
   ]
   const imageProps =
-    images_urls && images_urls.length > 0
-      ? { imageComponent: <FindStudentAccommodationImageCard image={images_urls[0]} name={name} /> }
+    imagesUrls && imagesUrls.length > 0
+      ? { imageComponent: <FindStudentAccommodationImageCard image={imagesUrls[0]} name={name} /> }
       : {
           imageComponent: <FindStudentAccommodationPlaceholderImageCard id={accomodation.id} />,
         }
   const badgeAvailability = (
-    <AvailabilityBadge
-      nbAvailable={nbAvailable}
-      noAvailabilityText={t('noAvailability')}
-      availabilityText={t('availability')}
-      unknownAvailabilityText={t('unknownAvailability')}
-      as="span"
-    />
+    <AvailabilityBadge nbAvailable={nbAvailable} noAvailabilityText={t('noAvailability')} availabilityText={t('availability')} as="span" />
   )
 
-  const badgeProps = price_min
+  const showWaitingListBadge = acceptWaitingList && (nbAvailable === null || nbAvailable === undefined || nbAvailable === 0)
+
+  const badgeProps = priceMin
     ? {
-        badge: <Badge severity="new" noIcon as="span">{`${t('priceFrom')} ${price_min}€`}</Badge>,
+        badge: <Badge severity="new" noIcon as="span">{`${t('priceFrom')} ${priceMin}€`}</Badge>,
       }
     : {}
 
-  const redirectUri = href ?? getAccommodationPath(city, accomodation.properties.slug)
+  const redirectUri = href ?? getAccommodationPath(city, accomodation.slug)
 
   const handleCardClick = (event: React.MouseEvent) => {
     const target = event.target as HTMLElement
     if (target.closest(`button[title="${FAVORITE_BUTTON_TITLES.ADD}"], button[title="${FAVORITE_BUTTON_TITLES.REMOVE}"]`)) {
       return
     }
-    trackEvent({ category: 'Logement', action: 'clic carte logement', name: accomodation.properties.slug })
+    trackEvent({ category: 'Logement', action: 'clic carte logement', name: accomodation.slug })
     if (targetBlank) {
       window.open(redirectUri, '_blank', 'noopener,noreferrer')
     } else {
@@ -129,12 +101,25 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
             <span className={clsx('ri-group-line', styles.description)}>{accommodationsTypes.join(' • ')}</span>
           )}
           <br />
-          {!!nb_total_apartments && (
-            <span className={clsx('ri-community-line', styles.description)}>{`${nb_total_apartments} logements`}</span>
+          {!!nbTotalApartments && <span className={clsx('ri-community-line', styles.description)}>{`${nbTotalApartments} logements`}</span>}
+          {badgeAvailability && <span className={clsx('fr-mt-1v', styles.badgeLine)}>{badgeAvailability}</span>}
+          {showWaitingListBadge && (
+            <span className={clsx('fr-mt-1v', styles.badgeLine)}>
+              <Badge severity="info" small as="span">
+                {t('waitingList')}
+              </Badge>
+            </span>
           )}
-          {badgeAvailability && <div className="fr-mt-1v fr-mb-1v">{badgeAvailability}</div>}
-          {accept_waiting_list && (nbAvailable === 0 || nbAvailable === null) && (
-            <span className={clsx('ri-folder-2-line', styles.description)}>{t('waitingList')}</span>
+          {(nbAvailable === null || nbAvailable === undefined) && (
+            <>
+              <br />
+              <span>
+                <TooltipHoverOnly id={`tooltip-availability-${accomodation.id}`} title={t('unknownAvailabilityTooltip')}>
+                  <span className={clsx('ri-information-line', styles.description)} />
+                </TooltipHoverOnly>
+                {t('unknownAvailability')}
+              </span>
+            </>
           )}
         </>
       }
@@ -142,10 +127,10 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
         <div className="fr-flex fr-justify-content-space-between">
           <ul className="fr-tags-group">
             <li>
-              <Tag nativeButtonProps={{ className: 'fr-cursor-default' }}>{`${city} (${postal_code})`}</Tag>
+              <Tag nativeButtonProps={{ className: 'fr-cursor-default' }}>{`${city} (${postalCode})`}</Tag>
             </li>
           </ul>
-          {showFavorite && <SaveAccommodationFavoriteButton slug={accomodation.properties.slug} user={user} />}
+          {showFavorite && <SaveAccommodationFavoriteButton slug={accomodation.slug} user={user} />}
         </div>
       }
       endDetail={<span className={clsx('ri-arrow-right-line fr-text-title--blue-france', styles.arrow)} />}

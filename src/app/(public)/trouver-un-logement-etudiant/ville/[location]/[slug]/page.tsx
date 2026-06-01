@@ -54,16 +54,16 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
   const {
     address,
     city,
-    images_urls,
+    imagesUrls,
     name,
-    nb_total_apartments,
+    nbTotalApartments,
     owner,
-    postal_code,
-    external_url,
+    postalCode,
+    externalUrl,
     description,
-    updated_at,
-    accept_waiting_list,
-    virtual_tour_url,
+    updatedAt,
+    acceptWaitingList,
+    virtualTourUrl,
   } = accommodation
 
   const citySearchUrl = `/trouver-un-logement-etudiant/ville/${encodeURIComponent(city)}?vue=carte&bbox=${cityBbox.west},${cityBbox.south},${cityBbox.east},${cityBbox.north}`
@@ -75,25 +75,25 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
         linkProps: { href: citySearchUrl },
       },
     ],
-    ...(accommodation.price_min ? [{ children: t('tags.priceFrom', { price: accommodation.price_min }) }] : []),
-    ...(accommodation.nb_t1 || accommodation.nb_t1_bis ? [{ iconId: 'ri-user-line' as RiIconClassName, children: t('tags.studio') }] : []),
-    ...(accommodation.nb_coliving_apartments ? [{ iconId: 'ri-group-line' as RiIconClassName, children: t('tags.shared') }] : []),
-    ...(accommodation.nb_accessible_apartments
-      ? [{ iconId: 'ri-wheelchair-line' as RiIconClassName, children: t('tags.accessible') }]
+    ...(accommodation.priceMin ? [{ children: t('tags.priceFrom', { price: accommodation.priceMin }) }] : []),
+    ...(accommodation.typologies.t1 || accommodation.typologies.t1_bis
+      ? [{ iconId: 'ri-user-line' as RiIconClassName, children: t('tags.studio') }]
       : []),
+    ...(accommodation.nbColivingApartments ? [{ iconId: 'ri-group-line' as RiIconClassName, children: t('tags.shared') }] : []),
+    ...(accommodation.nbAccessibleApartments ? [{ iconId: 'ri-wheelchair-line' as RiIconClassName, children: t('tags.accessible') }] : []),
   ]
 
-  const ownerLandingUrl = owner?.landing_url ?? null
+  const ownerLandingUrl = owner?.landingUrl ?? null
   const cityFormatted = formatCityWithA(city)
   const breadCrumbTitle = commonT('breadcrumbs.accommodationTitle', { name, cityFormatted })
   const isRSJAorFJT =
-    accommodation.residence_type === EResidenceType.SOCIALE_JEUNES_ACTIFS ||
-    accommodation.residence_type === EResidenceType.JEUNES_TRAVAILLEURS
+    accommodation.residenceType === EResidenceType.SOCIALE_JEUNES_ACTIFS ||
+    accommodation.residenceType === EResidenceType.JEUNES_TRAVAILLEURS
 
   const addressList =
     accommodation.addresses && accommodation.addresses.length > 0
       ? accommodation.addresses
-      : [{ address, city, postal_code, is_main: true, latitude, longitude }]
+      : [{ address, city, postalCode, isMain: true, latitude, longitude }]
 
   const mapPositions: [number, number][] = (() => {
     const fromAddresses = addressList
@@ -107,12 +107,12 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
     name,
     address,
     city,
-    postalCode: postal_code,
+    postalCode: postalCode,
     latitude,
     longitude,
-    imagesUrls: images_urls,
-    priceMin: accommodation.price_min,
-    priceMax: accommodation.price_max,
+    imagesUrls: imagesUrls,
+    priceMin: accommodation.priceMin,
+    priceMax: accommodation.priceMax,
     description: description ?? null,
     slug,
   })
@@ -145,11 +145,11 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
         </div>
         <div className={styles.container}>
           <div className={styles.infosContainer}>
-            {images_urls && images_urls.length > 0 && <AccommodationImages images={images_urls} title={name} />}
+            {imagesUrls && imagesUrls.length > 0 && <AccommodationImages images={imagesUrls} title={name} />}
             <div className={styles.section}>
-              {accommodation.residence_type && isRSJAorFJT && (
+              {accommodation.residenceType && isRSJAorFJT && (
                 <span className={clsx(styles.accommodationType, 'fr-text--bold fr-text--uppercase')}>
-                  {RESIDENCE_TYPE_LABELS[accommodation.residence_type]}
+                  {RESIDENCE_TYPE_LABELS[accommodation.residenceType]}
                 </span>
               )}
 
@@ -174,9 +174,9 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
                 </p>
               )}
             </div>
-            <AccommodationAvailability nbAvailable={nbAvailable} acceptWaitingList={accept_waiting_list} />
+            <AccommodationAvailability nbAvailable={nbAvailable} acceptWaitingList={acceptWaitingList} />
             <AccommodationResidence accommodation={accommodation} />
-            <AccommodationVirtualTour url={virtual_tour_url} />
+            <AccommodationVirtualTour url={virtualTourUrl} />
             <AccommodationEquipments accommodation={accommodation} />
             <AccommodationLocalisation addresses={addressList} positions={mapPositions} />
             <AccommodationNearbyEtablissements etablissements={nearbyEtablissements} />
@@ -185,19 +185,19 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
           <div className="fr-hidden-sm">{<AccommodationMap positions={mapPositions} />}</div>
           <div className={clsx('fr-mt-2w fr-mt-md-0 fr-px-2w fr-px-md-0', styles.stickyColumn)}>
             <OwnerDetails
-              updatedAt={updated_at}
-              acceptWaitingList={accept_waiting_list}
+              updatedAt={updatedAt}
+              acceptWaitingList={acceptWaitingList}
               owner={owner}
               nbAvailable={nbAvailable}
-              nbTotalApartments={nb_total_apartments}
-              externalUrl={external_url}
+              nbTotalApartments={nbTotalApartments}
+              externalUrl={externalUrl}
               title={name}
               location={city}
               slug={slug}
               isAuthenticated={!!user}
               accommodationSlug={slug}
-              availableApartmentTypes={getAvailableApartmentTypes(accommodation)}
-              acceptDossierFacile={owner?.accept_dossier_facile_applications ?? false}
+              availableApartmentTypes={getAvailableApartmentTypes(accommodation.typologies)}
+              acceptDossierFacile={owner?.acceptDossierFacileApplications ?? false}
             />
             <NearbyAccommodations nearbyAccommodations={nearbyAccommodations} accommodation={accommodation} />
           </div>

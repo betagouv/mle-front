@@ -16,8 +16,8 @@ type PrepareStudentLifeStatsProps = TCity & {
 export default function PrepareStudentLifeStats({
   average_rent,
   location,
-  nb_total_apartments,
-  price_min,
+  nb_total_apartments: nbTotalApartments,
+  price_min: priceMin,
   nb_t1,
   nb_t1_bis,
   nb_t2,
@@ -29,6 +29,22 @@ export default function PrepareStudentLifeStats({
 }: PrepareStudentLifeStatsProps) {
   const locationAids = ['Aides nationales', 'Aides régionales', 'Aides départementales', 'Aides de la ville']
 
+  // City-level counts → minimal typologies object (only presence drives the tiles).
+  const mkTypology = (n: number | null) =>
+    n != null
+      ? { nbTotal: n, nbAvailable: null, priceMin: null, priceMax: null, superficieMin: null, superficieMax: null, colocation: false }
+      : undefined
+  const typologies = {
+    t1: mkTypology(nb_t1),
+    t1_bis: mkTypology(nb_t1_bis),
+    t2: mkTypology(nb_t2),
+    t3: mkTypology(nb_t3),
+    t4: mkTypology(nb_t4),
+    t5: mkTypology(nb_t5),
+    t6: mkTypology(nb_t6),
+    t7_more: mkTypology(nb_t7_more),
+  }
+
   return (
     <div className={styles.mainContainer}>
       <div className={fr.cx('fr-container', 'fr-pt-2w', 'fr-pb-6w', 'fr-col-md-12')}>
@@ -37,7 +53,7 @@ export default function PrepareStudentLifeStats({
             <div className={fr.cx('fr-col-md-4')}>
               <div className={styles.card}>
                 <h2 className="h4">
-                  {nb_total_apartments} logements étudiants <br /> sur la ville de {location}
+                  {nbTotalApartments} logements étudiants <br /> sur la ville de {location}
                 </h2>
                 <p style={{ margin: 0 }}>soit 7% des logements de la ville</p>
                 <div className={styles.divider}></div>
@@ -72,17 +88,7 @@ export default function PrepareStudentLifeStats({
           </div>
           <div className={styles.cardContainer}>
             <div className={fr.cx('fr-col-md-8')}>
-              <PrepareStudentLifeAccommodationResidence
-                location={location}
-                nb_t1={nb_t1}
-                nb_t1_bis={nb_t1_bis}
-                nb_t2={nb_t2}
-                nb_t3={nb_t3}
-                nb_t4={nb_t4}
-                nb_t5={nb_t5}
-                nb_t6={nb_t6}
-                nb_t7_more={nb_t7_more}
-              />
+              <PrepareStudentLifeAccommodationResidence location={location} typologies={typologies} />
             </div>
             <div className={fr.cx('fr-col-md-4')}>
               <div className={clsx(styles.card, styles.helpersMainContainer, styles.marginLeft)}>
@@ -182,9 +188,9 @@ export default function PrepareStudentLifeStats({
                     </h4>
                     <p style={{ marginBottom: '0.5rem' }}>Résidence Crous, repas RU, et peu de sorties.</p>
                     {/* biome-ignore lint/complexity/noExtraBooleanCast: price min can be undefined */}
-                    {!!price_min ? (
+                    {!!priceMin ? (
                       <Badge noIcon severity="new">
-                        Entre {price_min} et {price_min * 1.5} €
+                        Entre {priceMin} et {priceMin * 1.5} €
                       </Badge>
                     ) : (
                       <Badge noIcon severity="new">
@@ -199,9 +205,9 @@ export default function PrepareStudentLifeStats({
                     </h4>
                     <p style={{ marginBottom: '0.5rem' }}>Logement privé et activités diverses.</p>
                     {/* biome-ignore lint/complexity/noExtraBooleanCast: price min can be undefined */}
-                    {!!price_min ? (
+                    {!!priceMin ? (
                       <Badge noIcon severity="new">
-                        Entre {price_min * 2} et {price_min * 3} €
+                        Entre {priceMin * 2} et {priceMin * 3} €
                       </Badge>
                     ) : (
                       <Badge noIcon severity="new">

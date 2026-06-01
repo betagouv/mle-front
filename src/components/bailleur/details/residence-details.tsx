@@ -45,10 +45,10 @@ export const ResidenceDetails = () => {
                   </>
                 }
                 nativeSelectProps={{
-                  ...register('residence_type'),
+                  ...register('residenceType'),
                 }}
-                state={errors.residence_type ? 'error' : 'default'}
-                stateRelatedMessage={errors.residence_type?.message}
+                state={errors.residenceType ? 'error' : 'default'}
+                stateRelatedMessage={errors.residenceType?.message}
               >
                 <option value="" disabled hidden>
                   {t('selectResidenceType')}
@@ -69,9 +69,9 @@ export const ResidenceDetails = () => {
                   {t('targetAudience')} <span className="fr-text-default--error">*</span>
                 </>
               }
-              name="target_audience"
-              state={errors.target_audience ? 'error' : undefined}
-              stateRelatedMessage={errors.target_audience?.message}
+              name="targetAudience"
+              state={errors.targetAudience ? 'error' : undefined}
+              stateRelatedMessage={errors.targetAudience?.message}
               className="fr-mb-0"
               classes={{
                 inputGroup: 'fr-my-0 fr-border fr-p-1w',
@@ -81,7 +81,7 @@ export const ResidenceDetails = () => {
                   label: t('targetAudienceEtudiantsLabel'),
                   hintText: t('targetAudienceEtudiantsHint'),
                   nativeInputProps: {
-                    ...register('target_audience'),
+                    ...register('targetAudience'),
                     value: ETargetAudience.ETUDIANTS,
                   },
                 },
@@ -89,7 +89,7 @@ export const ResidenceDetails = () => {
                   label: t('targetAudienceMixteLabel'),
                   hintText: t('targetAudienceMixteHint'),
                   nativeInputProps: {
-                    ...register('target_audience'),
+                    ...register('targetAudience'),
                     value: ETargetAudience.MIXTE,
                   },
                 },
@@ -97,7 +97,7 @@ export const ResidenceDetails = () => {
                   label: t('targetAudienceDiffusEtudiantsLabel'),
                   hintText: t('targetAudienceDiffusEtudiantsHint'),
                   nativeInputProps: {
-                    ...register('target_audience'),
+                    ...register('targetAudience'),
                     value: ETargetAudience.DIFFUS_ETUDIANTS,
                   },
                 },
@@ -105,7 +105,7 @@ export const ResidenceDetails = () => {
                   label: t('targetAudienceDiffusMixteLabel'),
                   hintText: t('targetAudienceDiffusMixteHint'),
                   nativeInputProps: {
-                    ...register('target_audience'),
+                    ...register('targetAudience'),
                     value: ETargetAudience.DIFFUS_MIXTE,
                   },
                 },
@@ -117,11 +117,11 @@ export const ResidenceDetails = () => {
             <div className="fr-py-2w fr-flex fr-justify-content-space-between fr-align-items-center fr-border-bottom">
               <span>{t('waitingList')}</span>
               <Controller
-                name="accept_waiting_list"
+                name="acceptWaitingList"
                 control={control}
                 render={({ field }) => (
                   <ToggleSwitch
-                    inputTitle="accept_waiting_list"
+                    inputTitle="acceptWaitingList"
                     label=""
                     showCheckedHint={false}
                     checked={field.value}
@@ -133,7 +133,7 @@ export const ResidenceDetails = () => {
             <div className="fr-py-2w fr-flex fr-justify-content-space-between fr-align-items-center fr-border-bottom">
               <span>{t('scholarship')}</span>
               <Controller
-                name="scholarship_holders_priority"
+                name="scholarshipHoldersPriority"
                 control={control}
                 render={({ field }) => (
                   <ToggleSwitch inputTitle="" label="" showCheckedHint={false} checked={field.value} onChange={field.onChange} />
@@ -143,7 +143,7 @@ export const ResidenceDetails = () => {
             <div className="fr-py-2w fr-flex fr-justify-content-space-between fr-align-items-center fr-border-bottom">
               <span>{t('socialHousing')}</span>
               <Controller
-                name="social_housing_required"
+                name="socialHousingRequired"
                 control={control}
                 render={({ field }) => (
                   <ToggleSwitch inputTitle="" label="" showCheckedHint={false} checked={field.value} onChange={field.onChange} />
@@ -158,7 +158,7 @@ export const ResidenceDetails = () => {
                 style={{ width: '74px' }}
                 className="fr-mr-4w"
                 nativeInputProps={{
-                  ...register('nb_accessible_apartments', { valueAsNumber: true }),
+                  ...register('nbAccessibleApartments', { valueAsNumber: true }),
                   type: 'number',
                   min: 0,
                 }}
@@ -172,7 +172,7 @@ export const ResidenceDetails = () => {
                 style={{ width: '74px' }}
                 className="fr-mr-4w"
                 nativeInputProps={{
-                  ...register('nb_coliving_apartments', { valueAsNumber: true }),
+                  ...register('nbColivingApartments', { valueAsNumber: true }),
                   type: 'number',
                   min: 0,
                 }}

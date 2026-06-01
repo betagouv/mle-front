@@ -3,6 +3,7 @@ import { EResidenceType } from '~/enums/residence-type'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, geocodeAddress } from '~/server/lib/import/geocoder'
+import { mergeTypologiesFromFlat, omitFlatTypologyFields, syncTypologiesFromFlat } from '~/server/lib/typologies'
 import { accommodationAddresses, accommodations, externalSources, importBlocklist } from '../../src/server/db/schema'
 import { generateAccommodationKey, uploadFile } from '../../src/server/services/s3'
 import { computeDerivedFields, generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
@@ -242,7 +243,8 @@ const command: ImportCommand = {
             ...(imageUrls.length > 0 ? { imagesUrls: imageUrls, imagesCount: derived.imagesCount } : {}),
           }
 
-          await db.update(accommodations).set(updateData).where(eq(accommodations.id, accommodationId))
+          await db.update(accommodations).set(omitFlatTypologyFields(updateData)).where(eq(accommodations.id, accommodationId))
+          await mergeTypologiesFromFlat(db, accommodationId, updateData)
 
           const existingAddress = await db
             .select({ id: accommodationAddresses.id })
@@ -262,15 +264,18 @@ const command: ImportCommand = {
           const slug = await findAvailableSlug(generateSlug(residence.title), db, accommodations)
           const [newAccommodation] = await db
             .insert(accommodations)
-            .values({
-              ...accommodationData,
-              name: residence.title,
-              imagesUrls: imageUrls.length > 0 ? imageUrls : null,
-              imagesCount: derived.imagesCount,
-              slug,
-              createdAt: new Date(),
-            })
+            .values(
+              omitFlatTypologyFields({
+                ...accommodationData,
+                name: residence.title,
+                imagesUrls: imageUrls.length > 0 ? imageUrls : null,
+                imagesCount: derived.imagesCount,
+                slug,
+                createdAt: new Date(),
+              }),
+            )
             .returning({ id: accommodations.id })
+          await syncTypologiesFromFlat(db, newAccommodation.id, accommodationData)
 
           await db.insert(accommodationAddresses).values({ accommodationId: newAccommodation.id, isMain: true, ...addressData })
 

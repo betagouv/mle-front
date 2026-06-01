@@ -19,7 +19,7 @@ interface PrepareStudentLifeNearbyAccommodationsProps {
 export default async function PrepareStudentLifeNearbyAccommodations({ bbox, name }: PrepareStudentLifeNearbyAccommodationsProps) {
   const formattedBbox = `${bbox.xmin},${bbox.ymin},${bbox.xmax},${bbox.ymax}`
   const accommodations = await getAccommodations({ bbox: formattedBbox })
-  const accommodationsList = accommodations.results.features.slice(0, 6)
+  const accommodationsList = accommodations.results.slice(0, 6)
   return (
     <div className="primaryBackgroundColor">
       <div className={clsx(fr.cx('fr-container'), styles.accommodationGridContainer, 'fr-pt-6w')}>
