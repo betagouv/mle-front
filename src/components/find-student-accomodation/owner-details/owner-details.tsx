@@ -7,7 +7,6 @@ import { OwnerDetailsActions } from '~/components/find-student-accomodation/owne
 import { OwnerDetailsAlert } from '~/components/find-student-accomodation/owner-details/owner-details-alert'
 import { AvailabilityBadge } from '~/components/shared/availability-badge'
 import { WaitingListBadge } from '~/components/shared/waiting-list-badge'
-import { TooltipHoverOnly } from '~/components/tooltip-hover-only'
 import { type ApartmentType } from '~/enums/apartment-type'
 import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
 import { formatDayjs } from '~/utils/dayjs'
@@ -47,7 +46,12 @@ export const OwnerDetails = async ({
   const [t, locale] = await Promise.all([getTranslations('accomodation'), getLocale()])
   const ownerUrl = externalUrl || owner?.url
   const badgeAvailability = (
-    <AvailabilityBadge nbAvailable={nbAvailable} noAvailabilityText={t('card.noAvailability')} availabilityText={t('card.availability')} />
+    <AvailabilityBadge
+      nbAvailable={nbAvailable}
+      noAvailabilityText={t('card.noAvailability')}
+      availabilityText={t('card.availability')}
+      unknownAvailabilityText={t('unknownAvailability')}
+    />
   )
 
   return (
@@ -68,17 +72,6 @@ export const OwnerDetails = async ({
       <div className="fr-flex fr-align-items-center fr-justify-content-center">{badgeAvailability}</div>
       <span className="fr-text--xs fr-mb-0">{t('sidebar.updatedAt', { date: formatDayjs(updatedAt, 'DD MMMM YYYY', locale) })}</span>
 
-      {(nbAvailable === null || nbAvailable === undefined) && (
-        <>
-          <br />
-          <span>
-            <TooltipHoverOnly id={`tooltip-availability-${slug}`} title={t('unknownAvailabilityTooltip')}>
-              <span className={clsx('ri-information-line')} />
-            </TooltipHoverOnly>
-            {t('unknownAvailability')}
-          </span>
-        </>
-      )}
       <DossierFacileLinkButton
         accommodationSlug={accommodationSlug}
         availableApartmentTypes={availableApartmentTypes}

@@ -14,8 +14,6 @@ import {
   FindStudentAccommodationPlaceholderImageCard,
 } from '~/components/find-student-accomodation/card/find-student-accommodation-image-card'
 import { AvailabilityBadge } from '~/components/shared/availability-badge'
-import { WaitingListBadge } from '~/components/shared/waiting-list-badge'
-import { TooltipHoverOnly } from '~/components/tooltip-hover-only'
 import { trackEvent } from '~/lib/tracking'
 import { TUser } from '~/lib/types'
 import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
@@ -81,11 +79,13 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
           imageComponent: <FindStudentAccommodationPlaceholderImageCard id={accomodation.id} />,
         }
   const badgeAvailability = (
-    <AvailabilityBadge nbAvailable={nbAvailable} noAvailabilityText={t('noAvailability')} availabilityText={t('availability')} as="span" />
-  )
-
-  const waitingListBadge = (
-    <WaitingListBadge acceptWaitingList={accept_waiting_list} nbAvailable={nbAvailable} waitingListText={t('waitingList')} />
+    <AvailabilityBadge
+      nbAvailable={nbAvailable}
+      noAvailabilityText={t('noAvailability')}
+      availabilityText={t('availability')}
+      unknownAvailabilityText={t('unknownAvailability')}
+      as="span"
+    />
   )
 
   const badgeProps = price_min
@@ -131,18 +131,9 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
           {!!nb_total_apartments && (
             <span className={clsx('ri-community-line', styles.description)}>{`${nb_total_apartments} logements`}</span>
           )}
-          {badgeAvailability && <div className="fr-mt-1v">{badgeAvailability}</div>}
-          {waitingListBadge}
-          {(nbAvailable === null || nbAvailable === undefined) && (
-            <>
-              <br />
-              <span>
-                <TooltipHoverOnly id={`tooltip-availability-${accomodation.id}`} title={t('unknownAvailabilityTooltip')}>
-                  <span className={clsx('ri-information-line', styles.description)} />
-                </TooltipHoverOnly>
-                {t('unknownAvailability')}
-              </span>
-            </>
+          {badgeAvailability && <div className="fr-mt-1v fr-mb-1v">{badgeAvailability}</div>}
+          {accept_waiting_list && (nbAvailable === 0 || nbAvailable === null) && (
+            <span className={clsx('ri-folder-2-line', styles.description)}>{t('waitingList')}</span>
           )}
         </>
       }
