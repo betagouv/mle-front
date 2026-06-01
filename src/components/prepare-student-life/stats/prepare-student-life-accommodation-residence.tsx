@@ -3,52 +3,18 @@ import clsx from 'clsx'
 import { TPrepareStudentLifeAccommodationResidence } from '~/schemas/accommodations/accommodations'
 import styles from './prepare-student-life-accommodation-residence.module.css'
 
-export const PrepareStudentLifeAccommodationResidence = async ({
-  nb_t1,
-  nb_t1_bis,
-  nb_t2,
-  nb_t3,
-  location,
-  nb_t4,
-  nb_t5,
-  nb_t6,
-  nb_t7_more,
-}: TPrepareStudentLifeAccommodationResidence) => {
+export const PrepareStudentLifeAccommodationResidence = async ({ typologies, location }: TPrepareStudentLifeAccommodationResidence) => {
   const studioPriceTiles = [
-    {
-      type: 'T1',
-      enabled: !!nb_t1,
-    },
-    {
-      type: 'T1bis',
-      enabled: !!nb_t1_bis,
-    },
-    {
-      type: 'T2',
-      enabled: !!nb_t2,
-    },
+    { type: 'T1', enabled: !!typologies.t1 },
+    { type: 'T1bis', enabled: !!typologies.t1_bis },
+    { type: 'T2', enabled: !!typologies.t2 },
   ]
   const priceTiles = [
-    {
-      type: 'T3',
-      enabled: !!nb_t3,
-    },
-    {
-      type: 'T4',
-      enabled: !!nb_t4,
-    },
-    {
-      type: 'T5',
-      enabled: !!nb_t5,
-    },
-    {
-      type: 'T6',
-      enabled: !!nb_t6,
-    },
-    {
-      type: 'T7',
-      enabled: !!nb_t7_more,
-    },
+    { type: 'T3', enabled: !!typologies.t3 },
+    { type: 'T4', enabled: !!typologies.t4 },
+    { type: 'T5', enabled: !!typologies.t5 },
+    { type: 'T6', enabled: !!typologies.t6 },
+    { type: 'T7', enabled: !!typologies.t7_more },
   ]
 
   return (

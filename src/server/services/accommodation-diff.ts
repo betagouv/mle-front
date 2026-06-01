@@ -1,7 +1,4 @@
-import { AVAILABILITY_FIELD_MAP } from '~/server/trpc/utils/field-mapping'
-
 const DIFF_IGNORE = new Set(['updatedAt', 'geom', 'cityId', 'city'])
-const AVAILABILITY_KEYS = new Set(Object.values(AVAILABILITY_FIELD_MAP))
 
 export type DiffEntry = { old: unknown; new: unknown }
 export type Diff = Record<string, DiffEntry>
@@ -27,20 +24,19 @@ export type ActivityAction =
   | 'accommodation.updated'
   | 'accommodation.published'
   | 'accommodation.unpublished'
+  // Emitted directly by bailleur.updateAvailability (availability lives in the typology child table,
+  // so it never appears in a bailleur.update field diff).
   | 'accommodation.availability_updated'
 
 export function classifyActions(diff: Diff): { action: ActivityAction; diff: Diff }[] {
   if (Object.keys(diff).length === 0) return []
 
   const publishedDiff: Diff = {}
-  const availabilityDiff: Diff = {}
   const otherDiff: Diff = {}
 
   for (const [key, value] of Object.entries(diff)) {
     if (key === 'published') {
       publishedDiff[key] = value
-    } else if (AVAILABILITY_KEYS.has(key)) {
-      availabilityDiff[key] = value
     } else {
       otherDiff[key] = value
     }
@@ -51,10 +47,6 @@ export function classifyActions(diff: Diff): { action: ActivityAction; diff: Dif
   if (Object.keys(publishedDiff).length > 0) {
     const action = publishedDiff.published.new ? 'accommodation.published' : 'accommodation.unpublished'
     actions.push({ action, diff: publishedDiff })
-  }
-
-  if (Object.keys(availabilityDiff).length > 0) {
-    actions.push({ action: 'accommodation.availability_updated', diff: availabilityDiff })
   }
 
   if (Object.keys(otherDiff).length > 0) {

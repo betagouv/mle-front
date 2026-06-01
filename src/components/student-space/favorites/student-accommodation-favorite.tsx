@@ -27,32 +27,8 @@ export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps>
   const t = useTranslations('findAccomodation.card')
   const router = useRouter()
   const { classes } = useStyles()
-  const {
-    city,
-    images_urls,
-    name,
-    nb_total_apartments,
-    nb_t1_available,
-    nb_t1_bis_available,
-    nb_t2_available,
-    nb_t3_available,
-    nb_t4_available,
-    nb_t5_available,
-    nb_t6_available,
-    nb_t7_more_available,
-    postal_code,
-    price_min,
-  } = accomodation.properties
-  const nbAvailable = calculateAvailability({
-    nb_t1_available,
-    nb_t1_bis_available,
-    nb_t2_available,
-    nb_t3_available,
-    nb_t4_available,
-    nb_t5_available,
-    nb_t6_available,
-    nb_t7_more_available,
-  })
+  const { city, imagesUrls, name, nbTotalApartments, postalCode, priceMin } = accomodation
+  const nbAvailable = calculateAvailability(accomodation.typologies)
   const badgeAvailability = (
     <AvailabilityBadge nbAvailable={nbAvailable} noAvailabilityText={t('noAvailability')} availabilityText={t('availability')} as="span" />
   )
@@ -65,21 +41,21 @@ export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps>
     router.push(redirectUri)
   }
 
-  const accommodationsTypes = accomodation.properties.nb_coliving_apartments ? [t('individual'), t('colocation')] : [t('individual')]
+  const accommodationsTypes = accomodation.nbColivingApartments ? [t('individual'), t('colocation')] : [t('individual')]
   const imageProps =
-    images_urls && images_urls.length > 0
-      ? { imageComponent: <FindStudentAccommodationImageCard image={images_urls[0]} name={name} /> }
+    imagesUrls && imagesUrls.length > 0
+      ? { imageComponent: <FindStudentAccommodationImageCard image={imagesUrls[0]} name={name} /> }
       : {
           imageComponent: <FindStudentAccommodationPlaceholderImageCard id={accomodation.id} />,
         }
 
-  const badgeProps = price_min
+  const badgeProps = priceMin
     ? {
-        badge: <Badge severity="new" noIcon as="span">{`${t('priceFrom')} ${price_min}€`}</Badge>,
+        badge: <Badge severity="new" noIcon as="span">{`${t('priceFrom')} ${priceMin}€`}</Badge>,
       }
     : {}
 
-  const redirectUri = `/trouver-un-logement-etudiant/ville/${encodeURIComponent(city)}/${accomodation.properties.slug}`
+  const redirectUri = `/trouver-un-logement-etudiant/ville/${encodeURIComponent(city)}/${accomodation.slug}`
   return (
     <Card
       {...badgeProps}
@@ -96,9 +72,7 @@ export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps>
         <>
           <span className={clsx('ri-group-line', classes.description)}>{accommodationsTypes.join(' • ')}</span>
           <br />
-          {nb_total_apartments && (
-            <span className={clsx('ri-community-line', classes.description)}>{`${nb_total_apartments} logements`}</span>
-          )}
+          {nbTotalApartments && <span className={clsx('ri-community-line', classes.description)}>{`${nbTotalApartments} logements`}</span>}
           {!!badgeAvailability && (
             <>
               <br />
@@ -122,10 +96,10 @@ export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps>
         <div className="fr-flex fr-justify-content-space-between">
           <ul className="fr-tags-group">
             <li>
-              <Tag>{`${city} (${postal_code})`}</Tag>
+              <Tag>{`${city} (${postalCode})`}</Tag>
             </li>
           </ul>
-          <SaveAccommodationFavoriteButton slug={accomodation.properties.slug} user={user} />
+          <SaveAccommodationFavoriteButton slug={accomodation.slug} user={user} />
         </div>
       }
       size="small"

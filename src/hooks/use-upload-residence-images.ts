@@ -53,15 +53,15 @@ export const useUploadResidenceImages = (slug: string, name: string) => {
       }
 
       const uploadData = await uploadResponse.json()
-      const newImageUrls = uploadData.images_urls || []
+      const newImageUrls = uploadData.imagesUrls || []
       const allImages = [...currentImages, ...newImageUrls]
 
       await trpcClient.bailleur.update.mutate({
         slug,
-        images_urls: allImages,
+        imagesUrls: allImages,
       })
 
-      return { images_urls: allImages }
+      return { imagesUrls: allImages }
     },
     onSuccess: async () => {
       trackEvent({ category: 'Espace Gestionnaire', action: 'upload images', name: slug })
@@ -95,7 +95,7 @@ export const useDeleteResidenceImage = (slug: string, name: string) => {
     mutationFn: async (remainingImages: string[]) => {
       return trpcClient.bailleur.update.mutate({
         slug,
-        images_urls: remainingImages,
+        imagesUrls: remainingImages,
         name,
       })
     },

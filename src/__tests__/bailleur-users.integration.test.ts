@@ -380,18 +380,18 @@ describe('bailleurProcedure permission gating on residences/candidatures', () =>
     await expect(
       gestCaller.bailleur.create({
         name: 'Forbidden Res',
-        addresses: [{ address: '1 rue X', city: 'Paris', postal_code: '75001' }],
-        external_url: 'https://example.com',
+        addresses: [{ address: '1 rue X', city: 'Paris', postalCode: '75001' }],
+        externalUrl: 'https://example.com',
         typologies: [
           {
-            type: 'T1',
-            price_min: 400,
-            price_max: 600,
-            superficie_min: 15,
-            superficie_max: 25,
+            type: 't1',
+            priceMin: 400,
+            priceMax: 600,
+            superficieMin: 15,
+            superficieMax: 25,
             colocation: false,
-            nb_total: 1,
-            nb_available: 1,
+            nbTotal: 1,
+            nbAvailable: 1,
           },
         ],
       }),
@@ -409,18 +409,18 @@ describe('bailleurProcedure permission gating on residences/candidatures', () =>
 
     const result = await gestCaller.bailleur.create({
       name: 'Allowed Res',
-      addresses: [{ address: '2 rue Y', city: 'Paris', postal_code: '75001' }],
-      external_url: 'https://example.com',
+      addresses: [{ address: '2 rue Y', city: 'Paris', postalCode: '75001' }],
+      externalUrl: 'https://example.com',
       typologies: [
         {
-          type: 'T1',
-          price_min: 400,
-          price_max: 600,
-          superficie_min: 15,
-          superficie_max: 25,
+          type: 't1',
+          priceMin: 400,
+          priceMax: 600,
+          superficieMin: 15,
+          superficieMax: 25,
           colocation: false,
-          nb_total: 1,
-          nb_available: 1,
+          nbTotal: 1,
+          nbAvailable: 1,
         },
       ],
     })

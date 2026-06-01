@@ -1,11 +1,14 @@
 import path from 'node:path'
 import { and, eq, sql } from 'drizzle-orm'
+import { z } from 'zod'
 import { ETargetAudience } from '~/enums/target-audience'
+import { TYPOLOGIES } from '~/schemas/accommodations/typology'
 import { ZUpdateResidence } from '~/schemas/accommodations/update-residence'
 import type { TImportJobResidence, TImportJobSummary } from '~/schemas/import-jobs'
 import { db } from '~/server/db'
 import { accommodationAddresses, accommodations, externalSources, owners } from '~/server/db/schema'
 import { env } from '~/server/env'
+import { omitFlatTypologyFields, syncTypologiesFromFlat } from '~/server/lib/typologies'
 import { generateAccommodationKey, uploadFile } from '~/server/services/s3'
 import { computeDerivedFields, generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '~/server/utils/slug'
@@ -43,80 +46,53 @@ export type CsvPreviewResult = {
   source: string
 }
 
+// CSV rows are flat per-typology (nb_t1, price_min_t1, …). Built explicitly here (ingestion stays
+// flat); persisted into typology child rows via syncTypologiesFromFlat downstream.
+const flatTypologyImportShape = Object.fromEntries(
+  TYPOLOGIES.flatMap(({ type }) => [
+    [`nb_${type}`, z.number().nullish()],
+    [`nb_${type}_available`, z.number().nullish()],
+    [`price_min_${type}`, z.number().nullish()],
+    [`price_max_${type}`, z.number().nullish()],
+    [`superficie_min_${type}`, z.number().nullish()],
+    [`superficie_max_${type}`, z.number().nullish()],
+  ]),
+) as z.ZodRawShape
+
 const ZAccommodationImport = ZUpdateResidence.pick({
   name: true,
-  residence_type: true,
-  target_audience: true,
+  residenceType: true,
+  targetAudience: true,
   description: true,
-  external_url: true,
-  accept_waiting_list: true,
-  nb_t1: true,
-  nb_t1_bis: true,
-  nb_t2: true,
-  nb_t3: true,
-  nb_t4: true,
-  nb_t5: true,
-  nb_t6: true,
-  nb_t7_more: true,
-  price_min_t1: true,
-  price_max_t1: true,
-  price_min_t1_bis: true,
-  price_max_t1_bis: true,
-  price_min_t2: true,
-  price_max_t2: true,
-  price_min_t3: true,
-  price_max_t3: true,
-  price_min_t4: true,
-  price_max_t4: true,
-  price_min_t5: true,
-  price_max_t5: true,
-  price_min_t6: true,
-  price_max_t6: true,
-  price_min_t7_more: true,
-  price_max_t7_more: true,
-  superficie_min_t1: true,
-  superficie_max_t1: true,
-  superficie_min_t1_bis: true,
-  superficie_max_t1_bis: true,
-  superficie_min_t2: true,
-  superficie_max_t2: true,
-  superficie_min_t3: true,
-  superficie_max_t3: true,
-  superficie_min_t4: true,
-  superficie_max_t4: true,
-  superficie_min_t5: true,
-  superficie_max_t5: true,
-  superficie_min_t6: true,
-  superficie_max_t6: true,
-  superficie_min_t7_more: true,
-  superficie_max_t7_more: true,
-  nb_accessible_apartments: true,
-  nb_coliving_apartments: true,
+  externalUrl: true,
+  acceptWaitingList: true,
+  nbAccessibleApartments: true,
+  nbColivingApartments: true,
   refrigerator: true,
-  laundry_room: true,
+  laundryRoom: true,
   bathroom: true,
-  kitchen_type: true,
+  kitchenType: true,
   microwave: true,
-  secure_access: true,
+  secureAccess: true,
   parking: true,
-  common_areas: true,
-  bike_storage: true,
+  commonAreas: true,
+  bikeStorage: true,
   desk: true,
-  residence_manager: true,
-  cooking_plates: true,
-  images_urls: true,
+  residenceManager: true,
+  cookingPlates: true,
+  imagesUrls: true,
   published: true,
-  scholarship_holders_priority: true,
-})
+  scholarshipHoldersPriority: true,
+}).extend(flatTypologyImportShape)
 
 function buildValidationPayload(row: CsvRow) {
   return {
     name: row.name?.trim() || undefined,
-    residence_type: normalizeEnum(row.residence_type) ?? undefined,
-    target_audience: normalizeEnum(row.target_audience) ?? 'etudiants',
+    residenceType: normalizeEnum(row.residence_type) ?? undefined,
+    targetAudience: normalizeEnum(row.target_audience) ?? 'etudiants',
     description: row.description?.trim() || undefined,
-    external_url: row.owner_url?.trim() || undefined,
-    accept_waiting_list: toBool(row.accept_waiting_list) ?? undefined,
+    externalUrl: row.owner_url?.trim() || undefined,
+    acceptWaitingList: toBool(row.accept_waiting_list) ?? undefined,
     nb_t1: toDigit(row.nb_t1) ?? undefined,
     nb_t1_bis: toDigit(row.nb_t1_bis) ?? undefined,
     nb_t2: toDigit(row.nb_t2) ?? undefined,
@@ -157,23 +133,23 @@ function buildValidationPayload(row: CsvRow) {
     superficie_max_t6: toDigit(row.superficie_max_t6) ?? undefined,
     superficie_min_t7_more: toDigit(row.superficie_min_t7_more) ?? undefined,
     superficie_max_t7_more: toDigit(row.superficie_max_t7_more) ?? undefined,
-    nb_accessible_apartments: toDigit(row.nb_accessible_apartments, true) ?? undefined,
-    nb_coliving_apartments: toDigit(row.nb_coliving_apartments, true) ?? undefined,
+    nbAccessibleApartments: toDigit(row.nb_accessible_apartments, true) ?? undefined,
+    nbColivingApartments: toDigit(row.nb_coliving_apartments, true) ?? undefined,
     refrigerator: toBool(row.refrigerator) ?? undefined,
-    laundry_room: toBool(row.laundry_room) ?? undefined,
+    laundryRoom: toBool(row.laundry_room) ?? undefined,
     bathroom: normalizeEnum(row.bathroom) ?? undefined,
-    kitchen_type: normalizeEnum(row.kitchen_type) ?? undefined,
+    kitchenType: normalizeEnum(row.kitchen_type) ?? undefined,
     microwave: toBool(row.microwave) ?? undefined,
-    secure_access: toBool(row.secure_access) ?? undefined,
+    secureAccess: toBool(row.secure_access) ?? undefined,
     parking: toBool(row.parking) ?? undefined,
-    common_areas: toBool(row.common_areas) ?? undefined,
-    bike_storage: toBool(row.bike_storage) ?? undefined,
+    commonAreas: toBool(row.common_areas) ?? undefined,
+    bikeStorage: toBool(row.bike_storage) ?? undefined,
     desk: toBool(row.desk) ?? undefined,
-    residence_manager: toBool(row.residence_manager) ?? undefined,
-    cooking_plates: toBool(row.cooking_plates) ?? undefined,
+    residenceManager: toBool(row.residence_manager) ?? undefined,
+    cookingPlates: toBool(row.cooking_plates) ?? undefined,
     published: true,
-    scholarship_holders_priority: toBool(row.scholarship_holders_priority) ?? undefined,
-    social_housing_required: toBool(row.social_housing_required) ?? undefined,
+    scholarshipHoldersPriority: toBool(row.scholarship_holders_priority) ?? undefined,
+    socialHousingRequired: toBool(row.social_housing_required) ?? undefined,
   }
 }
 
@@ -429,7 +405,7 @@ export async function executeCsvImport(
         name,
         description: row.description?.trim() || null,
         residenceType: normalizeEnum(row.residence_type),
-        target_audience: (normalizeEnum(row.target_audience) ?? 'etudiants') as ETargetAudience,
+        targetAudience: (normalizeEnum(row.target_audience) ?? 'etudiants') as ETargetAudience,
         published: true,
         nbT1: toDigit(row.nb_t1),
         nbT1Bis: toDigit(row.nb_t1_bis),
@@ -502,7 +478,13 @@ export async function executeCsvImport(
 
       if (existingSource[0]) {
         const accommodationId = existingSource[0].accommodationId
-        await db.update(accommodations).set(accommodationData).where(eq(accommodations.id, accommodationId))
+        await db.update(accommodations).set(omitFlatTypologyFields(accommodationData)).where(eq(accommodations.id, accommodationId))
+        await syncTypologiesFromFlat(db, accommodationId, accommodationData)
+        // The CSV total can exceed the sum of categorized typologies; keep it over sync's recomputed value.
+        await db
+          .update(accommodations)
+          .set({ nbTotalApartments: accommodationData.nbTotalApartments })
+          .where(eq(accommodations.id, accommodationId))
         await db.delete(accommodationAddresses).where(eq(accommodationAddresses.accommodationId, accommodationId))
         await db.insert(accommodationAddresses).values({ accommodationId, isMain: true, ...addressData })
         result.updated++
@@ -518,9 +500,15 @@ export async function executeCsvImport(
         const slug = await findAvailableSlug(generateSlug(name), db, accommodations)
         const [newAccommodation] = await db
           .insert(accommodations)
-          .values({ ...accommodationData, slug, createdAt: new Date() })
+          .values(omitFlatTypologyFields({ ...accommodationData, slug, createdAt: new Date() }))
           .returning({ id: accommodations.id })
 
+        await syncTypologiesFromFlat(db, newAccommodation.id, accommodationData)
+        // The CSV total can exceed the sum of categorized typologies; keep it over sync's recomputed value.
+        await db
+          .update(accommodations)
+          .set({ nbTotalApartments: accommodationData.nbTotalApartments })
+          .where(eq(accommodations.id, newAccommodation.id))
         await db.insert(accommodationAddresses).values({ accommodationId: newAccommodation.id, isMain: true, ...addressData })
         await db.insert(externalSources).values({ accommodationId: newAccommodation.id, source, sourceId })
         result.created++

@@ -7,6 +7,7 @@ import { z } from 'zod'
 import { db } from '~/server/db'
 import { academies } from '~/server/db/schema/academies'
 import { accommodationAddresses } from '~/server/db/schema/accommodation-addresses'
+import { accommodationTypologies } from '~/server/db/schema/accommodation-typologies'
 import { accommodations } from '~/server/db/schema/accommodations'
 import { cities } from '~/server/db/schema/cities'
 import { departments } from '~/server/db/schema/departments'
@@ -15,6 +16,14 @@ import { bboxSelect } from '~/server/trpc/utils/spatial-helpers'
 import { normalizeCitySearch, tokenizeQuery } from '~/server/utils/normalize-city-search'
 import { sortCitiesByRelevance } from '~/server/utils/sort-cities-by-relevance'
 import { baseProcedure, createTRPCRouter } from '../init'
+
+// Per-territory total of a typology, summed from the accommodation_typology child rows.
+// Mirrors the SUM(accommodations.nbTotalApartments) semantics (a per-accommodation scalar
+// summed over the address-joined rows), so multi-address behaviour is unchanged.
+const cityTypeTotal = (type: string): SQL<number | null> =>
+  sql<
+    number | null
+  >`SUM((SELECT COALESCE(SUM(t.nb_total), 0) FROM ${accommodationTypologies} t WHERE t.accommodation_id = ${accommodations.id} AND t.type = ${type}))::int`
 
 let rentDataCache: Record<string, number> | null = null
 
@@ -342,14 +351,14 @@ export const territoriesRouter = createTRPCRouter({
         .select({
           nbTotalApartments: sql<number>`COALESCE(SUM(${accommodations.nbTotalApartments}), 0)::int`,
           priceMin: sql<number | null>`MIN(${accommodations.priceMin})`,
-          nbT1: sql<number | null>`SUM(${accommodations.nbT1})::int`,
-          nbT1Bis: sql<number | null>`SUM(${accommodations.nbT1Bis})::int`,
-          nbT2: sql<number | null>`SUM(${accommodations.nbT2})::int`,
-          nbT3: sql<number | null>`SUM(${accommodations.nbT3})::int`,
-          nbT4: sql<number | null>`SUM(${accommodations.nbT4})::int`,
-          nbT5: sql<number | null>`SUM(${accommodations.nbT5})::int`,
-          nbT6: sql<number | null>`SUM(${accommodations.nbT6})::int`,
-          nbT7More: sql<number | null>`SUM(${accommodations.nbT7More})::int`,
+          nbT1: cityTypeTotal('t1'),
+          nbT1Bis: cityTypeTotal('t1_bis'),
+          nbT2: cityTypeTotal('t2'),
+          nbT3: cityTypeTotal('t3'),
+          nbT4: cityTypeTotal('t4'),
+          nbT5: cityTypeTotal('t5'),
+          nbT6: cityTypeTotal('t6'),
+          nbT7More: cityTypeTotal('t7_more'),
         })
         .from(accommodations)
         .innerJoin(accommodationAddresses, eq(accommodationAddresses.accommodationId, accommodations.id))
@@ -411,14 +420,14 @@ export const territoriesRouter = createTRPCRouter({
             .select({
               nbTotalApartments: sql<number>`COALESCE(SUM(${accommodations.nbTotalApartments}), 0)::int`,
               priceMin: sql<number | null>`MIN(${accommodations.priceMin})`,
-              nbT1: sql<number | null>`SUM(${accommodations.nbT1})::int`,
-              nbT1Bis: sql<number | null>`SUM(${accommodations.nbT1Bis})::int`,
-              nbT2: sql<number | null>`SUM(${accommodations.nbT2})::int`,
-              nbT3: sql<number | null>`SUM(${accommodations.nbT3})::int`,
-              nbT4: sql<number | null>`SUM(${accommodations.nbT4})::int`,
-              nbT5: sql<number | null>`SUM(${accommodations.nbT5})::int`,
-              nbT6: sql<number | null>`SUM(${accommodations.nbT6})::int`,
-              nbT7More: sql<number | null>`SUM(${accommodations.nbT7More})::int`,
+              nbT1: cityTypeTotal('t1'),
+              nbT1Bis: cityTypeTotal('t1_bis'),
+              nbT2: cityTypeTotal('t2'),
+              nbT3: cityTypeTotal('t3'),
+              nbT4: cityTypeTotal('t4'),
+              nbT5: cityTypeTotal('t5'),
+              nbT6: cityTypeTotal('t6'),
+              nbT7More: cityTypeTotal('t7_more'),
             })
             .from(accommodations)
             .innerJoin(accommodationAddresses, eq(accommodationAddresses.accommodationId, accommodations.id))

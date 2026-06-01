@@ -64,13 +64,13 @@ export const OwnerDetails = async ({
           <h3 className={styles.sidebarTitle}>{t('sidebar.accommodationsNoCount')}</h3>
         )}
         <span>{t('sidebar.proposedBy')}</span>
-        {owner?.image_base64 ? (
-          owner.landing_url ? (
-            <Link className="fr-link fr-link--no-underline" href={owner.landing_url} target="_blank" rel="noreferrer">
-              <Image className={styles.image} src={owner.image_base64} alt={owner.name} width={201} height={90} quality={100} />
+        {owner?.imageBase64 ? (
+          owner.landingUrl ? (
+            <Link className="fr-link fr-link--no-underline" href={owner.landingUrl} target="_blank" rel="noreferrer">
+              <Image className={styles.image} src={owner.imageBase64} alt={owner.name} width={201} height={90} quality={100} />
             </Link>
           ) : (
-            <Image className={styles.image} src={owner.image_base64} alt={owner.name} width={201} height={90} quality={100} />
+            <Image className={styles.image} src={owner.imageBase64} alt={owner.name} width={201} height={90} quality={100} />
           )
         ) : (
           <h3 className="fr-m-0">{owner?.name}</h3>

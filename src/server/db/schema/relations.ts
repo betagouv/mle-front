@@ -1,6 +1,7 @@
 import { relations } from 'drizzle-orm'
 import { academies } from './academies'
 import { accommodationAddresses } from './accommodation-addresses'
+import { accommodationTypologies } from './accommodation-typologies'
 import { accommodations } from './accommodations'
 import { adminOwnerLinks } from './admin-owner-links'
 import { user } from './auth'
@@ -66,6 +67,11 @@ export const accommodationsRelations = relations(accommodations, ({ one, many })
   favorites: many(favoriteAccommodations),
   externalSources: many(externalSources),
   applications: many(dossierFacileApplications),
+  typologies: many(accommodationTypologies),
+}))
+
+export const accommodationTypologiesRelations = relations(accommodationTypologies, ({ one }) => ({
+  accommodation: one(accommodations, { fields: [accommodationTypologies.accommodationId], references: [accommodations.id] }),
 }))
 
 export const accommodationAddressesRelations = relations(accommodationAddresses, ({ one }) => ({

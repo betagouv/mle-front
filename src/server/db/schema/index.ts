@@ -1,5 +1,6 @@
 export { academies } from './academies'
 export { accommodationAddresses } from './accommodation-addresses'
+export { accommodationTypologies, typologyTypeEnum } from './accommodation-typologies'
 export { accommodations, targetAudienceEnum } from './accommodations'
 export { activityLog } from './activity-log'
 export { adminOwnerLinks } from './admin-owner-links'
@@ -24,6 +25,7 @@ export {
   academiesRelations,
   accommodationAddressesRelations,
   accommodationsRelations,
+  accommodationTypologiesRelations,
   adminOwnerLinksRelations,
   citiesRelations,
   departmentsRelations,

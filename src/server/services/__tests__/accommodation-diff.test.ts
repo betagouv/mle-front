@@ -108,64 +108,22 @@ describe('classifyActions', () => {
     expect(actions[0].action).toBe('accommodation.unpublished')
   })
 
-  it('classifies availability-only changes as accommodation.availability_updated', () => {
-    const diff = {
-      nbT1Available: { old: 5, new: 6 },
-      nbT2Available: { old: 0, new: 2 },
-    }
-    const actions = classifyActions(diff)
-
-    expect(actions).toHaveLength(1)
-    expect(actions[0].action).toBe('accommodation.availability_updated')
-    expect(Object.keys(actions[0].diff).sort()).toEqual(['nbT1Available', 'nbT2Available'])
-  })
-
-  it('splits published + availability into separate actions', () => {
+  // Availability lives in the typology child table and is logged directly by bailleur.updateAvailability,
+  // so it never reaches the update field-diff: any non-published change classifies as accommodation.updated.
+  it('splits published + other into 2 actions', () => {
     const diff = {
       published: { old: false, new: true },
-      nbT1Available: { old: 0, new: 3 },
+      name: { old: 'Old', new: 'New' },
     }
     const actions = classifyActions(diff)
 
     expect(actions).toHaveLength(2)
-    expect(actions.map((a) => a.action).sort()).toEqual(['accommodation.availability_updated', 'accommodation.published'])
+    expect(actions.map((a) => a.action).sort()).toEqual(['accommodation.published', 'accommodation.updated'])
     expect(actions.find((a) => a.action === 'accommodation.published')!.diff).toEqual({
       published: { old: false, new: true },
     })
-    expect(actions.find((a) => a.action === 'accommodation.availability_updated')!.diff).toEqual({
-      nbT1Available: { old: 0, new: 3 },
-    })
-  })
-
-  it('splits published + availability + other into 3 actions', () => {
-    const diff = {
-      published: { old: false, new: true },
-      nbT1Available: { old: 0, new: 3 },
-      name: { old: 'Old', new: 'New' },
-    }
-    const actions = classifyActions(diff)
-
-    expect(actions).toHaveLength(3)
-    expect(actions.map((a) => a.action).sort()).toEqual([
-      'accommodation.availability_updated',
-      'accommodation.published',
-      'accommodation.updated',
-    ])
-  })
-
-  it('keeps availability and regular changes separate', () => {
-    const diff = {
-      name: { old: 'Old', new: 'New' },
-      nbT1Available: { old: 5, new: 6 },
-    }
-    const actions = classifyActions(diff)
-
-    expect(actions).toHaveLength(2)
     expect(actions.find((a) => a.action === 'accommodation.updated')!.diff).toEqual({
       name: { old: 'Old', new: 'New' },
-    })
-    expect(actions.find((a) => a.action === 'accommodation.availability_updated')!.diff).toEqual({
-      nbT1Available: { old: 5, new: 6 },
     })
   })
 })

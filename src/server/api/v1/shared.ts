@@ -28,35 +28,31 @@ export const errorResponses = {
 export const security = [{ ApiKeyAuth: [] as string[] }]
 
 type ListResult = Awaited<ReturnType<typeof queryPublicAccommodations>>
-type ListFeature = ListResult['results']['features'][number]
+type ListItem = ListResult['results'][number]
 // Sous-ensemble structurel commun à `queryPublicAccommodations` et au caller `listExpandedByCity`
 // (dont le early-return « ville introuvable » n'inclut pas `crousCounts`).
 export type SerializableList = {
   count: number
   next: string | null
   previous: string | null
-  min_price: number | null
-  max_price: number | null
-  page_size: number
-  results: { features: ListFeature[] }
+  minPrice: number | null
+  maxPrice: number | null
+  pageSize: number
+  results: ListItem[]
 }
 
-/** Sérialise une feature (Date → string ISO) pour une sortie JSON conforme au schéma OpenAPI. */
-const serializeFeature = (f: ListFeature): z.infer<typeof ZApiAccommodationsResponse>['results']['features'][number] => {
-  const { updated_at, ...rest } = f.properties
-  return {
-    geometry: f.geometry,
-    id: f.id,
-    properties: { ...rest, updated_at: updated_at instanceof Date ? updated_at.toISOString() : String(updated_at ?? '') },
-  }
-}
+/** Sérialise une résidence (Date → string ISO) pour une sortie JSON conforme au schéma OpenAPI. */
+const serializeAccommodation = (a: ListItem): z.infer<typeof ZApiAccommodationsResponse>['results'][number] => ({
+  ...a,
+  updatedAt: a.updatedAt instanceof Date ? a.updatedAt.toISOString() : String(a.updatedAt ?? ''),
+})
 
 export const serializeList = (r: SerializableList): z.infer<typeof ZApiAccommodationsResponse> => ({
   count: r.count,
   next: r.next,
   previous: r.previous,
-  min_price: r.min_price,
-  max_price: r.max_price,
-  page_size: r.page_size,
-  results: { features: r.results.features.map(serializeFeature) },
+  minPrice: r.minPrice,
+  maxPrice: r.maxPrice,
+  pageSize: r.pageSize,
+  results: r.results.map(serializeAccommodation),
 })

@@ -12,14 +12,14 @@ export const getAccommodationPageContext = cache(async (slug: string) => {
   const [accommodation, session] = await Promise.all([getAccommodationById(slug), getServerSession()])
 
   const cityBbox = expandBbox(
-    accommodation.city_bbox.xmin,
-    accommodation.city_bbox.ymin,
-    accommodation.city_bbox.xmax,
-    accommodation.city_bbox.ymax,
+    accommodation.cityBbox.xmin,
+    accommodation.cityBbox.ymin,
+    accommodation.cityBbox.xmax,
+    accommodation.cityBbox.ymax,
   )
 
-  const { coordinates } = accommodation.geom
-  const [longitude, latitude] = coordinates
+  const longitude = accommodation.longitude ?? 0
+  const latitude = accommodation.latitude ?? 0
 
   const queryClient = getQueryClient()
   const prefetchPromises: Promise<unknown>[] = []
@@ -34,20 +34,11 @@ export const getAccommodationPageContext = cache(async (slug: string) => {
   }
   const [nearbyAccommodations, nearbyEtablissements] = await Promise.all([
     getAccommodations({ center: `${longitude},${latitude}` }),
-    getNearbyEtablissements({ codePostal: accommodation.postal_code, lat: latitude, lng: longitude }),
+    getNearbyEtablissements({ codePostal: accommodation.postalCode, lat: latitude, lng: longitude }),
     ...prefetchPromises,
   ])
 
-  const nbAvailable = calculateAvailability({
-    nb_t1_available: accommodation.nb_t1_available,
-    nb_t1_bis_available: accommodation.nb_t1_bis_available,
-    nb_t2_available: accommodation.nb_t2_available,
-    nb_t3_available: accommodation.nb_t3_available,
-    nb_t4_available: accommodation.nb_t4_available,
-    nb_t5_available: accommodation.nb_t5_available,
-    nb_t6_available: accommodation.nb_t6_available,
-    nb_t7_more_available: accommodation.nb_t7_more_available,
-  })
+  const nbAvailable = calculateAvailability(accommodation.typologies)
 
   return {
     accommodation,

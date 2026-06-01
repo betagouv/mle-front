@@ -1,8 +1,8 @@
 import fs from 'node:fs/promises'
-import { and, eq, or, sql } from 'drizzle-orm'
+import { and, eq, inArray, or, sql } from 'drizzle-orm'
 import * as XLSX from 'xlsx'
 import { closeDb, db } from '~/server/db'
-import { accommodations, externalSources, owners } from '~/server/db/schema'
+import { accommodations, accommodationTypologies, externalSources, owners } from '~/server/db/schema'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import {
   buildDisplaySourceId,
@@ -85,28 +85,16 @@ type Options = {
   exitCode?: boolean
 }
 
-const DB_FIELDS: Record<
-  TypoCategory,
-  {
-    loyerMin: keyof typeof accommodations.$inferSelect
-    loyerMax: keyof typeof accommodations.$inferSelect
-    surfaceMin: keyof typeof accommodations.$inferSelect
-    surfaceMax: keyof typeof accommodations.$inferSelect
-  }
-> = {
-  t1: { loyerMin: 'priceMinT1', loyerMax: 'priceMaxT1', surfaceMin: 'superficieMinT1', surfaceMax: 'superficieMaxT1' },
-  t1bis: { loyerMin: 'priceMinT1Bis', loyerMax: 'priceMaxT1Bis', surfaceMin: 'superficieMinT1Bis', surfaceMax: 'superficieMaxT1Bis' },
-  t2: { loyerMin: 'priceMinT2', loyerMax: 'priceMaxT2', surfaceMin: 'superficieMinT2', surfaceMax: 'superficieMaxT2' },
-  t3: { loyerMin: 'priceMinT3', loyerMax: 'priceMaxT3', surfaceMin: 'superficieMinT3', surfaceMax: 'superficieMaxT3' },
-  t4: { loyerMin: 'priceMinT4', loyerMax: 'priceMaxT4', surfaceMin: 'superficieMinT4', surfaceMax: 'superficieMaxT4' },
-  t5: { loyerMin: 'priceMinT5', loyerMax: 'priceMaxT5', surfaceMin: 'superficieMinT5', surfaceMax: 'superficieMaxT5' },
-  t6: { loyerMin: 'priceMinT6', loyerMax: 'priceMaxT6', surfaceMin: 'superficieMinT6', surfaceMax: 'superficieMaxT6' },
-  t7more: {
-    loyerMin: 'priceMinT7More',
-    loyerMax: 'priceMaxT7More',
-    surfaceMin: 'superficieMinT7More',
-    surfaceMax: 'superficieMaxT7More',
-  },
+// Typology child-row enum value (suffix) -> the CROUS comparison category.
+const TYPE_TO_CATEGORY: Record<string, TypoCategory> = {
+  t1: 't1',
+  t1_bis: 't1bis',
+  t2: 't2',
+  t3: 't3',
+  t4: 't4',
+  t5: 't5',
+  t6: 't6',
+  t7_more: 't7more',
 }
 
 function formatValue(value: number | string | null | undefined): string {
@@ -207,16 +195,17 @@ function loadExpectedResidences(filePath: string, limit?: number): ExpectedResid
     })
 }
 
-function getDbTypologies(row: typeof accommodations.$inferSelect): Map<TypoCategory, Bounds> {
+function getDbTypologies(rows: (typeof accommodationTypologies.$inferSelect)[]): Map<TypoCategory, Bounds> {
   const typologies = new Map<TypoCategory, Bounds>()
 
-  for (const category of CATEGORIES) {
-    const fields = DB_FIELDS[category]
+  for (const row of rows) {
+    const category = TYPE_TO_CATEGORY[row.type]
+    if (!category) continue
     const bounds = {
-      loyerMin: cleanNumber(row[fields.loyerMin]),
-      loyerMax: cleanNumber(row[fields.loyerMax]),
-      surfaceMin: cleanNumber(row[fields.surfaceMin]),
-      surfaceMax: cleanNumber(row[fields.surfaceMax]),
+      loyerMin: cleanNumber(row.priceMin),
+      loyerMax: cleanNumber(row.priceMax),
+      surfaceMin: cleanNumber(row.superficieMin),
+      surfaceMax: cleanNumber(row.superficieMax),
     }
     if (Object.values(bounds).some((value) => value != null)) {
       typologies.set(category, bounds)
@@ -352,13 +341,25 @@ async function loadDbResidences(ownerNameOrSlug: string): Promise<DbResidence[]>
     .leftJoin(externalSources, and(eq(externalSources.accommodationId, accommodations.id), eq(externalSources.source, 'crous')))
     .where(eq(accommodations.ownerId, owner.id))
 
+  const accommodationIds = rows.map(({ accommodation }) => accommodation.id)
+  const typologyRows =
+    accommodationIds.length > 0
+      ? await db.select().from(accommodationTypologies).where(inArray(accommodationTypologies.accommodationId, accommodationIds))
+      : []
+  const typologiesByAccommodation = new Map<number, (typeof typologyRows)[number][]>()
+  for (const tRow of typologyRows) {
+    const list = typologiesByAccommodation.get(tRow.accommodationId) ?? []
+    list.push(tRow)
+    typologiesByAccommodation.set(tRow.accommodationId, list)
+  }
+
   return rows.map(({ accommodation, sourceId }) => ({
     id: accommodation.id,
     name: accommodation.name,
     slug: accommodation.slug,
     externalReference: accommodation.externalReference,
     sourceId,
-    typologies: getDbTypologies(accommodation),
+    typologies: getDbTypologies(typologiesByAccommodation.get(accommodation.id) ?? []),
   }))
 }
 

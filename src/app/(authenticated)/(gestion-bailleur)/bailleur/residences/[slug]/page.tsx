@@ -20,7 +20,7 @@ export default async function ResidenceDetailsPage({
   return (
     <div className="fr-container fr-pb-12w">
       <Breadcrumb
-        currentPageLabel={<>{accommodation.properties.name}</>}
+        currentPageLabel={<>{accommodation.name}</>}
         segments={[
           { label: 'Tableau de bord', linkProps: { href: buildHref('/bailleur/tableau-de-bord', awaitedSearchParams) } },
           { label: 'Gestion des résidences', linkProps: { href: buildHref('/bailleur/residences', awaitedSearchParams) } },

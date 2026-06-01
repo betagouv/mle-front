@@ -57,13 +57,10 @@ export const WidgetAccommodationGrid: FC<WidgetAccommodationGridProps> = ({ terr
     pageSize: 6,
   })
 
-  const totalPages = accommodations ? Math.ceil(accommodations.count / accommodations.page_size) : 1
+  const totalPages = accommodations ? Math.ceil(accommodations.count / accommodations.pageSize) : 1
   const currentPage = queryStates.page ?? 1
   const isLastPage = currentPage >= totalPages
-  const mainAccommodationIds = useMemo(
-    () => (accommodations?.results.features || []).map((feature) => feature.id),
-    [accommodations?.results.features],
-  )
+  const mainAccommodationIds = useMemo(() => (accommodations?.results || []).map((feature) => feature.id), [accommodations?.results])
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search)
@@ -81,12 +78,10 @@ export const WidgetAccommodationGrid: FC<WidgetAccommodationGridProps> = ({ terr
         </h2>
       )}
       <div className={styles.grid}>
-        {(accommodations?.results.features || []).map((accommodation) => (
+        {(accommodations?.results || []).map((accommodation) => (
           <AccomodationCard key={accommodation.id} accomodation={accommodation} showFavorite={false} targetBlank />
         ))}
-        {!accommodations?.results.features?.length &&
-          isLoading &&
-          Array.from({ length: 6 }).map((_, index) => <CardSkeleton key={index} />)}
+        {!accommodations?.results?.length && isLoading && Array.from({ length: 6 }).map((_, index) => <CardSkeleton key={index} />)}
       </div>
       {!isLoading && accommodations?.count === 0 && (
         <div className={fr.cx('fr-col-md-11')}>
@@ -95,7 +90,7 @@ export const WidgetAccommodationGrid: FC<WidgetAccommodationGridProps> = ({ terr
           <p>{t('description2')}</p>
         </div>
       )}
-      {accommodations && accommodations.count > accommodations.page_size && (
+      {accommodations && accommodations.count > accommodations.pageSize && (
         <div className={styles.paginationContainer}>
           <Pagination
             showFirstLast={false}
@@ -125,7 +120,7 @@ export const WidgetAccommodationGrid: FC<WidgetAccommodationGridProps> = ({ terr
         </div>
       )}
       {effectiveTerritory && isLastPage && (
-        <div className={clsx(accommodations && accommodations.count <= accommodations.page_size && 'fr-mt-4w')}>
+        <div className={clsx(accommodations && accommodations.count <= accommodations.pageSize && 'fr-mt-4w')}>
           <FindStudentAccomodationNeighborsResults
             territory={effectiveTerritory}
             mainAccommodationIds={mainAccommodationIds}

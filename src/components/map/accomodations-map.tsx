@@ -160,10 +160,10 @@ export const AccomodationsMap: FC = () => {
 
   const { data: accommodations } = useAccomodations()
 
-  const accommodationsData = accommodations?.results.features || []
+  const accommodationsData = accommodations?.results || []
 
   const markerPositions = useMemo<L.LatLngTuple[]>(
-    () => accommodationsData.map((a) => [a.geometry.coordinates[1], a.geometry.coordinates[0]]),
+    () => accommodationsData.map((a) => [a.latitude ?? 0, a.longitude ?? 0]),
     [accommodationsData],
   )
 

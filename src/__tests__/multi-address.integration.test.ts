@@ -117,14 +117,14 @@ describe('multi-address: accommodations.getBySlug', () => {
 
     // Top-level fields come from the main address
     expect(result.address).toBe('10 rue de Paris')
-    expect(result.postal_code).toBe('75001')
+    expect(result.postalCode).toBe('75001')
     expect(result.city).toContain('Paris')
 
     // All addresses are returned
     expect(result.addresses).toHaveLength(2)
-    expect(result.addresses![0].is_main).toBe(true)
+    expect(result.addresses![0].isMain).toBe(true)
     expect(result.addresses![0].address).toBe('10 rue de Paris')
-    expect(result.addresses![1].is_main).toBe(false)
+    expect(result.addresses![1].isMain).toBe(false)
     expect(result.addresses![1].address).toBe('5 avenue de Lyon')
   })
 })
@@ -152,12 +152,12 @@ describe('multi-address: accommodations.list spatial search', () => {
     // Search in Paris - should find it
     const parisResults = await caller.accommodations.list({ cityId: paris.id })
     expect(parisResults.count).toBe(1)
-    expect(parisResults.results.features[0].properties.slug).toBe('multi-city-search')
+    expect(parisResults.results[0].slug).toBe('multi-city-search')
 
     // Search in Lyon - should also find it via the secondary address
     const lyonResults = await caller.accommodations.list({ cityId: lyon.id })
     expect(lyonResults.count).toBe(1)
-    expect(lyonResults.results.features[0].properties.slug).toBe('multi-city-search')
+    expect(lyonResults.results[0].slug).toBe('multi-city-search')
   })
 
   it('shows contextual city badge based on search city', async () => {
@@ -181,9 +181,9 @@ describe('multi-address: accommodations.list spatial search', () => {
 
     // Search in Lyon -> city badge should show Lyon
     const lyonResults = await caller.accommodations.list({ cityId: lyon.id })
-    const feature = lyonResults.results.features[0]
-    expect(feature.properties.city).toContain('Lyon')
-    expect(feature.properties.postal_code).toBe('69001')
+    const feature = lyonResults.results[0]
+    expect(feature.city).toContain('Lyon')
+    expect(feature.postalCode).toBe('69001')
   })
 
   it('deduplicates when both addresses match the same search', async () => {
@@ -208,7 +208,7 @@ describe('multi-address: accommodations.list spatial search', () => {
     const results = await caller.accommodations.list({ cityId: paris.id })
     // Should appear only once, not twice
     expect(results.count).toBe(1)
-    expect(results.results.features).toHaveLength(1)
+    expect(results.results).toHaveLength(1)
   })
 
   it('finds accommodation via bbox covering secondary address', async () => {
@@ -233,7 +233,7 @@ describe('multi-address: accommodations.list spatial search', () => {
     // BBox around Lyon only
     const results = await caller.accommodations.list({ bbox: '4.7,45.7,4.9,45.9' })
     expect(results.count).toBe(1)
-    expect(results.results.features[0].properties.slug).toBe('bbox-secondary')
+    expect(results.results[0].slug).toBe('bbox-secondary')
   })
 })
 
@@ -246,20 +246,20 @@ describe('multi-address: bailleur.create with multiple addresses', () => {
     const result = await ownerCaller.bailleur.create({
       name: 'Residence Multi Create',
       addresses: [
-        { address: '1 rue A', city: 'Paris', postal_code: '75001' },
-        { address: '2 rue B', city: 'Paris', postal_code: '75001' },
+        { address: '1 rue A', city: 'Paris', postalCode: '75001' },
+        { address: '2 rue B', city: 'Paris', postalCode: '75001' },
       ],
-      external_url: 'https://example.com',
+      externalUrl: 'https://example.com',
       typologies: [
         {
-          type: 'T1',
-          price_min: 400,
-          price_max: 600,
-          superficie_min: 15,
-          superficie_max: 25,
+          type: 't1',
+          priceMin: 400,
+          priceMax: 600,
+          superficieMin: 15,
+          superficieMax: 25,
           colocation: false,
-          nb_total: 10,
-          nb_available: 5,
+          nbTotal: 10,
+          nbAvailable: 5,
         },
       ],
     })
@@ -281,17 +281,17 @@ describe('multi-address: bailleur.create with multiple addresses', () => {
       ownerCaller.bailleur.create({
         name: 'Residence No Addr',
         addresses: [],
-        external_url: 'https://example.com',
+        externalUrl: 'https://example.com',
         typologies: [
           {
-            type: 'T1',
-            price_min: 400,
-            price_max: 600,
-            superficie_min: 15,
-            superficie_max: 25,
+            type: 't1',
+            priceMin: 400,
+            priceMax: 600,
+            superficieMin: 15,
+            superficieMax: 25,
             colocation: false,
-            nb_total: 10,
-            nb_available: 5,
+            nbTotal: 10,
+            nbAvailable: 5,
           },
         ],
       }),
@@ -323,8 +323,8 @@ describe('multi-address: bailleur.update addresses', () => {
     await ownerCaller.bailleur.update({
       slug: 'update-addresses',
       addresses: [
-        { address: '10 new main', city: 'Paris', postal_code: '75001' },
-        { address: '20 new secondary', city: 'Paris', postal_code: '75001' },
+        { address: '10 new main', city: 'Paris', postalCode: '75001' },
+        { address: '20 new secondary', city: 'Paris', postalCode: '75001' },
       ],
     })
 
@@ -360,7 +360,7 @@ describe('multi-address: bailleur.update addresses', () => {
     // Update with only 1 address
     await ownerCaller.bailleur.update({
       slug: 'reduce-addresses',
-      addresses: [{ address: '99 only address', city: 'Paris', postal_code: '75001' }],
+      addresses: [{ address: '99 only address', city: 'Paris', postalCode: '75001' }],
     })
 
     const addresses = await db.select().from(accommodationAddresses).where(eq(accommodationAddresses.accommodationId, acc.id))
