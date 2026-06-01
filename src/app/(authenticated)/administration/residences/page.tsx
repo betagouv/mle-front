@@ -3,12 +3,12 @@
 import Badge from '@codegouvfr/react-dsfr/Badge'
 import Button from '@codegouvfr/react-dsfr/Button'
 import Input from '@codegouvfr/react-dsfr/Input'
-import Pagination from '@codegouvfr/react-dsfr/Pagination'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 import clsx from 'clsx'
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 import { useDebounce } from 'use-debounce'
+import { Pagination } from '~/components/ui/pagination'
 import { useTRPC } from '~/server/trpc/client'
 import styles from '../administration.module.css'
 

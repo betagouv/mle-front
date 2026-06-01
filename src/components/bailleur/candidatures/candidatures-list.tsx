@@ -1,8 +1,8 @@
 'use client'
 
-import Pagination from '@codegouvfr/react-dsfr/Pagination'
 import { CandidaturesFilters } from '~/app/(authenticated)/(gestion-bailleur)/bailleur/candidatures/filters'
 import { CandidatureCard } from '~/components/bailleur/candidatures/candidature-card'
+import { Pagination } from '~/components/ui/pagination'
 import { useCandidatures } from '~/hooks/use-candidatures'
 
 export const CandidaturesList = () => {

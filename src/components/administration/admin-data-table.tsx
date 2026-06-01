@@ -1,9 +1,9 @@
 'use client'
 
-import Pagination from '@codegouvfr/react-dsfr/Pagination'
 import { ColumnDef, flexRender, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from '@tanstack/react-table'
 import clsx from 'clsx'
 import { useState } from 'react'
+import { Pagination } from '~/components/ui/pagination'
 import styles from './admin-data-table.module.css'
 
 interface AdminDataTableProps<T> {
