@@ -6,7 +6,7 @@ const bytea = customType<{ data: Buffer; driverData: Buffer }>({
   },
 })
 
-export const owners = pgTable('account_owner', {
+export const owners = pgTable('owner', {
   id: bigint({ mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
   name: varchar({ length: 200 }).notNull(),
   slug: varchar({ length: 255 }).notNull().unique(),

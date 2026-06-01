@@ -2,7 +2,7 @@ import { bigint, geometry, index, pgTable, varchar } from 'drizzle-orm/pg-core'
 import { academies } from './academies'
 
 export const departments = pgTable(
-  'territories_department',
+  'department',
   {
     id: bigint({ mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
     name: varchar({ length: 200 }).notNull(),

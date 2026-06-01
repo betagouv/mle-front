@@ -38,7 +38,7 @@ export const UPDATE_FIELD_MAP: FieldMap = {
   // Core fields
   name: 'name',
   residence_type: 'residenceType',
-  target_audience: 'target_audience',
+  target_audience: 'targetAudience',
   description: 'description',
   rental_charges_details: 'rentalChargesDetails',
   external_url: 'externalUrl',

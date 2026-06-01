@@ -1,7 +1,7 @@
 import { bigint, pgTable, text, timestamp, unique, varchar } from 'drizzle-orm/pg-core'
 
 export const importBlocklist = pgTable(
-  'accommodation_importblocklist',
+  'import_blocklist',
   {
     id: bigint({ mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
     source: varchar({ length: 100 }).notNull(),

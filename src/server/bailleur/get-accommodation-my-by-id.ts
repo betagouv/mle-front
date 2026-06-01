@@ -115,7 +115,7 @@ export const getAccommodationMyById = async (slug: string): Promise<TAccomodatio
       postal_code: mainAddress?.postalCode ?? '',
       addresses: allAddresses,
       residence_type: toResidenceType(row.residenceType),
-      target_audience: toTargetAudience(row.target_audience),
+      target_audience: toTargetAudience(row.targetAudience),
       published: row.published,
       accept_waiting_list: row.acceptWaitingList ?? false,
       images_urls: row.imagesUrls ?? null,

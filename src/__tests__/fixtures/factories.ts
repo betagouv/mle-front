@@ -250,6 +250,7 @@ export async function createFavoriteAccommodation(
   },
 ) {
   const db = getTestDb()
+  await createUser({ id: overrides.userId })
   const [row] = await db.insert(favoriteAccommodations).values(overrides).returning()
   return row
 }

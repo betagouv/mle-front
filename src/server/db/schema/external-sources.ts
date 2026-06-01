@@ -2,7 +2,7 @@ import { bigint, pgTable, unique, varchar } from 'drizzle-orm/pg-core'
 import { accommodations } from './accommodations'
 
 export const externalSources = pgTable(
-  'accommodation_externalsource',
+  'external_source',
   {
     id: bigint({ mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
     accommodationId: bigint('accommodation_id', { mode: 'number' })
