@@ -31,6 +31,7 @@ export const userRelations = relations(user, ({ one, many }) => ({
   owner: one(owners, { fields: [user.ownerId], references: [owners.id] }),
   dossierFacileTenant: one(dossierFacileTenants, { fields: [user.id], references: [dossierFacileTenants.userId] }),
   adminOwnerLinks: many(adminOwnerLinks),
+  favoriteAccommodations: many(favoriteAccommodations),
 }))
 
 export const dossierFacileTenantsRelations = relations(dossierFacileTenants, ({ one, many }) => ({
@@ -74,6 +75,7 @@ export const accommodationAddressesRelations = relations(accommodationAddresses,
 
 export const favoriteAccommodationsRelations = relations(favoriteAccommodations, ({ one }) => ({
   accommodation: one(accommodations, { fields: [favoriteAccommodations.accommodationId], references: [accommodations.id] }),
+  user: one(user, { fields: [favoriteAccommodations.userId], references: [user.id] }),
 }))
 
 export const externalSourcesRelations = relations(externalSources, ({ one }) => ({

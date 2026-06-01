@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createAccommodation, createFavoriteAccommodation } from './fixtures/factories'
+import { createAccommodation, createFavoriteAccommodation, createUser } from './fixtures/factories'
 import { authenticatedCaller, authenticatedCaller2, caller } from './helpers/test-caller'
 import './helpers/setup-integration'
 
@@ -51,6 +51,7 @@ describe('favorites.add', () => {
   })
 
   it('adds a favorite', async () => {
+    await createUser({ id: 'test-user-id' })
     await createAccommodation({
       slug: 'add-fav-test',
       geom: { type: 'Point', coordinates: [2.35, 48.85] },
@@ -64,6 +65,7 @@ describe('favorites.add', () => {
   })
 
   it('is idempotent (no error if already favorite)', async () => {
+    await createUser({ id: 'test-user-id' })
     await createAccommodation({
       slug: 'idempotent-fav',
       geom: { type: 'Point', coordinates: [2.35, 48.85] },

@@ -362,14 +362,14 @@ export const ownerStatisticsRouter = createTRPCRouter({
                 AND te.created_at BETWEEN ${fromIso}::timestamptz AND ${toIso}::timestamptz
             ) AS "nbConsultOffer",
             (
-              SELECT count(*)::int FROM accommodation_favoriteaccommodation fa
+              SELECT count(*)::int FROM favorite_accommodation fa
               WHERE fa.accommodation_id = a.id
                 AND fa.created_at BETWEEN ${fromIso}::timestamptz AND ${toIso}::timestamptz
             ) AS "nbFavorites"
-          FROM accommodation_accommodation a
+          FROM accommodation a
           LEFT JOIN accommodation_address addr
             ON addr.accommodation_id = a.id AND addr.is_main = true
-          LEFT JOIN territories_city c ON c.id = addr.city_id
+          LEFT JOIN city c ON c.id = addr.city_id
           WHERE a.owner_id = ${owner.id}
           ${searchSql}
           ${orderBy}
@@ -428,7 +428,7 @@ export const ownerStatisticsRouter = createTRPCRouter({
               WHERE sa.city_id = c.id
                 AND sa.created_at BETWEEN ${fromIso}::timestamptz AND ${toIso}::timestamptz
             ) AS "nbAlerts"
-          FROM territories_city c
+          FROM city c
           WHERE c.id IN (${sql.join(cityIds, sql`, `)})
           ${searchSql}
           ${orderBy}

@@ -2,7 +2,7 @@ import { bigint, boolean, doublePrecision, geometry, index, integer, pgTable, va
 import { departments } from './departments'
 
 export const cities = pgTable(
-  'territories_city',
+  'city',
   {
     id: bigint({ mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
     name: varchar({ length: 200 }).notNull(),

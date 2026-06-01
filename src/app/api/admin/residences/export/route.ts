@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       address: accommodationAddresses.address,
       postalCode: accommodationAddresses.postalCode,
       residenceType: accommodations.residenceType,
-      targetAudience: accommodations.target_audience,
+      targetAudience: accommodations.targetAudience,
       published: accommodations.published,
       city: cities.name,
       departmentCode: departments.code,
