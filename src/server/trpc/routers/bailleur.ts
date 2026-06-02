@@ -97,10 +97,6 @@ async function verifyOwnership(slug: string, userId: string) {
 
 const PAGE_SIZE = 20
 
-function hasOwnField<T extends string>(fields: Record<string, unknown>, key: T) {
-  return Object.hasOwn(fields, key)
-}
-
 const accommodationSelectFields = {
   id: accommodations.id,
   name: accommodations.name,
@@ -262,7 +258,6 @@ export const bailleurRouter = createTRPCRouter({
         priceMin: aggregates.priceMin,
         priceMax: aggregates.priceMax,
         nbAvailableApartments: aggregates.nbAvailableApartments,
-        imagesCount: 0,
         imagesUrls: [],
         // Independent (caller-set) aggregates, not derived from typologies
         nbAccessibleApartments: 0,
@@ -340,10 +335,6 @@ export const bailleurRouter = createTRPCRouter({
       }
       const userProvidedKeys = new Set(Object.keys(camelFields))
       const parentSet: Record<string, unknown> = { ...camelFields }
-
-      if (hasOwnField(fields, 'imagesUrls')) {
-        parentSet.imagesCount = fields.imagesUrls?.length ?? 0
-      }
 
       // When typologies are provided, refresh the denormalized parent aggregates.
       if (typologies) {

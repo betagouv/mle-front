@@ -364,7 +364,6 @@ const command: ImportCommand = {
           refrigerator: item.refrigerator ?? null,
           bathroom: item.bathroom ?? null,
           acceptWaitingList: item.accept_waiting_list ?? null,
-          imagesCount: 0,
           externalReference: sourceId,
           ownerId,
           updatedAt: new Date(),

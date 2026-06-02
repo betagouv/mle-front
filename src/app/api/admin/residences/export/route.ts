@@ -67,7 +67,6 @@ export async function GET(request: NextRequest) {
       externalUrl: accommodations.externalUrl,
       virtualTourUrl: accommodations.virtualTourUrl,
       externalReference: accommodations.externalReference,
-      imagesCount: accommodations.imagesCount,
       createdAt: accommodations.createdAt,
       updatedAt: accommodations.updatedAt,
     })

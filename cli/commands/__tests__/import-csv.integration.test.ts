@@ -458,7 +458,6 @@ describe('import-csv integration', () => {
 
     const accs = await db.select().from(accommodations)
     expect(accs[0].imagesUrls).toContain(s3Url)
-    expect(accs[0].imagesCount).toBe(1)
     // Should NOT have fetched the image since it's already on our bucket
     expect(mockFetch).not.toHaveBeenCalled()
   })
@@ -481,7 +480,6 @@ describe('import-csv integration', () => {
     const accs = await db.select().from(accommodations)
     expect(accs[0].imagesUrls).toHaveLength(1)
     expect(accs[0].imagesUrls![0]).toContain('s3.gra.io.cloud.ovh.net')
-    expect(accs[0].imagesCount).toBe(1)
   })
 
   it('handles multiple pictures separated by pipe', async () => {
@@ -496,7 +494,6 @@ describe('import-csv integration', () => {
 
     const accs = await db.select().from(accommodations)
     expect(accs[0].imagesUrls).toHaveLength(2)
-    expect(accs[0].imagesCount).toBe(2)
   })
 
   it('re-uploads staging S3 images when running in prod', async () => {
