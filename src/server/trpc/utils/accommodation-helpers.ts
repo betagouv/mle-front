@@ -77,9 +77,7 @@ export function computeDerivedFields(data: {
 
   const priceMin = prices.length > 0 ? Math.min(...prices) : null
 
-  const imagesCount = data.images_urls?.length ?? 0
-
-  return { nbTotalApartments, priceMin, imagesCount }
+  return { nbTotalApartments, priceMin }
 }
 
 export async function geocodeAddress(address: string, city: string, postalCode: string): Promise<{ lon: number; lat: number } | null> {

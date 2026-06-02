@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises'
-import { and, eq, inArray, or, sql } from 'drizzle-orm'
+import { eq, or, sql } from 'drizzle-orm'
 import * as XLSX from 'xlsx'
 import { closeDb, db } from '~/server/db'
 import { accommodations, accommodationTypologies, externalSources, owners } from '~/server/db/schema'
@@ -335,31 +335,24 @@ async function loadDbResidences(ownerNameOrSlug: string): Promise<DbResidence[]>
     throw new Error(`Owner introuvable: ${ownerNameOrSlug}`)
   }
 
-  const rows = await db
-    .select({ accommodation: accommodations, sourceId: externalSources.sourceId })
-    .from(accommodations)
-    .leftJoin(externalSources, and(eq(externalSources.accommodationId, accommodations.id), eq(externalSources.source, 'crous')))
-    .where(eq(accommodations.ownerId, owner.id))
+  const rows = await db.query.accommodations.findMany({
+    where: eq(accommodations.ownerId, owner.id),
+    with: {
+      typologies: true,
+      externalSources: {
+        where: eq(externalSources.source, 'crous'),
+        columns: { sourceId: true },
+      },
+    },
+  })
 
-  const accommodationIds = rows.map(({ accommodation }) => accommodation.id)
-  const typologyRows =
-    accommodationIds.length > 0
-      ? await db.select().from(accommodationTypologies).where(inArray(accommodationTypologies.accommodationId, accommodationIds))
-      : []
-  const typologiesByAccommodation = new Map<number, (typeof typologyRows)[number][]>()
-  for (const tRow of typologyRows) {
-    const list = typologiesByAccommodation.get(tRow.accommodationId) ?? []
-    list.push(tRow)
-    typologiesByAccommodation.set(tRow.accommodationId, list)
-  }
-
-  return rows.map(({ accommodation, sourceId }) => ({
+  return rows.map((accommodation) => ({
     id: accommodation.id,
     name: accommodation.name,
     slug: accommodation.slug,
     externalReference: accommodation.externalReference,
-    sourceId,
-    typologies: getDbTypologies(typologiesByAccommodation.get(accommodation.id) ?? []),
+    sourceId: accommodation.externalSources[0]?.sourceId ?? null,
+    typologies: getDbTypologies(accommodation.typologies),
   }))
 }
 

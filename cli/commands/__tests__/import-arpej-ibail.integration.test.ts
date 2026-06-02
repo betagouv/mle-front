@@ -237,7 +237,6 @@ describe('import-arpej-ibail integration', () => {
       slug: 'residence-conservee',
       description: 'Description existante',
       imagesUrls: ['https://s3.example.com/existing.jpg'],
-      imagesCount: 1,
       postalCode: '75011',
     })
     await createExternalSource({ accommodationId: existing.id, source: 'arpej', sourceId: 'preserve-001' })
@@ -283,7 +282,6 @@ describe('import-arpej-ibail integration', () => {
     const [updated] = await db.select().from(accommodations).where(eq(accommodations.id, existing.id))
     expect(updated!.description).toBe('Description existante')
     expect(updated!.imagesUrls).toEqual(['https://s3.example.com/existing.jpg'])
-    expect(updated!.imagesCount).toBe(1)
     const typos = await loadTypologies(updated!.id)
     expect(typos.t1?.nbAvailable).toBe(0)
     expect(typos.t1?.priceMin).toBe(500)

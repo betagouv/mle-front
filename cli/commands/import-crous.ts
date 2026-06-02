@@ -459,7 +459,6 @@ const command: ImportCommand = {
               omitFlatTypologyFields({
                 ...baseFields,
                 slug,
-                imagesCount: 0,
                 createdAt: new Date(),
               }),
             )

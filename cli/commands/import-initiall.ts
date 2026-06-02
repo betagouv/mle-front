@@ -249,7 +249,6 @@ const command: ImportCommand = {
           nbAccessibleApartments: residence.acf.residence_is_accessible ? 1 : null,
           ...equipment,
           imagesUrls: imageUrls.length > 0 ? imageUrls : null,
-          imagesCount: derived.imagesCount,
           externalUrl: residence.link,
           ownerId,
           updatedAt: new Date(),

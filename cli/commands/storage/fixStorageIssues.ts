@@ -31,7 +31,7 @@ export async function fixBrokenUrls(brokenUrls: BrokenUrl[]): Promise<{ accommod
 
     if (removed === 0) continue
 
-    await db.update(accommodations).set({ imagesUrls: newUrls, imagesCount: newUrls.length }).where(eq(accommodations.id, id))
+    await db.update(accommodations).set({ imagesUrls: newUrls }).where(eq(accommodations.id, id))
 
     accommodationsUpdated++
     urlsRemoved += removed
