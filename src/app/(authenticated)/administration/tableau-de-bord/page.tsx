@@ -343,7 +343,7 @@ function KeyFigures({ data, isLoading }: { data: ReturnType<typeof useAdminStats
           <div className={styles.cardHeader}>
             <span className={styles.cardTitle}>
               <span className="ri-calendar-check-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
-              Disponibilité des résidences
+              Disponibilité des résidences hors-CROUS
             </span>
           </div>
           <div className={styles.kpiRow}>
