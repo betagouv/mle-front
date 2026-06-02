@@ -1,4 +1,4 @@
-import { eq, sql } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import { db } from '~/server/db'
 import { cities, departments } from '~/server/db/schema'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
@@ -209,6 +209,18 @@ export async function fillCityFromApi(cityId: number): Promise<boolean> {
 }
 
 export async function ensureCity(postalCode: string, cityName: string): Promise<{ name: string; id: number }> {
+  const existingByName = await db
+    .select({ name: cities.name, id: cities.id })
+    .from(cities)
+    .where(
+      and(
+        sql`${cities.postalCodes} @> ARRAY[${postalCode}]::varchar[]`,
+        sql`lower(immutable_unaccent(${cities.name})) = lower(immutable_unaccent(${cityName}))`,
+      ),
+    )
+    .limit(1)
+  if (existingByName[0]) return existingByName[0]
+
   const existing = await db
     .select({ name: cities.name, id: cities.id })
     .from(cities)
