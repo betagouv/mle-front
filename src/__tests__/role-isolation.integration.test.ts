@@ -96,7 +96,7 @@ describe('owner cannot access alerts routes', () => {
   })
 
   it('rejects owner from alerts.create', async () => {
-    await expect(ownerCaller.alerts.create({ name: 'Test', has_coliving: false, is_accessible: false, max_price: 500 })).rejects.toThrow(
+    await expect(ownerCaller.alerts.create({ name: 'Test', hasColiving: false, isAccessible: false, maxPrice: 500 })).rejects.toThrow(
       'Student or admin role required',
     )
   })

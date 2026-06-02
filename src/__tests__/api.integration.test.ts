@@ -226,7 +226,7 @@ describe('API v1 — filtres', () => {
 
   it('filtre available (disponibilités)', async () => {
     const { key } = await makeKey()
-    await createAccommodation({ slug: 'dispo', nbT1Available: 2, geom: { type: 'Point', coordinates: PARIS } })
+    await createAccommodation({ slug: 'dispo', nbAvailableApartments: 2, geom: { type: 'Point', coordinates: PARIS } })
     await createAccommodation({ slug: 'no-dispo', geom: { type: 'Point', coordinates: PARIS } })
     expect(slugs(await req('/accommodations?available=true&page_size=50', key))).toEqual(['dispo'])
   })

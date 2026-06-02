@@ -9,21 +9,21 @@ import { formatCityWithA, formatCityWithDe } from '~/utils/french-contraction'
 import styles from './prepare-student-life-summary.module.css'
 
 interface PrepareStudentLifeSummaryProps {
-  average_income: number
+  averageIncome: number
   bbox: { xmax: number; xmin: number; ymax: number; ymin: number }
   location: string
   name: string
-  nb_students: number
-  nearby_cities: Array<{ name: string; slug: string }>
+  nbStudents: number
+  nearbyCities: Array<{ name: string; slug: string }>
 }
 
 export default async function PrepareStudentLifeSummary({
-  average_income,
+  averageIncome,
   bbox,
   location,
   name,
-  nb_students,
-  nearby_cities,
+  nbStudents,
+  nearbyCities,
 }: PrepareStudentLifeSummaryProps) {
   const t = await getTranslations('prepareStudentLife')
   const universities = [
@@ -34,7 +34,7 @@ export default async function PrepareStudentLifeSummary({
     "École Supérieure d'Ingénieurs de Paris-Est (ESIPE)",
   ]
   const formattedBbox = `${bbox.xmin},${bbox.ymin},${bbox.xmax},${bbox.ymax}`
-  const mensualIncome = Math.round(average_income / 12)
+  const mensualIncome = Math.round(averageIncome / 12)
 
   return (
     <div className={clsx(fr.cx('fr-container'), styles.mainContainer)}>
@@ -50,7 +50,7 @@ export default async function PrepareStudentLifeSummary({
           <div className={styles.statsContainer}>
             <div className={styles.statColumn}>
               <span className={fr.cx('fr-icon-team-line')}>93000 habitants</span>
-              <span className={clsx(fr.cx('fr-text--bold'), styles.statValue)}>{nb_students} étudiants</span>
+              <span className={clsx(fr.cx('fr-text--bold'), styles.statValue)}>{nbStudents} étudiants</span>
             </div>
             <div className={clsx(fr.cx('fr-hidden', 'fr-unhidden-sm'), styles.statDivider)}></div>
             <div className={styles.statColumn}>
@@ -108,7 +108,7 @@ export default async function PrepareStudentLifeSummary({
           <div className={styles.nearbyContainer}>
             <p>{t('nearbyCities', { titleFormattedDe: formatCityWithDe(name) })}</p>
             <div className={styles.tagContainer}>
-              {nearby_cities.map((city) => (
+              {nearbyCities.map((city) => (
                 <Tag key={city.slug}>{city.name}</Tag>
               ))}
             </div>

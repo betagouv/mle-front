@@ -57,7 +57,7 @@ describe('alerts.list', () => {
 
 describe('alerts.create', () => {
   it('requires authentication', async () => {
-    await expect(caller.alerts.create({ name: 'Test', has_coliving: false, is_accessible: false, max_price: 500 })).rejects.toThrow(
+    await expect(caller.alerts.create({ name: 'Test', hasColiving: false, isAccessible: false, maxPrice: 500 })).rejects.toThrow(
       'UNAUTHORIZED',
     )
   })
@@ -71,10 +71,10 @@ describe('alerts.create', () => {
 
     const result = await authenticatedCaller.alerts.create({
       name: 'Mon alerte',
-      city_id: city.id,
-      has_coliving: true,
-      is_accessible: false,
-      max_price: 600,
+      cityId: city.id,
+      hasColiving: true,
+      isAccessible: false,
+      maxPrice: 600,
     })
 
     expect(result.name).toBe('Mon alerte')
@@ -93,12 +93,12 @@ describe('alerts.create', () => {
 
     const result = await authenticatedCaller.alerts.create({
       name: 'Alert Territoire',
-      city_id: city.id,
-      department_id: dept.id,
-      academy_id: academy.id,
-      has_coliving: false,
-      is_accessible: true,
-      max_price: 800,
+      cityId: city.id,
+      departmentId: dept.id,
+      academyId: academy.id,
+      hasColiving: false,
+      isAccessible: true,
+      maxPrice: 800,
     })
 
     expect(result.cityId).toBe(city.id)
@@ -118,7 +118,7 @@ describe('alerts.update', () => {
     const result = await authenticatedCaller.alerts.update({
       id: alert.id,
       name: 'Updated',
-      max_price: 700,
+      maxPrice: 700,
     })
 
     expect(result.name).toBe('Updated')
@@ -135,7 +135,7 @@ describe('alerts.update', () => {
 
     const result = await authenticatedCaller.alerts.update({
       id: alert.id,
-      has_coliving: true,
+      hasColiving: true,
     })
 
     expect(result.name).toBe('Original')

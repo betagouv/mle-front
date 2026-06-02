@@ -3,10 +3,10 @@ import { EResidenceType } from '~/enums/residence-type'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, geocodeAddress } from '~/server/lib/import/geocoder'
-import { mergeTypologies, syncTypologies, type TypologyPatch, typologyDraft } from '~/server/lib/typologies'
+import { mergeTypologies, syncTypologies, type TypologyPatch, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { accommodationAddresses, accommodations, externalSources, importBlocklist } from '../../src/server/db/schema'
 import { generateAccommodationKey, uploadFile } from '../../src/server/services/s3'
-import { computeDerivedFields, generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
+import { generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '../../src/server/utils/slug'
 import type { ImportCommand, ImportOptions, ImportResult } from '../types'
 import { getOrCreateOwner } from '../utils/get-or-create-owner'
@@ -193,12 +193,6 @@ const command: ImportCommand = {
           imageUrls = await uploadImages(normalized.imageSources, options.verbose ?? false)
         }
 
-        const derived = computeDerivedFields({
-          nb_t1: normalized.accommodationQuantity,
-          price_min_t1: normalized.rentAmountFrom,
-          images_urls: imageUrls.length > 0 ? imageUrls : null,
-        })
-
         const addressData = {
           address: geo?.address ?? residence.address.trim(),
           postalCode: resolvedPostalCode,
@@ -215,6 +209,8 @@ const command: ImportCommand = {
           superficieMin: normalized.surfaceFrom,
           superficieMax: normalized.surfaceTo,
         }
+
+        const derived = typologyAggregates([typologyDraft('t1', t1Fields)])
 
         const accommodationData = {
           description: (residence.description as string) ?? null,

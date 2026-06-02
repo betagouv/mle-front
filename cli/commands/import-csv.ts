@@ -10,9 +10,9 @@ import { ZUpdateResidence } from '../../src/schemas/accommodations/update-reside
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
 import type { CsvRow } from '../../src/server/lib/import/csv-parser'
 import { generateSourceId, normalizeEnum, parseCsvContent, toBool, toDigit } from '../../src/server/lib/import/csv-parser'
-import { syncTypologies, typologyDraft } from '../../src/server/lib/typologies'
+import { syncTypologies, typologyAggregates, typologyDraft } from '../../src/server/lib/typologies'
 import { generateAccommodationKey, uploadFile } from '../../src/server/services/s3'
-import { computeDerivedFields, generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
+import { generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '../../src/server/utils/slug'
 import type { ImportCommand, ImportOptions, ImportResult } from '../types'
 import { getOrCreateOwner } from '../utils/get-or-create-owner'
@@ -311,26 +311,6 @@ const command: ImportCommand = {
         // Images
         const imagesUrls = options.dryRun ? [] : await processImages(row.pictures ?? '', options.verbose)
 
-        const derived = computeDerivedFields({
-          nb_t1: toDigit(row.nb_t1),
-          nb_t1_bis: toDigit(row.nb_t1_bis),
-          nb_t2: toDigit(row.nb_t2),
-          nb_t3: toDigit(row.nb_t3),
-          nb_t4: toDigit(row.nb_t4),
-          nb_t5: toDigit(row.nb_t5),
-          nb_t6: toDigit(row.nb_t6),
-          nb_t7_more: toDigit(row.nb_t7_more),
-          price_min_t1: toDigit(row.t1_rent_min),
-          price_min_t1_bis: toDigit(row.t1_bis_rent_min),
-          price_min_t2: toDigit(row.t2_rent_min),
-          price_min_t3: toDigit(row.t3_rent_min),
-          price_min_t4: toDigit(row.t4_rent_min),
-          price_min_t5: toDigit(row.t5_rent_min),
-          price_min_t6: toDigit(row.t6_rent_min),
-          price_min_t7_more: toDigit(row.t7_more_rent_min),
-          images_urls: imagesUrls.length > 0 ? imagesUrls : undefined,
-        })
-
         const addressData = {
           address: resolvedAddress,
           postalCode: resolvedPostalCode,
@@ -347,6 +327,8 @@ const command: ImportCommand = {
             superficieMax: toDigit(row[`superficie_max_${type}`]),
           }),
         )
+
+        const derived = typologyAggregates(typologyDrafts)
 
         const accommodationData = {
           name,
