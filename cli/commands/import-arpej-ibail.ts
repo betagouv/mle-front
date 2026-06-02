@@ -240,7 +240,7 @@ const command: ImportCommand = {
           const accommodationId = existingSource[0].accommodationId
           const updateData: Partial<typeof accommodations.$inferInsert> = {
             ...omitNullish(accommodationData),
-            ...(imageUrls.length > 0 ? { imagesUrls: imageUrls, imagesCount: derived.imagesCount } : {}),
+            ...(imageUrls.length > 0 ? { imagesUrls: imageUrls } : {}),
           }
 
           await db.update(accommodations).set(omitFlatTypologyFields(updateData)).where(eq(accommodations.id, accommodationId))
@@ -269,7 +269,6 @@ const command: ImportCommand = {
                 ...accommodationData,
                 name: residence.title,
                 imagesUrls: imageUrls.length > 0 ? imageUrls : null,
-                imagesCount: derived.imagesCount,
                 slug,
                 createdAt: new Date(),
               }),

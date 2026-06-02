@@ -404,7 +404,6 @@ const command: ImportCommand = {
           scholarshipHoldersPriority: toBool(row.scholarship_holders_priority),
           socialHousingRequired: toBool(row.social_housing_required),
           imagesUrls: imagesUrls.length > 0 ? imagesUrls : null,
-          imagesCount: derived.imagesCount,
           externalUrl: row.owner_url?.trim() || null,
           externalReference: sourceId,
           ownerId: ownerId!,

@@ -201,7 +201,6 @@ export async function createAccommodation(
     name: 'Résidence Test',
     slug: `residence-test-${suffix}`,
     published: true,
-    imagesCount: 0,
     ...rest,
   }
   const [row] = await db

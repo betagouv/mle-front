@@ -304,7 +304,6 @@ describe('bailleur.update', () => {
       nbTotalApartments: 42,
       priceMin: 500,
       imagesUrls: ['https://example.com/old.jpg'],
-      imagesCount: 1,
       geom: parisPoint,
     })
 
@@ -316,7 +315,7 @@ describe('bailleur.update', () => {
     const [updated] = await db.select().from(accommodations).where(eq(accommodations.slug, 'image-update'))
     expect(updated.nbTotalApartments).toBe(42)
     expect(updated.priceMin).toBe(500)
-    expect(updated.imagesCount).toBe(2)
+    expect(updated.imagesUrls).toEqual(['https://example.com/old.jpg', 'https://example.com/new.jpg'])
   })
 
   it('rejects update of accommodation owned by another user', async () => {

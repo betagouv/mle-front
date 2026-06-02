@@ -226,7 +226,7 @@ Options :
 |--------|-------------|
 | `--verbose` | Affiche le détail de chaque URL cassée et fichier orphelin |
 | `--csv <dir>` | Écrit deux CSV dans le dossier : `broken-urls-{timestamp}.csv` et `unreferenced-files-{timestamp}.csv` |
-| `--write` | Applique les corrections : supprime les URLs cassées des tableaux `imagesUrls` en base (et met à jour `imagesCount`), supprime les fichiers orphelins de S3 |
+| `--write` | Applique les corrections : supprime les URLs cassées des tableaux `imagesUrls` en base, supprime les fichiers orphelins de S3 |
 
 Variables d'env requises : `DATABASE_URL`, `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`
 
