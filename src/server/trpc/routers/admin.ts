@@ -689,9 +689,9 @@ const statsRouter = createTRPCRouter({
           .from(accommodations),
         db
           .select({
-            avecDispo: sql<number>`count(*) filter (where ${isAvailable})`.mapWith(Number),
-            sansDispo: sql<number>`count(*) filter (where not ${isAvailable} and not ${isUnknown})`.mapWith(Number),
-            nonRenseignee: sql<number>`count(*) filter (where ${isUnknown})`.mapWith(Number),
+            avecDispo: sql<number>`count(*) filter (where ${isAvailable} and not ${isCrous})`.mapWith(Number),
+            sansDispo: sql<number>`count(*) filter (where not ${isAvailable} and not ${isUnknown} and not ${isCrous})`.mapWith(Number),
+            nonRenseignee: sql<number>`count(*) filter (where ${isUnknown} and not ${isCrous})`.mapWith(Number),
           })
           .from(accommodations),
       ])
