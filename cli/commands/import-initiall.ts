@@ -1,10 +1,11 @@
 import { and, eq, sql } from 'drizzle-orm'
+import type { TypologyType } from '~/schemas/accommodations/typology'
 import { db } from '~/server/db'
 import { ensureCity, geocodeAddress } from '~/server/lib/import/geocoder'
-import { omitFlatTypologyFields, syncTypologiesFromFlat } from '~/server/lib/typologies'
+import { syncTypologies, type TypologyDraft, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
 import { generateAccommodationKey, uploadFile } from '../../src/server/services/s3'
-import { computeDerivedFields, generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
+import { generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '../../src/server/utils/slug'
 import type { ImportCommand, ImportOptions, ImportResult } from '../types'
 import { getOrCreateOwner } from '../utils/get-or-create-owner'
@@ -91,34 +92,26 @@ async function uploadImages(gallery: { url: string }[], verbose: boolean): Promi
   return urls
 }
 
-const TYPOLOGY_MAP: Record<string, string> = {
-  T1: 'nbT1',
-  'T1 bis': 'nbT1Bis',
-  T2: 'nbT2',
-  T3: 'nbT3',
-  T4: 'nbT4',
-  T5: 'nbT5',
+const TYPOLOGY_MAP: Record<string, TypologyType> = {
+  T1: 't1',
+  'T1 bis': 't1_bis',
+  T2: 't2',
+  T3: 't3',
+  T4: 't4',
+  T5: 't5',
 }
 
-function buildTypologyValues(typologies?: false | { name: string; count: string | number }[]) {
-  const result: Record<string, number | null> = {
-    nbT1: null,
-    nbT1Bis: null,
-    nbT2: null,
-    nbT3: null,
-    nbT4: null,
-    nbT5: null,
-  }
-  if (!typologies) return result
-
+function buildTypologyDrafts(typologies?: false | { name: string; count: string | number }[]): TypologyDraft[] {
+  if (!typologies) return []
+  const counts = new Map<TypologyType, number>()
   for (const typo of typologies) {
-    const field = TYPOLOGY_MAP[typo.name]
-    if (field) {
+    const type = TYPOLOGY_MAP[typo.name]
+    if (type) {
       const count = Number(typo.count)
-      if (count > 0) result[field] = count
+      if (count > 0) counts.set(type, count)
     }
   }
-  return result
+  return [...counts].map(([type, nbTotal]) => typologyDraft(type, { nbTotal }))
 }
 
 const EQUIPMENT_MAP: Record<string, string> = {
@@ -212,20 +205,12 @@ const command: ImportCommand = {
           imageUrls = await uploadImages(residence.acf.gallery, options.verbose ?? false)
         }
 
-        const typology = buildTypologyValues(residence.acf.typologies)
+        const typologyDrafts = buildTypologyDrafts(residence.acf.typologies)
         const equipment = buildEquipmentValues(residence.acf.equipments)
 
         const priceMin = residence.acf.price != null ? parseInt(String(residence.acf.price), 10) || null : null
 
-        const derived = computeDerivedFields({
-          nb_t1: typology.nbT1,
-          nb_t1_bis: typology.nbT1Bis,
-          nb_t2: typology.nbT2,
-          nb_t3: typology.nbT3,
-          nb_t4: typology.nbT4,
-          nb_t5: typology.nbT5,
-          images_urls: imageUrls.length > 0 ? imageUrls : null,
-        })
+        const derived = typologyAggregates(typologyDrafts)
 
         const addressData = {
           address: resolvedAddress,
@@ -238,12 +223,6 @@ const command: ImportCommand = {
           name,
           published: true,
           targetAudience: residence.acf.residence_for_students_only ? ('etudiants' as const) : null,
-          nbT1: typology.nbT1,
-          nbT1Bis: typology.nbT1Bis,
-          nbT2: typology.nbT2,
-          nbT3: typology.nbT3,
-          nbT4: typology.nbT4,
-          nbT5: typology.nbT5,
           priceMin: priceMin ?? derived.priceMin,
           nbTotalApartments: derived.nbTotalApartments,
           nbAccessibleApartments: residence.acf.residence_is_accessible ? 1 : null,
@@ -267,8 +246,8 @@ const command: ImportCommand = {
 
         if (existingSource[0]) {
           const accommodationId = existingSource[0].accommodationId
-          await db.update(accommodations).set(omitFlatTypologyFields(accommodationData)).where(eq(accommodations.id, accommodationId))
-          await syncTypologiesFromFlat(db, accommodationId, accommodationData)
+          await db.update(accommodations).set(accommodationData).where(eq(accommodations.id, accommodationId))
+          await syncTypologies(db, accommodationId, typologyDrafts)
           await db.delete(accommodationAddresses).where(eq(accommodationAddresses.accommodationId, accommodationId))
           await db.insert(accommodationAddresses).values({ accommodationId, isMain: true, ...addressData })
           result.updated++
@@ -277,9 +256,9 @@ const command: ImportCommand = {
           const slug = await findAvailableSlug(generateSlug(name), db, accommodations)
           const [newAccommodation] = await db
             .insert(accommodations)
-            .values(omitFlatTypologyFields({ ...accommodationData, slug, createdAt: new Date() }))
+            .values({ ...accommodationData, slug, createdAt: new Date() })
             .returning({ id: accommodations.id })
-          await syncTypologiesFromFlat(db, newAccommodation.id, accommodationData)
+          await syncTypologies(db, newAccommodation.id, typologyDrafts)
 
           await db.insert(accommodationAddresses).values({ accommodationId: newAccommodation.id, isMain: true, ...addressData })
 

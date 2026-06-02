@@ -3,13 +3,15 @@ import * as XLSX from 'xlsx'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, reverseGeocode } from '~/server/lib/import/geocoder'
-import { omitFlatTypologyFields, syncTypologiesFromFlat } from '~/server/lib/typologies'
+import { syncTypologies, type TypologyDraft, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { sanitizeHTML } from '~/utils/sanitize-html'
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
-import { computeDerivedFields, generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
+import { generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '../../src/server/utils/slug'
 import {
   buildMatchSourceId,
+  CATEGORIES,
+  CATEGORY_TO_TYPE,
   cleanNumber,
   getDuplicatedUairnes,
   getSheet,
@@ -97,51 +99,18 @@ function buildTypologyFromRows(rows: CrousTypology[]) {
     if (typologie.endsWith('+') || name.includes('COLOCATION')) colivingCount++
   }
 
-  const get = (cat: TypoCategory) => byCategory.get(cat)
+  const drafts: TypologyDraft[] = CATEGORIES.map((cat) => {
+    const e = byCategory.get(cat)
+    return typologyDraft(CATEGORY_TO_TYPE[cat], {
+      nbTotal: e?.count ?? null,
+      priceMin: e?.rentMin ?? null,
+      priceMax: e?.rentMax ?? null,
+      superficieMin: e?.surfaceMin ?? null,
+      superficieMax: e?.surfaceMax ?? null,
+    })
+  })
 
-  return {
-    nbT1: get('t1')?.count ?? null,
-    nbT1Bis: get('t1bis')?.count ?? null,
-    nbT2: get('t2')?.count ?? null,
-    nbT3: get('t3')?.count ?? null,
-    nbT4: get('t4')?.count ?? null,
-    nbT5: get('t5')?.count ?? null,
-    nbT6: get('t6')?.count ?? null,
-    nbT7More: get('t7more')?.count ?? null,
-    nbColivingApartments: colivingCount || null,
-    priceMinT1: get('t1')?.rentMin ?? null,
-    priceMaxT1: get('t1')?.rentMax ?? null,
-    priceMinT1Bis: get('t1bis')?.rentMin ?? null,
-    priceMaxT1Bis: get('t1bis')?.rentMax ?? null,
-    priceMinT2: get('t2')?.rentMin ?? null,
-    priceMaxT2: get('t2')?.rentMax ?? null,
-    priceMinT3: get('t3')?.rentMin ?? null,
-    priceMaxT3: get('t3')?.rentMax ?? null,
-    priceMinT4: get('t4')?.rentMin ?? null,
-    priceMaxT4: get('t4')?.rentMax ?? null,
-    priceMinT5: get('t5')?.rentMin ?? null,
-    priceMaxT5: get('t5')?.rentMax ?? null,
-    priceMinT6: get('t6')?.rentMin ?? null,
-    priceMaxT6: get('t6')?.rentMax ?? null,
-    priceMinT7More: get('t7more')?.rentMin ?? null,
-    priceMaxT7More: get('t7more')?.rentMax ?? null,
-    superficieMinT1: get('t1')?.surfaceMin ?? null,
-    superficieMaxT1: get('t1')?.surfaceMax ?? null,
-    superficieMinT1Bis: get('t1bis')?.surfaceMin ?? null,
-    superficieMaxT1Bis: get('t1bis')?.surfaceMax ?? null,
-    superficieMinT2: get('t2')?.surfaceMin ?? null,
-    superficieMaxT2: get('t2')?.surfaceMax ?? null,
-    superficieMinT3: get('t3')?.surfaceMin ?? null,
-    superficieMaxT3: get('t3')?.surfaceMax ?? null,
-    superficieMinT4: get('t4')?.surfaceMin ?? null,
-    superficieMaxT4: get('t4')?.surfaceMax ?? null,
-    superficieMinT5: get('t5')?.surfaceMin ?? null,
-    superficieMaxT5: get('t5')?.surfaceMax ?? null,
-    superficieMinT6: get('t6')?.surfaceMin ?? null,
-    superficieMaxT6: get('t6')?.surfaceMax ?? null,
-    superficieMinT7More: get('t7more')?.surfaceMin ?? null,
-    superficieMaxT7More: get('t7more')?.surfaceMax ?? null,
-  }
+  return { drafts, nbColivingApartments: colivingCount || null }
 }
 
 function buildResidenceKey(row: { code_crous?: number; code_residence: number }) {
@@ -318,26 +287,9 @@ const command: ImportCommand = {
         }
 
         const typoRows = typologiesByResidence.get(buildResidenceKey(item)) ?? []
-        const typology = buildTypologyFromRows(typoRows)
+        const { drafts: typologyDrafts, nbColivingApartments } = buildTypologyFromRows(typoRows)
 
-        const derived = computeDerivedFields({
-          nb_t1: typology.nbT1,
-          nb_t1_bis: typology.nbT1Bis,
-          nb_t2: typology.nbT2,
-          nb_t3: typology.nbT3,
-          nb_t4: typology.nbT4,
-          nb_t5: typology.nbT5,
-          nb_t6: typology.nbT6,
-          nb_t7_more: typology.nbT7More,
-          price_min_t1: typology.priceMinT1,
-          price_min_t1_bis: typology.priceMinT1Bis,
-          price_min_t2: typology.priceMinT2,
-          price_min_t3: typology.priceMinT3,
-          price_min_t4: typology.priceMinT4,
-          price_min_t5: typology.priceMinT5,
-          price_min_t6: typology.priceMinT6,
-          price_min_t7_more: typology.priceMinT7More,
-        })
+        const derived = typologyAggregates(typologyDrafts)
 
         // Check if residence already exists. Dry-run still resolves the match so the
         // preview reports whether the command would create or update.
@@ -371,47 +323,7 @@ const command: ImportCommand = {
           published: true,
           available: true,
           nbTotalApartments: derived.nbTotalApartments,
-          nbColivingApartments: typology.nbColivingApartments,
-          nbT1: typology.nbT1,
-          nbT1Bis: typology.nbT1Bis,
-          nbT2: typology.nbT2,
-          nbT3: typology.nbT3,
-          nbT4: typology.nbT4,
-          nbT5: typology.nbT5,
-          nbT6: typology.nbT6,
-          nbT7More: typology.nbT7More,
-          priceMinT1: typology.priceMinT1,
-          priceMaxT1: typology.priceMaxT1,
-          priceMinT1Bis: typology.priceMinT1Bis,
-          priceMaxT1Bis: typology.priceMaxT1Bis,
-          priceMinT2: typology.priceMinT2,
-          priceMaxT2: typology.priceMaxT2,
-          priceMinT3: typology.priceMinT3,
-          priceMaxT3: typology.priceMaxT3,
-          priceMinT4: typology.priceMinT4,
-          priceMaxT4: typology.priceMaxT4,
-          priceMinT5: typology.priceMinT5,
-          priceMaxT5: typology.priceMaxT5,
-          priceMinT6: typology.priceMinT6,
-          priceMaxT6: typology.priceMaxT6,
-          priceMinT7More: typology.priceMinT7More,
-          priceMaxT7More: typology.priceMaxT7More,
-          superficieMinT1: typology.superficieMinT1,
-          superficieMaxT1: typology.superficieMaxT1,
-          superficieMinT1Bis: typology.superficieMinT1Bis,
-          superficieMaxT1Bis: typology.superficieMaxT1Bis,
-          superficieMinT2: typology.superficieMinT2,
-          superficieMaxT2: typology.superficieMaxT2,
-          superficieMinT3: typology.superficieMinT3,
-          superficieMaxT3: typology.superficieMaxT3,
-          superficieMinT4: typology.superficieMinT4,
-          superficieMaxT4: typology.superficieMaxT4,
-          superficieMinT5: typology.superficieMinT5,
-          superficieMaxT5: typology.superficieMaxT5,
-          superficieMinT6: typology.superficieMinT6,
-          superficieMaxT6: typology.superficieMaxT6,
-          superficieMinT7More: typology.superficieMinT7More,
-          superficieMaxT7More: typology.superficieMaxT7More,
+          nbColivingApartments,
           priceMin: derived.priceMin,
           externalReference: sourceId,
           externalUrl: CROUS_EXTERNAL_URL,
@@ -420,15 +332,11 @@ const command: ImportCommand = {
         }
         if (existing) {
           // UPDATE — keep existing slug, images, etc.
-          const [updated] = await db
-            .update(accommodations)
-            .set(omitFlatTypologyFields(baseFields))
-            .where(eq(accommodations.id, existing.id))
-            .returning({
-              slug: accommodations.slug,
-              name: accommodations.name,
-            })
-          await syncTypologiesFromFlat(db, existing.id, baseFields)
+          const [updated] = await db.update(accommodations).set(baseFields).where(eq(accommodations.id, existing.id)).returning({
+            slug: accommodations.slug,
+            name: accommodations.name,
+          })
+          await syncTypologies(db, existing.id, typologyDrafts)
 
           // Upsert address
           await db.delete(accommodationAddresses).where(eq(accommodationAddresses.accommodationId, existing.id))
@@ -455,15 +363,13 @@ const command: ImportCommand = {
           const slug = await findAvailableSlug(generateSlug(name), db, accommodations)
           const [created] = await db
             .insert(accommodations)
-            .values(
-              omitFlatTypologyFields({
-                ...baseFields,
-                slug,
-                createdAt: new Date(),
-              }),
-            )
+            .values({
+              ...baseFields,
+              slug,
+              createdAt: new Date(),
+            })
             .returning({ id: accommodations.id, slug: accommodations.slug })
-          await syncTypologiesFromFlat(db, created.id, baseFields)
+          await syncTypologies(db, created.id, typologyDrafts)
 
           await db.insert(accommodationAddresses).values({ accommodationId: created.id, isMain: true, ...addressData })
 

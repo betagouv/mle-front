@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createAcademy, createAccommodation, createCity, createDepartment, createExternalSource, createOwner } from './fixtures/factories'
 import './helpers/setup-integration'
+import { typologyDraft } from '../server/lib/typologies'
 import { caller } from './helpers/test-caller'
 
 describe('accommodations.list', () => {
@@ -520,18 +521,21 @@ describe('accommodations.list', () => {
   })
 
   it('orders by priority (available first)', async () => {
-    await createAccommodation({
-      slug: 'no-availability',
-      nbT1Available: 0,
-      nbT2Available: 0,
-      acceptWaitingList: false,
-      geom: { type: 'Point', coordinates: [4.39, 45.44] },
-    })
-    await createAccommodation({
-      slug: 'has-availability',
-      nbT1Available: 5,
-      geom: { type: 'Point', coordinates: [4.39, 45.44] },
-    })
+    await createAccommodation(
+      {
+        slug: 'no-availability',
+        acceptWaitingList: false,
+        geom: { type: 'Point', coordinates: [4.39, 45.44] },
+      },
+      [typologyDraft('t1', { nbAvailable: 0 }), typologyDraft('t2', { nbAvailable: 0 })],
+    )
+    await createAccommodation(
+      {
+        slug: 'has-availability',
+        geom: { type: 'Point', coordinates: [4.39, 45.44] },
+      },
+      [typologyDraft('t1', { nbAvailable: 5 })],
+    )
 
     const result = await caller.accommodations.list({})
     expect(result.results[0].slug).toBe('has-availability')
@@ -559,20 +563,20 @@ describe('accommodations.list', () => {
   })
 
   it('computes price bounds', async () => {
-    await createAccommodation({
-      slug: 'a1',
-      priceMinT1: 200,
-      priceMaxT1: 400,
-      priceMinT2: 300,
-      priceMaxT2: 600,
-      geom: { type: 'Point', coordinates: [4.39, 45.44] },
-    })
-    await createAccommodation({
-      slug: 'a2',
-      priceMinT1: 150,
-      priceMaxT1: 350,
-      geom: { type: 'Point', coordinates: [4.39, 45.44] },
-    })
+    await createAccommodation(
+      {
+        slug: 'a1',
+        geom: { type: 'Point', coordinates: [4.39, 45.44] },
+      },
+      [typologyDraft('t1', { priceMin: 200, priceMax: 400 }), typologyDraft('t2', { priceMin: 300, priceMax: 600 })],
+    )
+    await createAccommodation(
+      {
+        slug: 'a2',
+        geom: { type: 'Point', coordinates: [4.39, 45.44] },
+      },
+      [typologyDraft('t1', { priceMin: 150, priceMax: 350 })],
+    )
 
     const result = await caller.accommodations.list({})
     expect(result.minPrice).toBe(150)
@@ -606,19 +610,21 @@ describe('accommodations.list', () => {
   it('filters by ownerSlug — count and price bounds reflect the filter', async () => {
     const owner = await createOwner({ name: 'Bailleur Prix', slug: 'bailleur-prix' })
 
-    await createAccommodation({
-      slug: 'owner-cheap',
-      ownerId: owner.id,
-      priceMinT1: 200,
-      priceMaxT1: 400,
-      geom: { type: 'Point', coordinates: [4.39, 45.44] },
-    })
-    await createAccommodation({
-      slug: 'other-expensive',
-      priceMinT1: 800,
-      priceMaxT1: 1200,
-      geom: { type: 'Point', coordinates: [4.39, 45.44] },
-    })
+    await createAccommodation(
+      {
+        slug: 'owner-cheap',
+        ownerId: owner.id,
+        geom: { type: 'Point', coordinates: [4.39, 45.44] },
+      },
+      [typologyDraft('t1', { priceMin: 200, priceMax: 400 })],
+    )
+    await createAccommodation(
+      {
+        slug: 'other-expensive',
+        geom: { type: 'Point', coordinates: [4.39, 45.44] },
+      },
+      [typologyDraft('t1', { priceMin: 800, priceMax: 1200 })],
+    )
 
     const result = await caller.accommodations.list({ ownerSlug: 'bailleur-prix' })
     expect(result.count).toBe(1)
@@ -660,18 +666,21 @@ describe('accommodations.list', () => {
 
 describe('accommodations.list — filter combinations', () => {
   it('filters by onlyWithAvailability', async () => {
-    await createAccommodation({
-      slug: 'available',
-      nbT1Available: 5,
-      geom: { type: 'Point', coordinates: [4.39, 45.44] },
-    })
-    await createAccommodation({
-      slug: 'unavailable',
-      nbT1Available: 0,
-      nbT2Available: 0,
-      acceptWaitingList: false,
-      geom: { type: 'Point', coordinates: [4.39, 45.44] },
-    })
+    await createAccommodation(
+      {
+        slug: 'available',
+        geom: { type: 'Point', coordinates: [4.39, 45.44] },
+      },
+      [typologyDraft('t1', { nbAvailable: 5 })],
+    )
+    await createAccommodation(
+      {
+        slug: 'unavailable',
+        acceptWaitingList: false,
+        geom: { type: 'Point', coordinates: [4.39, 45.44] },
+      },
+      [typologyDraft('t1', { nbAvailable: 0 }), typologyDraft('t2', { nbAvailable: 0 })],
+    )
 
     const result = await caller.accommodations.list({ onlyWithAvailability: true })
     expect(result.count).toBe(1)
@@ -730,34 +739,40 @@ describe('accommodations.list — filter combinations', () => {
   })
 
   it('stacks all filters together', async () => {
-    const match = await createAccommodation({
-      slug: 'matches-all',
-      priceMin: 300,
-      nbAccessibleApartments: 3,
-      nbColivingApartments: 2,
-      nbT1Available: 5,
-      geom: { type: 'Point', coordinates: [4.39, 45.44] },
-    })
+    const match = await createAccommodation(
+      {
+        slug: 'matches-all',
+        priceMin: 300,
+        nbAccessibleApartments: 3,
+        nbColivingApartments: 2,
+        geom: { type: 'Point', coordinates: [4.39, 45.44] },
+      },
+      [typologyDraft('t1', { nbAvailable: 5 })],
+    )
     await createExternalSource({ accommodationId: match.id, source: 'crous' })
 
-    const tooExpensive = await createAccommodation({
-      slug: 'too-expensive',
-      priceMin: 800,
-      nbAccessibleApartments: 3,
-      nbColivingApartments: 2,
-      nbT1Available: 5,
-      geom: { type: 'Point', coordinates: [4.39, 45.44] },
-    })
+    const tooExpensive = await createAccommodation(
+      {
+        slug: 'too-expensive',
+        priceMin: 800,
+        nbAccessibleApartments: 3,
+        nbColivingApartments: 2,
+        geom: { type: 'Point', coordinates: [4.39, 45.44] },
+      },
+      [typologyDraft('t1', { nbAvailable: 5 })],
+    )
     await createExternalSource({ accommodationId: tooExpensive.id, source: 'crous' })
 
-    const notAccessible = await createAccommodation({
-      slug: 'not-accessible',
-      priceMin: 300,
-      nbAccessibleApartments: 0,
-      nbColivingApartments: 2,
-      nbT1Available: 5,
-      geom: { type: 'Point', coordinates: [4.39, 45.44] },
-    })
+    const notAccessible = await createAccommodation(
+      {
+        slug: 'not-accessible',
+        priceMin: 300,
+        nbAccessibleApartments: 0,
+        nbColivingApartments: 2,
+        geom: { type: 'Point', coordinates: [4.39, 45.44] },
+      },
+      [typologyDraft('t1', { nbAvailable: 5 })],
+    )
     await createExternalSource({ accommodationId: notAccessible.id, source: 'crous' })
 
     const result = await caller.accommodations.list({
@@ -775,22 +790,23 @@ describe('accommodations.list — filter combinations', () => {
 describe('accommodations.getBySlug', () => {
   it('returns full detail with owner', async () => {
     const owner = await createOwner({ name: 'CROUS', slug: 'crous', url: 'https://crous.fr' })
-    await createAccommodation({
-      slug: 'detail-test',
-      name: 'Résidence Détail',
-      description: 'A nice residence',
-      address: '42 rue de la Paix',
-      postalCode: '75001',
-      residenceType: 'residence-universitaire-conventionnee',
-      ownerId: owner.id,
-      nbTotalApartments: 100,
-      priceMinT1: 200,
-      priceMaxT1: 400,
-      laundryRoom: true,
-      wifi: true,
-      parking: false,
-      geom: { type: 'Point', coordinates: [2.35, 48.85] },
-    })
+    await createAccommodation(
+      {
+        slug: 'detail-test',
+        name: 'Résidence Détail',
+        description: 'A nice residence',
+        address: '42 rue de la Paix',
+        postalCode: '75001',
+        residenceType: 'residence-universitaire-conventionnee',
+        ownerId: owner.id,
+        nbTotalApartments: 100,
+        laundryRoom: true,
+        wifi: true,
+        parking: false,
+        geom: { type: 'Point', coordinates: [2.35, 48.85] },
+      },
+      [typologyDraft('t1', { priceMin: 200, priceMax: 400 })],
+    )
 
     const result = await caller.accommodations.getBySlug({ slug: 'detail-test' })
     expect(result.name).toBe('Résidence Détail')
@@ -849,16 +865,17 @@ describe('accommodations.getBySlug', () => {
   })
 
   it('returns detailed prices', async () => {
-    await createAccommodation({
-      slug: 'prices-test',
-      priceMinT1: 200,
-      priceMaxT1: 400,
-      priceMinT2: 300,
-      priceMaxT2: 600,
-      priceMinT3: 400,
-      priceMaxT3: 800,
-      geom: { type: 'Point', coordinates: [2.35, 48.85] },
-    })
+    await createAccommodation(
+      {
+        slug: 'prices-test',
+        geom: { type: 'Point', coordinates: [2.35, 48.85] },
+      },
+      [
+        typologyDraft('t1', { priceMin: 200, priceMax: 400 }),
+        typologyDraft('t2', { priceMin: 300, priceMax: 600 }),
+        typologyDraft('t3', { priceMin: 400, priceMax: 800 }),
+      ],
+    )
 
     const result = await caller.accommodations.getBySlug({ slug: 'prices-test' })
     expect(result.typologies.t1?.priceMin).toBe(200)

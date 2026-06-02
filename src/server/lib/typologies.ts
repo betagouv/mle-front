@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { TYPOLOGIES, type TypologyType } from '~/schemas/accommodations/typology'
+import type { TypologyType } from '~/schemas/accommodations/typology'
 import { db } from '~/server/db'
 import { accommodationTypologies } from '~/server/db/schema/accommodation-typologies'
 import { accommodations } from '~/server/db/schema/accommodations'
@@ -85,6 +85,32 @@ export type TypologyDraft = {
   colocation: boolean
 }
 
+/** A partial typology update keyed by `type`: only the provided fields are applied (see mergeTypologies). */
+export type TypologyPatch = { type: TypologyType } & Partial<Omit<TypologyDraft, 'type'>>
+
+/**
+ * Build a TypologyDraft from partial fields. Missing numeric fields default to null (preserving
+ * "unknown"); `colocation` defaults to isPerPersonTypology(type). This is the ergonomic primitive
+ * importers and test fixtures use to declare typologies — there is no flat camelCase intermediate.
+ */
+export function typologyDraft(type: TypologyType, fields: Partial<Omit<TypologyDraft, 'type'>> = {}): TypologyDraft {
+  return {
+    type,
+    priceMin: fields.priceMin ?? null,
+    priceMax: fields.priceMax ?? null,
+    superficieMin: fields.superficieMin ?? null,
+    superficieMax: fields.superficieMax ?? null,
+    nbTotal: fields.nbTotal ?? null,
+    nbAvailable: fields.nbAvailable ?? null,
+    colocation: fields.colocation ?? isPerPersonTypology(type),
+  }
+}
+
+/** A draft carries real data only if at least one numeric field is set; empty drafts are not persisted. */
+function hasAnyValue(d: TypologyDraft): boolean {
+  return [d.nbTotal, d.nbAvailable, d.priceMin, d.priceMax, d.superficieMin, d.superficieMax].some((v) => v != null)
+}
+
 function toRow(accommodationId: number, t: TypologyDraft): typeof accommodationTypologies.$inferInsert {
   return {
     accommodationId,
@@ -106,92 +132,29 @@ export async function persistTypologies(tx: DbOrTx, accommodationId: number, typ
   await tx.insert(accommodationTypologies).values(typologies.map((t) => toRow(accommodationId, t)))
 }
 
-// ---------------------------------------------------------------------------
-// Importer bridge: external sources (CSV/CROUS/…) and test fixtures build a flat camelCase object
-// (nbT1, priceMinT1, …). These helpers convert that to typology drafts. This flat↔camel conversion
-// is intentionally confined to ingestion — the response/domain layer uses the keyed `typologies`.
-// ---------------------------------------------------------------------------
-
-// Typology type (= suffix) -> PascalCase suffix used by the legacy flat camelCase columns.
-const TYPE_TO_CAMEL: Record<TypologyType, string> = {
-  t1: 'T1',
-  t1_bis: 'T1Bis',
-  t2: 'T2',
-  t3: 'T3',
-  t4: 'T4',
-  t5: 'T5',
-  t6: 'T6',
-  t7_more: 'T7More',
-}
-
-function camelFlatToTypologyDrafts(flat: Record<string, unknown>): TypologyDraft[] {
-  const num = (v: unknown): number | null => (typeof v === 'number' ? v : null)
-  const result: TypologyDraft[] = []
-  for (const { type } of TYPOLOGIES) {
-    const c = TYPE_TO_CAMEL[type]
-    const nbTotal = num(flat[`nb${c}`])
-    const nbAvailable = num(flat[`nb${c}Available`])
-    const priceMin = num(flat[`priceMin${c}`])
-    const priceMax = num(flat[`priceMax${c}`])
-    const superficieMin = num(flat[`superficieMin${c}`])
-    const superficieMax = num(flat[`superficieMax${c}`])
-    if (![nbTotal, nbAvailable, priceMin, priceMax, superficieMin, superficieMax].some((v) => v != null)) continue
-    result.push({
-      type,
-      nbTotal,
-      nbAvailable,
-      priceMin,
-      priceMax,
-      superficieMin,
-      superficieMax,
-      colocation: isPerPersonTypology(type),
-    })
-  }
-  return result
-}
-
-/**
- * The legacy flat per-typology camelCase keys (nbT1, nbT1Available, priceMinT1, superficieMaxT7More, …).
- * The underlying columns are dropped (migration 0039); importers build these keys in-memory only to
- * feed the typology child rows via the bridge, so they must be stripped before any accommodation
- * insert/update. Keep in sync with camelFlatToTypologyDrafts.
- */
-export const FLAT_TYPOLOGY_CAMEL_KEYS: readonly string[] = TYPOLOGIES.flatMap(({ type }) => {
-  const c = TYPE_TO_CAMEL[type]
-  return [`nb${c}`, `nb${c}Available`, `priceMin${c}`, `priceMax${c}`, `superficieMin${c}`, `superficieMax${c}`]
-})
-
-const FLAT_TYPOLOGY_CAMEL_KEY_SET = new Set(FLAT_TYPOLOGY_CAMEL_KEYS)
-
-/** Return a shallow copy of an accommodation insert/update payload without the legacy flat typology keys. */
-export function omitFlatTypologyFields<T extends Record<string, unknown>>(obj: T): T {
-  const result: Record<string, unknown> = {}
-  for (const [key, value] of Object.entries(obj)) {
-    if (!FLAT_TYPOLOGY_CAMEL_KEY_SET.has(key)) result[key] = value
-  }
-  return result as T
-}
-
-/** Importer bridge: derive typology rows from a flat camelCase object, persist, refresh aggregates. */
-export async function syncTypologiesFromFlat(tx: DbOrTx, accommodationId: number, flat: Record<string, unknown>): Promise<void> {
-  await persistTypologies(tx, accommodationId, camelFlatToTypologyDrafts(flat))
+/** Replace all typologies of an accommodation with `drafts` (empty drafts skipped), then refresh aggregates. */
+export async function syncTypologies(tx: DbOrTx, accommodationId: number, drafts: TypologyDraft[]): Promise<void> {
+  await persistTypologies(tx, accommodationId, drafts.filter(hasAnyValue))
   await recomputeAndPersistAggregates(tx, accommodationId)
 }
 
-/** Like syncTypologiesFromFlat but MERGES onto current rows (partial importers, e.g. ARPEJ). */
-export async function mergeTypologiesFromFlat(tx: DbOrTx, accommodationId: number, flatOverrides: Record<string, unknown>): Promise<void> {
+/**
+ * Field-level MERGE of partial typologies onto the current rows (partial importers, e.g. ARPEJ / CROUS
+ * rents/surfaces): for each patch, only the provided fields overwrite the existing row of that type;
+ * untouched dimensions are preserved. Types that end up all-null are dropped. Refreshes aggregates.
+ */
+export async function mergeTypologies(tx: DbOrTx, accommodationId: number, patches: TypologyPatch[]): Promise<void> {
   const current = await tx.select().from(accommodationTypologies).where(eq(accommodationTypologies.accommodationId, accommodationId))
-  const currentFlat: Record<string, unknown> = {}
-  for (const r of current) {
-    const c = TYPE_TO_CAMEL[r.type]
-    currentFlat[`nb${c}`] = r.nbTotal
-    currentFlat[`nb${c}Available`] = r.nbAvailable
-    currentFlat[`priceMin${c}`] = r.priceMin
-    currentFlat[`priceMax${c}`] = r.priceMax
-    currentFlat[`superficieMin${c}`] = r.superficieMin
-    currentFlat[`superficieMax${c}`] = r.superficieMax
+  const byType = new Map<TypologyType, TypologyDraft>(current.map((r) => [r.type, typologyDraft(r.type, r)]))
+  for (const patch of patches) {
+    const base = byType.get(patch.type) ?? typologyDraft(patch.type)
+    const merged: TypologyDraft = { ...base }
+    for (const [key, value] of Object.entries(patch)) {
+      if (key !== 'type' && value !== undefined) (merged as Record<string, unknown>)[key] = value
+    }
+    byType.set(patch.type, merged)
   }
-  await persistTypologies(tx, accommodationId, camelFlatToTypologyDrafts({ ...currentFlat, ...flatOverrides }))
+  await persistTypologies(tx, accommodationId, [...byType.values()].filter(hasAnyValue))
   await recomputeAndPersistAggregates(tx, accommodationId)
 }
 
