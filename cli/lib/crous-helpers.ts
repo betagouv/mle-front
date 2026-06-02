@@ -1,11 +1,24 @@
 import { and, eq, or, sql } from 'drizzle-orm'
 import * as XLSX from 'xlsx'
+import type { TypologyType } from '~/schemas/accommodations/typology'
 import { db } from '~/server/db'
 import { accommodations, externalSources, owners } from '~/server/db/schema'
 
 export type TypoCategory = 't1' | 't1bis' | 't2' | 't3' | 't4' | 't5' | 't6' | 't7more'
 
 export const CATEGORIES: TypoCategory[] = ['t1', 't1bis', 't2', 't3', 't4', 't5', 't6', 't7more']
+
+/** Map a CROUS spreadsheet category to the DB typology type enum (t1bis -> t1_bis, t7more -> t7_more). */
+export const CATEGORY_TO_TYPE: Record<TypoCategory, TypologyType> = {
+  t1: 't1',
+  t1bis: 't1_bis',
+  t2: 't2',
+  t3: 't3',
+  t4: 't4',
+  t5: 't5',
+  t6: 't6',
+  t7more: 't7_more',
+}
 
 export type MinMaxBounds = { min: number | null; max: number | null }
 

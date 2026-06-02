@@ -13,7 +13,7 @@ import { importBlocklist } from '../../server/db/schema/import-blocklist'
 import { owners } from '../../server/db/schema/owners'
 import { studentAlerts } from '../../server/db/schema/student-alerts'
 import { trackingEvents } from '../../server/db/schema/tracking-events'
-import { omitFlatTypologyFields, syncTypologiesFromFlat } from '../../server/lib/typologies'
+import { syncTypologies, type TypologyDraft } from '../../server/lib/typologies'
 import { generateSlug } from '../../server/trpc/utils/accommodation-helpers'
 import { getTestDb } from '../helpers/test-db'
 
@@ -151,30 +151,14 @@ function buildTestSlug(value: string, suffix: number) {
   return suffix === 1 ? baseSlug : `${baseSlug}-${suffix}`
 }
 
-// Legacy flat per-typology overrides accepted by the factory for convenience: they no longer map to
-// accommodation columns (dropped in 0039) but are forwarded to syncTypologiesFromFlat to seed the
-// typology child rows, then stripped before the accommodation insert.
-type FlatTypoSuffix = 'T1' | 'T1Bis' | 'T2' | 'T3' | 'T4' | 'T5' | 'T6' | 'T7More'
-type FlatTypologyOverrides = Partial<
-  Record<
-    | `nb${FlatTypoSuffix}`
-    | `nb${FlatTypoSuffix}Available`
-    | `priceMin${FlatTypoSuffix}`
-    | `priceMax${FlatTypoSuffix}`
-    | `superficieMin${FlatTypoSuffix}`
-    | `superficieMax${FlatTypoSuffix}`,
-    number | null
-  >
->
-
 export async function createAccommodation(
-  overrides: Partial<AccommodationInsert> &
-    FlatTypologyOverrides & {
-      geom?: { type: string; coordinates: [number, number] | number[][][][] }
-      cityId?: number
-      address?: string
-      postalCode?: string
-    } = {},
+  overrides: Partial<AccommodationInsert> & {
+    geom?: { type: string; coordinates: [number, number] | number[][][][] }
+    cityId?: number
+    address?: string
+    postalCode?: string
+  } = {},
+  typologies: TypologyDraft[] = [],
 ) {
   const db = getTestDb()
   const { geom, cityId: overrideCityId, address, postalCode, ...rest } = overrides
@@ -205,12 +189,12 @@ export async function createAccommodation(
   }
   const [row] = await db
     .insert(accommodations)
-    .values(omitFlatTypologyFields(values) as typeof accommodations.$inferInsert)
+    .values(values as typeof accommodations.$inferInsert)
     .returning()
 
-  // Derive typology child rows from the flat overrides and refresh the parent aggregates,
-  // mirroring production writes so readers (which use child rows) see the test's typology data.
-  await syncTypologiesFromFlat(db, row.id, values)
+  // Seed the typology child rows and refresh the parent aggregates, mirroring production writes so
+  // readers (which use child rows) see the test's typology data.
+  if (typologies.length > 0) await syncTypologies(db, row.id, typologies)
 
   // Preserve any aggregate the test set explicitly (some tests set summary totals like
   // nbTotalApartments without a per-typology breakdown — recompute would otherwise null them).

@@ -11,7 +11,7 @@ import {
 } from '../../../src/__tests__/fixtures/factories'
 import { getTestDb } from '../../../src/__tests__/helpers/test-db'
 import { accommodationAddresses, accommodations, accommodationTypologies, externalSources } from '../../../src/server/db/schema'
-import { typologiesByType } from '../../../src/server/lib/typologies'
+import { typologiesByType, typologyDraft } from '../../../src/server/lib/typologies'
 
 async function loadTypologies(accommodationId: number) {
   return typologiesByType(
@@ -294,20 +294,17 @@ describe('import-arpej-ibail integration', () => {
     const academy = await createAcademy({ name: 'Académie Paris Preserve' })
     const department = await createDepartment({ academyId: academy.id, code: '75', name: 'Paris Preserve' })
     const city = await createCity({ departmentId: department.id, name: 'Paris', slug: 'paris-preserve', postalCodes: ['75012'] })
-    const existing = await createAccommodation({
-      name: 'Résidence Valeurs',
-      slug: 'residence-valeurs',
-      nbT1: 42,
-      nbT1Available: 7,
-      nbTotalApartments: 42,
-      priceMin: 430,
-      priceMinT1: 430,
-      priceMaxT1: 610,
-      superficieMinT1: 18,
-      superficieMaxT1: 32,
-      cityId: city.id,
-      postalCode: '75012',
-    })
+    const existing = await createAccommodation(
+      {
+        name: 'Résidence Valeurs',
+        slug: 'residence-valeurs',
+        nbTotalApartments: 42,
+        priceMin: 430,
+        cityId: city.id,
+        postalCode: '75012',
+      },
+      [typologyDraft('t1', { nbTotal: 42, nbAvailable: 7, priceMin: 430, priceMax: 610, superficieMin: 18, superficieMax: 32 })],
+    )
     await createExternalSource({ accommodationId: existing.id, source: 'arpej', sourceId: 'preserve-scalars-001' })
 
     mockFetch.mockResolvedValueOnce({

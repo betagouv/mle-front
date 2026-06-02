@@ -3,7 +3,7 @@ import { EResidenceType } from '~/enums/residence-type'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, geocodeAddress } from '~/server/lib/import/geocoder'
-import { mergeTypologiesFromFlat, omitFlatTypologyFields, syncTypologiesFromFlat } from '~/server/lib/typologies'
+import { mergeTypologies, syncTypologies, type TypologyPatch, typologyDraft } from '~/server/lib/typologies'
 import { accommodationAddresses, accommodations, externalSources, importBlocklist } from '../../src/server/db/schema'
 import { generateAccommodationKey, uploadFile } from '../../src/server/services/s3'
 import { computeDerivedFields, generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
@@ -206,18 +206,22 @@ const command: ImportCommand = {
           ...(geo ? { geom: sql`ST_SetSRID(ST_MakePoint(${geo.lng}, ${geo.lat}), 4326)` } : {}),
         }
 
+        // ARPEJ/iBail exposes a single (T1) typology per residence.
+        const t1Fields = {
+          nbTotal: normalized.accommodationQuantity,
+          nbAvailable: normalized.availableAccommodationQuantity,
+          priceMin: normalized.rentAmountFrom,
+          priceMax: normalized.rentAmountTo,
+          superficieMin: normalized.surfaceFrom,
+          superficieMax: normalized.surfaceTo,
+        }
+
         const accommodationData = {
           description: (residence.description as string) ?? null,
           residenceType: EResidenceType.UNIVERSITAIRE_CONVENTIONNEE,
           published: true,
-          nbT1: normalized.accommodationQuantity,
-          nbT1Available: normalized.availableAccommodationQuantity,
-          priceMinT1: normalized.rentAmountFrom,
-          priceMaxT1: normalized.rentAmountTo,
           priceMin: derived.priceMin,
           nbTotalApartments: derived.nbTotalApartments,
-          superficieMinT1: normalized.surfaceFrom,
-          superficieMaxT1: normalized.surfaceTo,
           ownerId,
           externalUrl: normalized.externalUrl,
           updatedAt: new Date(),
@@ -243,8 +247,9 @@ const command: ImportCommand = {
             ...(imageUrls.length > 0 ? { imagesUrls: imageUrls } : {}),
           }
 
-          await db.update(accommodations).set(omitFlatTypologyFields(updateData)).where(eq(accommodations.id, accommodationId))
-          await mergeTypologiesFromFlat(db, accommodationId, updateData)
+          await db.update(accommodations).set(updateData).where(eq(accommodations.id, accommodationId))
+          // Partial merge: only the fields ARPEJ actually provides (non-nullish) overwrite the T1 row.
+          await mergeTypologies(db, accommodationId, [{ type: 't1', ...omitNullish(t1Fields) } satisfies TypologyPatch])
 
           const existingAddress = await db
             .select({ id: accommodationAddresses.id })
@@ -264,17 +269,15 @@ const command: ImportCommand = {
           const slug = await findAvailableSlug(generateSlug(residence.title), db, accommodations)
           const [newAccommodation] = await db
             .insert(accommodations)
-            .values(
-              omitFlatTypologyFields({
-                ...accommodationData,
-                name: residence.title,
-                imagesUrls: imageUrls.length > 0 ? imageUrls : null,
-                slug,
-                createdAt: new Date(),
-              }),
-            )
+            .values({
+              ...accommodationData,
+              name: residence.title,
+              imagesUrls: imageUrls.length > 0 ? imageUrls : null,
+              slug,
+              createdAt: new Date(),
+            })
             .returning({ id: accommodations.id })
-          await syncTypologiesFromFlat(db, newAccommodation.id, accommodationData)
+          await syncTypologies(db, newAccommodation.id, [typologyDraft('t1', t1Fields)])
 
           await db.insert(accommodationAddresses).values({ accommodationId: newAccommodation.id, isMain: true, ...addressData })
 

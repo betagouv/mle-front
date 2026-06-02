@@ -1,6 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { dossierFacileApplications, dossierFacileTenants } from '../server/db/schema'
+import { typologyDraft } from '../server/lib/typologies'
 import { createAccommodation, createDossierFacileApplication, createDossierFacileTenant, createUser } from './fixtures/factories'
 import './helpers/setup-integration'
 import { authenticatedCaller, caller, ownerCaller } from './helpers/test-caller'
@@ -347,7 +348,7 @@ describe('DossierFacile tRPC', () => {
 
     it('rejects when tenant is not verified', async () => {
       await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-app-1', status: 'pending' })
-      await createAccommodation({ slug: 'res-unverified', nbT1Available: 5 })
+      await createAccommodation({ slug: 'res-unverified' }, [typologyDraft('t1', { nbAvailable: 5 })])
 
       await expect(
         authenticatedCaller.dossierFacile.application({ accommodationSlug: 'res-unverified', apartmentType: 't1' }),
@@ -364,7 +365,7 @@ describe('DossierFacile tRPC', () => {
 
     it('rejects when apartment type is not available', async () => {
       await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-app-3', status: 'verified' })
-      await createAccommodation({ slug: 'res-no-avail', nbT1Available: 0 })
+      await createAccommodation({ slug: 'res-no-avail' }, [typologyDraft('t1', { nbAvailable: 0 })])
 
       await expect(
         authenticatedCaller.dossierFacile.application({ accommodationSlug: 'res-no-avail', apartmentType: 't1' }),
@@ -373,7 +374,7 @@ describe('DossierFacile tRPC', () => {
 
     it('creates an application successfully', async () => {
       await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-app-4', status: 'verified' })
-      await createAccommodation({ slug: 'res-apply', nbT2Available: 3 })
+      await createAccommodation({ slug: 'res-apply' }, [typologyDraft('t2', { nbAvailable: 3 })])
 
       const result = await authenticatedCaller.dossierFacile.application({
         accommodationSlug: 'res-apply',
@@ -386,7 +387,7 @@ describe('DossierFacile tRPC', () => {
 
     it('returns null on duplicate application (conflict do nothing)', async () => {
       await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-app-5', status: 'verified' })
-      await createAccommodation({ slug: 'res-dup', nbT1Available: 5 })
+      await createAccommodation({ slug: 'res-dup' }, [typologyDraft('t1', { nbAvailable: 5 })])
 
       await authenticatedCaller.dossierFacile.application({ accommodationSlug: 'res-dup', apartmentType: 't1' })
       const second = await authenticatedCaller.dossierFacile.application({

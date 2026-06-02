@@ -2,13 +2,14 @@ import { eq } from 'drizzle-orm'
 import * as XLSX from 'xlsx'
 import { closeDb, db } from '~/server/db'
 import { accommodations } from '~/server/db/schema'
-import { mergeTypologiesFromFlat, omitFlatTypologyFields } from '~/server/lib/typologies'
+import { mergeTypologies, type TypologyPatch } from '~/server/lib/typologies'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import {
   buildDisplaySourceId,
   buildMatchSourceId,
   buildResidenceLookup,
   CATEGORIES,
+  CATEGORY_TO_TYPE,
   type CrousResidenceRow,
   cleanNumber,
   getDuplicatedUairnes,
@@ -46,18 +47,6 @@ type Options = {
   limit?: number
 }
 
-// Flat camelCase keys consumed by the typology bridge (mergeTypologiesFromFlat), not DB columns.
-const RENT_FIELDS: Record<TypoCategory, { min: string; max: string }> = {
-  t1: { min: 'priceMinT1', max: 'priceMaxT1' },
-  t1bis: { min: 'priceMinT1Bis', max: 'priceMaxT1Bis' },
-  t2: { min: 'priceMinT2', max: 'priceMaxT2' },
-  t3: { min: 'priceMinT3', max: 'priceMaxT3' },
-  t4: { min: 'priceMinT4', max: 'priceMaxT4' },
-  t5: { min: 'priceMinT5', max: 'priceMaxT5' },
-  t6: { min: 'priceMinT6', max: 'priceMaxT6' },
-  t7more: { min: 'priceMinT7More', max: 'priceMaxT7More' },
-}
-
 function loadExpectedRents(filePath: string, limit?: number): ExpectedResidenceRents[] {
   const workbook = XLSX.readFile(filePath)
   const residences = XLSX.utils.sheet_to_json<CrousResidenceRow>(getSheet(workbook, 'Liste residences', 0))
@@ -92,21 +81,11 @@ function loadExpectedRents(filePath: string, limit?: number): ExpectedResidenceR
     })
 }
 
-function buildRentUpdate(rents: Map<TypoCategory, MinMaxBounds>): Record<string, number | null | Date> {
-  const update: Record<string, number | null | Date> = {}
-  const minRents: number[] = []
-
-  for (const category of CATEGORIES) {
+function buildRentPatches(rents: Map<TypoCategory, MinMaxBounds>): TypologyPatch[] {
+  return CATEGORIES.map((category) => {
     const bounds = rents.get(category)
-    const fields = RENT_FIELDS[category]
-    update[fields.min] = bounds?.min ?? null
-    update[fields.max] = bounds?.max ?? null
-    if (bounds?.min != null) minRents.push(bounds.min)
-  }
-
-  update.priceMin = minRents.length > 0 ? Math.min(...minRents) : null
-  update.updatedAt = new Date()
-  return update
+    return { type: CATEGORY_TO_TYPE[category], priceMin: bounds?.min ?? null, priceMax: bounds?.max ?? null }
+  })
 }
 
 export async function importCrousRents(filePath: string, options: Options) {
@@ -121,7 +100,7 @@ export async function importCrousRents(filePath: string, options: Options) {
     console.log(`Import des loyers CROUS: ${expectedResidences.length} residences fichier, ${dbResidences.length} residences BDD.`)
     if (options.dryRun) console.log('(mode dry-run, aucune ecriture)')
 
-    const pendingUpdates: Array<{ id: number; update: Record<string, number | null | Date> }> = []
+    const pendingUpdates: Array<{ id: number; patches: TypologyPatch[] }> = []
 
     for (const expected of expectedResidences) {
       try {
@@ -148,7 +127,7 @@ export async function importCrousRents(filePath: string, options: Options) {
           console.log(`  ${options.dryRun ? '[dry-run] ' : ''}${actual.id} ${actual.slug}: ${summarizeBounds(expected.rents)}`)
         }
 
-        pendingUpdates.push({ id: actual.id, update: buildRentUpdate(expected.rents) })
+        pendingUpdates.push({ id: actual.id, patches: buildRentPatches(expected.rents) })
         result.updated++
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error)
@@ -158,10 +137,11 @@ export async function importCrousRents(filePath: string, options: Options) {
 
     if (!options.dryRun && pendingUpdates.length > 0) {
       await db.transaction(async (tx) => {
-        for (const { id, update } of pendingUpdates) {
-          await tx.update(accommodations).set(omitFlatTypologyFields(update)).where(eq(accommodations.id, id))
-          // Merge the new rent bounds into existing typology child rows (counts/surfaces preserved).
-          await mergeTypologiesFromFlat(tx, id, update)
+        for (const { id, patches } of pendingUpdates) {
+          await tx.update(accommodations).set({ updatedAt: new Date() }).where(eq(accommodations.id, id))
+          // Merge the new rent bounds into existing typology child rows (counts/surfaces preserved);
+          // recomputes the parent priceMin aggregate from the updated child rows.
+          await mergeTypologies(tx, id, patches)
         }
       })
     }
