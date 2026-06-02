@@ -128,4 +128,21 @@ describe('brevo service', () => {
       expect(body.params).toBeUndefined()
     })
   })
+
+  describe('sendAdminResetPasswordEmail', () => {
+    it('uses template ID 50 without params', async () => {
+      vi.stubEnv('BREVO_TEMPLATE_ADMIN_RESET_PASSWORD', '50')
+      const { sendAdminResetPasswordEmail } = await import('./brevo')
+
+      await sendAdminResetPasswordEmail('student@test.com')
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+      expect(body).toEqual({
+        to: [{ email: 'student@test.com' }],
+        templateId: 50,
+        replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      })
+      expect(body.params).toBeUndefined()
+    })
+  })
 })

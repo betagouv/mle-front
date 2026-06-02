@@ -17,7 +17,7 @@ import { importJobs } from '~/server/db/schema/import-jobs'
 import { ownerFeedback } from '~/server/db/schema/owner-feedback'
 import { owners } from '~/server/db/schema/owners'
 import { stats } from '~/server/db/schema/stats'
-import { sendOwnerWelcomeEmail } from '~/server/services/brevo'
+import { sendAdminResetPasswordEmail, sendOwnerWelcomeEmail } from '~/server/services/brevo'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '~/server/utils/slug'
 import { adminProcedure, createTRPCRouter } from '../init'
@@ -304,6 +304,8 @@ const usersRouter = createTRPCRouter({
       .where(and(eq(account.userId, input.id), eq(account.providerId, 'credential')))
 
     await db.delete(session).where(eq(session.userId, input.id))
+
+    await sendAdminResetPasswordEmail(usr.email)
 
     return { success: true }
   }),
