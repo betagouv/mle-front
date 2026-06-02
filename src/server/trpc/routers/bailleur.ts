@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server'
 import { and, asc, count, desc, eq, gt, ilike, inArray, ne, or, sql } from 'drizzle-orm'
 import { SignJWT } from 'jose'
-import { headers } from 'next/headers'
+
 import { z } from 'zod'
 import { transformTypologiesToFlat, ZCreateResidence } from '~/schemas/accommodations/create-residence'
 import { ZUpdateResidence } from '~/schemas/accommodations/update-residence'
@@ -18,12 +18,13 @@ import { dossierFacileApplications, dossierFacileDocuments, dossierFacileTenants
 import { owners } from '~/server/db/schema/owners'
 import { classifyActions, computeDiff } from '~/server/services/accommodation-diff'
 import { logActivity } from '~/server/services/activity-logger'
+import { sendOwnerWelcomeEmail } from '~/server/services/brevo'
 import { computeDerivedFields, generateSlug, geocodeAddress } from '~/server/trpc/utils/accommodation-helpers'
 import { AVAILABILITY_FIELD_MAP, mapFields, UPDATE_FIELD_MAP } from '~/server/trpc/utils/field-mapping'
 import { resolveCityId } from '~/server/trpc/utils/resolve-city'
 import { getJwtSecret } from '~/server/utils/jwt-secret'
 import { findAvailableSlug } from '~/server/utils/slug'
-import { auth } from '~/services/better-auth'
+
 import { normalizeAccommodationName } from '~/utils/normalize-accommodation-name'
 import { bailleurProcedure, createTRPCRouter, ownerProcedure } from '../init'
 import { mapToGeoJsonFeature, priceMaxComputed } from './accommodations'
@@ -931,13 +932,9 @@ export const bailleurRouter = createTRPCRouter({
           .returning()
 
         try {
-          const requestHeaders = await headers()
-          await auth.api.signInMagicLink({
-            body: { email: input.email, callbackURL: '/bailleur/tableau-de-bord' },
-            headers: requestHeaders,
-          })
+          await sendOwnerWelcomeEmail(created.email)
         } catch (err) {
-          console.error('Erreur envoi magic-link bailleur user', err)
+          console.error('Erreur envoi email bienvenue gestionnaire', err)
         }
 
         return created
