@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { accommodations } from '../server/db/schema/accommodations'
 import { activityLog } from '../server/db/schema/activity-log'
 import { owners } from '../server/db/schema/owners'
+import { typologyDraft } from '../server/lib/typologies'
 import {
   createAcademy,
   createAccommodation,
@@ -346,13 +347,15 @@ describe('admin verifyOwnership bypass', () => {
 
   it('admin can updateAvailability on accommodation owned by another user', async () => {
     const otherOwner = await createOwner({ name: 'Other Avail', slug: 'other-avail', userId: 'test-owner-id-2' })
-    await createAccommodation({
-      name: 'Other Avail Res',
-      slug: 'other-avail-update',
-      ownerId: otherOwner.id,
-      nbT1: 10,
-      geom: parisPoint,
-    })
+    await createAccommodation(
+      {
+        name: 'Other Avail Res',
+        slug: 'other-avail-update',
+        ownerId: otherOwner.id,
+        geom: parisPoint,
+      },
+      [typologyDraft('t1', { nbTotal: 10 })],
+    )
 
     const result = await adminCaller.bailleur.updateAvailability({
       slug: 'other-avail-update',
@@ -380,14 +383,15 @@ describe('admin verifyOwnership bypass', () => {
 describe('bailleur.updateAvailability', () => {
   it('updates availability fields', async () => {
     const owner = await createOwner({ name: 'Owner Avail', slug: 'owner-avail', userId: 'test-owner-id' })
-    await createAccommodation({
-      name: 'Avail Test',
-      slug: 'avail-test',
-      ownerId: owner.id,
-      nbT1: 10,
-      nbT2: 5,
-      geom: parisPoint,
-    })
+    await createAccommodation(
+      {
+        name: 'Avail Test',
+        slug: 'avail-test',
+        ownerId: owner.id,
+        geom: parisPoint,
+      },
+      [typologyDraft('t1', { nbTotal: 10 }), typologyDraft('t2', { nbTotal: 5 })],
+    )
 
     const result = await ownerCaller.bailleur.updateAvailability({
       slug: 'avail-test',
@@ -407,15 +411,15 @@ describe('bailleur.updateAvailability', () => {
 
   it('preserves null availability when updating with null (does not default to 0)', async () => {
     const owner = await createOwner({ name: 'Owner NullAvail', slug: 'owner-null-avail', userId: 'test-owner-id' })
-    await createAccommodation({
-      name: 'Null Avail Test',
-      slug: 'null-avail-test',
-      ownerId: owner.id,
-      nbT1: 10,
-      nbT2: 5,
-      nbT3: null,
-      geom: parisPoint,
-    })
+    await createAccommodation(
+      {
+        name: 'Null Avail Test',
+        slug: 'null-avail-test',
+        ownerId: owner.id,
+        geom: parisPoint,
+      },
+      [typologyDraft('t1', { nbTotal: 10 }), typologyDraft('t2', { nbTotal: 5 }), typologyDraft('t3', { nbTotal: null })],
+    )
 
     // Update with explicit nulls for typologies without stock
     await ownerCaller.bailleur.updateAvailability({
@@ -498,14 +502,15 @@ describe('activity_log diff accuracy', () => {
   it('classifies availability-only changes as accommodation.availability_updated', async () => {
     const db = getTestDb()
     const owner = await createOwner({ name: 'Owner Avail2', slug: 'owner-avail2', userId: 'test-owner-id' })
-    await createAccommodation({
-      name: 'Avail Class',
-      slug: 'avail-class',
-      ownerId: owner.id,
-      nbT1: 10,
-      nbT1Available: 5,
-      geom: parisPoint,
-    })
+    await createAccommodation(
+      {
+        name: 'Avail Class',
+        slug: 'avail-class',
+        ownerId: owner.id,
+        geom: parisPoint,
+      },
+      [typologyDraft('t1', { nbTotal: 10, nbAvailable: 5 })],
+    )
 
     await db.delete(activityLog)
     await ownerCaller.bailleur.updateAvailability({
@@ -565,15 +570,16 @@ describe('activity_log diff accuracy', () => {
   it('logs published and availability changes as separate log entries', async () => {
     const db = getTestDb()
     const owner = await createOwner({ name: 'Owner Split', slug: 'owner-split', userId: 'test-owner-id' })
-    await createAccommodation({
-      name: 'Split Test',
-      slug: 'split-test',
-      ownerId: owner.id,
-      published: false,
-      nbT1: 10,
-      nbT1Available: 0,
-      geom: parisPoint,
-    })
+    await createAccommodation(
+      {
+        name: 'Split Test',
+        slug: 'split-test',
+        ownerId: owner.id,
+        published: false,
+        geom: parisPoint,
+      },
+      [typologyDraft('t1', { nbTotal: 10, nbAvailable: 0 })],
+    )
 
     await db.delete(activityLog)
     await ownerCaller.bailleur.update({

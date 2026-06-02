@@ -6,9 +6,9 @@ import SftpClient from 'ssh2-sftp-client'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, geocodeAddress } from '~/server/lib/import/geocoder'
-import { omitFlatTypologyFields, syncTypologiesFromFlat } from '~/server/lib/typologies'
+import { syncTypologies, type TypologyDraft, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
-import { computeDerivedFields, generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
+import { generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '../../src/server/utils/slug'
 import type { ImportCommand, ImportOptions, ImportResult } from '../types'
 import { getOrCreateOwner } from '../utils/get-or-create-owner'
@@ -145,7 +145,9 @@ async function downloadFromSftp(verbose?: boolean): Promise<string> {
   }
 }
 
-function buildTypologyValues(item: FacHabitatResidence) {
+// FAC-Habitat splits some DB typologies across several source columns (e.g. t1_bis = t1_bis + t1_prime
+// + studio_double + duplex). The grouping below maps those source columns onto the DB typology types.
+function buildTypologyDrafts(item: FacHabitatResidence): TypologyDraft[] {
   const sumIfAny = (...vals: (number | undefined | null)[]) => {
     const nums = vals.filter((v): v is number => v != null)
     return nums.length > 0 ? nums.reduce((a, b) => a + b, 0) : null
@@ -160,63 +162,61 @@ function buildTypologyValues(item: FacHabitatResidence) {
     return nums.length > 0 ? Math.round(Math.max(...nums)) : null
   }
 
-  const nbT1 = sumIfAny(item.nb_t1)
-  const nbT1Bis = sumIfAny(item.nb_t1_bis, item.nb_t1_prime, item.nb_studio_double, item.nb_duplex)
-  const nbT2 = sumIfAny(item.nb_t2, item.nb_t2_duplex)
-  const nbT3 = sumIfAny(item.nb_t3, item.nb_duo)
-  const nbT4 = sumIfAny(item.nb_t4)
-  const nbT5 = sumIfAny(item.nb_t5, item.nb_t5_en_colocation)
-
-  const nbT1Available = sumIfAny(item.nb_t1_available)
-  const nbT1BisAvailable = sumIfAny(
-    item.nb_t1_bis_available,
-    item.nb_t1_prime_available,
-    item.nb_studio_double_available,
-    item.nb_duplex_available,
-  )
-  const nbT2Available = sumIfAny(item.nb_t2_available, item.nb_t2_duplex_available)
-  const nbT3Available = sumIfAny(item.nb_t3_available, item.nb_duo_available)
-  const nbT4Available = sumIfAny(item.nb_t4_available)
-  const nbT5Available = sumIfAny(item.nb_t5_en_colocation_available)
-
-  return {
-    nbT1,
-    nbT1Bis,
-    nbT2,
-    nbT3,
-    nbT4,
-    nbT5,
-    nbT1Available,
-    nbT1BisAvailable,
-    nbT2Available,
-    nbT3Available,
-    nbT4Available,
-    nbT5Available,
-    priceMinT1: minOf(item.t1_rent_min),
-    priceMaxT1: maxOf(item.t1_rent_max),
-    priceMinT1Bis: minOf(item.t1_bis_rent_min, item.t1_prime_rent_min, item.studio_double_rent_min, item.duplex_rent_min),
-    priceMaxT1Bis: maxOf(item.t1_bis_rent_max, item.t1_prime_rent_max, item.studio_double_rent_max, item.duplex_rent_max),
-    priceMinT2: minOf(item.t2_rent_min, item.t2_duplex_rent_min),
-    priceMaxT2: maxOf(item.t2_rent_max, item.t2_duplex_rent_max),
-    priceMinT3: minOf(item.t3_rent_min, item.duo_rent_min),
-    priceMaxT3: maxOf(item.t3_rent_max, item.duo_rent_max),
-    priceMinT4: minOf(item.t4_rent_min),
-    priceMaxT4: maxOf(item.t4_rent_max),
-    priceMinT5: minOf(item.t5_rent_min, item.t5_en_colocation_rent_min),
-    priceMaxT5: maxOf(item.t5_rent_max, item.t5_en_colocation_rent_max),
-    superficieMinT1: minOf(item.t1_surface_min),
-    superficieMaxT1: maxOf(item.t1_surface_max),
-    superficieMinT1Bis: minOf(item.t1_bis_surface_min, item.t1_prime_surface_min, item.studio_double_surface_min, item.duplex_surface_min),
-    superficieMaxT1Bis: maxOf(item.t1_bis_surface_max, item.t1_prime_surface_max, item.studio_double_surface_max, item.duplex_surface_max),
-    superficieMinT2: minOf(item.t2_surface_min, item.t2_duplex_surface_min),
-    superficieMaxT2: maxOf(item.t2_surface_max, item.t2_duplex_surface_max),
-    superficieMinT3: minOf(item.t3_surface_min, item.duo_surface_min),
-    superficieMaxT3: maxOf(item.t3_surface_max, item.duo_surface_max),
-    superficieMinT4: minOf(item.t4_surface_min),
-    superficieMaxT4: maxOf(item.t4_surface_max),
-    superficieMinT5: minOf(item.t5_en_colocation_surface_min),
-    superficieMaxT5: maxOf(item.t5_en_colocation_surface_max),
-  }
+  return [
+    typologyDraft('t1', {
+      nbTotal: sumIfAny(item.nb_t1),
+      nbAvailable: sumIfAny(item.nb_t1_available),
+      priceMin: minOf(item.t1_rent_min),
+      priceMax: maxOf(item.t1_rent_max),
+      superficieMin: minOf(item.t1_surface_min),
+      superficieMax: maxOf(item.t1_surface_max),
+    }),
+    typologyDraft('t1_bis', {
+      nbTotal: sumIfAny(item.nb_t1_bis, item.nb_t1_prime, item.nb_studio_double, item.nb_duplex),
+      nbAvailable: sumIfAny(
+        item.nb_t1_bis_available,
+        item.nb_t1_prime_available,
+        item.nb_studio_double_available,
+        item.nb_duplex_available,
+      ),
+      priceMin: minOf(item.t1_bis_rent_min, item.t1_prime_rent_min, item.studio_double_rent_min, item.duplex_rent_min),
+      priceMax: maxOf(item.t1_bis_rent_max, item.t1_prime_rent_max, item.studio_double_rent_max, item.duplex_rent_max),
+      superficieMin: minOf(item.t1_bis_surface_min, item.t1_prime_surface_min, item.studio_double_surface_min, item.duplex_surface_min),
+      superficieMax: maxOf(item.t1_bis_surface_max, item.t1_prime_surface_max, item.studio_double_surface_max, item.duplex_surface_max),
+    }),
+    typologyDraft('t2', {
+      nbTotal: sumIfAny(item.nb_t2, item.nb_t2_duplex),
+      nbAvailable: sumIfAny(item.nb_t2_available, item.nb_t2_duplex_available),
+      priceMin: minOf(item.t2_rent_min, item.t2_duplex_rent_min),
+      priceMax: maxOf(item.t2_rent_max, item.t2_duplex_rent_max),
+      superficieMin: minOf(item.t2_surface_min, item.t2_duplex_surface_min),
+      superficieMax: maxOf(item.t2_surface_max, item.t2_duplex_surface_max),
+    }),
+    typologyDraft('t3', {
+      nbTotal: sumIfAny(item.nb_t3, item.nb_duo),
+      nbAvailable: sumIfAny(item.nb_t3_available, item.nb_duo_available),
+      priceMin: minOf(item.t3_rent_min, item.duo_rent_min),
+      priceMax: maxOf(item.t3_rent_max, item.duo_rent_max),
+      superficieMin: minOf(item.t3_surface_min, item.duo_surface_min),
+      superficieMax: maxOf(item.t3_surface_max, item.duo_surface_max),
+    }),
+    typologyDraft('t4', {
+      nbTotal: sumIfAny(item.nb_t4),
+      nbAvailable: sumIfAny(item.nb_t4_available),
+      priceMin: minOf(item.t4_rent_min),
+      priceMax: maxOf(item.t4_rent_max),
+      superficieMin: minOf(item.t4_surface_min),
+      superficieMax: maxOf(item.t4_surface_max),
+    }),
+    typologyDraft('t5', {
+      nbTotal: sumIfAny(item.nb_t5, item.nb_t5_en_colocation),
+      nbAvailable: sumIfAny(item.nb_t5_en_colocation_available),
+      priceMin: minOf(item.t5_rent_min, item.t5_en_colocation_rent_min),
+      priceMax: maxOf(item.t5_rent_max, item.t5_en_colocation_rent_max),
+      superficieMin: minOf(item.t5_en_colocation_surface_min),
+      superficieMax: maxOf(item.t5_en_colocation_surface_max),
+    }),
+  ]
 }
 
 async function loadResidences(options: ImportOptions): Promise<FacHabitatResidence[]> {
@@ -288,22 +288,9 @@ const command: ImportCommand = {
           resolvedCityId = cityResult.id || null
         }
 
-        const typology = buildTypologyValues(item)
+        const typologyDrafts = buildTypologyDrafts(item)
 
-        const derived = computeDerivedFields({
-          nb_t1: typology.nbT1,
-          nb_t1_bis: typology.nbT1Bis,
-          nb_t2: typology.nbT2,
-          nb_t3: typology.nbT3,
-          nb_t4: typology.nbT4,
-          nb_t5: typology.nbT5,
-          price_min_t1: typology.priceMinT1,
-          price_min_t1_bis: typology.priceMinT1Bis,
-          price_min_t2: typology.priceMinT2,
-          price_min_t3: typology.priceMinT3,
-          price_min_t4: typology.priceMinT4,
-          price_min_t5: typology.priceMinT5,
-        })
+        const derived = typologyAggregates(typologyDrafts)
 
         const addressData = {
           address: geo?.address ?? item.address,
@@ -317,42 +304,6 @@ const command: ImportCommand = {
           residenceType: 'residence-etudiante',
           targetAudience: 'etudiants' as const,
           published: true,
-          nbT1: typology.nbT1,
-          nbT1Bis: typology.nbT1Bis,
-          nbT2: typology.nbT2,
-          nbT3: typology.nbT3,
-          nbT4: typology.nbT4,
-          nbT5: typology.nbT5,
-          priceMinT1: typology.priceMinT1,
-          priceMaxT1: typology.priceMaxT1,
-          priceMinT1Bis: typology.priceMinT1Bis,
-          priceMaxT1Bis: typology.priceMaxT1Bis,
-          priceMinT2: typology.priceMinT2,
-          priceMaxT2: typology.priceMaxT2,
-          priceMinT3: typology.priceMinT3,
-          priceMaxT3: typology.priceMaxT3,
-          priceMinT4: typology.priceMinT4,
-          priceMaxT4: typology.priceMaxT4,
-          priceMinT5: typology.priceMinT5,
-          priceMaxT5: typology.priceMaxT5,
-          nbT1Available: typology.nbT1Available,
-          nbT1BisAvailable: typology.nbT1BisAvailable,
-          nbT2Available: typology.nbT2Available,
-          nbT3Available: typology.nbT3Available,
-          nbT4Available: typology.nbT4Available,
-          nbT5Available: typology.nbT5Available,
-          superficieMinT1: typology.superficieMinT1,
-          superficieMaxT1: typology.superficieMaxT1,
-          superficieMinT1Bis: typology.superficieMinT1Bis,
-          superficieMaxT1Bis: typology.superficieMaxT1Bis,
-          superficieMinT2: typology.superficieMinT2,
-          superficieMaxT2: typology.superficieMaxT2,
-          superficieMinT3: typology.superficieMinT3,
-          superficieMaxT3: typology.superficieMaxT3,
-          superficieMinT4: typology.superficieMinT4,
-          superficieMaxT4: typology.superficieMaxT4,
-          superficieMinT5: typology.superficieMinT5,
-          superficieMaxT5: typology.superficieMaxT5,
           priceMin: derived.priceMin,
           nbTotalApartments: item.nb_total_apartments ?? derived.nbTotalApartments,
           nbAccessibleApartments: item.nb_accessible_apartments ?? null,
@@ -382,8 +333,8 @@ const command: ImportCommand = {
 
         if (existingSource[0]) {
           const accommodationId = existingSource[0].accommodationId
-          await db.update(accommodations).set(omitFlatTypologyFields(accommodationData)).where(eq(accommodations.id, accommodationId))
-          await syncTypologiesFromFlat(db, accommodationId, accommodationData)
+          await db.update(accommodations).set(accommodationData).where(eq(accommodations.id, accommodationId))
+          await syncTypologies(db, accommodationId, typologyDrafts)
           await db.delete(accommodationAddresses).where(eq(accommodationAddresses.accommodationId, accommodationId))
           await db.insert(accommodationAddresses).values({ accommodationId, isMain: true, ...addressData })
           result.updated++
@@ -397,9 +348,9 @@ const command: ImportCommand = {
           const slug = await findAvailableSlug(generateSlug(item.name), db, accommodations)
           const [newAccommodation] = await db
             .insert(accommodations)
-            .values(omitFlatTypologyFields({ ...accommodationData, slug, createdAt: new Date() }))
+            .values({ ...accommodationData, slug, createdAt: new Date() })
             .returning({ id: accommodations.id })
-          await syncTypologiesFromFlat(db, newAccommodation.id, accommodationData)
+          await syncTypologies(db, newAccommodation.id, typologyDrafts)
 
           await db.insert(accommodationAddresses).values({ accommodationId: newAccommodation.id, isMain: true, ...addressData })
 

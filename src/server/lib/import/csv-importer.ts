@@ -8,7 +8,7 @@ import type { TImportJobResidence, TImportJobSummary } from '~/schemas/import-jo
 import { db } from '~/server/db'
 import { accommodationAddresses, accommodations, externalSources, owners } from '~/server/db/schema'
 import { env } from '~/server/env'
-import { omitFlatTypologyFields, syncTypologiesFromFlat } from '~/server/lib/typologies'
+import { syncTypologies, typologyDraft } from '~/server/lib/typologies'
 import { generateAccommodationKey, uploadFile } from '~/server/services/s3'
 import { computeDerivedFields, generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '~/server/utils/slug'
@@ -46,8 +46,8 @@ export type CsvPreviewResult = {
   source: string
 }
 
-// CSV rows are flat per-typology (nb_t1, price_min_t1, …). Built explicitly here (ingestion stays
-// flat); persisted into typology child rows via syncTypologiesFromFlat downstream.
+// CSV rows are flat per-typology (nb_t1, price_min_t1, …); this Zod shape validates them. They are
+// later mapped into TypologyDraft[] (see typologyDrafts below) and persisted via syncTypologies.
 const flatTypologyImportShape = Object.fromEntries(
   TYPOLOGIES.flatMap(({ type }) => [
     [`nb_${type}`, z.number().nullish()],
@@ -401,52 +401,22 @@ export async function executeCsvImport(
         images_urls: imagesUrls.length > 0 ? imagesUrls : undefined,
       })
 
+      const typologyDrafts = TYPOLOGIES.map(({ type }) =>
+        typologyDraft(type, {
+          nbTotal: toDigit(row[`nb_${type}`]),
+          priceMin: toDigit(row[`${type}_rent_min`]),
+          priceMax: toDigit(row[`${type}_rent_max`]),
+          superficieMin: toDigit(row[`superficie_min_${type}`]),
+          superficieMax: toDigit(row[`superficie_max_${type}`]),
+        }),
+      )
+
       const accommodationData = {
         name,
         description: row.description?.trim() || null,
         residenceType: normalizeEnum(row.residence_type),
         targetAudience: (normalizeEnum(row.target_audience) ?? 'etudiants') as ETargetAudience,
         published: true,
-        nbT1: toDigit(row.nb_t1),
-        nbT1Bis: toDigit(row.nb_t1_bis),
-        nbT2: toDigit(row.nb_t2),
-        nbT3: toDigit(row.nb_t3),
-        nbT4: toDigit(row.nb_t4),
-        nbT5: toDigit(row.nb_t5),
-        nbT6: toDigit(row.nb_t6),
-        nbT7More: toDigit(row.nb_t7_more),
-        priceMinT1: toDigit(row.t1_rent_min),
-        priceMaxT1: toDigit(row.t1_rent_max),
-        priceMinT1Bis: toDigit(row.t1_bis_rent_min),
-        priceMaxT1Bis: toDigit(row.t1_bis_rent_max),
-        priceMinT2: toDigit(row.t2_rent_min),
-        priceMaxT2: toDigit(row.t2_rent_max),
-        priceMinT3: toDigit(row.t3_rent_min),
-        priceMaxT3: toDigit(row.t3_rent_max),
-        priceMinT4: toDigit(row.t4_rent_min),
-        priceMaxT4: toDigit(row.t4_rent_max),
-        priceMinT5: toDigit(row.t5_rent_min),
-        priceMaxT5: toDigit(row.t5_rent_max),
-        priceMinT6: toDigit(row.t6_rent_min),
-        priceMaxT6: toDigit(row.t6_rent_max),
-        priceMinT7More: toDigit(row.t7_more_rent_min),
-        priceMaxT7More: toDigit(row.t7_more_rent_max),
-        superficieMinT1: toDigit(row.superficie_min_t1),
-        superficieMaxT1: toDigit(row.superficie_max_t1),
-        superficieMinT1Bis: toDigit(row.superficie_min_t1_bis),
-        superficieMaxT1Bis: toDigit(row.superficie_max_t1_bis),
-        superficieMinT2: toDigit(row.superficie_min_t2),
-        superficieMaxT2: toDigit(row.superficie_max_t2),
-        superficieMinT3: toDigit(row.superficie_min_t3),
-        superficieMaxT3: toDigit(row.superficie_max_t3),
-        superficieMinT4: toDigit(row.superficie_min_t4),
-        superficieMaxT4: toDigit(row.superficie_max_t4),
-        superficieMinT5: toDigit(row.superficie_min_t5),
-        superficieMaxT5: toDigit(row.superficie_max_t5),
-        superficieMinT6: toDigit(row.superficie_min_t6),
-        superficieMaxT6: toDigit(row.superficie_max_t6),
-        superficieMinT7More: toDigit(row.superficie_min_t7_more),
-        superficieMaxT7More: toDigit(row.superficie_max_t7_more),
         priceMin: derived.priceMin,
         nbTotalApartments: toDigit(row.nb_total_apartments, true) ?? derived.nbTotalApartments,
         nbAccessibleApartments: toDigit(row.nb_accessible_apartments, true),
@@ -477,8 +447,8 @@ export async function executeCsvImport(
 
       if (existingSource[0]) {
         const accommodationId = existingSource[0].accommodationId
-        await db.update(accommodations).set(omitFlatTypologyFields(accommodationData)).where(eq(accommodations.id, accommodationId))
-        await syncTypologiesFromFlat(db, accommodationId, accommodationData)
+        await db.update(accommodations).set(accommodationData).where(eq(accommodations.id, accommodationId))
+        await syncTypologies(db, accommodationId, typologyDrafts)
         // The CSV total can exceed the sum of categorized typologies; keep it over sync's recomputed value.
         await db
           .update(accommodations)
@@ -499,10 +469,10 @@ export async function executeCsvImport(
         const slug = await findAvailableSlug(generateSlug(name), db, accommodations)
         const [newAccommodation] = await db
           .insert(accommodations)
-          .values(omitFlatTypologyFields({ ...accommodationData, slug, createdAt: new Date() }))
+          .values({ ...accommodationData, slug, createdAt: new Date() })
           .returning({ id: accommodations.id })
 
-        await syncTypologiesFromFlat(db, newAccommodation.id, accommodationData)
+        await syncTypologies(db, newAccommodation.id, typologyDrafts)
         // The CSV total can exceed the sum of categorized typologies; keep it over sync's recomputed value.
         await db
           .update(accommodations)

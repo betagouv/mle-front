@@ -2,13 +2,14 @@ import { eq } from 'drizzle-orm'
 import * as XLSX from 'xlsx'
 import { closeDb, db } from '~/server/db'
 import { accommodations } from '~/server/db/schema'
-import { mergeTypologiesFromFlat, omitFlatTypologyFields } from '~/server/lib/typologies'
+import { mergeTypologies, type TypologyPatch } from '~/server/lib/typologies'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import {
   buildDisplaySourceId,
   buildMatchSourceId,
   buildResidenceLookup,
   CATEGORIES,
+  CATEGORY_TO_TYPE,
   type CrousResidenceRow,
   getDuplicatedUairnes,
   getSheet,
@@ -41,18 +42,6 @@ type Options = {
   verbose?: boolean
   limit?: number
   replace?: boolean
-}
-
-// Flat camelCase keys consumed by the typology bridge (mergeTypologiesFromFlat), not DB columns.
-const COUNT_FIELDS: Record<TypoCategory, string> = {
-  t1: 'nbT1',
-  t1bis: 'nbT1Bis',
-  t2: 'nbT2',
-  t3: 'nbT3',
-  t4: 'nbT4',
-  t5: 'nbT5',
-  t6: 'nbT6',
-  t7more: 'nbT7More',
 }
 
 function isColivingTypology(row: CrousTypologyRow): boolean {
@@ -104,28 +93,22 @@ function loadExpectedTypologies(filePath: string, limit?: number): ExpectedResid
     })
 }
 
-function buildTypologyUpdate(
-  counts: Map<TypoCategory, number>,
-  colivingCount: number,
-  options: { replace?: boolean },
-): Record<string, number | Date> | Record<string, number | null | Date> {
-  const update: Record<string, number | null | Date> = {}
-
+// Counts present overwrite; absent counts are left untouched unless `replace` clears them to null.
+function buildCountPatches(counts: Map<TypoCategory, number>, options: { replace?: boolean }): TypologyPatch[] {
+  const patches: TypologyPatch[] = []
   for (const category of CATEGORIES) {
     const count = counts.get(category)
-    if (count != null) {
-      update[COUNT_FIELDS[category]] = count
-    } else if (options.replace) {
-      update[COUNT_FIELDS[category]] = null
-    }
+    if (count != null) patches.push({ type: CATEGORY_TO_TYPE[category], nbTotal: count })
+    else if (options.replace) patches.push({ type: CATEGORY_TO_TYPE[category], nbTotal: null })
   }
+  return patches
+}
 
-  if (colivingCount > 0) {
-    update.nbColivingApartments = colivingCount
-  } else if (options.replace) {
-    update.nbColivingApartments = null
-  }
-  update.updatedAt = new Date()
+// nbColivingApartments is a real accommodation column (not a typology field), set alongside updatedAt.
+function buildAccommodationUpdate(colivingCount: number, options: { replace?: boolean }): Record<string, number | null | Date> {
+  const update: Record<string, number | null | Date> = { updatedAt: new Date() }
+  if (colivingCount > 0) update.nbColivingApartments = colivingCount
+  else if (options.replace) update.nbColivingApartments = null
   return update
 }
 
@@ -151,7 +134,7 @@ export async function importCrousTypologies(filePath: string, options: Options) 
     console.log(`Import des typologies CROUS: ${expectedResidences.length} residences fichier, ${dbResidences.length} residences BDD.`)
     if (options.dryRun) console.log('(mode dry-run, aucune ecriture)')
 
-    const pendingUpdates: Array<{ id: number; update: Record<string, number | null | Date> }> = []
+    const pendingUpdates: Array<{ id: number; accUpdate: Record<string, number | null | Date>; patches: TypologyPatch[] }> = []
 
     for (const expected of expectedResidences) {
       try {
@@ -180,7 +163,11 @@ export async function importCrousTypologies(filePath: string, options: Options) 
           )
         }
 
-        pendingUpdates.push({ id: actual.id, update: buildTypologyUpdate(expected.counts, expected.colivingCount, options) })
+        pendingUpdates.push({
+          id: actual.id,
+          accUpdate: buildAccommodationUpdate(expected.colivingCount, options),
+          patches: buildCountPatches(expected.counts, options),
+        })
         result.updated++
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error)
@@ -190,10 +177,10 @@ export async function importCrousTypologies(filePath: string, options: Options) 
 
     if (!options.dryRun && pendingUpdates.length > 0) {
       await db.transaction(async (tx) => {
-        for (const { id, update } of pendingUpdates) {
-          await tx.update(accommodations).set(omitFlatTypologyFields(update)).where(eq(accommodations.id, id))
+        for (const { id, accUpdate, patches } of pendingUpdates) {
+          await tx.update(accommodations).set(accUpdate).where(eq(accommodations.id, id))
           // Merge the new typology counts into existing child rows (prices/surfaces preserved).
-          await mergeTypologiesFromFlat(tx, id, update)
+          await mergeTypologies(tx, id, patches)
         }
       })
     }

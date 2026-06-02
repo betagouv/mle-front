@@ -2,13 +2,14 @@ import { eq } from 'drizzle-orm'
 import * as XLSX from 'xlsx'
 import { closeDb, db } from '~/server/db'
 import { accommodations } from '~/server/db/schema'
-import { mergeTypologiesFromFlat, omitFlatTypologyFields } from '~/server/lib/typologies'
+import { mergeTypologies, type TypologyPatch } from '~/server/lib/typologies'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import {
   buildDisplaySourceId,
   buildMatchSourceId,
   buildResidenceLookup,
   CATEGORIES,
+  CATEGORY_TO_TYPE,
   type CrousResidenceRow,
   cleanNumber,
   getDuplicatedUairnes,
@@ -44,18 +45,6 @@ type Options = {
   dryRun?: boolean
   verbose?: boolean
   limit?: number
-}
-
-// Flat camelCase keys consumed by the typology bridge (mergeTypologiesFromFlat), not DB columns.
-const SURFACE_FIELDS: Record<TypoCategory, { min: string; max: string }> = {
-  t1: { min: 'superficieMinT1', max: 'superficieMaxT1' },
-  t1bis: { min: 'superficieMinT1Bis', max: 'superficieMaxT1Bis' },
-  t2: { min: 'superficieMinT2', max: 'superficieMaxT2' },
-  t3: { min: 'superficieMinT3', max: 'superficieMaxT3' },
-  t4: { min: 'superficieMinT4', max: 'superficieMaxT4' },
-  t5: { min: 'superficieMinT5', max: 'superficieMaxT5' },
-  t6: { min: 'superficieMinT6', max: 'superficieMaxT6' },
-  t7more: { min: 'superficieMinT7More', max: 'superficieMaxT7More' },
 }
 
 function loadExpectedSurfaces(filePath: string, limit?: number): ExpectedResidenceSurfaces[] {
@@ -95,18 +84,11 @@ function loadExpectedSurfaces(filePath: string, limit?: number): ExpectedResiden
     })
 }
 
-function buildSurfaceUpdate(surfaces: Map<TypoCategory, MinMaxBounds>): Record<string, number | null | Date> {
-  const update: Record<string, number | null | Date> = {}
-
-  for (const category of CATEGORIES) {
+function buildSurfacePatches(surfaces: Map<TypoCategory, MinMaxBounds>): TypologyPatch[] {
+  return CATEGORIES.map((category) => {
     const bounds = surfaces.get(category)
-    const fields = SURFACE_FIELDS[category]
-    update[fields.min] = bounds?.min ?? null
-    update[fields.max] = bounds?.max ?? null
-  }
-
-  update.updatedAt = new Date()
-  return update
+    return { type: CATEGORY_TO_TYPE[category], superficieMin: bounds?.min ?? null, superficieMax: bounds?.max ?? null }
+  })
 }
 
 export async function importCrousSurfaces(filePath: string, options: Options) {
@@ -121,7 +103,7 @@ export async function importCrousSurfaces(filePath: string, options: Options) {
     console.log(`Import des superficies CROUS: ${expectedResidences.length} residences fichier, ${dbResidences.length} residences BDD.`)
     if (options.dryRun) console.log('(mode dry-run, aucune ecriture)')
 
-    const pendingUpdates: Array<{ id: number; update: Record<string, number | null | Date> }> = []
+    const pendingUpdates: Array<{ id: number; patches: TypologyPatch[] }> = []
 
     for (const expected of expectedResidences) {
       try {
@@ -148,7 +130,7 @@ export async function importCrousSurfaces(filePath: string, options: Options) {
           console.log(`  ${options.dryRun ? '[dry-run] ' : ''}${actual.id} ${actual.slug}: ${summarizeBounds(expected.surfaces)}`)
         }
 
-        pendingUpdates.push({ id: actual.id, update: buildSurfaceUpdate(expected.surfaces) })
+        pendingUpdates.push({ id: actual.id, patches: buildSurfacePatches(expected.surfaces) })
         result.updated++
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error)
@@ -158,10 +140,10 @@ export async function importCrousSurfaces(filePath: string, options: Options) {
 
     if (!options.dryRun && pendingUpdates.length > 0) {
       await db.transaction(async (tx) => {
-        for (const { id, update } of pendingUpdates) {
-          await tx.update(accommodations).set(omitFlatTypologyFields(update)).where(eq(accommodations.id, id))
+        for (const { id, patches } of pendingUpdates) {
+          await tx.update(accommodations).set({ updatedAt: new Date() }).where(eq(accommodations.id, id))
           // Merge the new surface bounds into existing typology child rows (counts/prices preserved).
-          await mergeTypologiesFromFlat(tx, id, update)
+          await mergeTypologies(tx, id, patches)
         }
       })
     }
