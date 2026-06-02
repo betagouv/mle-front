@@ -9,7 +9,7 @@ export const CommonFooter = async () => {
   const t = await getTranslations()
   const popularCities = await getPopularCities()
   const sortedPopularCities = popularCities
-    .sort((a, b) => b.nb_total_apartments - a.nb_total_apartments)
+    .sort((a, b) => b.nbTotalApartments - a.nbTotalApartments)
     .map((city) => ({
       ...city,
       expandedBbox: expandBbox(city.bbox.xmin, city.bbox.ymin, city.bbox.xmax, city.bbox.ymax),

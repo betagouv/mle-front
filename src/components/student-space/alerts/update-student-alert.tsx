@@ -28,42 +28,42 @@ export const UpdateStudentAlert = ({ alert }: { alert: TAlert }) => {
     resolver: zodResolver(ZUpdateAlertRequest),
     defaultValues: {
       name: alert.name,
-      max_price: alert.max_price,
-      has_coliving: alert.has_coliving,
-      is_accessible: alert.is_accessible,
+      maxPrice: alert.maxPrice,
+      hasColiving: alert.hasColiving,
+      isAccessible: alert.isAccessible,
       id: alert.id,
-      receive_notifications: alert.receive_notifications,
-      city_id: alert.city?.id,
-      department_id: alert.department?.id,
-      academy_id: alert.academy?.id,
+      receiveNotifications: alert.receiveNotifications,
+      cityId: alert.city?.id,
+      departmentId: alert.department?.id,
+      academyId: alert.academy?.id,
     },
   })
 
   useEffect(() => {
     form.reset({
       name: alert.name,
-      max_price: alert.max_price,
-      has_coliving: alert.has_coliving,
-      is_accessible: alert.is_accessible,
+      maxPrice: alert.maxPrice,
+      hasColiving: alert.hasColiving,
+      isAccessible: alert.isAccessible,
       id: alert.id,
-      receive_notifications: alert.receive_notifications,
-      city_id: alert.city?.id,
-      department_id: alert.department?.id,
-      academy_id: alert.academy?.id,
+      receiveNotifications: alert.receiveNotifications,
+      cityId: alert.city?.id,
+      departmentId: alert.department?.id,
+      academyId: alert.academy?.id,
     })
   }, [alert, form])
 
   const handleCancel = () => {
     form.reset({
       name: alert.name,
-      max_price: alert.max_price,
-      has_coliving: alert.has_coliving,
-      is_accessible: alert.is_accessible,
+      maxPrice: alert.maxPrice,
+      hasColiving: alert.hasColiving,
+      isAccessible: alert.isAccessible,
       id: alert.id,
-      receive_notifications: alert.receive_notifications,
-      city_id: alert.city?.id,
-      department_id: alert.department?.id,
-      academy_id: alert.academy?.id,
+      receiveNotifications: alert.receiveNotifications,
+      cityId: alert.city?.id,
+      departmentId: alert.department?.id,
+      academyId: alert.academy?.id,
     })
     updateStudentAlertModal.close()
   }
@@ -71,7 +71,7 @@ export const UpdateStudentAlert = ({ alert }: { alert: TAlert }) => {
   const handleSubmit = form.handleSubmit(async (data) => {
     try {
       await updateAlert(data)
-      trackEvent({ category: 'Alertes', action: 'modification alerte', name: String(data.id), value: data.max_price })
+      trackEvent({ category: 'Alertes', action: 'modification alerte', name: String(data.id), value: data.maxPrice })
       updateStudentAlertModal.close()
     } catch (error) {
       console.error('Error creating alert:', error)
@@ -106,12 +106,12 @@ export const UpdateStudentAlert = ({ alert }: { alert: TAlert }) => {
               }}
             />
             <StudentAlertLocation
-              error={form.formState.errors.city_id?.message || form.formState.errors.department_id?.message}
+              error={form.formState.errors.cityId?.message || form.formState.errors.departmentId?.message}
               initialLocation={alert.city?.name || alert.department?.name || alert.academy?.name}
             />
 
             <Controller
-              name="max_price"
+              name="maxPrice"
               control={control}
               render={({ field }) => (
                 <Range
@@ -130,7 +130,7 @@ export const UpdateStudentAlert = ({ alert }: { alert: TAlert }) => {
             />
             <div className="fr-flex fr-flex-gap-4v fr-justify-content-space-between">
               <Controller
-                name="has_coliving"
+                name="hasColiving"
                 control={control}
                 render={({ field }) => (
                   <ToggleSwitch
@@ -145,7 +145,7 @@ export const UpdateStudentAlert = ({ alert }: { alert: TAlert }) => {
                 )}
               />
               <Controller
-                name="is_accessible"
+                name="isAccessible"
                 control={control}
                 render={({ field }) => (
                   <ToggleSwitch

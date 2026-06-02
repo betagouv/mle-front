@@ -14,18 +14,18 @@ type PrepareStudentLifeStatsProps = TCity & {
 }
 
 export default function PrepareStudentLifeStats({
-  average_rent,
+  averageRent,
   location,
-  nb_total_apartments: nbTotalApartments,
-  price_min: priceMin,
-  nb_t1,
-  nb_t1_bis,
-  nb_t2,
-  nb_t3,
-  nb_t4,
-  nb_t5,
-  nb_t6,
-  nb_t7_more,
+  nbTotalApartments,
+  priceMin,
+  nbT1,
+  nbT1Bis,
+  nbT2,
+  nbT3,
+  nbT4,
+  nbT5,
+  nbT6,
+  nbT7More,
 }: PrepareStudentLifeStatsProps) {
   const locationAids = ['Aides nationales', 'Aides régionales', 'Aides départementales', 'Aides de la ville']
 
@@ -35,14 +35,14 @@ export default function PrepareStudentLifeStats({
       ? { nbTotal: n, nbAvailable: null, priceMin: null, priceMax: null, superficieMin: null, superficieMax: null, colocation: false }
       : undefined
   const typologies = {
-    t1: mkTypology(nb_t1),
-    t1_bis: mkTypology(nb_t1_bis),
-    t2: mkTypology(nb_t2),
-    t3: mkTypology(nb_t3),
-    t4: mkTypology(nb_t4),
-    t5: mkTypology(nb_t5),
-    t6: mkTypology(nb_t6),
-    t7_more: mkTypology(nb_t7_more),
+    t1: mkTypology(nbT1),
+    t1_bis: mkTypology(nbT1Bis),
+    t2: mkTypology(nbT2),
+    t3: mkTypology(nbT3),
+    t4: mkTypology(nbT4),
+    t5: mkTypology(nbT5),
+    t6: mkTypology(nbT6),
+    t7_more: mkTypology(nbT7More),
   }
 
   return (
@@ -226,10 +226,10 @@ export default function PrepareStudentLifeStats({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                   <span className={fr.cx('fr-text--bold')}>Logement</span>
                   <div>
-                    <span className={fr.cx('fr-text--bold')}>Prix moyen du m²</span> : {Math.round(average_rent)} €.
+                    <span className={fr.cx('fr-text--bold')}>Prix moyen du m²</span> : {Math.round(averageRent)} €.
                   </div>
                   <div>
-                    <span className={fr.cx('fr-text--bold')}>Loyer moyen pour un logement de 20m²</span> : {Math.round(average_rent * 20)} €
+                    <span className={fr.cx('fr-text--bold')}>Loyer moyen pour un logement de 20m²</span> : {Math.round(averageRent * 20)} €
                     par mois.
                   </div>
                 </div>

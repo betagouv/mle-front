@@ -32,10 +32,10 @@ const ZAlert = z.object({
   city: ZAlertCity.nullable(),
   department: ZAlertDepartment.nullable(),
   academy: ZAlertAcademy.nullable(),
-  has_coliving: z.boolean(),
-  is_accessible: z.boolean(),
-  max_price: z.number(),
-  receive_notifications: z.boolean(),
+  hasColiving: z.boolean(),
+  isAccessible: z.boolean(),
+  maxPrice: z.number(),
+  receiveNotifications: z.boolean(),
 })
 
 export const ZGetAlertsResponse = z.object({

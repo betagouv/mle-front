@@ -9,16 +9,16 @@ export const StudentAlertCountButton = ({ alert }: { alert: TAlert }) => {
   const getHref = () => {
     const searchParams = new URLSearchParams()
 
-    if (alert.has_coliving) {
+    if (alert.hasColiving) {
       searchParams.set('colocation', 'true')
     }
 
-    if (alert.is_accessible) {
+    if (alert.isAccessible) {
       searchParams.set('accessible', 'true')
     }
 
-    if (alert.max_price) {
-      searchParams.set('prix', alert.max_price.toString())
+    if (alert.maxPrice) {
+      searchParams.set('prix', alert.maxPrice.toString())
     }
 
     if (alert.city) {

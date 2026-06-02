@@ -8,7 +8,7 @@ import styles from './cities.module.css'
 export const CitiesSection = async () => {
   const tHome = await getTranslations('home')
   const popularCities = await getPopularCities()
-  const sortedPopularCities = popularCities.sort((a, b) => b.nb_total_apartments - a.nb_total_apartments).slice(0, 16)
+  const sortedPopularCities = popularCities.sort((a, b) => b.nbTotalApartments - a.nbTotalApartments).slice(0, 16)
 
   return (
     <section className="fr-container-sm fr-pb-md-16w">
@@ -29,7 +29,7 @@ export const CitiesSection = async () => {
               {sortedPopularCities.map((city) => (
                 <Button
                   className={styles.cityButton}
-                  linkProps={{ href: `/trouver-un-logement-etudiant/ville/${city.name}${city.majority_crous ? '?crous=true' : ''}` }}
+                  linkProps={{ href: `/trouver-un-logement-etudiant/ville/${city.name}${city.majorityCrous ? '?crous=true' : ''}` }}
                   key={city.id}
                   priority="secondary"
                 >

@@ -11,7 +11,7 @@ import { TUpdateResidence } from '~/schemas/accommodations/update-residence'
 
 type Category = 'collective' | 'individual'
 
-const ENUM_FIELDS = ['bathroom', 'kitchen_type'] as const
+const ENUM_FIELDS = ['bathroom', 'kitchenType'] as const
 const ENUM_OPTIONS = ['private', 'shared'] as const
 
 const categories: { key: Category; label: string }[] = [

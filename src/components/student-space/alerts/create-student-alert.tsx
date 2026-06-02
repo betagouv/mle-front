@@ -26,9 +26,9 @@ export const CreateStudentAlert = () => {
     resolver: zodResolver(ZCreateAlertRequest),
     defaultValues: {
       name: '',
-      max_price: 1000,
-      has_coliving: false,
-      is_accessible: false,
+      maxPrice: 1000,
+      hasColiving: false,
+      isAccessible: false,
     },
   })
 
@@ -40,7 +40,7 @@ export const CreateStudentAlert = () => {
   const handleSubmit = form.handleSubmit(async (data) => {
     try {
       await createAlert(data)
-      trackEvent({ category: 'Alertes', action: 'creation alerte', name: data.name, value: data.max_price })
+      trackEvent({ category: 'Alertes', action: 'creation alerte', name: data.name, value: data.maxPrice })
       form.reset()
       createStudentAlertModal.close()
     } catch (error) {
@@ -76,7 +76,7 @@ export const CreateStudentAlert = () => {
                 ...form.register('name'),
               }}
             />
-            <StudentAlertLocation error={form.formState.errors.city_id?.message || form.formState.errors.department_id?.message} />
+            <StudentAlertLocation error={form.formState.errors.cityId?.message || form.formState.errors.departmentId?.message} />
 
             <Range
               label="Budget maximum"
@@ -86,8 +86,8 @@ export const CreateStudentAlert = () => {
               step={50}
               suffix=" €"
               nativeInputProps={{
-                value: form.watch('max_price'),
-                onChange: (e) => form.setValue('max_price', Number(e.target.value)),
+                value: form.watch('maxPrice'),
+                onChange: (e) => form.setValue('maxPrice', Number(e.target.value)),
               }}
             />
             <div className="fr-flex fr-flex-gap-4v fr-justify-content-space-between">
@@ -97,8 +97,8 @@ export const CreateStudentAlert = () => {
                 showCheckedHint={false}
                 label="En colocation"
                 labelPosition="right"
-                checked={form.watch('has_coliving')}
-                onChange={(checked) => form.setValue('has_coliving', checked)}
+                checked={form.watch('hasColiving')}
+                onChange={(checked) => form.setValue('hasColiving', checked)}
               />
               <ToggleSwitch
                 classes={{ label: 'fr-width-full' }}
@@ -106,8 +106,8 @@ export const CreateStudentAlert = () => {
                 showCheckedHint={false}
                 label="Adapté PMR"
                 labelPosition="right"
-                checked={form.watch('is_accessible')}
-                onChange={(checked) => form.setValue('is_accessible', checked)}
+                checked={form.watch('isAccessible')}
+                onChange={(checked) => form.setValue('isAccessible', checked)}
               />
             </div>
             <div className="fr-flex fr-justify-content-end fr-flex-gap-2v">

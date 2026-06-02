@@ -129,30 +129,19 @@ function formatAlert(
     city,
     department,
     academy,
-    has_coliving: alert.hasColiving,
-    is_accessible: alert.isAccessible,
-    max_price: alert.maxPrice,
-    receive_notifications: alert.receiveNotifications,
+    hasColiving: alert.hasColiving,
+    isAccessible: alert.isAccessible,
+    maxPrice: alert.maxPrice,
+    receiveNotifications: alert.receiveNotifications,
   }
 }
 
-/** Map snake_case input fields to camelCase column names for partial updates. */
-const UPDATE_FIELD_MAP: Record<string, string> = {
-  name: 'name',
-  city_id: 'cityId',
-  department_id: 'departmentId',
-  academy_id: 'academyId',
-  has_coliving: 'hasColiving',
-  is_accessible: 'isAccessible',
-  max_price: 'maxPrice',
-  receive_notifications: 'receiveNotifications',
-}
-
+/** Keep only the defined fields so partial updates don't overwrite columns with undefined. */
 function buildUpdateData(fields: Record<string, unknown>): Record<string, unknown> {
   const updateData: Record<string, unknown> = {}
-  for (const [inputKey, columnKey] of Object.entries(UPDATE_FIELD_MAP)) {
-    if (fields[inputKey] !== undefined) {
-      updateData[columnKey] = fields[inputKey]
+  for (const [key, value] of Object.entries(fields)) {
+    if (value !== undefined) {
+      updateData[key] = value
     }
   }
   return updateData
@@ -198,25 +187,25 @@ export const alertsRouter = createTRPCRouter({
       .values({
         userId,
         name: input.name,
-        cityId: input.city_id ?? null,
-        departmentId: input.department_id ?? null,
-        academyId: input.academy_id ?? null,
-        hasColiving: input.has_coliving,
-        isAccessible: input.is_accessible,
-        maxPrice: input.max_price,
+        cityId: input.cityId ?? null,
+        departmentId: input.departmentId ?? null,
+        academyId: input.academyId ?? null,
+        hasColiving: input.hasColiving,
+        isAccessible: input.isAccessible,
+        maxPrice: input.maxPrice,
       })
       .returning()
 
     const [[cityRow], [academyRow]] = await Promise.all([
-      input.city_id ? db.select({ name: cities.name }).from(cities).where(eq(cities.id, input.city_id)) : [],
-      input.academy_id ? db.select({ name: academies.name }).from(academies).where(eq(academies.id, input.academy_id)) : [],
+      input.cityId ? db.select({ name: cities.name }).from(cities).where(eq(cities.id, input.cityId)) : [],
+      input.academyId ? db.select({ name: academies.name }).from(academies).where(eq(academies.id, input.academyId)) : [],
     ])
 
     await sendAlertCreationConfirmationEmail(ctx.session.user.email, {
       alertName: input.name,
       city: cityRow?.name,
       academy: academyRow?.name,
-      maxBudget: input.max_price,
+      maxBudget: input.maxPrice,
     })
 
     try {

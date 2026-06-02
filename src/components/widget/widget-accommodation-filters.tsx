@@ -84,7 +84,7 @@ export const WidgetAccommodationFilters: FC<WidgetAccommodationFiltersProps> = (
           <ul className={classes.list}>
             {cities.map((city) => (
               <li key={city.id} className={classes.dropdownItem} onClick={() => handleCitySelect(city)}>
-                {city.name} {city.department_code ? `(${city.department_code})` : ''}
+                {city.name} {city.departmentCode ? `(${city.departmentCode})` : ''}
               </li>
             ))}
           </ul>
