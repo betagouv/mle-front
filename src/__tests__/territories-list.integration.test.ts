@@ -82,8 +82,8 @@ describe('territories.listCities', () => {
     const saintEtienne = result.find((c) => c.name === 'Saint-Étienne')
     const lyon = result.find((c) => c.name === 'Lyon')
 
-    expect(saintEtienne?.majority_crous).toBe(true)
-    expect(lyon?.majority_crous).toBe(false)
+    expect(saintEtienne?.majorityCrous).toBe(true)
+    expect(lyon?.majorityCrous).toBe(false)
   })
 })
 
@@ -113,15 +113,15 @@ describe('territories.getCityDetails', () => {
 
     const result = await caller.territories.getCityDetails({ slug: 'saint-etienne' })
     expect(result.name).toBe('Saint-Étienne')
-    expect(result.nb_total_apartments).toBe(15)
-    expect(result.price_min).toBe(250)
+    expect(result.nbTotalApartments).toBe(15)
+    expect(result.priceMin).toBe(250)
   })
 
   it('returns empty nearby_cities without geometry', async () => {
     await createCity({ departmentId, name: 'Saint-Étienne', slug: 'saint-etienne' })
 
     const result = await caller.territories.getCityDetails({ slug: 'saint-etienne' })
-    expect(result.nearby_cities).toEqual([])
+    expect(result.nearbyCities).toEqual([])
   })
 
   it('throws if slug is unknown', async () => {

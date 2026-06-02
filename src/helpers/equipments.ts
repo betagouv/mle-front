@@ -1,4 +1,18 @@
-export const EQUIPMENTS = [
+import type { accommodations } from '~/server/db/schema/accommodations'
+
+// `key` is constrained to a real accommodation field (camelCase, from the Drizzle schema). This makes
+// any snake_case / stale key a compile error — the API response (getBySlug) and the form schemas
+// (ZUpdateResidence / ZCreateResidence) all derive from these same field names.
+type AccommodationField = keyof typeof accommodations.$inferSelect
+
+type Equipment = {
+  icon: string
+  key: AccommodationField
+  label: string | ((value: string) => string)
+  category: 'collective' | 'individual'
+}
+
+export const EQUIPMENTS: Equipment[] = [
   {
     icon: 'ri-fridge-line',
     key: 'refrigerator',
@@ -7,7 +21,7 @@ export const EQUIPMENTS = [
   },
   {
     icon: 'ri-t-shirt-air-line',
-    key: 'laundry_room',
+    key: 'laundryRoom',
     label: 'Laverie',
     category: 'collective',
   },
@@ -19,7 +33,7 @@ export const EQUIPMENTS = [
   },
   {
     icon: 'ri-restaurant-line',
-    key: 'kitchen_type',
+    key: 'kitchenType',
     label: (value: string) => (value === 'shared' ? 'Cuisine partagée' : 'Cuisine privée'),
     category: 'individual',
   },
@@ -31,7 +45,7 @@ export const EQUIPMENTS = [
   },
   {
     icon: 'ri-lock-line',
-    key: 'secure_access',
+    key: 'secureAccess',
     label: 'Accès sécurisé',
     category: 'collective',
   },
@@ -43,13 +57,13 @@ export const EQUIPMENTS = [
   },
   {
     icon: 'ri-community-line',
-    key: 'common_areas',
+    key: 'commonAreas',
     label: 'Espaces communs',
     category: 'collective',
   },
   {
     icon: 'ri-riding-line',
-    key: 'bike_storage',
+    key: 'bikeStorage',
     label: 'Garage à vélos',
     category: 'collective',
   },
@@ -61,13 +75,13 @@ export const EQUIPMENTS = [
   },
   {
     icon: 'ri-user-2-line',
-    key: 'residence_manager',
+    key: 'residenceManager',
     label: 'Conciergerie',
     category: 'collective',
   },
   {
     icon: 'fr-icon-sign-language-line',
-    key: 'cooking_plates',
+    key: 'cookingPlates',
     label: 'Plaques de cuisson',
     category: 'individual',
   },

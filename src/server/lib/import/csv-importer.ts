@@ -8,9 +8,9 @@ import type { TImportJobResidence, TImportJobSummary } from '~/schemas/import-jo
 import { db } from '~/server/db'
 import { accommodationAddresses, accommodations, externalSources, owners } from '~/server/db/schema'
 import { env } from '~/server/env'
-import { syncTypologies, typologyDraft } from '~/server/lib/typologies'
+import { syncTypologies, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { generateAccommodationKey, uploadFile } from '~/server/services/s3'
-import { computeDerivedFields, generateSlug } from '~/server/trpc/utils/accommodation-helpers'
+import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '~/server/utils/slug'
 import { type CsvRow, generateSourceId, normalizeEnum, parseCsvContent, toBool, toDigit } from './csv-parser'
 import { ensureCity, geocodeAddress, reverseGeocode } from './geocoder'
@@ -381,26 +381,6 @@ export async function executeCsvImport(
         ...(geom ? { geom } : {}),
       }
 
-      const derived = computeDerivedFields({
-        nb_t1: toDigit(row.nb_t1),
-        nb_t1_bis: toDigit(row.nb_t1_bis),
-        nb_t2: toDigit(row.nb_t2),
-        nb_t3: toDigit(row.nb_t3),
-        nb_t4: toDigit(row.nb_t4),
-        nb_t5: toDigit(row.nb_t5),
-        nb_t6: toDigit(row.nb_t6),
-        nb_t7_more: toDigit(row.nb_t7_more),
-        price_min_t1: toDigit(row.t1_rent_min),
-        price_min_t1_bis: toDigit(row.t1_bis_rent_min),
-        price_min_t2: toDigit(row.t2_rent_min),
-        price_min_t3: toDigit(row.t3_rent_min),
-        price_min_t4: toDigit(row.t4_rent_min),
-        price_min_t5: toDigit(row.t5_rent_min),
-        price_min_t6: toDigit(row.t6_rent_min),
-        price_min_t7_more: toDigit(row.t7_more_rent_min),
-        images_urls: imagesUrls.length > 0 ? imagesUrls : undefined,
-      })
-
       const typologyDrafts = TYPOLOGIES.map(({ type }) =>
         typologyDraft(type, {
           nbTotal: toDigit(row[`nb_${type}`]),
@@ -410,6 +390,8 @@ export async function executeCsvImport(
           superficieMax: toDigit(row[`superficie_max_${type}`]),
         }),
       )
+
+      const derived = typologyAggregates(typologyDrafts)
 
       const accommodationData = {
         name,

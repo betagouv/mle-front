@@ -15,7 +15,7 @@ export const StudentAlert = ({ alert }: StudentAlertProps) => {
   const { mutateAsync: updateAlert } = useUpdateAlert()
 
   const handleToggleNotifications = async (checked: boolean) => {
-    await updateAlert({ id: alert.id, receive_notifications: checked })
+    await updateAlert({ id: alert.id, receiveNotifications: checked })
   }
 
   return (
@@ -30,9 +30,9 @@ export const StudentAlert = ({ alert }: StudentAlertProps) => {
         </div>
         <div className="fr-flex fr-flex-gap-2v">
           {alert.city && <Tag small>{`${alert.city?.name} ${alert.department?.code ? `(${alert.department.code})` : ''}`}</Tag>}
-          <Tag small>{`${alert.max_price}€ max.`}</Tag>
-          {alert.has_coliving && <Tag small>Colocation</Tag>}
-          {alert.is_accessible && <Tag small>Accessible</Tag>}
+          <Tag small>{`${alert.maxPrice}€ max.`}</Tag>
+          {alert.hasColiving && <Tag small>Colocation</Tag>}
+          {alert.isAccessible && <Tag small>Accessible</Tag>}
         </div>
       </div>
       <div className="fr-mt-4w fr-flex fr-justify-content-space-between">
@@ -40,7 +40,7 @@ export const StudentAlert = ({ alert }: StudentAlertProps) => {
           <ToggleSwitch
             label="Recevoir des alertes mail"
             inputTitle={`receive-notifications-${alert.id}`}
-            checked={alert.receive_notifications}
+            checked={alert.receiveNotifications}
             onChange={handleToggleNotifications}
             showCheckedHint={false}
           />

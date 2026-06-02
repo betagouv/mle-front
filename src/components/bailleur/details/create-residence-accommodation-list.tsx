@@ -117,7 +117,6 @@ export const CreateResidenceAccommodationList = () => {
             {sortedFieldsWithIndex.map(({ field, originalIndex }) => (
               <div key={field.id} className={selectedTabId === `tab-${originalIndex}` ? '' : 'fr-hidden'}>
                 <TypologyTabContent
-                  mode="create"
                   index={originalIndex}
                   typologyType={watchedTypologies?.[originalIndex]?.type}
                   usedTypes={usedTypes}

@@ -41,7 +41,7 @@ export const StudentAlertLocation: FC<StudentAlertLocationProps> = ({ error, ini
     }
   }
 
-  const handleClick = (field: 'city_id' | 'academy_id' | 'department_id', item: TCity | TAcademyOrDepartment) => {
+  const handleClick = (field: 'cityId' | 'academyId' | 'departmentId', item: TCity | TAcademyOrDepartment) => {
     setSearchQuery(item.name)
     setSelectedLocation(item.name)
     setShowResults(false)
@@ -70,19 +70,19 @@ export const StudentAlertLocation: FC<StudentAlertLocationProps> = ({ error, ini
         <div className={classes.resultsContainer}>
           <ul className={classes.list}>
             {data.cities?.map((item: TCity) => (
-              <li className={classes.item} key={`city-${item.id}`} onClick={() => handleClick('city_id', item)}>
+              <li className={classes.item} key={`city-${item.id}`} onClick={() => handleClick('cityId', item)}>
                 <span className={clsx(classes.icon, 'ri-map-pin-2-fill')} />
-                {item.name} ({item.department_code})
+                {item.name} ({item.departmentCode})
               </li>
             ))}
             {data.departments?.map((item: TAcademyOrDepartment) => (
-              <li className={classes.item} key={`dept-${item.id}`} onClick={() => handleClick('department_id', item)}>
+              <li className={classes.item} key={`dept-${item.id}`} onClick={() => handleClick('departmentId', item)}>
                 <span className={clsx(classes.icon, 'ri-road-map-line')} />
                 {item.name}
               </li>
             ))}
             {data.academies?.map((item: TAcademyOrDepartment) => (
-              <li className={classes.item} key={`academy-${item.id}`} onClick={() => handleClick('academy_id', item)}>
+              <li className={classes.item} key={`academy-${item.id}`} onClick={() => handleClick('academyId', item)}>
                 <span className={clsx(classes.icon, 'ri-government-line')} />
                 {item.name}
               </li>

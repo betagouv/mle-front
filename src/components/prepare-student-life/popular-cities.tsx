@@ -35,13 +35,13 @@ export const PopularCities: FC<PopularCitiesProps> = ({ cities }) => {
       )}
       <div className={classes.tilesGrid}>
         {(sortedCities || cities).map((city) => {
-          const desc = !!city.nb_total_apartments && `${city.nb_total_apartments} logement${sPluriel(city.nb_total_apartments)} étudiants`
+          const desc = !!city.nbTotalApartments && `${city.nbTotalApartments} logement${sPluriel(city.nbTotalApartments)} étudiants`
           return (
             <Tile
               noIcon
               key={city.id}
               desc={desc}
-              detail={city.price_min ? `Budget minimum ${city.price_min}€` : undefined}
+              detail={city.priceMin ? `Budget minimum ${city.priceMin}€` : undefined}
               linkProps={{
                 href: `/preparer-sa-vie-etudiante/${city.slug}`,
               }}
