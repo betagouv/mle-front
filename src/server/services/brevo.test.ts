@@ -13,6 +13,8 @@ describe('brevo service', () => {
     vi.stubEnv('BREVO_TEMPLATE_VALIDATION', '21')
     vi.stubEnv('BREVO_TEMPLATE_RESET_PASSWORD', '23')
     vi.stubEnv('BREVO_TEMPLATE_OWNER_WELCOME', '40')
+    vi.stubEnv('BREVO_TEMPLATE_OWNER_AVAILABILITY_REMINDER', '42')
+    vi.stubEnv('BREVO_TEMPLATE_OWNER_AVAILABILITY_REMINDER_J30', '43')
   })
 
   describe('sendTemplateEmail', () => {
@@ -123,6 +125,38 @@ describe('brevo service', () => {
       expect(body).toEqual({
         to: [{ email: 'owner@test.com' }],
         templateId: 40,
+        replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      })
+      expect(body.params).toBeUndefined()
+    })
+  })
+
+  describe('sendOwnerAvailabilityReminderEmail', () => {
+    it('uses template ID 42 without params', async () => {
+      const { sendOwnerAvailabilityReminderEmail } = await import('./brevo')
+
+      await sendOwnerAvailabilityReminderEmail('owner@test.com')
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+      expect(body).toEqual({
+        to: [{ email: 'owner@test.com' }],
+        templateId: 42,
+        replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      })
+      expect(body.params).toBeUndefined()
+    })
+  })
+
+  describe('sendOwnerAvailabilityReminderJ30Email', () => {
+    it('uses template ID 43 without params', async () => {
+      const { sendOwnerAvailabilityReminderJ30Email } = await import('./brevo')
+
+      await sendOwnerAvailabilityReminderJ30Email('owner@test.com')
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+      expect(body).toEqual({
+        to: [{ email: 'owner@test.com' }],
+        templateId: 43,
         replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
       })
       expect(body.params).toBeUndefined()

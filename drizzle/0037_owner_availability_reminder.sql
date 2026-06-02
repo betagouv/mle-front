@@ -1,0 +1,1 @@
+ALTER TABLE "account_owner" ADD COLUMN "availability_reminder_sent_at" timestamp with time zone;

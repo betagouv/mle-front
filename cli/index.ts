@@ -7,6 +7,7 @@ import { importCrousSurfaces } from './commands/import-crous-surfaces'
 import { importCrousTypologies } from './commands/import-crous-typologies'
 import { migrate } from './commands/migrate'
 import { migrateUsers } from './commands/migrate-users'
+import { Options, sendOwnerAvailabilityReminder } from './commands/send-owner-availability-reminder'
 import { auditStorage } from './commands/storage/auditStorage'
 import { uploadImages } from './commands/upload-images'
 import { runImport, runSync } from './factory'
@@ -115,5 +116,19 @@ program
   .option('--verbose', 'Afficher le détail de chaque problème')
   .option('--write', 'Appliquer les corrections (URLs cassées retirées de la base, fichiers orphelins supprimés de S3)')
   .action((opts) => auditStorage(opts))
+
+program
+  .command('send-owner-availability-reminder')
+  .description("Envoie l'email de rappel J+7 ou J+30 aux owners avec accommodationAvailability non renseignée")
+  .requiredOption('--days <number>', 'Délai en jours depuis la création du compte (7 ou 30)', parseInt)
+  .option('--dry-run', 'Simuler sans envoyer ni modifier la BDD')
+  .option('--verbose', 'Afficher le détail des owners ciblés')
+  .action((opts) => {
+    if (opts.days !== 7 && opts.days !== 30) {
+      console.error('❌ --days doit valoir 7 ou 30')
+      process.exit(1)
+    }
+    sendOwnerAvailabilityReminder({ ...opts, days: opts.days as Options['days'] })
+  })
 
 program.parse()

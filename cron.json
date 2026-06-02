@@ -7,5 +7,8 @@
     { "command": "10 4 1 * * npx tsx cli/index.ts sync students" },
     { "command": "0 3 * * * npx tsx cli/index.ts sync stats" },
     { "command": "0 4 * * * npx tsx cli/index.ts import initiall" }
+    // run in dry mode to validate the test
+    // { "command": "0 8 * * * npx tsx cli/index.ts send-owner-availability-reminder --days 7" },
+    // { "command": "0 8 * * * npx tsx cli/index.ts send-owner-availability-reminder --days 30" }
   ]
 }

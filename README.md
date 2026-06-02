@@ -299,6 +299,31 @@ Options :
 
 Variables d'env requises : `S3_*`
 
+#### `send-owner-availability-reminder` — Envoyer le rappel J+7 / J+30 disponibilités
+
+```bash
+pnpm cli send-owner-availability-reminder --days 7
+pnpm cli send-owner-availability-reminder --days 30
+pnpm cli send-owner-availability-reminder --days 7 --dry-run --verbose
+```
+
+Envoie un email de rappel aux owners dont le compte a été créé il y a au moins `--days` jours et qui ont au moins une résidence avec toutes les disponibilités non renseignées (`accommodationAvailability` null). L'envoi est tracké (champ `availabilityReminderSentAt` pour J+7, `availabilityReminderJ30SentAt` pour J+30) : chaque owner ne reçoit l'email qu'une seule fois par palier. Le cron tournant quotidiennement, le rattrapage est automatique si le job saute un jour.
+
+| `--days` | Template Brevo |
+|----------|----------------|
+| `7` | `BREVO_TEMPLATE_OWNER_AVAILABILITY_REMINDER` |
+| `30` | `BREVO_TEMPLATE_OWNER_AVAILABILITY_REMINDER_J30` |
+
+Options :
+
+| Option | Description |
+|--------|-------------|
+| `--days <number>` | (requis) Délai en jours : `7` ou `30` |
+| `--dry-run` | Simule sans envoyer d'email ni modifier la BDD |
+| `--verbose` | Affiche le détail des owners ciblés et leurs emails |
+
+Variables d'env requises : `DATABASE_URL`, `BREVO_API_KEY`, `BREVO_TEMPLATE_OWNER_AVAILABILITY_REMINDER`, `BREVO_TEMPLATE_OWNER_AVAILABILITY_REMINDER_J30`
+
 ---
 
 ### Commandes de sync
@@ -385,6 +410,8 @@ Les migrations Drizzle sont appliquées au déploiement via le hook `postdeploy`
 | `0 4 1 * *` | `sync rents` | 1er du mois à 4h |
 | `10 4 1 * *` | `sync students` | 1er du mois à 4h10 |
 | `0 3 * * *` | `sync stats` | Tous les jours à 3h |
+| `0 8 * * *` | `send-owner-availability-reminder --days 7` | Tous les jours à 8h |
+| `0 8 * * *` | `send-owner-availability-reminder --days 30` | Tous les jours à 8h |
 
 Pour vérifier les crons actifs : `scalingo --app <app> cron-tasks`
 Pour voir les logs d'exécution : `scalingo --app <app> logs --filter cron`
@@ -410,6 +437,9 @@ Toutes les variables sont dans `.env.dist`. Celles spécifiques au CLI :
 | `FAC_HABITAT_SFTP_PASSWORD` | `import fac-habitat` |
 | `FAC_HABITAT_SFTP_PORT` | `import fac-habitat` |
 | `S3_*` | `import arpej-ibail`, `import csv`, `import fac-habitat`, `upload-images`, `audit-storage` |
+| `BREVO_API_KEY` | `send-owner-availability-reminder` |
+| `BREVO_TEMPLATE_OWNER_AVAILABILITY_REMINDER` | `send-owner-availability-reminder --days 7` |
+| `BREVO_TEMPLATE_OWNER_AVAILABILITY_REMINDER_J30` | `send-owner-availability-reminder --days 30` |
 
 ## Architecture
 

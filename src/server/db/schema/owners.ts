@@ -1,4 +1,4 @@
-import { bigint, boolean, customType, pgTable, varchar } from 'drizzle-orm/pg-core'
+import { bigint, boolean, customType, pgTable, timestamp, varchar } from 'drizzle-orm/pg-core'
 
 const bytea = customType<{ data: Buffer; driverData: Buffer }>({
   dataType() {
@@ -13,4 +13,6 @@ export const owners = pgTable('account_owner', {
   url: varchar({ length: 500 }),
   image: bytea('image'),
   acceptDossierFacileApplications: boolean('accept_dossier_facile_applications').notNull().default(false),
+  availabilityReminderSentAt: timestamp('availability_reminder_sent_at', { withTimezone: true }),
+  availabilityReminderJ30SentAt: timestamp('availability_reminder_j30_sent_at', { withTimezone: true }),
 })

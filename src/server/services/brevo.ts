@@ -66,3 +66,17 @@ export async function sendOwnerWelcomeEmail(email: string): Promise<void> {
     templateId: env.BREVO_TEMPLATE_OWNER_WELCOME,
   })
 }
+
+export async function sendOwnerAvailabilityReminderEmail(email: string): Promise<void> {
+  await sendTemplateEmail({
+    to: email,
+    templateId: env.BREVO_TEMPLATE_OWNER_AVAILABILITY_REMINDER,
+  })
+}
+
+export async function sendOwnerAvailabilityReminderJ30Email(email: string): Promise<void> {
+  await sendTemplateEmail({
+    to: email,
+    templateId: env.BREVO_TEMPLATE_OWNER_AVAILABILITY_REMINDER_J30,
+  })
+}
