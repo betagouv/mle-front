@@ -750,6 +750,7 @@
       "ownerCta": "Prendre rendez-vous"
     },
     "success": "Si un compte est associé à cette adresse e-mail, vous recevrez un lien sur cette adresse.",
+    "activated": "Votre compte a bien été activé, connectez-vous avec votre adresse email et le mot de passe que vous venez de créer.",
     "unverified": {
       "title": "Compte non confirmé",
       "description": "Votre compte n'a pas encore été confirmé par email. Cliquez sur le bouton ci-dessous pour recevoir un nouvel email de confirmation.",

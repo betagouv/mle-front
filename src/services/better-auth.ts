@@ -66,7 +66,9 @@ export const auth = betterAuth({
       await sendVerificationEmail(user.email, url)
     },
     sendOnSignUp: true,
-    autoSignInAfterVerification: true,
+    // Ne pas connecter automatiquement après activation : l'étudiant atterrit sur
+    // la page de connexion (réassurance) et se connecte avec le mot de passe créé.
+    autoSignInAfterVerification: false,
   },
   plugins: [
     magicLink({
