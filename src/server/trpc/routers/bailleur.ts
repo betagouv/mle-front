@@ -18,7 +18,8 @@ import { dossierFacileApplications, dossierFacileDocuments, dossierFacileTenants
 import { owners } from '~/server/db/schema/owners'
 import { classifyActions, computeDiff } from '~/server/services/accommodation-diff'
 import { logActivity } from '~/server/services/activity-logger'
-import { sendOwnerWelcomeEmail } from '~/server/services/brevo'
+import { sendOwnerWelcomeEmail, syncBrevoDataUpdated, syncBrevoOwnerCreated } from '~/server/services/brevo'
+
 import { computeDerivedFields, generateSlug, geocodeAddress } from '~/server/trpc/utils/accommodation-helpers'
 import { AVAILABILITY_FIELD_MAP, mapFields, UPDATE_FIELD_MAP } from '~/server/trpc/utils/field-mapping'
 import { resolveCityId } from '~/server/trpc/utils/resolve-city'
@@ -565,6 +566,28 @@ export const bailleurRouter = createTRPCRouter({
         }
       }
 
+      // Sync Brevo : si toutes les résidences du owner ont au moins une dispo renseignée
+      try {
+        if (!owner) throw new Error('Owner introuvable pour la sync Brevo')
+
+        const residencesWithoutAvailability = await db
+          .select({ slug: accommodations.slug })
+          .from(accommodations)
+          .where(
+            and(
+              eq(accommodations.ownerId, owner.id),
+              sql`coalesce(${accommodations.nbT1Available}, ${accommodations.nbT1BisAvailable}, ${accommodations.nbT2Available}, ${accommodations.nbT3Available}, ${accommodations.nbT4Available}, ${accommodations.nbT5Available}, ${accommodations.nbT6Available}, ${accommodations.nbT7MoreAvailable}) IS NULL`,
+            ),
+          )
+          .limit(1)
+
+        if (residencesWithoutAvailability.length === 0) {
+          await syncBrevoDataUpdated(ctx.session.user.email)
+        }
+      } catch (err) {
+        console.error('Erreur sync Brevo DATE_DERNIERE_MAJ_DONNEES', err)
+      }
+
       return updated
     }),
 
@@ -933,6 +956,7 @@ export const bailleurRouter = createTRPCRouter({
 
         try {
           await sendOwnerWelcomeEmail(created.email)
+          await syncBrevoOwnerCreated(created.email)
         } catch (err) {
           console.error('Erreur envoi email bienvenue gestionnaire', err)
         }
