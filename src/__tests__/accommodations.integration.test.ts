@@ -809,6 +809,7 @@ describe('accommodations.getBySlug', () => {
       name: 'CROUS',
       slug: 'crous',
       url: 'https://crous.fr',
+      landing_url: null,
       image_base64: null,
       accept_dossier_facile_applications: false,
     })
