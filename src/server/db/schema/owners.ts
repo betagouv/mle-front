@@ -11,6 +11,7 @@ export const owners = pgTable('account_owner', {
   name: varchar({ length: 200 }).notNull(),
   slug: varchar({ length: 255 }).notNull().unique(),
   url: varchar({ length: 500 }),
+  landingUrl: varchar('landing_url', { length: 500 }),
   image: bytea('image'),
   acceptDossierFacileApplications: boolean('accept_dossier_facile_applications').notNull().default(false),
 })

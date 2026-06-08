@@ -14,7 +14,7 @@ export const useAdminCreateOwner = () => {
   const t = useTranslations('toast')
 
   return useMutation({
-    mutationFn: (data: { name: string; url?: string }) => trpcClient.admin.owners.create.mutate(data),
+    mutationFn: (data: { name: string; url?: string; landingUrl?: string }) => trpcClient.admin.owners.create.mutate(data),
     onSuccess: async (created) => {
       await queryClient.invalidateQueries({ queryKey: trpc.admin.owners.list.queryKey() })
       createToast({ priority: 'success', message: t('ownerCreated') })

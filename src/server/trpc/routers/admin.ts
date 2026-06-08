@@ -427,6 +427,7 @@ const ownersRouter = createTRPCRouter({
       z.object({
         name: z.string().min(1),
         url: z.string().url().optional(),
+        landingUrl: z.string().url().optional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -438,6 +439,7 @@ const ownersRouter = createTRPCRouter({
           name: input.name,
           slug,
           url: input.url ?? null,
+          landingUrl: input.landingUrl ?? null,
         })
         .returning()
 
@@ -451,6 +453,7 @@ const ownersRouter = createTRPCRouter({
         id: z.number(),
         name: z.string().min(1).optional(),
         url: z.string().url().nullable().optional(),
+        landingUrl: z.string().url().nullable().optional(),
         acceptDossierFacileApplications: z.boolean().optional(),
       }),
     )
@@ -460,6 +463,7 @@ const ownersRouter = createTRPCRouter({
 
       if (fields.name !== undefined) updateData.name = fields.name
       if (fields.url !== undefined) updateData.url = fields.url
+      if (fields.landingUrl !== undefined) updateData.landingUrl = fields.landingUrl
       if (fields.acceptDossierFacileApplications !== undefined)
         updateData.acceptDossierFacileApplications = fields.acceptDossierFacileApplications
 

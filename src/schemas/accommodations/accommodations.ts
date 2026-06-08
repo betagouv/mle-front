@@ -152,6 +152,7 @@ export const ZAccomodationDetails = ZBaseAccommodationInfo.extend(ZApartmentCoun
         name: z.string().max(150),
         slug: z.string().max(250),
         url: z.string().max(500),
+        landing_url: z.string().max(500).nullable(),
         accept_dossier_facile_applications: z.boolean(),
       })
       .nullable(),

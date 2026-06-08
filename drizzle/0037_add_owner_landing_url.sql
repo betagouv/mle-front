@@ -1,0 +1,1 @@
+ALTER TABLE "account_owner" ADD COLUMN "landing_url" varchar(500);

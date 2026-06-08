@@ -186,6 +186,7 @@
     "socialHousingRequiredLink": "Faire une demande de logement social.",
     "descriptionTitle": "À propos du logement étudiant {title}",
     "title": "Logement étudiant {title} {cityFormatted}",
+    "managedBy": "Résidence étudiante gérée par le gestionnaire <manager>{managerName}</manager>",
     "tags": {
       "studio": "Studio",
       "shared": "Colocation",

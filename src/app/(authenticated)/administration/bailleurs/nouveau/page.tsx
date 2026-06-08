@@ -8,7 +8,7 @@ export default function NewOwnerPage() {
   const createOwner = useAdminCreateOwner()
 
   const handleSubmit = async (data: TOwnerFormData) => {
-    await createOwner.mutateAsync({ name: data.name, url: data.url || undefined })
+    await createOwner.mutateAsync({ name: data.name, url: data.url || undefined, landingUrl: data.landingUrl || undefined })
   }
 
   return (
