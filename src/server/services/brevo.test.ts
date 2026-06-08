@@ -145,4 +145,61 @@ describe('brevo service', () => {
       expect(body.params).toBeUndefined()
     })
   })
+
+  describe('syncBrevoOwnerCreated', () => {
+    it('sends COMPTE_ESPACE_GESTIONNAIRE attribute when contacts URL is set', async () => {
+      vi.stubEnv('BREVO_CONTACTS_API_URL', 'https://api.brevo.com/v3/contacts')
+      const { syncBrevoOwnerCreated } = await import('./brevo')
+
+      await syncBrevoOwnerCreated('owner@test.com')
+
+      expect(fetchMock).toHaveBeenCalledOnce()
+      const [url, options] = fetchMock.mock.calls[0]
+      expect(url).toBe('https://api.brevo.com/v3/contacts')
+      expect(options.method).toBe('POST')
+
+      const body = JSON.parse(options.body)
+      expect(body).toEqual({
+        email: 'owner@test.com',
+        attributes: { COMPTE_ESPACE_GESTIONNAIRE: true },
+        updateEnabled: true,
+      })
+    })
+
+    it('skips API call when contacts URL is not set', async () => {
+      vi.stubEnv('BREVO_CONTACTS_API_URL', '')
+      const { syncBrevoOwnerCreated } = await import('./brevo')
+
+      await syncBrevoOwnerCreated('owner@test.com')
+
+      expect(fetchMock).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('syncBrevoDataUpdated', () => {
+    it('sends DATE_DERNIERE_MAJ_DONNEES attribute when contacts URL is set', async () => {
+      vi.stubEnv('BREVO_CONTACTS_API_URL', 'https://api.brevo.com/v3/contacts')
+      const { syncBrevoDataUpdated } = await import('./brevo')
+
+      await syncBrevoDataUpdated('owner@test.com')
+
+      expect(fetchMock).toHaveBeenCalledOnce()
+      const [url, options] = fetchMock.mock.calls[0]
+      expect(url).toBe('https://api.brevo.com/v3/contacts')
+
+      const body = JSON.parse(options.body)
+      expect(body.email).toBe('owner@test.com')
+      expect(body.attributes.DATE_DERNIERE_MAJ_DONNEES).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+      expect(body.updateEnabled).toBe(true)
+    })
+
+    it('skips API call when contacts URL is not set', async () => {
+      vi.stubEnv('BREVO_CONTACTS_API_URL', '')
+      const { syncBrevoDataUpdated } = await import('./brevo')
+
+      await syncBrevoDataUpdated('owner@test.com')
+
+      expect(fetchMock).not.toHaveBeenCalled()
+    })
+  })
 })

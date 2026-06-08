@@ -26,6 +26,7 @@ export default defineConfig({
             AUTH_SECRET: 'test-secret',
             DATABASE_URL: 'postgres://test:test@localhost:5432/test',
             BREVO_API_KEY: 'test-brevo-key',
+
             BREVO_TEMPLATE_MAGIC_LINK: '1',
             BREVO_TEMPLATE_VALIDATION: '1',
             BREVO_TEMPLATE_RESET_PASSWORD: '1',
@@ -60,6 +61,7 @@ export default defineConfig({
             AUTH_SECRET: 'test-secret-for-integration-tests',
             DATABASE_URL: 'postgres://test:test@localhost:5491/mle_test',
             BREVO_API_KEY: 'test-brevo-api-key',
+
             BREVO_TEMPLATE_MAGIC_LINK: '1',
             BREVO_TEMPLATE_VALIDATION: '1',
             BREVO_TEMPLATE_RESET_PASSWORD: '1',
