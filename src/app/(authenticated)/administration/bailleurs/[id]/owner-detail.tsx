@@ -91,6 +91,7 @@ export function OwnerDetail({ id }: { id: string }) {
       id: ownerId,
       name: data.name,
       url: data.url || undefined,
+      landingUrl: data.landingUrl || undefined,
       acceptDossierFacileApplications: data.acceptDossierFacileApplications,
     })
   }
@@ -195,6 +196,7 @@ export function OwnerDetail({ id }: { id: string }) {
                     defaultValues={{
                       name: ownerData.name,
                       url: ownerData.url ?? '',
+                      landingUrl: ownerData.landingUrl ?? '',
                       acceptDossierFacileApplications: ownerData.acceptDossierFacileApplications,
                     }}
                     onSubmit={handleSubmit}
