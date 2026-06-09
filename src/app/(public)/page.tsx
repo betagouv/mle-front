@@ -1,6 +1,5 @@
 import { colors } from '@codegouvfr/react-dsfr'
 import { getTranslations } from 'next-intl/server'
-import { AlertSection } from '~/components/home/alert/alert-section'
 import { CitiesSection } from '~/components/home/cities/cities'
 import { FacilitateSection } from '~/components/home/facilitate/facilitate'
 import { FAQSection } from '~/components/home/faq/faq'
@@ -45,7 +44,8 @@ export default async function Home() {
         }}
       >
         <HeroSection />
-        <AlertSection />
+        {/* TODO REACTIVATE IN 2K27 WITH NEW DATES
+        <AlertSection /> */}
         <FeaturesSection />
         <CitiesSection />
       </div>
