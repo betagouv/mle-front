@@ -608,6 +608,10 @@
       "title": "Réalisez votre Dossier Social Étudiant (DSE) sur <underline>messervices.étudiant.gouv.fr</underline> avant le 31 mai 2026",
       "description": "Cela permet un traitement optimal de votre dossier et vous assure, si vous êtes éligible, le versement de votre bourse dès la rentrée de septembre. Par ailleurs, les dossiers complétés et validés avant cette date sont prioritaires pour l'attribution d'un logement Crous."
     },
+    "crousAlert": {
+      "title": "Étudiants boursiers, faites votre demande de logement Crous.",
+      "description": "Les demandes de logement Crous ne se font pas sur Mon Logement Étudiant. Le premier tour d'attribution réservé aux étudiants a lieu du 5 mai au 29 juin sur <link>trouverunlogement.lescrous.fr</link>."
+    },
     "header": {
       "rangeLabel": "Budget maximum"
     },
