@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import Image from 'next/image'
+import Link from 'next/link'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { ConsultOfferButton } from '~/components/find-student-accomodation/owner-details/consult-offer-button'
 import { DossierFacileLinkButton } from '~/components/find-student-accomodation/owner-details/dossier-facile-candidate-button'
@@ -64,7 +65,13 @@ export const OwnerDetails = async ({
         )}
         <span>{t('sidebar.proposedBy')}</span>
         {owner?.image_base64 ? (
-          <Image className={styles.image} src={owner.image_base64} alt={owner.name} width={201} height={90} quality={100} />
+          owner.landing_url ? (
+            <Link className="fr-link fr-link--no-underline" href={owner.landing_url} target="_blank" rel="noreferrer">
+              <Image className={styles.image} src={owner.image_base64} alt={owner.name} width={201} height={90} quality={100} />
+            </Link>
+          ) : (
+            <Image className={styles.image} src={owner.image_base64} alt={owner.name} width={201} height={90} quality={100} />
+          )
         ) : (
           <h3 className="fr-m-0">{owner?.name}</h3>
         )}
