@@ -79,6 +79,28 @@ export async function sendAdminResetPasswordEmail(email: string): Promise<void> 
   })
 }
 
+export async function sendStudentAlertEmail(
+  email: string,
+  // TODO : adapt to template variables
+  params: { firstName: string; acccomodations: { nom: string; url: string }[] },
+): Promise<void> {
+  const response = await fetch(env.BREVO_API_URL, {
+    method: 'POST',
+    headers: brevoHeaders,
+    body: JSON.stringify({
+      to: [{ email }],
+      templateId: env.BREVO_TEMPLATE_STUDENT_ALERT,
+      replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      params,
+    }),
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    throw new Error(`Brevo student alert email failed: ${response.status} ${error}`)
+  }
+}
+
 // --- Brevo Contacts ---
 type BrevoOwnerCreated = {
   COMPTE_ESPACE_GESTIONNAIRE: true

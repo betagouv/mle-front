@@ -7,6 +7,7 @@ import { importCrousSurfaces } from './commands/import-crous-surfaces'
 import { importCrousTypologies } from './commands/import-crous-typologies'
 import { migrate } from './commands/migrate'
 import { migrateUsers } from './commands/migrate-users'
+import { sendAlertJobs } from './commands/send-alert-jobs'
 import { auditStorage } from './commands/storage/auditStorage'
 import { uploadImages } from './commands/upload-images'
 import { runImport, runSync } from './factory'
@@ -115,5 +116,12 @@ program
   .option('--verbose', 'Afficher le détail de chaque problème')
   .option('--write', 'Appliquer les corrections (URLs cassées retirées de la base, fichiers orphelins supprimés de S3)')
   .action((opts) => auditStorage(opts))
+
+program
+  .command('send-alert-jobs')
+  .description("Batcher envoyant les emails d'alertes aux étudiants")
+  .option('--dry-run', 'Simuler sans envoyer ni modifier la BDD')
+  .option('--verbose', 'Afficher le détail par utilisateur')
+  .action((opts) => sendAlertJobs(opts))
 
 program.parse()
