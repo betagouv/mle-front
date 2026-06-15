@@ -616,8 +616,8 @@
       "rangeLabel": "Budget maximum"
     },
     "hero": {
-      "title": "Trouvez votre prochaine",
-      "titleHighlight": "résidence sociale étudiante",
+      "title": "Trouvez votre prochain",
+      "titleHighlight": "logement social étudiant",
       "counter": "Plus de <strong>60 000 logements</strong> déjà référencés",
       "illustrationAlt": "Étudiant travaillant sur son ordinateur"
     },
@@ -1218,9 +1218,9 @@
         "targetAudienceEtudiantsHint": "Étudiants y compris stagiaires, alternants et étudiants salariés.",
         "targetAudienceMixteLabel": "Résidence pour étudiants et jeunes actifs",
         "targetAudienceMixteHint": "Étudiants, alternants, stagiaires et jeunes salariés.",
-        "targetAudienceDiffusEtudiantsLabel": "Diffus - uniquement étudiants",
+        "targetAudienceDiffusEtudiantsLabel": "Logements diffus pour étudiants",
         "targetAudienceDiffusEtudiantsHint": "Logements étudiants au sein d'une résidence de logement social, attribués uniquement à des étudiants.",
-        "targetAudienceDiffusMixteLabel": "Diffus - étudiants et jeunes actifs",
+        "targetAudienceDiffusMixteLabel": "Logements diffus pour étudiants et jeunes actifs",
         "targetAudienceDiffusMixteHint": "Logements étudiants au sein d'une résidence de logement social, pour étudiants et jeunes actifs.",
         "typologyTab": {
           "housingType": "Type de logement",
