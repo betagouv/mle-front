@@ -295,8 +295,8 @@
         "departments": "Départements"
       }
     },
-    "title": "Trouver un logement étudiant",
-    "titleWithLocation": "Trouver un logement étudiant {locationFormatted}",
+    "title": "Trouver un logement social étudiant",
+    "titleWithLocation": "Trouver un logement social étudiant {locationFormatted}",
     "header": {
       "inputLabel": "Ville, académie ou département",
       "shared": "Colocation",
