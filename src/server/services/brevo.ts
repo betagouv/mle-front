@@ -89,8 +89,6 @@ type BrevoDataUpdated = {
 }
 
 async function updateBrevoContactAttributes(email: string, attributes: BrevoDataUpdated | BrevoOwnerCreated): Promise<void> {
-  if (!env.BREVO_CONTACTS_API_URL) return
-
   const response = await fetch(env.BREVO_CONTACTS_API_URL, {
     method: 'POST',
     headers: brevoHeaders,
