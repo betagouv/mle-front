@@ -82,6 +82,7 @@ export async function sendAdminResetPasswordEmail(email: string): Promise<void> 
 // --- Brevo Contacts ---
 type BrevoOwnerCreated = {
   COMPTE_ESPACE_GESTIONNAIRE: true
+  DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE: string
 }
 type BrevoDataUpdated = {
   DATE_DERNIERE_MAJ_DONNEES: string
@@ -109,6 +110,7 @@ async function updateBrevoContactAttributes(email: string, attributes: BrevoData
 export async function syncBrevoOwnerCreated(email: string): Promise<void> {
   await updateBrevoContactAttributes(email, {
     COMPTE_ESPACE_GESTIONNAIRE: true,
+    DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE: new Date().toISOString().split('T')[0],
   })
 }
 
