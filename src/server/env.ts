@@ -78,9 +78,9 @@ const envSchema = z.object({
   IBAIL_API_AUTH_KEY: requiredInProd,
   IBAIL_API_AUTH_SECRET: requiredInProd,
 
-  // Crisp Helpdesk
-  CRISP_BASIC_AUTH: requiredInProd,
-  CRISP_BASE_URL: requiredInProdUrl,
+  // WordPress FAQ (Espace Gestionnaire)
+  WP_FAQ_URL: z.url(),
+  WP_FAQ_PAGE_ID: z.coerce.number().int().positive(),
 })
 
 export const env = envSchema.parse(process.env)
