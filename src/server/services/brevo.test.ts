@@ -117,7 +117,7 @@ describe('brevo service', () => {
     it('uses template ID 40 without params', async () => {
       const { sendOwnerWelcomeEmail } = await import('./brevo')
 
-      await sendOwnerWelcomeEmail('owner@test.com')
+      await sendOwnerWelcomeEmail('owner@test.com', { firstname: 'Jean', lastname: 'Dupont' })
 
       const body = JSON.parse(fetchMock.mock.calls[0][1].body)
       expect(body).toEqual({
@@ -151,7 +151,7 @@ describe('brevo service', () => {
       vi.stubEnv('BREVO_CONTACTS_API_URL', 'https://api.brevo.com/v3/contacts')
       const { syncBrevoOwnerCreated } = await import('./brevo')
 
-      await syncBrevoOwnerCreated('owner@test.com')
+      await syncBrevoOwnerCreated('owner@test.com', { firstname: 'Jean', lastname: 'Dupont' })
 
       expect(fetchMock).toHaveBeenCalledOnce()
       const [url, options] = fetchMock.mock.calls[0]

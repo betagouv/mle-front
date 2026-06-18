@@ -149,7 +149,7 @@ const usersRouter = createTRPCRouter({
 
       if (created.role === 'owner') {
         try {
-          await sendOwnerWelcomeEmail(created.email)
+          await sendOwnerWelcomeEmail(created.email, { firstname: input.firstname, lastname: input.lastname })
         } catch (err) {
           console.error('Erreur envoi email bienvenue gestionnaire', err)
         }

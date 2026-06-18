@@ -18,7 +18,7 @@ import { dossierFacileApplications, dossierFacileDocuments, dossierFacileTenants
 import { owners } from '~/server/db/schema/owners'
 import { classifyActions, computeDiff } from '~/server/services/accommodation-diff'
 import { logActivity } from '~/server/services/activity-logger'
-import { sendOwnerWelcomeEmail, syncBrevoDataUpdated, syncBrevoOwnerCreated } from '~/server/services/brevo'
+import { sendOwnerWelcomeEmail, syncBrevoDataUpdated } from '~/server/services/brevo'
 
 import { computeDerivedFields, generateSlug, geocodeAddress } from '~/server/trpc/utils/accommodation-helpers'
 import { AVAILABILITY_FIELD_MAP, mapFields, UPDATE_FIELD_MAP } from '~/server/trpc/utils/field-mapping'
@@ -955,8 +955,7 @@ export const bailleurRouter = createTRPCRouter({
           .returning()
 
         try {
-          await sendOwnerWelcomeEmail(created.email)
-          await syncBrevoOwnerCreated(created.email)
+          await sendOwnerWelcomeEmail(created.email, { firstname: input.firstname, lastname: input.lastname })
         } catch (err) {
           console.error('Erreur envoi email bienvenue gestionnaire', err)
         }

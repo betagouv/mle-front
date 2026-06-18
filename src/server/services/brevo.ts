@@ -64,12 +64,15 @@ export async function sendOwnerAccountActivated(email: string, url: string): Pro
   })
 }
 
-export async function sendOwnerWelcomeEmail(email: string): Promise<void> {
+export async function sendOwnerWelcomeEmail(
+  email: string,
+  { firstname, lastname }: { firstname: string; lastname: string },
+): Promise<void> {
   await sendTemplateEmail({
     to: email,
     templateId: env.BREVO_TEMPLATE_OWNER_WELCOME,
   })
-  await syncBrevoOwnerCreated(email)
+  await syncBrevoOwnerCreated(email, { firstname, lastname })
 }
 
 export async function sendAdminResetPasswordEmail(email: string): Promise<void> {
@@ -83,6 +86,8 @@ export async function sendAdminResetPasswordEmail(email: string): Promise<void> 
 type BrevoOwnerCreated = {
   COMPTE_ESPACE_GESTIONNAIRE: true
   DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE: string
+  NOM: string
+  PRENOM: string
 }
 type BrevoDataUpdated = {
   DATE_DERNIERE_MAJ_DONNEES: string
@@ -105,10 +110,15 @@ async function updateBrevoContactAttributes(email: string, attributes: BrevoData
   }
 }
 
-export async function syncBrevoOwnerCreated(email: string): Promise<void> {
+export async function syncBrevoOwnerCreated(
+  email: string,
+  { firstname, lastname }: { firstname: string; lastname: string },
+): Promise<void> {
   await updateBrevoContactAttributes(email, {
     COMPTE_ESPACE_GESTIONNAIRE: true,
     DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE: new Date().toISOString().split('T')[0],
+    NOM: lastname,
+    PRENOM: firstname,
   })
 }
 
