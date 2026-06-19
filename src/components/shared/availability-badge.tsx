@@ -21,14 +21,12 @@ export function AvailabilityBadge({
   context = 'public',
 }: AvailabilityBadgeProps) {
   if (nbAvailable === null || nbAvailable === undefined) {
-    if (context === 'owner') {
-      return (
-        <Badge severity="warning" noIcon className={className} as={as}>
-          <span className="fr-text--uppercase fr-mb-0">{unknownAvailabilityText}</span>
-        </Badge>
-      )
-    }
-    return null
+    if (!unknownAvailabilityText) return null
+    return (
+      <Badge noIcon className={className} as={as}>
+        <span className="fr-text--uppercase fr-mb-0">{unknownAvailabilityText}</span>
+      </Badge>
+    )
   }
 
   if (nbAvailable === 0) {

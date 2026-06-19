@@ -91,6 +91,7 @@ export function OwnerDetail({ id }: { id: string }) {
       id: ownerId,
       name: data.name,
       url: data.url || undefined,
+      landingUrl: data.landingUrl || undefined,
       acceptDossierFacileApplications: data.acceptDossierFacileApplications,
     })
   }
@@ -101,6 +102,7 @@ export function OwnerDetail({ id }: { id: string }) {
 
   const userCount = ownerData.users?.length ?? 0
   const accCount = accommodationsData?.length ?? 0
+  const totalLogements = (accommodationsData ?? []).reduce((sum, a) => sum + (a.nbTotalApartments ?? 0), 0)
 
   return (
     <>
@@ -136,15 +138,19 @@ export function OwnerDetail({ id }: { id: string }) {
             <div className={styles.kpiLabel}>Résidence{sPluriel(accCount)}</div>
           </div>
           <div className={styles.kpiItem}>
-            <div className={styles.kpiValue}>{userCount}</div>
-            <div className={styles.kpiLabel}>
-              Utilisateur{sPluriel(userCount)} rattaché{sPluriel(userCount)}
-            </div>
+            <div className={styles.kpiValue}>{totalLogements}</div>
+            <div className={styles.kpiLabel}>Logement{sPluriel(totalLogements)}</div>
           </div>
           <div className={styles.kpiItem}>
             <div className={styles.kpiValue}>{(accommodationsData ?? []).reduce((sum, a) => sum + (a.nbAvailableApartments ?? 0), 0)}</div>
             <div className={styles.kpiLabel}>
               Disponible{sPluriel((accommodationsData ?? []).reduce((sum, a) => sum + (a.nbAvailableApartments ?? 0), 0))}
+            </div>
+          </div>
+          <div className={styles.kpiItem}>
+            <div className={styles.kpiValue}>{userCount}</div>
+            <div className={styles.kpiLabel}>
+              Utilisateur{sPluriel(userCount)} rattaché{sPluriel(userCount)}
             </div>
           </div>
         </div>
@@ -190,6 +196,7 @@ export function OwnerDetail({ id }: { id: string }) {
                     defaultValues={{
                       name: ownerData.name,
                       url: ownerData.url ?? '',
+                      landingUrl: ownerData.landingUrl ?? '',
                       acceptDossierFacileApplications: ownerData.acceptDossierFacileApplications,
                     }}
                     onSubmit={handleSubmit}

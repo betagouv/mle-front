@@ -1,5 +1,6 @@
 'use client'
 
+import { useQuery } from '@tanstack/react-query'
 import type L from 'leaflet'
 import { FC, useEffect, useMemo } from 'react'
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
@@ -7,10 +8,15 @@ import { tss } from 'tss-react'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import 'leaflet-defaulticon-compatibility'
-import { parseAsString, useQueryStates } from 'nuqs'
+import { usePathname } from 'next/navigation'
+import { parseAsBoolean, parseAsString, useQueryState, useQueryStates } from 'nuqs'
 import { useAccomodations } from '~/hooks/use-accomodations'
+import { useTRPC } from '~/server/trpc/client'
 
-const BoundsHandler: FC<{ markerPositions: L.LatLngTuple[] }> = ({ markerPositions }) => {
+const BoundsHandler: FC<{ markerPositions: L.LatLngTuple[]; cityBounds?: L.LatLngBoundsExpression }> = ({
+  markerPositions,
+  cityBounds,
+}) => {
   const map = useMap()
   const [queryStates, setQueryStates] = useQueryStates({
     bbox: parseAsString,
@@ -27,10 +33,12 @@ const BoundsHandler: FC<{ markerPositions: L.LatLngTuple[] }> = ({ markerPositio
       ])
     } else if (markerPositions.length > 0) {
       map.fitBounds(markerPositions, { padding: [20, 20] })
+    } else if (cityBounds) {
+      map.fitBounds(cityBounds, { padding: [50, 50] })
     } else {
       map.setView([46.5, 2.4], 6)
     }
-  }, [queryStates.bbox, markerPositions, map])
+  }, [queryStates.bbox, markerPositions, cityBounds, map])
 
   useMapEvents({
     dragend: (e) => {
@@ -128,6 +136,28 @@ export const AccomodationsMap: FC = () => {
     id: parseAsString,
   })
 
+  const pathname = usePathname()
+  const [rechercheParCarte] = useQueryState('recherche-par-carte', parseAsBoolean)
+  const isMapSearch = !!rechercheParCarte
+
+  const pathSegments = pathname.split('/')
+  const villeIndex = pathSegments.indexOf('ville')
+  const citySlugFromPath = villeIndex !== -1 ? decodeURIComponent(pathSegments[villeIndex + 1] ?? '') || undefined : undefined
+  const effectiveCitySlug = citySlugFromPath && !isMapSearch ? citySlugFromPath : undefined
+
+  const trpc = useTRPC()
+  const { data: territory } = useQuery({
+    ...trpc.territories.getBySlug.queryOptions({ type: 'ville', slug: effectiveCitySlug! }),
+    enabled: !!effectiveCitySlug,
+  })
+
+  const cityBounds: L.LatLngBoundsExpression | undefined = territory?.bbox
+    ? [
+        [territory.bbox.ymin, territory.bbox.xmin],
+        [territory.bbox.ymax, territory.bbox.xmax],
+      ]
+    : undefined
+
   const { data: accommodations } = useAccomodations()
 
   const accommodationsData = accommodations?.results.features || []
@@ -162,12 +192,12 @@ export const AccomodationsMap: FC = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <BoundsHandler markerPositions={markerPositions} />
+        <BoundsHandler markerPositions={markerPositions} cityBounds={cityBounds} />
         <CustomZoomControls />
         {markers}
       </MapContainer>
     )
-  }, [markers, markerPositions, queryStates.bbox])
+  }, [markers, markerPositions, cityBounds, queryStates.bbox])
 
   return memoizedMap
 }

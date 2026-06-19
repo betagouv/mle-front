@@ -1,0 +1,20 @@
+.ellipsis {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Le <select> transparent est superposé à l'ellipse « … » pour la rendre cliquable
+   tout en conservant l'apparence du composant DSFR. */
+.select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}

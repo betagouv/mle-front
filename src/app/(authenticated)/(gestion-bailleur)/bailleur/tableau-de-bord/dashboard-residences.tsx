@@ -1,11 +1,11 @@
 'use client'
 
 import Badge from '@codegouvfr/react-dsfr/Badge'
-import Pagination from '@codegouvfr/react-dsfr/Pagination'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { ResidenceChart } from '~/app/(authenticated)/(gestion-bailleur)/bailleur/tableau-de-bord/chart'
+import { Pagination } from '~/components/ui/pagination'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
 import { calculateAvailability } from '~/utils/calculateAvailability'
 import { buildHref } from '~/utils/preserve-query-params'

@@ -177,7 +177,7 @@
       "noAvailabilityTitle": "Aucune disponibilité pour le moment",
       "noAvailabilityDescription": "Les logements sont actuellement complets, mais de nouvelles places peuvent se libérer à tout moment.",
       "maximiseChancesTitle": "Augmentez vos chances d’avoir un logement",
-      "maximiseChancesDescription": "Cette résidence n’a pas communiqué de disponibilités pour le moment. Nous vous invitons à consulter l'offre et à déposer votre dossier sur le site du bailleur, afin qu’il soit examiné dès qu’un logement se libère."
+      "maximiseChancesDescription": "Cette résidence n’a pas communiqué de disponibilités pour le moment. Nous vous invitons à consulter l'offre et à déposer votre dossier sur le site du gestionnaire, afin qu’il soit examiné dès qu’un logement se libère."
     },
     "equipments": {
       "title": "Équipements"
@@ -186,6 +186,7 @@
     "socialHousingRequiredLink": "Faire une demande de logement social.",
     "descriptionTitle": "À propos du logement étudiant {title}",
     "title": "Logement étudiant {title} {cityFormatted}",
+    "managedBy": "Résidence étudiante gérée par le gestionnaire <manager>{managerName}</manager>",
     "tags": {
       "studio": "Studio",
       "shared": "Colocation",
@@ -193,6 +194,7 @@
       "priceFrom": "À partir de {price} €"
     },
     "charges": "Charges comprises",
+    "perPerson": "Par personne",
     "rentalChargesDetails": "Ce qui est compris dans les charges locatives",
     "availableAccommodations": "Logements de la résidence étudiante",
     "availableAccommodationsCount": "{count} logements dans la résidence étudiante",
@@ -244,6 +246,16 @@
     "simulator": "Des aides au logement peuvent diminuer le coût du logement.",
     "simulatorDescription": "Effectuez une simulation pour savoir si vous êtes éligible.",
     "simulatorButton": "Simulateur",
+    "fjtRsjaNoticeText": "Les Foyers de Jeunes Travailleurs (FJT) et les Résidences Sociales Jeunes Actifs (RSJA) n'ont pas vocation à accueillir prioritairement des étudiants,",
+    "fjtRsjaNoticeDescription": "mais des jeunes actifs en situation appelant des réponses davantage sociales (de façon privilégiée de 16 à 25 ans pour les FJT, de 18 à 30 ans pour les RSJA).",
+    "fjtRsjaLearnMore": "En savoir plus",
+    "fjtRsjaModalTitle": "FJT et RSJA",
+    "fjtRsjaModalParagraph1": "Cependant, en fonction des places disponibles, il est possible pour des étudiants d'y être acceptés. Les étudiants alternants et salariés peuvent être considérés comme des jeunes actifs.",
+    "fjtRsjaModalParagraph2": "En tout état de cause, au-delà du public-socle des FJT, la circulaire CNAF du 14 octobre 2020 précise que les jeunes âgés de 26 à 30 ans, les jeunes étudiants non-salariés ou les jeunes scolarisés (notamment les lycéens) et les apprentis de moins de 16 ans devront représenter globalement, au maximum, 35 % du public logé en FJT au cours de l'année.",
+    "fjtRsjaModalClose": "J'ai compris",
+    "diffusMixteNoticeTitle": "Ces logements étudiants sont situés dans une ou plusieurs résidences de logement social où vivent aussi des familles.",
+    "diffusMixteNoticeDescription": "Il ne s'agit pas de résidences étudiantes dédiées : seuls certains logements peuvent être attribués à des étudiants.",
+    "diffusEtudiantsNoticeTitle": "Ces logements étudiants sont situés dans une ou plusieurs résidences de logement social dédiées uniquement aux étudiants.",
     "card": {
       "availability": "Disponibilité",
       "noAvailability": "Aucune disponibilité",
@@ -283,8 +295,8 @@
         "departments": "Départements"
       }
     },
-    "title": "Trouver un logement étudiant",
-    "titleWithLocation": "Trouver un logement étudiant {locationFormatted}",
+    "title": "Trouver un logement social étudiant",
+    "titleWithLocation": "Trouver un logement social étudiant {locationFormatted}",
     "header": {
       "inputLabel": "Ville, académie ou département",
       "shared": "Colocation",
@@ -596,12 +608,16 @@
       "title": "Réalisez votre Dossier Social Étudiant (DSE) sur <underline>messervices.étudiant.gouv.fr</underline> avant le 31 mai 2026",
       "description": "Cela permet un traitement optimal de votre dossier et vous assure, si vous êtes éligible, le versement de votre bourse dès la rentrée de septembre. Par ailleurs, les dossiers complétés et validés avant cette date sont prioritaires pour l'attribution d'un logement Crous."
     },
+    "crousAlert": {
+      "title": "Étudiants boursiers, faites votre demande de logement Crous.",
+      "description": "Les demandes de logement Crous ne se font pas sur Mon Logement Étudiant. Le premier tour d'attribution réservé aux étudiants boursiers a lieu du 5 mai au 29 juin sur <link>trouverunlogement.lescrous.fr</link>."
+    },
     "header": {
       "rangeLabel": "Budget maximum"
     },
     "hero": {
-      "title": "Trouvez votre prochaine",
-      "titleHighlight": "résidence sociale étudiante",
+      "title": "Trouvez votre prochain",
+      "titleHighlight": "logement social étudiant",
       "counter": "Plus de <strong>60 000 logements</strong> déjà référencés",
       "illustrationAlt": "Étudiant travaillant sur son ordinateur"
     },
@@ -738,6 +754,7 @@
       "ownerCta": "Prendre rendez-vous"
     },
     "success": "Si un compte est associé à cette adresse e-mail, vous recevrez un lien sur cette adresse.",
+    "activated": "Votre compte a bien été activé, connectez-vous avec votre adresse email et le mot de passe que vous venez de créer.",
     "unverified": {
       "title": "Compte non confirmé",
       "description": "Votre compte n'a pas encore été confirmé par email. Cliquez sur le bouton ci-dessous pour recevoir un nouvel email de confirmation.",
@@ -893,8 +910,8 @@
     "summary": {
       "title": "Résumé du budget",
       "subtitle": "Résultats de votre simulation en équivalent mensuel",
-      "totalIncome": "Revenus totaux mensuels",
-      "totalExpenses": "Dépenses totales mensuelles",
+      "totalIncome": "Revenus totaux mensualisés",
+      "totalExpenses": "Dépenses totales mensualisées",
       "remainingBalance": "Solde restant",
       "savingsRate": "Taux d'épargne : {rate} %",
       "expensesBreakdown": "Répartition des dépenses",
@@ -1011,7 +1028,13 @@
     "ownerCreated": "Gestionnaire créé avec succès",
     "ownerCreateError": "Erreur lors de la création du gestionnaire",
     "ownerDeleted": "Gestionnaire supprimé",
-    "ownerDeleteError": "Erreur lors de la suppression du gestionnaire"
+    "ownerDeleteError": "Erreur lors de la suppression du gestionnaire",
+    "userActivated": "Compte activé",
+    "userActivateError": "Erreur lors de l'activation du compte",
+    "userDeactivated": "Compte désactivé",
+    "userDeactivateError": "Erreur lors de la désactivation du compte",
+    "userPasswordReset": "Mot de passe réinitialisé",
+    "userPasswordResetError": "Erreur lors de la réinitialisation du mot de passe"
   },
   "trpc": {
     "admin": {
@@ -1189,6 +1212,16 @@
         "socialHousing": "Une demande de logement social est nécessaire.",
         "accommodationType": "Type de résidence",
         "targetAudience": "Public dans la résidence",
+        "accommodationNameHint": "Le terme « Résidence » n'est conservé que s'il est suivi d'un article ; sinon, il est supprimé.",
+        "selectResidenceType": "Sélectionnez un type",
+        "targetAudienceEtudiantsLabel": "Résidence exclusivement étudiante",
+        "targetAudienceEtudiantsHint": "Étudiants y compris stagiaires, alternants et étudiants salariés.",
+        "targetAudienceMixteLabel": "Résidence pour étudiants et jeunes actifs",
+        "targetAudienceMixteHint": "Étudiants, alternants, stagiaires et jeunes salariés.",
+        "targetAudienceDiffusEtudiantsLabel": "Logements diffus pour étudiants",
+        "targetAudienceDiffusEtudiantsHint": "Logements étudiants au sein d'une résidence de logement social, attribués uniquement à des étudiants.",
+        "targetAudienceDiffusMixteLabel": "Logements diffus pour étudiants et jeunes actifs",
+        "targetAudienceDiffusMixteHint": "Logements étudiants au sein d'une résidence de logement social, pour étudiants et jeunes actifs.",
         "typologyTab": {
           "housingType": "Type de logement",
           "selectType": "Sélectionnez un type",
@@ -1216,16 +1249,16 @@
       }
     },
     "feedback": {
-      "title": "What do you think of the manager space?",
-      "ratingQuestion": "On a scale from 1 to 5, how satisfied are you?",
-      "commentLabel": "Comments, suggestions or issues (optional)",
-      "submit": "Send",
-      "close": "Close",
-      "ariaBanner": "Give your feedback on the manager space",
-      "ariaRating": "Satisfaction rating",
-      "ratingRequired": "Please select a rating.",
-      "successToast": "Thanks for your feedback!",
-      "errorToast": "Failed to send"
+      "title": "Que pensez-vous de l'espace gestionnaire ?",
+      "ratingQuestion": "Sur une échelle de 1 à 5, quel est votre niveau de satisfaction ?",
+      "commentLabel": "Commentaires, suggestions ou difficultés (facultatif)",
+      "submit": "Envoyer",
+      "close": "Fermer",
+      "ariaBanner": "Donner votre avis sur l'espace gestionnaire",
+      "ariaRating": "Note de satisfaction",
+      "ratingRequired": "Veuillez sélectionner une note.",
+      "successToast": "Merci pour votre retour !",
+      "errorToast": "Erreur lors de l'envoi"
     }
   }
 }

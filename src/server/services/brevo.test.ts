@@ -35,6 +35,7 @@ describe('brevo service', () => {
       expect(body).toEqual({
         to: [{ email: 'user@test.com' }],
         templateId: 2,
+        replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
         params: { MAGIC_LINK: 'https://example.com/magic' },
       })
     })
@@ -51,7 +52,11 @@ describe('brevo service', () => {
       await sendTemplateEmail({ to: 'user@test.com', templateId: 40 })
 
       const body = JSON.parse(fetchMock.mock.calls[0][1].body)
-      expect(body).toEqual({ to: [{ email: 'user@test.com' }], templateId: 40 })
+      expect(body).toEqual({
+        to: [{ email: 'user@test.com' }],
+        templateId: 40,
+        replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      })
       expect(body.params).toBeUndefined()
     })
 
@@ -112,11 +117,70 @@ describe('brevo service', () => {
     it('uses template ID 40 without params', async () => {
       const { sendOwnerWelcomeEmail } = await import('./brevo')
 
-      await sendOwnerWelcomeEmail('owner@test.com')
+      await sendOwnerWelcomeEmail('owner@test.com', { firstname: 'Jean', lastname: 'Dupont' })
 
       const body = JSON.parse(fetchMock.mock.calls[0][1].body)
-      expect(body).toEqual({ to: [{ email: 'owner@test.com' }], templateId: 40 })
+      expect(body).toEqual({
+        to: [{ email: 'owner@test.com' }],
+        templateId: 40,
+        replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      })
       expect(body.params).toBeUndefined()
+    })
+  })
+
+  describe('sendAdminResetPasswordEmail', () => {
+    it('uses template ID 50 without params', async () => {
+      vi.stubEnv('BREVO_TEMPLATE_ADMIN_RESET_PASSWORD', '50')
+      const { sendAdminResetPasswordEmail } = await import('./brevo')
+
+      await sendAdminResetPasswordEmail('student@test.com')
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+      expect(body).toEqual({
+        to: [{ email: 'student@test.com' }],
+        templateId: 50,
+        replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      })
+      expect(body.params).toBeUndefined()
+    })
+  })
+
+  describe('syncBrevoOwnerCreated', () => {
+    it('sends COMPTE_ESPACE_GESTIONNAIRE and DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE attributes when contacts URL is set', async () => {
+      vi.stubEnv('BREVO_CONTACTS_API_URL', 'https://api.brevo.com/v3/contacts')
+      const { syncBrevoOwnerCreated } = await import('./brevo')
+
+      await syncBrevoOwnerCreated('owner@test.com', { firstname: 'Jean', lastname: 'Dupont' })
+
+      expect(fetchMock).toHaveBeenCalledOnce()
+      const [url, options] = fetchMock.mock.calls[0]
+      expect(url).toBe('https://api.brevo.com/v3/contacts')
+      expect(options.method).toBe('POST')
+
+      const body = JSON.parse(options.body)
+      expect(body.email).toEqual('owner@test.com')
+      expect(body.attributes.COMPTE_ESPACE_GESTIONNAIRE).toEqual(true)
+      expect(body.attributes.DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+      expect(body.updateEnabled).toEqual(true)
+    })
+  })
+
+  describe('syncBrevoDataUpdated', () => {
+    it('sends DATE_DERNIERE_MAJ_DONNEES attribute when contacts URL is set', async () => {
+      vi.stubEnv('BREVO_CONTACTS_API_URL', 'https://api.brevo.com/v3/contacts')
+      const { syncBrevoDataUpdated } = await import('./brevo')
+
+      await syncBrevoDataUpdated('owner@test.com')
+
+      expect(fetchMock).toHaveBeenCalledOnce()
+      const [url, options] = fetchMock.mock.calls[0]
+      expect(url).toBe('https://api.brevo.com/v3/contacts')
+
+      const body = JSON.parse(options.body)
+      expect(body.email).toBe('owner@test.com')
+      expect(body.attributes.DATE_DERNIERE_MAJ_DONNEES).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+      expect(body.updateEnabled).toBe(true)
     })
   })
 })

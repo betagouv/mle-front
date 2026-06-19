@@ -3,7 +3,6 @@
 import { Alert } from '@codegouvfr/react-dsfr/Alert'
 import Button from '@codegouvfr/react-dsfr/Button'
 import Input from '@codegouvfr/react-dsfr/Input'
-import Pagination from '@codegouvfr/react-dsfr/Pagination'
 import { SegmentedControl } from '@codegouvfr/react-dsfr/SegmentedControl'
 import { ColumnDef } from '@tanstack/react-table'
 import clsx from 'clsx'
@@ -13,6 +12,7 @@ import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } f
 import { useState } from 'react'
 import { useDebounce } from 'use-debounce'
 import { AdminDataTable } from '~/components/administration/admin-data-table'
+import { Pagination } from '~/components/ui/pagination'
 import { useAdminOwners } from '~/hooks/use-admin-owners'
 import { getAvatarColor, getInitials } from '~/utils/avatar'
 import { getFaviconUrl } from '~/utils/get-favicon-url'
@@ -26,6 +26,7 @@ type OwnerRow = {
   url: string | null
   imageBase64: string | null
   accommodationCount: number
+  nbTotalApartments: number
   userCount: number
   availableApartments: number
 }
@@ -77,6 +78,11 @@ const columns: ColumnDef<OwnerRow, unknown>[] = [
   {
     accessorKey: 'accommodationCount',
     header: 'Résidences',
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'nbTotalApartments',
+    header: 'Logements',
     enableSorting: true,
   },
   {
@@ -195,12 +201,16 @@ export default function OwnersPage() {
                       <div className={styles.gCardStatLbl}>Résidence{sPluriel(owner.accommodationCount)}</div>
                     </div>
                     <div>
-                      <div className={styles.gCardStatVal}>{owner.userCount}</div>
-                      <div className={styles.gCardStatLbl}>Utilisateur{sPluriel(owner.userCount)}</div>
+                      <div className={styles.gCardStatVal}>{owner.nbTotalApartments}</div>
+                      <div className={styles.gCardStatLbl}>Logement{sPluriel(owner.nbTotalApartments)}</div>
                     </div>
                     <div>
                       <div className={styles.gCardStatVal}>{owner.availableApartments}</div>
                       <div className={styles.gCardStatLbl}>Disponible{sPluriel(owner.availableApartments)}</div>
+                    </div>
+                    <div>
+                      <div className={styles.gCardStatVal}>{owner.userCount}</div>
+                      <div className={styles.gCardStatLbl}>Utilisateur{sPluriel(owner.userCount)}</div>
                     </div>
                   </div>
                   <div className={styles.gCardBottom}>

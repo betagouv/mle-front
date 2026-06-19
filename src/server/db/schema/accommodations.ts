@@ -1,5 +1,12 @@
-import { bigint, boolean, index, integer, pgTable, text, timestamp, unique, varchar } from 'drizzle-orm/pg-core'
+import { bigint, boolean, index, integer, pgEnum, pgTable, text, timestamp, unique, varchar } from 'drizzle-orm/pg-core'
 import { owners } from './owners'
+
+export const targetAudienceEnum = pgEnum('target_audience', [
+  'etudiants',
+  'mixte-etudiants-jeunes-actifs',
+  'diffus-etudiants',
+  'diffus-mixte-etudiants-jeunes-actifs',
+])
 
 export const accommodations = pgTable(
   'accommodation_accommodation',
@@ -9,7 +16,7 @@ export const accommodations = pgTable(
     slug: varchar({ length: 255 }).notNull().unique(),
     description: text(),
     residenceType: varchar('residence_type', { length: 100 }),
-    target_audience: varchar('target_audience', { length: 100 }),
+    target_audience: targetAudienceEnum('target_audience'),
     published: boolean().notNull(),
 
     // Apartment counts

@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import Image from 'next/image'
+import Link from 'next/link'
 import { getLocale, getTranslations } from 'next-intl/server'
 import { ConsultOfferButton } from '~/components/find-student-accomodation/owner-details/consult-offer-button'
 import { DossierFacileLinkButton } from '~/components/find-student-accomodation/owner-details/dossier-facile-candidate-button'
@@ -7,7 +8,6 @@ import { OwnerDetailsActions } from '~/components/find-student-accomodation/owne
 import { OwnerDetailsAlert } from '~/components/find-student-accomodation/owner-details/owner-details-alert'
 import { AvailabilityBadge } from '~/components/shared/availability-badge'
 import { WaitingListBadge } from '~/components/shared/waiting-list-badge'
-import { TooltipHoverOnly } from '~/components/tooltip-hover-only'
 import { type ApartmentType } from '~/enums/apartment-type'
 import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
 import { formatDayjs } from '~/utils/dayjs'
@@ -47,15 +47,11 @@ export const OwnerDetails = async ({
   const [t, locale] = await Promise.all([getTranslations('accomodation'), getLocale()])
   const ownerUrl = externalUrl || owner?.url
   const badgeAvailability = (
-    <AvailabilityBadge nbAvailable={nbAvailable} noAvailabilityText={t('card.noAvailability')} availabilityText={t('card.availability')} />
-  )
-
-  const waitingListBadge = (
-    <WaitingListBadge
-      acceptWaitingList={acceptWaitingList}
+    <AvailabilityBadge
       nbAvailable={nbAvailable}
-      waitingListText={t('waitingList')}
-      className={styles.otherBadge}
+      noAvailabilityText={t('card.noAvailability')}
+      availabilityText={t('card.availability')}
+      unknownAvailabilityText={t('unknownAvailability')}
     />
   )
 
@@ -69,28 +65,20 @@ export const OwnerDetails = async ({
         )}
         <span>{t('sidebar.proposedBy')}</span>
         {owner?.image_base64 ? (
-          <Image className={styles.image} src={owner.image_base64} alt={owner.name} width={201} height={90} quality={100} />
+          owner.landing_url ? (
+            <Link className="fr-link fr-link--no-underline" href={owner.landing_url} target="_blank" rel="noreferrer">
+              <Image className={styles.image} src={owner.image_base64} alt={owner.name} width={201} height={90} quality={100} />
+            </Link>
+          ) : (
+            <Image className={styles.image} src={owner.image_base64} alt={owner.name} width={201} height={90} quality={100} />
+          )
         ) : (
           <h3 className="fr-m-0">{owner?.name}</h3>
         )}
       </div>
-      <div className="fr-flex fr-flex-gap-2v fr-direction-column fr-align-items-center fr-justify-content-center">
-        {badgeAvailability}
-        {waitingListBadge}
-      </div>
+      <div className="fr-flex fr-align-items-center fr-justify-content-center">{badgeAvailability}</div>
       <span className="fr-text--xs fr-mb-0">{t('sidebar.updatedAt', { date: formatDayjs(updatedAt, 'DD MMMM YYYY', locale) })}</span>
 
-      {(nbAvailable === null || nbAvailable === undefined) && (
-        <>
-          <br />
-          <span>
-            <TooltipHoverOnly id={`tooltip-availability-${slug}`} title={t('unknownAvailabilityTooltip')}>
-              <span className={clsx('ri-information-line')} />
-            </TooltipHoverOnly>
-            {t('unknownAvailability')}
-          </span>
-        </>
-      )}
       <DossierFacileLinkButton
         accommodationSlug={accommodationSlug}
         availableApartmentTypes={availableApartmentTypes}
@@ -98,6 +86,12 @@ export const OwnerDetails = async ({
         acceptDossierFacile={acceptDossierFacile}
       />
       <div className={styles.sidebarOwner}>
+        <WaitingListBadge
+          acceptWaitingList={acceptWaitingList}
+          nbAvailable={nbAvailable}
+          waitingListText={t('waitingList')}
+          className="fr-mb-1w fr-width-full"
+        />
         {!!ownerUrl && (
           <ConsultOfferButton
             href={ownerUrl}

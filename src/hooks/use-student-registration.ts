@@ -11,9 +11,14 @@ export const postStudentRegistration = async (body: TSignUpForm): Promise<void> 
     name: `${body.firstname} ${body.lastname}`.trim(),
     firstname: body.firstname,
     lastname: body.lastname,
+    // Après activation, l'étudiant est renvoyé vers la page de connexion (réassurance).
+    callbackURL: '/se-connecter?activated=1',
   })
 
   if (result.error) {
+    // Ne pas divulguer qu'un compte existe déjà : on traite ce cas comme un succès
+    // pour afficher le même message générique (anti-énumération).
+    if (result.error.code === 'USER_ALREADY_EXISTS') return
     throw new Error(result.error.message || 'Registration failed')
   }
 }
@@ -25,7 +30,8 @@ export const useStudentRegistration = () => {
       trackEvent({ category: 'Authentification', action: 'inscription', name: 'succes' })
       createToast({
         priority: 'success',
-        message: "Inscription réussie ! Vous allez recevoir un email de confirmation avec un lien vous permettant d'activer votre compte.",
+        message:
+          "Votre demande d'inscription a bien été prise en compte. Si cette adresse email peut être utilisée, vous recevrez un email pour activer votre compte. Pensez à vérifier vos courriers indésirables.",
       })
     },
     onError: (error: Error) => {

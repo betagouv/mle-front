@@ -9,7 +9,7 @@ export const FaqQuestionsAnswers = ({ contents = FAQ_CONTENTS }: { contents?: TF
       <div className="fr-accordions-group">
         {contents.map((content, index) => (
           <Accordion key={index} label={content.question}>
-            {content.answer}
+            {typeof content.answer === 'string' ? <div dangerouslySetInnerHTML={{ __html: content.answer }} /> : content.answer}
           </Accordion>
         ))}
       </div>

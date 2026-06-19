@@ -1,5 +1,13 @@
 import { env } from '~/server/env'
 
+const brevoHeaders = {
+  'api-key': env.BREVO_API_KEY,
+  'Content-Type': 'application/json',
+  Accept: 'application/json',
+}
+
+// --- Brevo Emails ---
+
 interface TemplateEmailParams {
   to: string
   templateId: number
@@ -9,14 +17,11 @@ interface TemplateEmailParams {
 export async function sendTemplateEmail({ to, templateId, params }: TemplateEmailParams): Promise<void> {
   const response = await fetch(env.BREVO_API_URL, {
     method: 'POST',
-    headers: {
-      'api-key': env.BREVO_API_KEY,
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
+    headers: brevoHeaders,
     body: JSON.stringify({
       to: [{ email: to }],
       templateId,
+      replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
       ...(params && { params }),
     }),
   })
@@ -59,9 +64,66 @@ export async function sendOwnerAccountActivated(email: string, url: string): Pro
   })
 }
 
-export async function sendOwnerWelcomeEmail(email: string): Promise<void> {
+export async function sendOwnerWelcomeEmail(
+  email: string,
+  { firstname, lastname }: { firstname: string; lastname: string },
+): Promise<void> {
   await sendTemplateEmail({
     to: email,
     templateId: env.BREVO_TEMPLATE_OWNER_WELCOME,
+  })
+  await syncBrevoOwnerCreated(email, { firstname, lastname })
+}
+
+export async function sendAdminResetPasswordEmail(email: string): Promise<void> {
+  await sendTemplateEmail({
+    to: email,
+    templateId: env.BREVO_TEMPLATE_ADMIN_RESET_PASSWORD,
+  })
+}
+
+// --- Brevo Contacts ---
+type BrevoOwnerCreated = {
+  COMPTE_ESPACE_GESTIONNAIRE: true
+  DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE: string
+  NOM: string
+  PRENOM: string
+}
+type BrevoDataUpdated = {
+  DATE_DERNIERE_MAJ_DONNEES: string
+}
+
+async function updateBrevoContactAttributes(email: string, attributes: BrevoDataUpdated | BrevoOwnerCreated): Promise<void> {
+  const response = await fetch(env.BREVO_CONTACTS_API_URL, {
+    method: 'POST',
+    headers: brevoHeaders,
+    body: JSON.stringify({
+      email,
+      attributes,
+      updateEnabled: true,
+    }),
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    throw new Error(`Échec de la mise à jour du contact Brevo : ${response.status} ${error}`)
+  }
+}
+
+export async function syncBrevoOwnerCreated(
+  email: string,
+  { firstname, lastname }: { firstname: string; lastname: string },
+): Promise<void> {
+  await updateBrevoContactAttributes(email, {
+    COMPTE_ESPACE_GESTIONNAIRE: true,
+    DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE: new Date().toISOString().split('T')[0],
+    NOM: lastname,
+    PRENOM: firstname,
+  })
+}
+
+export async function syncBrevoDataUpdated(email: string): Promise<void> {
+  await updateBrevoContactAttributes(email, {
+    DATE_DERNIERE_MAJ_DONNEES: new Date().toISOString().split('T')[0],
   })
 }

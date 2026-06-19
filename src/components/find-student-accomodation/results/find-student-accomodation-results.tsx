@@ -1,7 +1,6 @@
 'use client'
 
 import { fr } from '@codegouvfr/react-dsfr'
-import { Pagination } from '@codegouvfr/react-dsfr/Pagination'
 import clsx from 'clsx'
 import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
@@ -11,6 +10,7 @@ import { FC, Suspense, useEffect, useMemo } from 'react'
 import { tss } from 'tss-react'
 import { AccomodationCard } from '~/components/find-student-accomodation/card/find-student-accomodation-card'
 import { MapSkeleton } from '~/components/map/map-skeleton'
+import { Pagination } from '~/components/ui/pagination'
 import { CardSkeleton } from '~/components/ui/skeleton/card-skeleton'
 import { useAccomodations } from '~/hooks/use-accomodations'
 import { trackEvent } from '~/lib/tracking'
@@ -69,7 +69,8 @@ export const FindStudentAccomodationResultsContent: FC<FindStudentAccomodationRe
     }
   }, [accommodations?.results.features.length])
 
-  const { classes } = useStyles({ view: queryStates.vue })
+  const hasNoResults = !isFetching && !!accommodations && accommodations.count === 0
+  const { classes } = useStyles({ view: queryStates.vue, hasNoResults })
 
   const AccomodationsMap = useMemo(
     () =>
@@ -160,7 +161,7 @@ export const FindStudentAccomodationResultsContent: FC<FindStudentAccomodationRe
   )
 }
 
-const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) => ({
+const useStyles = tss.withParams<{ view: string | null; hasNoResults: boolean }>().create(({ view, hasNoResults }) => ({
   '@keyframes pulse': {
     '0%, 100%': {
       opacity: 1,
@@ -196,7 +197,7 @@ const useStyles = tss.withParams<{ view: string | null }>().create(({ view }) =>
   },
   mapContainer: {
     width: '100%',
-    height: 'calc(100vh - 20px)',
+    height: hasNoResults ? '350px' : 'calc(100vh - 20px)',
     minHeight: '300px',
     position: 'sticky',
     top: '1rem',

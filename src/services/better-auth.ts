@@ -66,11 +66,19 @@ export const auth = betterAuth({
       await sendVerificationEmail(user.email, url)
     },
     sendOnSignUp: true,
-    autoSignInAfterVerification: true,
+    // Ne pas connecter automatiquement après activation : l'étudiant atterrit sur
+    // la page de connexion (réassurance) et se connecte avec le mot de passe créé.
+    autoSignInAfterVerification: false,
   },
   plugins: [
     magicLink({
       sendMagicLink: async ({ email, url }) => {
+        const usr = await db.query.user.findFirst({
+          where: eq(schema.user.email, email),
+          columns: { role: true },
+        })
+        // Only send magic links to owners and admins, never to students (role 'user')
+        if (!usr || usr.role === 'user') return
         await sendMagicLinkEmail(email, url)
       },
     }),

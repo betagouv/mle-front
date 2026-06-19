@@ -13,8 +13,7 @@ import { tss } from 'tss-react'
 import { createToast } from '~/components/ui/createToast'
 import { trackEvent } from '~/lib/tracking'
 import { TMagicLinkSignInForm, ZMagicLinkSignInForm } from '~/schemas/magic-link-sign-in/magic-link-sign-in'
-import { authClient } from '~/services/better-auth-client'
-import { sendAdminMagicLink } from './actions'
+import { sendMagicLink } from './actions'
 
 export const MagicLinkSignInForm: FC<{ callbackURL?: string; type?: 'owner' | 'admin' }> = ({ callbackURL, type = 'owner' }) => {
   const t = useTranslations('login')
@@ -31,29 +30,7 @@ export const MagicLinkSignInForm: FC<{ callbackURL?: string; type?: 'owner' | 'a
   const onSubmit = async () => {
     const { email } = getValues()
     try {
-      if (type === 'admin') {
-        await sendAdminMagicLink(email, callbackURL)
-        createToast({
-          priority: 'success',
-          message: t('success'),
-        })
-        return
-      }
-
-      const result = await authClient.signIn.magicLink({
-        email,
-        callbackURL,
-      })
-
-      if (result.error) {
-        trackEvent({ category: 'Authentification', action: 'connexion gestionnaire', name: 'erreur' })
-        createToast({
-          priority: 'error',
-          message: 'Une erreur est survenue lors de la connexion, veuillez réessayé ultérieurement',
-        })
-        return
-      }
-
+      await sendMagicLink(email, type, callbackURL)
       trackEvent({ category: 'Authentification', action: 'connexion gestionnaire', name: 'succes' })
       createToast({
         priority: 'success',

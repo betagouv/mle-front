@@ -1,4 +1,5 @@
 import { and, eq, sql } from 'drizzle-orm'
+import { EResidenceType } from '~/enums/residence-type'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, geocodeAddress } from '~/server/lib/import/geocoder'
@@ -206,7 +207,7 @@ const command: ImportCommand = {
 
         const accommodationData = {
           description: (residence.description as string) ?? null,
-          residenceType: 'universitaire-conventionnee',
+          residenceType: EResidenceType.UNIVERSITAIRE_CONVENTIONNEE,
           published: true,
           nbT1: normalized.accommodationQuantity,
           nbT1Available: normalized.availableAccommodationQuantity,

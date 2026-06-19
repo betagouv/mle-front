@@ -10,14 +10,14 @@ import { accommodationAddresses } from '~/server/db/schema/accommodation-address
 import { accommodations } from '~/server/db/schema/accommodations'
 import { activityLog } from '~/server/db/schema/activity-log'
 import { adminOwnerLinks } from '~/server/db/schema/admin-owner-links'
-import { user } from '~/server/db/schema/auth'
+import { account, session, user } from '~/server/db/schema/auth'
 import { cities } from '~/server/db/schema/cities'
 import { eventStats } from '~/server/db/schema/event-stats'
 import { importJobs } from '~/server/db/schema/import-jobs'
 import { ownerFeedback } from '~/server/db/schema/owner-feedback'
 import { owners } from '~/server/db/schema/owners'
 import { stats } from '~/server/db/schema/stats'
-import { sendOwnerWelcomeEmail } from '~/server/services/brevo'
+import { sendAdminResetPasswordEmail, sendOwnerWelcomeEmail } from '~/server/services/brevo'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '~/server/utils/slug'
 import { adminProcedure, createTRPCRouter } from '../init'
@@ -94,16 +94,22 @@ const usersRouter = createTRPCRouter({
     }),
 
   getById: adminProcedure.input(z.object({ id: z.string() })).query(async ({ input }) => {
-    const result = await db.query.user.findFirst({
-      where: eq(user.id, input.id),
-      with: { owner: true, adminOwnerLinks: { with: { owner: true } } },
-    })
+    const [result, credentialAccount] = await Promise.all([
+      db.query.user.findFirst({
+        where: eq(user.id, input.id),
+        with: { owner: true, adminOwnerLinks: { with: { owner: true } } },
+      }),
+      db.query.account.findFirst({
+        where: and(eq(account.userId, input.id), eq(account.providerId, 'credential')),
+        columns: { password: true },
+      }),
+    ])
 
     if (!result) {
       throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('userNotFound') })
     }
 
-    return result
+    return { ...result, hasPassword: credentialAccount?.password != null }
   }),
 
   create: adminProcedure
@@ -143,7 +149,7 @@ const usersRouter = createTRPCRouter({
 
       if (created.role === 'owner') {
         try {
-          await sendOwnerWelcomeEmail(created.email)
+          await sendOwnerWelcomeEmail(created.email, { firstname: input.firstname, lastname: input.lastname })
         } catch (err) {
           console.error('Erreur envoi email bienvenue gestionnaire', err)
         }
@@ -268,6 +274,42 @@ const usersRouter = createTRPCRouter({
     return deleted
   }),
 
+  setEmailVerified: adminProcedure.input(z.object({ id: z.string(), emailVerified: z.boolean() })).mutation(async ({ input }) => {
+    const [updated] = await db
+      .update(user)
+      .set({ emailVerified: input.emailVerified, updatedAt: new Date() })
+      .where(eq(user.id, input.id))
+      .returning()
+
+    if (!updated) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('userNotFound') })
+    }
+
+    if (!input.emailVerified) {
+      await db.delete(session).where(eq(session.userId, input.id))
+    }
+
+    return updated
+  }),
+
+  resetPassword: adminProcedure.input(z.object({ id: z.string() })).mutation(async ({ input }) => {
+    const usr = await db.query.user.findFirst({ where: and(eq(user.id, input.id), eq(user.role, 'user')) })
+    if (!usr) {
+      throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('userNotFound') })
+    }
+
+    await db
+      .update(account)
+      .set({ password: null, updatedAt: new Date() })
+      .where(and(eq(account.userId, input.id), eq(account.providerId, 'credential')))
+
+    await db.delete(session).where(eq(session.userId, input.id))
+
+    await sendAdminResetPasswordEmail(usr.email)
+
+    return { success: true }
+  }),
+
   myLinkedOwners: adminProcedure.query(async ({ ctx }) => {
     const links = await db.query.adminOwnerLinks.findMany({
       where: eq(adminOwnerLinks.userId, ctx.session.user.id),
@@ -312,6 +354,7 @@ const ownersRouter = createTRPCRouter({
             url: owners.url,
             image: owners.image,
             accommodationCount: sql<number>`(SELECT count(*)::int FROM accommodation_accommodation WHERE owner_id = "account_owner"."id")`,
+            nbTotalApartments: sql<number>`(SELECT coalesce(sum(coalesce(nb_total_apartments, 0)), 0)::int FROM accommodation_accommodation WHERE owner_id = "account_owner"."id")`,
             userCount: sql<number>`(SELECT count(*)::int FROM "user" WHERE owner_id = "account_owner"."id")`,
             availableApartments: sql<number>`(
               WITH available_counts AS (
@@ -384,6 +427,7 @@ const ownersRouter = createTRPCRouter({
       z.object({
         name: z.string().min(1),
         url: z.string().url().optional(),
+        landingUrl: z.string().url().optional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -395,6 +439,7 @@ const ownersRouter = createTRPCRouter({
           name: input.name,
           slug,
           url: input.url ?? null,
+          landingUrl: input.landingUrl ?? null,
         })
         .returning()
 
@@ -408,6 +453,7 @@ const ownersRouter = createTRPCRouter({
         id: z.number(),
         name: z.string().min(1).optional(),
         url: z.string().url().nullable().optional(),
+        landingUrl: z.string().url().nullable().optional(),
         acceptDossierFacileApplications: z.boolean().optional(),
       }),
     )
@@ -417,6 +463,7 @@ const ownersRouter = createTRPCRouter({
 
       if (fields.name !== undefined) updateData.name = fields.name
       if (fields.url !== undefined) updateData.url = fields.url
+      if (fields.landingUrl !== undefined) updateData.landingUrl = fields.landingUrl
       if (fields.acceptDossierFacileApplications !== undefined)
         updateData.acceptDossierFacileApplications = fields.acceptDossierFacileApplications
 
@@ -595,24 +642,65 @@ const residencesRouter = createTRPCRouter({
 
 const statsRouter = createTRPCRouter({
   overview: adminProcedure.query(async () => {
-    const [usersCount, ownersCount, accommodationsCount, apartmentsStats] = await Promise.all([
-      db
-        .select({
-          total: count(),
-          admins: sql<number>`count(*) filter (where role = 'admin')`.mapWith(Number),
-          ownerUsers: sql<number>`count(*) filter (where role = 'owner')`.mapWith(Number),
-          students: sql<number>`count(*) filter (where role = 'user')`.mapWith(Number),
-        })
-        .from(user),
-      db.select({ count: count() }).from(owners),
-      db.select({ count: count() }).from(accommodations),
-      db
-        .select({
-          totalApartments: sql<number>`coalesce(sum(coalesce(nb_total_apartments, 0)), 0)::int`,
-          availableApartments: sql<number>`coalesce(sum(${nbAvailableApartmentsSum}), 0)::int`,
-        })
-        .from(accommodations),
-    ])
+    const isCrous = sql`exists (select 1 from accommodation_externalsource where accommodation_id = ${accommodations.id} and source = 'crous')`
+
+    const availCols = [
+      accommodations.nbT1Available,
+      accommodations.nbT1BisAvailable,
+      accommodations.nbT2Available,
+      accommodations.nbT3Available,
+      accommodations.nbT4Available,
+      accommodations.nbT5Available,
+      accommodations.nbT6Available,
+      accommodations.nbT7MoreAvailable,
+    ]
+    const isAvailable = sql`(${sql.join(
+      availCols.map((c) => sql`${c} > 0`),
+      sql` OR `,
+    )})`
+    const isUnknown = sql`(${sql.join(
+      availCols.map((c) => sql`${c} IS NULL`),
+      sql` AND `,
+    )})`
+
+    const [usersCount, ownersCount, accommodationsCount, apartmentsStats, residencesBreakdown, logementsBreakdown, availabilityBreakdown] =
+      await Promise.all([
+        db
+          .select({
+            total: count(),
+            admins: sql<number>`count(*) filter (where role = 'admin')`.mapWith(Number),
+            ownerUsers: sql<number>`count(*) filter (where role = 'owner')`.mapWith(Number),
+            students: sql<number>`count(*) filter (where role = 'user')`.mapWith(Number),
+          })
+          .from(user),
+        db.select({ count: count() }).from(owners),
+        db.select({ count: count() }).from(accommodations),
+        db
+          .select({
+            totalApartments: sql<number>`coalesce(sum(coalesce(nb_total_apartments, 0)), 0)::int`,
+            availableApartments: sql<number>`coalesce(sum(${nbAvailableApartmentsSum}), 0)::int`,
+          })
+          .from(accommodations),
+        db
+          .select({
+            crous: sql<number>`count(*) filter (where ${isCrous})`.mapWith(Number),
+            autres: sql<number>`count(*) filter (where not ${isCrous})`.mapWith(Number),
+          })
+          .from(accommodations),
+        db
+          .select({
+            crous: sql<number>`coalesce(sum(coalesce(nb_total_apartments, 0)) filter (where ${isCrous}), 0)::int`.mapWith(Number),
+            autres: sql<number>`coalesce(sum(coalesce(nb_total_apartments, 0)) filter (where not ${isCrous}), 0)::int`.mapWith(Number),
+          })
+          .from(accommodations),
+        db
+          .select({
+            avecDispo: sql<number>`count(*) filter (where ${isAvailable} and not ${isCrous})`.mapWith(Number),
+            sansDispo: sql<number>`count(*) filter (where not ${isAvailable} and not ${isUnknown} and not ${isCrous})`.mapWith(Number),
+            nonRenseignee: sql<number>`count(*) filter (where ${isUnknown} and not ${isCrous})`.mapWith(Number),
+          })
+          .from(accommodations),
+      ])
 
     const totalApartments = apartmentsStats[0]?.totalApartments ?? 0
     const availableApartments = apartmentsStats[0]?.availableApartments ?? 0
@@ -631,6 +719,21 @@ const statsRouter = createTRPCRouter({
         total: totalApartments,
         available: availableApartments,
         occupied: totalApartments - availableApartments,
+      },
+      residences: {
+        total: accommodationsCount[0]?.count ?? 0,
+        crous: residencesBreakdown[0]?.crous ?? 0,
+        autres: residencesBreakdown[0]?.autres ?? 0,
+      },
+      logements: {
+        total: totalApartments,
+        crous: logementsBreakdown[0]?.crous ?? 0,
+        autres: logementsBreakdown[0]?.autres ?? 0,
+      },
+      disponibilite: {
+        avecDispo: availabilityBreakdown[0]?.avecDispo ?? 0,
+        sansDispo: availabilityBreakdown[0]?.sansDispo ?? 0,
+        nonRenseignee: availabilityBreakdown[0]?.nonRenseignee ?? 0,
       },
     }
   }),

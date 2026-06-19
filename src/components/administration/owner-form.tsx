@@ -26,6 +26,7 @@ export const OwnerForm = ({ defaultValues, onSubmit, isPending, submitLabel = 'E
     defaultValues: {
       name: '',
       url: '',
+      landingUrl: '',
       acceptDossierFacileApplications: false,
       ...defaultValues,
     },
@@ -46,6 +47,13 @@ export const OwnerForm = ({ defaultValues, onSubmit, isPending, submitLabel = 'E
         nativeInputProps={{ type: 'url', ...register('url') }}
         state={errors.url ? 'error' : 'default'}
         stateRelatedMessage={errors.url?.message}
+      />
+      <Input
+        label="Page de présentation du bailleur (optionnel)"
+        hintText="URL affichée sur la fiche logement, sous « gérée par le gestionnaire »"
+        nativeInputProps={{ type: 'url', ...register('landingUrl') }}
+        state={errors.landingUrl ? 'error' : 'default'}
+        stateRelatedMessage={errors.landingUrl?.message}
       />
       <ToggleSwitch
         label="Accepter les candidatures DossierFacile"

@@ -4,10 +4,13 @@ import clsx from 'clsx'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { TooltipHoverOnly } from '~/components/tooltip-hover-only'
+import { EResidenceType } from '~/enums/residence-type'
+import { ETargetAudience } from '~/enums/target-audience'
 import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
 import { isPerPersonTypology } from '~/utils/is-per-person-typology'
 import { getSocialHousingApplicationLink } from '~/utils/social-housing-application-link'
 import styles from './accommodation-residence.module.css'
+import { FjtRsjaNotice } from './fjt-rsja-notice'
 
 type AccommodationResidenceProps = {
   accommodation: TAccomodationDetails
@@ -154,16 +157,18 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
                     </span>
                   )}
 
-                  <div className="fr-flex fr-align-items-center fr-flex-gap-2v">
+                  <div className="fr-flex fr-direction-column fr-direction-md-row fr-align-items-md-center fr-flex-gap-2v">
                     <div className={styles.pricesTiles}>
                       <span className="fr-text--bold">
                         {accommodation.min && accommodation.max && accommodation.min !== accommodation.max
                           ? `De ${accommodation.min} à ${accommodation.max} €`
                           : `${accommodation.min} €`}
-                        {isPerPersonTypology(accommodation.type) ? ' par personne' : ''}
                       </span>
                     </div>
-                    <span className="fr-text--xs fr-mb-0">{t('charges')}</span>
+                    <div className="fr-flex fr-direction-column">
+                      {isPerPersonTypology(accommodation.type) && <span className="fr-text--xs fr-mb-0">{t('perPerson')}</span>}
+                      <span className="fr-text--xs fr-mb-0">{t('charges')}</span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -198,6 +203,24 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
             )}
           </div>
         </div>
+        {!!accommodation.target_audience &&
+          [ETargetAudience.DIFFUS_MIXTE, ETargetAudience.DIFFUS_ETUDIANTS].includes(accommodation.target_audience) && (
+            <div className="fr-flex fr-direction-column fr-direction-md-row fr-align-items-md-center fr-flex-gap-2v fr-border fr-border-radius--8 fr-px-3w fr-py-2w">
+              <span className={clsx('ri-community-line fr-hidden fr-unhidden-sm', styles.diffusIcon)} aria-hidden />
+              <p className="fr-mb-0 fr-flex fr-direction-column">
+                <span className="fr-text--bold">
+                  {accommodation.target_audience === ETargetAudience.DIFFUS_MIXTE
+                    ? t('diffusMixteNoticeTitle')
+                    : t('diffusEtudiantsNoticeTitle')}
+                </span>
+                {accommodation.target_audience === ETargetAudience.DIFFUS_MIXTE && (
+                  <span className="fr-mb-0">{t('diffusMixteNoticeDescription')}</span>
+                )}
+              </p>
+            </div>
+          )}
+        {(accommodation.residence_type === EResidenceType.JEUNES_TRAVAILLEURS ||
+          accommodation.residence_type === EResidenceType.SOCIALE_JEUNES_ACTIFS) && <FjtRsjaNotice />}
         <div className="fr-flex fr-direction-column fr-direction-md-row fr-justify-content-space-between fr-align-items-md-center fr-flex-gap-2v fr-border fr-border-radius--8 fr-px-3w fr-py-2w">
           <span className={clsx('ri-calculator-line fr-hidden fr-unhidden-sm', styles.simulatorIcon)} aria-hidden />
           <p className="fr-mb-0 fr-flex fr-direction-column">

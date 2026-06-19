@@ -47,6 +47,14 @@ const nextConfig = {
         destination: 'https://info.monlogementetudiant.beta.gouv.fr/foire-aux-questions/',
       },
       {
+        source: '/landing',
+        destination: 'https://info.monlogementetudiant.beta.gouv.fr/partenariat/',
+      },
+      {
+        source: '/landing/:path*',
+        destination: 'https://info.monlogementetudiant.beta.gouv.fr/partenariat/:path*/',
+      },
+      {
         source: '/app/:path*',
         destination: 'https://info.monlogementetudiant.beta.gouv.fr/app/:path*',
       },

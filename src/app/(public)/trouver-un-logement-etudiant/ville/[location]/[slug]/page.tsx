@@ -82,6 +82,7 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
       : []),
   ]
 
+  const ownerLandingUrl = owner?.landing_url ?? null
   const cityFormatted = formatCityWithA(city)
   const breadCrumbTitle = commonT('breadcrumbs.accommodationTitle', { name, cityFormatted })
   const isRSJAorFJT =
@@ -159,6 +160,18 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
                   </Tag>
                 ))}
               </div>
+              {owner && ownerLandingUrl && (
+                <p className="fr-mt-3w fr-mb-0">
+                  {t.rich('managedBy', {
+                    managerName: owner.name,
+                    manager: (chunks) => (
+                      <a href={ownerLandingUrl} target="_blank" rel="noopener noreferrer">
+                        {chunks}
+                      </a>
+                    ),
+                  })}
+                </p>
+              )}
             </div>
             <AccommodationAvailability nbAvailable={nbAvailable} acceptWaitingList={accept_waiting_list} />
             <AccommodationResidence accommodation={accommodation} />

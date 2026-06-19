@@ -1,4 +1,5 @@
 import { fr } from '@codegouvfr/react-dsfr'
+import Alert from '@codegouvfr/react-dsfr/Alert'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import { Metadata } from 'next'
@@ -13,8 +14,13 @@ export const generateMetadata = async (): Promise<Metadata> => {
   return { title: tLogin('studentTitle'), description: tMeta('loginStudent.description') }
 }
 
-export default async function LoginPage() {
+interface LoginPageProps {
+  searchParams: Promise<{ activated?: string }>
+}
+
+export default async function LoginPage({ searchParams }: LoginPageProps) {
   const t = await getTranslations('login')
+  const { activated } = await searchParams
   return (
     <>
       <div className={authStyles.imageContainer}>
@@ -27,6 +33,7 @@ export default async function LoginPage() {
           &nbsp;<span className={clsx(fr.cx('fr-text--bold'), authStyles.required)}>*</span>
           &nbsp;{t('subTitlePart2')}
         </p>
+        {activated && <Alert severity="success" small description={t('activated')} className={fr.cx('fr-mb-3w')} />}
         <CredentialsSignInForm />
         <div className={authStyles.dividerContainer}>
           <span className={authStyles.divider}>{t('labels.or')}</span>

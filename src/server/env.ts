@@ -1,9 +1,11 @@
 import { z } from 'zod'
 
 const isProd = process.env.NEXT_PUBLIC_APP_ENV === 'production' || process.env.NEXT_PUBLIC_APP_ENV === 'staging'
+// const isProdOnly = process.env.NEXT_PUBLIC_APP_ENV === 'production'
 
 const optionalUrl = z.preprocess((v) => (v === '' ? undefined : v), z.url().optional())
 const requiredInProdUrl = isProd ? z.url() : optionalUrl
+// const requiredInProdOnlyUrl = isProdOnly ? z.url() : optionalUrl
 const requiredInProd = isProd ? z.string().min(1) : z.string().optional()
 
 const envSchema = z.object({
@@ -15,11 +17,13 @@ const envSchema = z.object({
   // Brevo (email)
   BREVO_API_KEY: z.string().min(1, 'BREVO_API_KEY is required'),
   BREVO_API_URL: z.url().default('https://api.brevo.com/v3/smtp/email'),
+  BREVO_CONTACTS_API_URL: z.url(),
   // accepts only entire positive numbers for the brevo templates.
   BREVO_TEMPLATE_MAGIC_LINK: z.coerce.number().int().positive(),
   BREVO_TEMPLATE_VALIDATION: z.coerce.number().int().positive(),
   BREVO_TEMPLATE_RESET_PASSWORD: z.coerce.number().int().positive(),
   BREVO_TEMPLATE_OWNER_WELCOME: z.coerce.number().int().positive(),
+  BREVO_TEMPLATE_ADMIN_RESET_PASSWORD: z.coerce.number().int().positive(),
 
   // S3
   S3_ENDPOINT: z.url(),
@@ -73,6 +77,10 @@ const envSchema = z.object({
   IBAIL_API_HOST: requiredInProdUrl,
   IBAIL_API_AUTH_KEY: requiredInProd,
   IBAIL_API_AUTH_SECRET: requiredInProd,
+
+  // Crisp Helpdesk
+  CRISP_BASIC_AUTH: requiredInProd,
+  CRISP_BASE_URL: requiredInProdUrl,
 })
 
 export const env = envSchema.parse(process.env)
