@@ -1,4 +1,5 @@
 import { program } from 'commander'
+import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
 import { compareCrous } from './commands/compare-crous'
 import { healthcheck, healthcheckCities } from './commands/healthcheck'
 import { importBackup } from './commands/import-backup'
@@ -15,6 +16,15 @@ import { runImport, runSync } from './factory'
 program.name('mle').description('MLE CLI tools')
 
 program.command('migrate-users').description('Migrate Django users to better-auth').action(migrateUsers)
+
+program
+  .command('backfill-brevo-contacts')
+  .description('Rattrape les contacts Brevo de toute la base (étudiants + gestionnaires, admins exclus)')
+  .option('--dry-run', 'Simuler sans appeler Brevo')
+  .option('--verbose', 'Afficher chaque contact traité')
+  .option('--limit <n>', "Limiter le nombre d'utilisateurs", parseInt)
+  .option('--batch-size <n>', 'Nombre de requêtes Brevo en parallèle par lot', parseInt)
+  .action((opts) => backfillBrevoContacts(opts))
 
 program.command('migrate').description('Apply Drizzle migrations').action(migrate)
 

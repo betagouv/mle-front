@@ -80,6 +80,7 @@ cli/
     matomo.ts            # Service API Matomo
   commands/
     migrate-users.ts     # Migration users Django
+    backfill-brevo-contacts.ts # Rattrapage des contacts Brevo (étudiants + gestionnaires)
     import-backup.ts     # Import backup Scalingo
     import-arpej-ibail.ts # Import résidences ARPEJ (API iBAIL)
     import-crous.ts       # Import résidences CROUS depuis XLSX
@@ -112,6 +113,34 @@ pnpm cli migrate-users
 Lit les tables Django existantes dans la BDD locale (typiquement après un `import-backup`) et traduit les utilisateurs vers le schéma better-auth : insertion dans les tables `user` et `account`, puis liaison des owners existants par correspondance de nom, et liaisons des utilisateurs students.
 
 À utiliser une seule fois après la migration Django → tRPC/Drizzle.
+
+#### `backfill-brevo-contacts` — Rattraper les contacts Brevo
+
+```bash
+pnpm cli backfill-brevo-contacts --dry-run --limit 20 --verbose   # simulation sur un échantillon
+pnpm cli backfill-brevo-contacts --verbose                        # run complet
+```
+
+Parcourt toute la base et synchronise les attributs Brevo (`COMPTE_ESPACE_GESTIONNAIRE`, `DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE`, `NOM`, `PRENOM`) pour chaque utilisateur :
+
+- **Gestionnaires** (`role = 'owner'`) : `COMPTE_ESPACE_GESTIONNAIRE = true`, date = `user.created_at`.
+- **Étudiants** (`role = 'user'`) : `COMPTE_ESPACE_GESTIONNAIRE = false`, date vidée (chaîne vide).
+- **Admins** (`role = 'admin'`) : exclus du rattrapage.
+
+Les requêtes Brevo sont envoyées par lots (concurrence limitée + délai entre lots) pour respecter le rate limit de l'API contacts. Un échec sur un contact n'interrompt pas le run : le détail des erreurs est affiché en fin d'exécution.
+
+Options :
+
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Simule sans appeler Brevo |
+| `--verbose` | Affiche chaque contact traité |
+| `--limit <n>` | Limite le nombre d'utilisateurs traités |
+| `--batch-size <n>` | Nombre de requêtes Brevo en parallèle par lot (défaut : 5) |
+
+Variables d'env requises : `DATABASE_URL`, `BREVO_API_KEY`, `BREVO_CONTACTS_API_URL`
+
+> Conçue pour un one-off Scalingo. Sur Scalingo (vars injectées, pas de fichier `.env`), lancer directement `tsx cli/index.ts backfill-brevo-contacts --verbose` plutôt que `pnpm cli` (qui charge `--env-file=.env`).
 
 #### `import-backup` — Importer un backup Scalingo
 

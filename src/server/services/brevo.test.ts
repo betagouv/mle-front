@@ -162,6 +162,43 @@ describe('brevo service', () => {
       expect(body.email).toEqual('owner@test.com')
       expect(body.attributes.COMPTE_ESPACE_GESTIONNAIRE).toEqual(true)
       expect(body.attributes.DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE).toMatch(/^\d{4}-\d{2}-\d{2}$/)
+      expect(body.attributes.NOM).toEqual('Dupont')
+      expect(body.attributes.PRENOM).toEqual('Jean')
+      expect(body.updateEnabled).toEqual(true)
+    })
+
+    it('uses the provided createdAt for DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE when given', async () => {
+      vi.stubEnv('BREVO_CONTACTS_API_URL', 'https://api.brevo.com/v3/contacts')
+      const { syncBrevoOwnerCreated } = await import('./brevo')
+
+      await syncBrevoOwnerCreated('owner@test.com', {
+        firstname: 'Jean',
+        lastname: 'Dupont',
+        createdAt: new Date('2021-03-15T10:30:00.000Z'),
+      })
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+      expect(body.attributes.DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE).toBe('2021-03-15')
+    })
+  })
+
+  describe('syncBrevoStudentCreated', () => {
+    it('sends COMPTE_ESPACE_GESTIONNAIRE false with an empty DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE', async () => {
+      vi.stubEnv('BREVO_CONTACTS_API_URL', 'https://api.brevo.com/v3/contacts')
+      const { syncBrevoStudentCreated } = await import('./brevo')
+
+      await syncBrevoStudentCreated('student@test.com', { firstname: 'Marie', lastname: 'Martin' })
+
+      expect(fetchMock).toHaveBeenCalledOnce()
+      const [url, options] = fetchMock.mock.calls[0]
+      expect(url).toBe('https://api.brevo.com/v3/contacts')
+
+      const body = JSON.parse(options.body)
+      expect(body.email).toEqual('student@test.com')
+      expect(body.attributes.COMPTE_ESPACE_GESTIONNAIRE).toEqual(false)
+      expect(body.attributes.DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE).toEqual('')
+      expect(body.attributes.NOM).toEqual('Martin')
+      expect(body.attributes.PRENOM).toEqual('Marie')
       expect(body.updateEnabled).toEqual(true)
     })
   })
