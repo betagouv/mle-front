@@ -105,8 +105,9 @@ export async function sendStudentAlertEmail(
 }
 
 // --- Brevo Contacts ---
-type BrevoOwnerCreated = {
-  COMPTE_ESPACE_GESTIONNAIRE: true
+type BrevoEspaceGestionnaire = {
+  COMPTE_ESPACE_GESTIONNAIRE: boolean
+  // Date 'YYYY-MM-DD' pour les gestionnaires, chaîne vide pour vider l'attribut (étudiants)
   DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE: string
   NOM: string
   PRENOM: string
@@ -115,7 +116,7 @@ type BrevoDataUpdated = {
   DATE_DERNIERE_MAJ_DONNEES: string
 }
 
-async function updateBrevoContactAttributes(email: string, attributes: BrevoDataUpdated | BrevoOwnerCreated): Promise<void> {
+async function updateBrevoContactAttributes(email: string, attributes: BrevoDataUpdated | BrevoEspaceGestionnaire): Promise<void> {
   const response = await fetch(env.BREVO_CONTACTS_API_URL, {
     method: 'POST',
     headers: brevoHeaders,
@@ -134,11 +135,24 @@ async function updateBrevoContactAttributes(email: string, attributes: BrevoData
 
 export async function syncBrevoOwnerCreated(
   email: string,
-  { firstname, lastname }: { firstname: string; lastname: string },
+  // createdAt par défaut à aujourd'hui (flux live de création) ; surchargé lors du rattrapage de la base
+  { firstname, lastname, createdAt }: { firstname: string; lastname: string; createdAt?: Date },
 ): Promise<void> {
   await updateBrevoContactAttributes(email, {
     COMPTE_ESPACE_GESTIONNAIRE: true,
-    DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE: new Date().toISOString().split('T')[0],
+    DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE: (createdAt ?? new Date()).toISOString().split('T')[0],
+    NOM: lastname,
+    PRENOM: firstname,
+  })
+}
+
+export async function syncBrevoStudentCreated(
+  email: string,
+  { firstname, lastname }: { firstname: string; lastname: string },
+): Promise<void> {
+  await updateBrevoContactAttributes(email, {
+    COMPTE_ESPACE_GESTIONNAIRE: false,
+    DATE_CREATION_COMPTE_ESPACE_GESTIONNAIRE: '',
     NOM: lastname,
     PRENOM: firstname,
   })
