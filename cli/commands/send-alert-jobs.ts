@@ -14,11 +14,13 @@ export async function sendAlertJobs(options: SendAlertJobsOptions): Promise<void
   })
 
   if (options.dryRun) {
-    console.log(`\n  [dry-run] ${result.sent} email(s) auraient été envoyés`)
+    console.log(`\n  [dry-run] ${result.requeued} job(s) en échec auraient été replanifiés`)
+    console.log(`  [dry-run] ${result.sent} email(s) auraient été envoyés`)
     return
   }
 
-  console.log(`\n  Envoyés : ${result.sent}`)
+  console.log(`\n  Replanifiés : ${result.requeued}`)
+  console.log(`  Envoyés : ${result.sent}`)
   console.log(`  Échoués : ${result.failed}`)
 
   if (result.failed > 0) process.exit(1)

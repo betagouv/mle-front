@@ -1,12 +1,17 @@
-import { eq, inArray, sql } from 'drizzle-orm'
+import { and, count, eq, inArray, lt, or, sql } from 'drizzle-orm'
 import { db } from '~/server/db'
 import { accommodations, alertJobs, user } from '~/server/db/schema'
 import { env } from '~/server/env'
 import { sendStudentAlertEmail } from './brevo'
 
+// Nombre maximal de tentatives d'envoi par job (1 envoi initial + retries).
+// Au-delà, un job `failed` n'est plus replanifié et reste en échec définitif.
+export const MAX_ATTEMPTS = 3
+
 export type AlertSenderResult = {
   sent: number
   failed: number
+  requeued: number
 }
 
 type UserAlertBatch = {
@@ -17,6 +22,28 @@ type UserAlertBatch = {
 }
 
 export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?: boolean } = {}): Promise<AlertSenderResult> {
+  // Jobs en échec encore éligibles à une nouvelle tentative (sous le plafond).
+  const retryableFailed = and(eq(alertJobs.status, 'failed'), lt(alertJobs.attempts, MAX_ATTEMPTS))
+
+  // Replanification : on repasse ces jobs en `pending` (et on efface l'erreur précédente)
+  // afin qu'ils soient repris par le traitement ci-dessous. En dry-run on ne touche pas
+  // à la BDD : on se contente de les compter et de les inclure dans la sélection.
+  let requeued = 0
+  if (options.dryRun) {
+    const [result] = await db.select({ value: count() }).from(alertJobs).where(retryableFailed)
+    requeued = result?.value ?? 0
+  } else {
+    const rows = await db.update(alertJobs).set({ status: 'pending', error: null }).where(retryableFailed).returning({ id: alertJobs.id })
+    requeued = rows.length
+  }
+  if (options.verbose && requeued > 0) {
+    console.log(`  ↺ ${requeued} job(s) en échec replanifié(s) pour nouvelle tentative`)
+  }
+
+  // En exécution réelle, les jobs replanifiés sont déjà `pending`. En dry-run rien n'a été
+  // écrit, donc on ajoute explicitement les `failed` éligibles à la sélection simulée.
+  const selection = options.dryRun ? or(eq(alertJobs.status, 'pending'), retryableFailed) : eq(alertJobs.status, 'pending')
+
   const pendingJobs = await db
     .select({
       jobId: alertJobs.id,
@@ -28,9 +55,9 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
     .from(alertJobs)
     .innerJoin(user, eq(alertJobs.userId, user.id))
     .innerJoin(accommodations, eq(alertJobs.accommodationId, accommodations.id))
-    .where(eq(alertJobs.status, 'pending'))
+    .where(selection)
 
-  if (pendingJobs.length === 0) return { sent: 0, failed: 0 }
+  if (pendingJobs.length === 0) return { sent: 0, failed: 0, requeued }
 
   const byUser = new Map<string, UserAlertBatch>()
   for (const job of pendingJobs) {
@@ -81,5 +108,5 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
     }
   }
 
-  return { sent, failed }
+  return { sent, failed, requeued }
 }
