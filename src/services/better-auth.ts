@@ -145,6 +145,7 @@ export const getServerSession = cache(async () => {
     ...results,
     user: {
       ...results.user,
+      role: usr?.role ?? results.user.role,
       owner: usr?.owner ?? null,
       adminOwners,
       bailleurRole: usr?.bailleurRole ?? null,
