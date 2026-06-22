@@ -24,7 +24,7 @@ export default async function BudgetPage() {
       <div className={fr.cx('fr-container')}>
         <h1>{t('title')}</h1>
         <p>
-          {t('lastUpdate')} <span className={fr.cx('fr-text--bold')}>19/05/25</span>
+          {t('lastUpdate')} <span className={fr.cx('fr-text--bold')}>22/06/26</span>
         </p>
         <div className={clsx(fr.cx('fr-p-4w'), styles.mainContainer)}>
           <p className={clsx(fr.cx('fr-text--bold'), styles.description)}>{t('description')}</p>
@@ -37,18 +37,19 @@ export default async function BudgetPage() {
               noCaption
               caption={t('repartition')}
               data={[
-                [t('table.coaching'), '16 128€', '33 984 €', '46 080 €'],
-                [t('table.development'), '0 €', '55 062 €', '65 990 €'],
-                [t('table.design'), '0 €', '27 463 €', '21 437 €'],
-                [t('table.deployment'), '0 €', '24 077 €', '32 256 €'],
-                [t('table.total'), '16 128 €', '140 586 €', '165 763 €'],
+                [t('table.coaching'), '16 128€', '33 984 €', '46 080 €', '63 360 €'],
+                [t('table.development'), '0 €', '55 062 €', '65 990 €', '92 393 €'],
+                [t('table.design'), '0 €', '27 463 €', '21 437 €', '36 590 €'],
+                [t('table.deployment'), '0 €', '24 077 €', '32 256 €', '86 352 €'],
+                [t('table.communication'), '0 €', '0 €', '0 €', '35 953 €'],
+                [t('table.total'), '16 128 €', '140 586 €', '165 763 €', '314 648 €'],
               ]}
-              headers={['', t('investigationDate'), t('constructionDate'), t('constructionDatePart2')]}
+              headers={['', t('investigationDate'), t('constructionDate'), t('constructionDatePart2'), t('accelerationDate')]}
               className={styles.boldTable}
             />
             <p>
               {t('total')}&nbsp;
-              <span className="fr-text--bold">322 477€ TTC.</span>
+              <span className="fr-text--bold">637 125€ TTC.</span>
             </p>
           </div>
         </div>
