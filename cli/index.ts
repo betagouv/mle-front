@@ -2,6 +2,7 @@ import { program } from 'commander'
 import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
 import { backfillBrevoOwners } from './commands/backfill-brevo-owners'
 import { compareCrous } from './commands/compare-crous'
+import { detectAlertJobsCommand } from './commands/detect-alert-jobs'
 import { healthcheck, healthcheckCities } from './commands/healthcheck'
 import { importBackup } from './commands/import-backup'
 import { importCrousRents } from './commands/import-crous-rents'
@@ -9,6 +10,7 @@ import { importCrousSurfaces } from './commands/import-crous-surfaces'
 import { importCrousTypologies } from './commands/import-crous-typologies'
 import { migrate } from './commands/migrate'
 import { migrateUsers } from './commands/migrate-users'
+import { seedAlertSnapshotCommand } from './commands/seed-alert-snapshot'
 import { sendAlertJobs } from './commands/send-alert-jobs'
 import { auditStorage } from './commands/storage/auditStorage'
 import { uploadImages } from './commands/upload-images'
@@ -136,6 +138,19 @@ program
   .option('--verbose', 'Afficher le détail de chaque problème')
   .option('--write', 'Appliquer les corrections (URLs cassées retirées de la base, fichiers orphelins supprimés de S3)')
   .action((opts) => auditStorage(opts))
+
+program
+  .command('seed-alert-snapshot')
+  .description('Amorce le snapshot de dispo (baseline) — à jouer une fois avant la détection événementielle')
+  .option('--dry-run', 'Simuler sans modifier le snapshot')
+  .action((opts) => seedAlertSnapshotCommand(opts))
+
+program
+  .command('detect-alert-jobs')
+  .description("Détecte les hausses de disponibilité et crée les jobs d'alerte (pending)")
+  .option('--dry-run', 'Simuler sans créer de jobs ni modifier le snapshot')
+  .option('--verbose', 'Afficher le détail des hausses détectées')
+  .action((opts) => detectAlertJobsCommand(opts))
 
 program
   .command('send-alert-jobs')

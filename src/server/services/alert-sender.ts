@@ -1,6 +1,6 @@
 import { and, count, eq, inArray, lt, or, sql } from 'drizzle-orm'
 import { db } from '~/server/db'
-import { accommodations, alertJobs, user } from '~/server/db/schema'
+import { accommodations, alertJobs, studentAlerts, user } from '~/server/db/schema'
 import { env } from '~/server/env'
 import { sendStudentAlertEmail } from './brevo'
 
@@ -14,11 +14,14 @@ export type AlertSenderResult = {
   requeued: number
 }
 
-type UserAlertBatch = {
+// Un envoi = une alerte : un étudiant ayant plusieurs alertes reçoit plusieurs résidences définies par les critères de l'alerte.
+// un mail par alerte, ce qui évite aussi qu'une résidence matchée par 2 alertes soit dupliquée.
+type AlertBatch = {
   email: string
   firstname: string | null
+  alertName: string
   jobIds: number[]
-  accomodations: { nom: string; url: string }[]
+  accommodations: { nom: string; url: string }[]
 }
 
 export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?: boolean } = {}): Promise<AlertSenderResult> {
@@ -47,6 +50,8 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
   const pendingJobs = await db
     .select({
       jobId: alertJobs.id,
+      studentAlertId: alertJobs.studentAlertId,
+      alertName: studentAlerts.name,
       userEmail: user.email,
       userFirstname: user.firstname,
       accommodationName: accommodations.name,
@@ -54,24 +59,26 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
     })
     .from(alertJobs)
     .innerJoin(user, eq(alertJobs.userId, user.id))
+    .innerJoin(studentAlerts, eq(alertJobs.studentAlertId, studentAlerts.id))
     .innerJoin(accommodations, eq(alertJobs.accommodationId, accommodations.id))
     .where(selection)
 
   if (pendingJobs.length === 0) return { sent: 0, failed: 0, requeued }
 
-  const byUser = new Map<string, UserAlertBatch>()
+  const byAlert = new Map<number, AlertBatch>()
   for (const job of pendingJobs) {
-    if (!byUser.has(job.userEmail)) {
-      byUser.set(job.userEmail, {
+    if (!byAlert.has(job.studentAlertId)) {
+      byAlert.set(job.studentAlertId, {
         email: job.userEmail,
         firstname: job.userFirstname,
+        alertName: job.alertName,
         jobIds: [],
-        accomodations: [],
+        accommodations: [],
       })
     }
-    const batch = byUser.get(job.userEmail)!
+    const batch = byAlert.get(job.studentAlertId)!
     batch.jobIds.push(job.jobId)
-    batch.accomodations.push({
+    batch.accommodations.push({
       nom: job.accommodationName,
       url: `${env.BASE_URL}logement/${job.accommodationSlug}`,
     })
@@ -80,22 +87,26 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
   let sent = 0
   let failed = 0
 
-  for (const batch of byUser.values()) {
+  for (const batch of byAlert.values()) {
     if (options.dryRun) {
       if (options.verbose) {
-        console.log(`  [dry-run] ${batch.email} — ${batch.accomodations.length} logement(s)`)
+        console.log(`  [dry-run] ${batch.email} — alerte « ${batch.alertName} » — ${batch.accommodations.length} logement(s)`)
       }
       sent++
       continue
     }
 
     try {
-      await sendStudentAlertEmail(batch.email, { firstName: batch.firstname ?? '', acccomodations: batch.accomodations })
+      await sendStudentAlertEmail(batch.email, {
+        firstName: batch.firstname ?? '',
+        alertName: batch.alertName,
+        accommodations: batch.accommodations,
+      })
       await db
         .update(alertJobs)
         .set({ status: 'sent', sentAt: new Date(), attempts: sql`${alertJobs.attempts} + 1` })
         .where(inArray(alertJobs.id, batch.jobIds))
-      if (options.verbose) console.log(`  ✓ ${batch.email} — ${batch.accomodations.length} logement(s)`)
+      if (options.verbose) console.log(`  ✓ ${batch.email} — ${batch.accommodations.length} logement(s)`)
       sent++
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue'

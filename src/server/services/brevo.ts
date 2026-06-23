@@ -110,9 +110,15 @@ export async function sendAlertCreationConfirmationEmail(
 
 export async function sendStudentAlertEmail(
   email: string,
-  // TODO : adapt to template variables
-  params: { firstName: string; acccomodations: { nom: string; url: string }[] },
+  params: { firstName: string; alertName?: string; accommodations: { nom: string; url: string }[] },
 ): Promise<void> {
+  // Anti-spam : on n'envoie réellement les alertes qu'en production.
+  // Jamais en dev, jamais en staging. Eviter les spam intempestifs.
+  if (env.NEXT_PUBLIC_APP_ENV !== 'production') {
+    console.info(`[${env.NEXT_PUBLIC_APP_ENV}] email d'alerte non envoyé à ${email}`)
+    return
+  }
+
   const response = await fetch(env.BREVO_API_URL, {
     method: 'POST',
     headers: brevoHeaders,

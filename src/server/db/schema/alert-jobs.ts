@@ -1,4 +1,5 @@
-import { bigint, index, integer, pgEnum, pgTable, text, timestamp, unique } from 'drizzle-orm/pg-core'
+import { sql } from 'drizzle-orm'
+import { bigint, index, integer, pgEnum, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
 import { accommodations } from './accommodations'
 import { user } from './auth'
 import { studentAlerts } from './student-alerts'
@@ -27,6 +28,8 @@ export const alertJobs = pgTable(
   (t) => [
     index('alert_job_user_id_idx').on(t.userId),
     index('alert_job_status_idx').on(t.status),
-    unique('alert_job_unique').on(t.userId, t.studentAlertId, t.accommodationId),
+    uniqueIndex('alert_job_active_unique')
+      .on(t.userId, t.studentAlertId, t.accommodationId)
+      .where(sql`${t.status} = 'pending' OR (${t.status} = 'failed' AND ${t.attempts} < 3)`),
   ],
 )

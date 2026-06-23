@@ -274,6 +274,20 @@
       "when": 1781513011829,
       "tag": "0038_add-alert-jobs",
       "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1782201386655,
+      "tag": "0039_add_alert_availability_snapshot_and_partial_unique",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1782215808257,
+      "tag": "0040_alert_job_active_partial_index",
+      "breakpoints": true
     }
   ]
 }
