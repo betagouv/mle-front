@@ -5,12 +5,19 @@ import ToggleSwitch from '@codegouvfr/react-dsfr/ToggleSwitch'
 import { DeleteStudentAlert } from '~/components/student-space/alerts/delete-student-alert'
 import { StudentAlertCountButton } from '~/components/student-space/alerts/student-alert-count-button'
 import { UpdateStudentAlert } from '~/components/student-space/alerts/update-student-alert'
+import { useUpdateAlert } from '~/hooks/use-update-alert'
 import { TAlert } from '~/schemas/alerts/get-alerts'
 
 type StudentAlertProps = {
   alert: TAlert
 }
 export const StudentAlert = ({ alert }: StudentAlertProps) => {
+  const { mutateAsync: updateAlert } = useUpdateAlert()
+
+  const handleToggleNotifications = async (checked: boolean) => {
+    await updateAlert({ id: alert.id, receive_notifications: checked })
+  }
+
   return (
     <div className="fr-border fr-background-default--grey fr-width-full fr-p-5w">
       <div className="fr-flex fr-direction-column fr-flex-gap-4v">
@@ -30,7 +37,13 @@ export const StudentAlert = ({ alert }: StudentAlertProps) => {
       </div>
       <div className="fr-mt-4w fr-flex fr-justify-content-space-between">
         <div className="fr-col-6">
-          <ToggleSwitch label="E-mail" inputTitle="terms" defaultChecked={false} showCheckedHint={false} />
+          <ToggleSwitch
+            label="Recevoir des alertes mail"
+            inputTitle={`receive-notifications-${alert.id}`}
+            checked={alert.receive_notifications}
+            onChange={handleToggleNotifications}
+            showCheckedHint={false}
+          />
         </div>
         <div>
           <StudentAlertCountButton alert={alert} />
