@@ -1,5 +1,6 @@
 import { program } from 'commander'
 import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
+import { backfillBrevoOwners } from './commands/backfill-brevo-owners'
 import { compareCrous } from './commands/compare-crous'
 import { healthcheck, healthcheckCities } from './commands/healthcheck'
 import { importBackup } from './commands/import-backup'
@@ -24,6 +25,15 @@ program
   .option('--limit <n>', "Limiter le nombre d'utilisateurs", parseInt)
   .option('--batch-size <n>', 'Nombre de requêtes Brevo en parallèle par lot', parseInt)
   .action((opts) => backfillBrevoContacts(opts))
+
+program
+  .command('backfill-brevo-owners')
+  .description('Rattrape les contacts Brevo des gestionnaires uniquement (role owner), avec log des codes HTTP Brevo')
+  .option('--dry-run', 'Simuler sans appeler Brevo')
+  .option('--verbose', 'Afficher chaque contact traité')
+  .option('--limit <n>', 'Limiter le nombre de gestionnaires', parseInt)
+  .option('--batch-size <n>', 'Nombre de requêtes Brevo en parallèle par lot', parseInt)
+  .action((opts) => backfillBrevoOwners(opts))
 
 program.command('migrate').description('Apply Drizzle migrations').action(migrate)
 
