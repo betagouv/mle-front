@@ -1,0 +1,2 @@
+DROP INDEX "alert_job_unsent_unique";--> statement-breakpoint
+CREATE UNIQUE INDEX "alert_job_active_unique" ON "alert_job" USING btree ("user_id","student_alert_id","accommodation_id") WHERE "alert_job"."status" = 'pending' OR ("alert_job"."status" = 'failed' AND "alert_job"."attempts" < 3);

@@ -19,6 +19,7 @@ import { dossierFacileApplications, dossierFacileDocuments, dossierFacileTenants
 import { owners } from '~/server/db/schema/owners'
 import { classifyActions, computeDiff } from '~/server/services/accommodation-diff'
 import { logActivity } from '~/server/services/activity-logger'
+import { triggerAlertDetection } from '~/server/services/alert-detection-trigger'
 import { sendOwnerWelcomeEmail, syncBrevoDataUpdated } from '~/server/services/brevo'
 
 import { computeDerivedFields, generateSlug, geocodeAddress } from '~/server/trpc/utils/accommodation-helpers'
@@ -430,6 +431,8 @@ export const bailleurRouter = createTRPCRouter({
         metadata: { slug: created.slug },
       })
 
+      await triggerAlertDetection([created.id])
+
       return { slug: created.slug }
     }),
 
@@ -528,6 +531,11 @@ export const bailleurRouter = createTRPCRouter({
         }
       }
 
+      const availabilityTouched = Object.values(AVAILABILITY_FIELD_MAP).some((camelKey) => camelKey in camelFields)
+      if (availabilityTouched) {
+        await triggerAlertDetection([accommodationId])
+      }
+
       return updated
     }),
 
@@ -535,7 +543,7 @@ export const bailleurRouter = createTRPCRouter({
     .input(z.object({ slug: z.string() }).merge(ZUpdateResidenceList))
     .mutation(async ({ ctx, input }) => {
       const { slug, ...availFields } = input
-      const { owner } = await verifyOwnership(slug, ctx.session.user.id)
+      const { owner, accommodationId } = await verifyOwnership(slug, ctx.session.user.id)
 
       // Snapshot current state for diff
       const [snapshot] = await db.select().from(accommodations).where(eq(accommodations.slug, slug)).limit(1)
@@ -591,6 +599,8 @@ export const bailleurRouter = createTRPCRouter({
       } catch (err) {
         console.error('Erreur sync Brevo DATE_DERNIERE_MAJ_DONNEES', err)
       }
+
+      await triggerAlertDetection([accommodationId])
 
       return updated
     }),
