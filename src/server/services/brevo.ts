@@ -82,6 +82,32 @@ export async function sendAdminResetPasswordEmail(email: string): Promise<void> 
   })
 }
 
+export async function sendAlertCreationConfirmationEmail(
+  email: string,
+  params: {
+    alertName: string
+    city?: string
+    academy?: string
+    maxBudget: number
+  },
+): Promise<void> {
+  try {
+    const UNDEFINED = 'Non définie'
+    await sendTemplateEmail({
+      to: email,
+      templateId: env.BREVO_TEMPLATE_ALERT_CREATION,
+      params: {
+        alertName: params.alertName,
+        maxBudget: String(params.maxBudget),
+        city: params.city ?? UNDEFINED,
+        academy: params.academy ?? UNDEFINED,
+      },
+    })
+  } catch (error) {
+    console.error('sendAlertCreationConfirmationEmail failed:', error)
+  }
+}
+
 export async function sendStudentAlertEmail(
   email: string,
   // TODO : adapt to template variables
@@ -135,7 +161,6 @@ async function updateBrevoContactAttributes(email: string, attributes: BrevoData
 
 export async function syncBrevoOwnerCreated(
   email: string,
-  // createdAt par défaut à aujourd'hui (flux live de création) ; surchargé lors du rattrapage de la base
   { firstname, lastname, createdAt }: { firstname: string; lastname: string; createdAt?: Date },
 ): Promise<void> {
   await updateBrevoContactAttributes(email, {

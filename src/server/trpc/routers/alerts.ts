@@ -10,6 +10,7 @@ import { cities } from '~/server/db/schema/cities'
 import { departments } from '~/server/db/schema/departments'
 import { owners } from '~/server/db/schema/owners'
 import { studentAlerts } from '~/server/db/schema/student-alerts'
+import { sendAlertCreationConfirmationEmail } from '~/server/services/brevo'
 import { bboxSelect } from '~/server/trpc/utils/spatial-helpers'
 import { createTRPCRouter, userProcedure } from '../init'
 
@@ -254,6 +255,18 @@ export const alertsRouter = createTRPCRouter({
         maxPrice: input.max_price,
       })
       .returning()
+
+    const [[cityRow], [academyRow]] = await Promise.all([
+      input.city_id ? db.select({ name: cities.name }).from(cities).where(eq(cities.id, input.city_id)) : [],
+      input.academy_id ? db.select({ name: academies.name }).from(academies).where(eq(academies.id, input.academy_id)) : [],
+    ])
+
+    await sendAlertCreationConfirmationEmail(ctx.session.user.email, {
+      alertName: input.name,
+      city: cityRow?.name,
+      academy: academyRow?.name,
+      maxBudget: input.max_price,
+    })
 
     return row
   }),

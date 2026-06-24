@@ -13,6 +13,7 @@ describe('brevo service', () => {
     vi.stubEnv('BREVO_TEMPLATE_VALIDATION', '21')
     vi.stubEnv('BREVO_TEMPLATE_RESET_PASSWORD', '23')
     vi.stubEnv('BREVO_TEMPLATE_OWNER_WELCOME', '40')
+    vi.stubEnv('BREVO_TEMPLATE_ALERT_CREATION', '43')
   })
 
   describe('sendTemplateEmail', () => {
@@ -143,6 +144,62 @@ describe('brevo service', () => {
         replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
       })
       expect(body.params).toBeUndefined()
+    })
+  })
+
+  describe('sendAlertCreationConfirmationEmail', () => {
+    it('uses template ID 43 avec alertName, maxBudget et les valeurs par défaut pour city et academy', async () => {
+      const { sendAlertCreationConfirmationEmail } = await import('./brevo')
+
+      await sendAlertCreationConfirmationEmail('student@test.com', {
+        alertName: 'Mon alerte Paris',
+        maxBudget: 600,
+      })
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+      expect(body.templateId).toBe(43)
+      expect(body.to).toEqual([{ email: 'student@test.com' }])
+      expect(body.params.alertName).toBe('Mon alerte Paris')
+      expect(body.params.maxBudget).toBe('600')
+      expect(body.params.city).toBe('Non définie')
+      expect(body.params.academy).toBe('Non définie')
+    })
+
+    it('inclut la valeur de city quand elle est fournie', async () => {
+      const { sendAlertCreationConfirmationEmail } = await import('./brevo')
+
+      await sendAlertCreationConfirmationEmail('student@test.com', {
+        alertName: 'Mon alerte',
+        city: 'Lyon',
+        maxBudget: 500,
+      })
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+      expect(body.params.city).toBe('Lyon')
+      expect(body.params.academy).toBe('Non définie')
+    })
+
+    it('inclut la valeur de academy quand elle est fournie', async () => {
+      const { sendAlertCreationConfirmationEmail } = await import('./brevo')
+
+      await sendAlertCreationConfirmationEmail('student@test.com', {
+        alertName: 'Mon alerte',
+        academy: 'Académie de Bordeaux',
+        maxBudget: 450,
+      })
+
+      const body = JSON.parse(fetchMock.mock.calls[0][1].body)
+      expect(body.params.academy).toBe('Académie de Bordeaux')
+      expect(body.params.city).toBe('Non définie')
+    })
+
+    it("ne propage pas l'erreur si l'envoi échoue", async () => {
+      fetchMock.mockResolvedValueOnce({ ok: false, status: 500, text: async () => 'Internal Server Error' })
+      const { sendAlertCreationConfirmationEmail } = await import('./brevo')
+
+      await expect(
+        sendAlertCreationConfirmationEmail('student@test.com', { alertName: 'Mon alerte', maxBudget: 500 }),
+      ).resolves.toBeUndefined()
     })
   })
 
