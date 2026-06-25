@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { tss } from 'tss-react'
 import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
 import { TGetAccomodationsResponse } from '~/schemas/accommodations/get-accommodations'
+import { getAccommodationPath } from '~/utils/get-accommodation-url'
 
 export const NearbyAccommodations = ({
   nearbyAccommodations,
@@ -46,7 +47,7 @@ export const NearbyAccommodations = ({
         }
       : {}),
     linkProps: {
-      href: `/trouver-un-logement-etudiant/ville/${encodeURIComponent(currentFeature.city)}/${currentFeature.slug}`,
+      href: getAccommodationPath(currentFeature.city, currentFeature.slug),
     },
     size: 'small' as const,
     title: currentFeature?.name,

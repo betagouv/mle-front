@@ -1,7 +1,8 @@
 import { and, count, eq, inArray, lt, or, sql } from 'drizzle-orm'
 import { db } from '~/server/db'
-import { accommodations, alertJobs, studentAlerts, user } from '~/server/db/schema'
+import { accommodationAddresses, accommodations, alertJobs, cities, studentAlerts, user } from '~/server/db/schema'
 import { env } from '~/server/env'
+import { getAccommodationPath } from '~/utils/get-accommodation-url'
 import { sendStudentAlertEmail } from './brevo'
 
 // Nombre maximal de tentatives d'envoi par job (1 envoi initial + retries).
@@ -56,11 +57,19 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
       userFirstname: user.firstname,
       accommodationName: accommodations.name,
       accommodationSlug: accommodations.slug,
+      cityName: cities.name,
     })
     .from(alertJobs)
     .innerJoin(user, eq(alertJobs.userId, user.id))
     .innerJoin(studentAlerts, eq(alertJobs.studentAlertId, studentAlerts.id))
     .innerJoin(accommodations, eq(alertJobs.accommodationId, accommodations.id))
+    // Ville pour construire l'URL de détail. En `leftJoin` (+ adresse principale) pour ne
+    // jamais écarter un job d'une résidence sans adresse principale/ville renseignée.
+    .leftJoin(
+      accommodationAddresses,
+      and(eq(accommodationAddresses.accommodationId, accommodations.id), eq(accommodationAddresses.isMain, true)),
+    )
+    .leftJoin(cities, eq(accommodationAddresses.cityId, cities.id))
     .where(selection)
 
   if (pendingJobs.length === 0) return { sent: 0, failed: 0, requeued }
@@ -78,9 +87,11 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
     }
     const batch = byAlert.get(job.studentAlertId)!
     batch.jobIds.push(job.jobId)
+    // Sans ville résolue, on retombe sur la page de recherche plutôt qu'un lien cassé.
+    const path = job.cityName ? getAccommodationPath(job.cityName, job.accommodationSlug) : '/trouver-un-logement-etudiant'
     batch.accommodations.push({
       nom: job.accommodationName,
-      url: `${env.BASE_URL}logement/${job.accommodationSlug}`,
+      url: `${env.BASE_URL}${path}`,
     })
   }
 
