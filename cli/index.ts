@@ -1,4 +1,5 @@
 import { program } from 'commander'
+import { backfillAlertJobsCommand } from './commands/backfill-alert-jobs'
 import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
 import { backfillBrevoOwners } from './commands/backfill-brevo-owners'
 import { compareCrous } from './commands/compare-crous'
@@ -144,6 +145,13 @@ program
   .description('Amorce le snapshot de dispo (baseline) — à jouer une fois avant la détection événementielle')
   .option('--dry-run', 'Simuler sans modifier le snapshot')
   .action((opts) => seedAlertSnapshotCommand(opts))
+
+program
+  .command('backfill-alert-jobs')
+  .description('Vague initiale : enfile les jobs pour le stock déjà dispo qui matche les alertes existantes (envoi de masse ponctuel)')
+  .option('--dry-run', 'Simuler sans enfiler de jobs')
+  .option('--verbose', 'Afficher le nombre de jobs candidats')
+  .action((opts) => backfillAlertJobsCommand(opts))
 
 program
   .command('detect-alert-jobs')

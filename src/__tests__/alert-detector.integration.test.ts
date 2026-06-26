@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm'
 import { describe, expect, it } from 'vitest'
 import { accommodations, alertJobs } from '~/server/db/schema'
-import { detectAlertJobs, enqueueJobsForNewAlert } from '~/server/services/alert-detector'
+import { backfillAlertJobs, detectAlertJobs, enqueueJobsForNewAlert } from '~/server/services/alert-detector'
 import { MAX_ATTEMPTS } from '~/server/services/alert-sender'
 import { createAcademy, createAccommodation, createAlert, createCity, createDepartment, createOwner } from './fixtures/factories'
 import { getTestDb } from './helpers/test-db'
@@ -328,6 +328,68 @@ describe('enqueueJobsForNewAlert (flux pull à la création d’alerte)', () => 
 
     expect(await enqueueJobsForNewAlert(alert.id)).toBe(1)
     expect(await enqueueJobsForNewAlert(alert.id)).toBe(0)
+    expect(await jobsFor(accom.id)).toHaveLength(1)
+  })
+})
+
+describe('backfillAlertJobs (vague initiale pour les alertes existantes)', () => {
+  it('enfile un job par couple alerte active × stock dispo qui matche', async () => {
+    const city = await setupCity()
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
+    await createAlert({ userId: 'student-2', cityId: city.id, maxPrice: 500, receiveNotifications: true })
+
+    const { alertsProcessed, jobsCreated } = await backfillAlertJobs()
+
+    expect(alertsProcessed).toBe(2)
+    expect(jobsCreated).toBe(2)
+    expect(await jobsFor(accom.id)).toHaveLength(2)
+  })
+
+  it('dry-run : compte les jobs candidats sans rien écrire', async () => {
+    const city = await setupCity()
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
+
+    const { jobsCreated } = await backfillAlertJobs({ dryRun: true })
+
+    expect(jobsCreated).toBe(1)
+    expect(await jobsFor(accom.id)).toHaveLength(0)
+  })
+
+  it('ne touche pas le snapshot (le détecteur reste muet juste après)', async () => {
+    const city = await setupCity()
+    await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
+
+    await backfillAlertJobs()
+    // Snapshot non amorcé par le backfill : le 1er run du détecteur ne fait que poser la baseline.
+    const result = await detectAlertJobs()
+
+    expect(result.jobsCreated).toBe(0)
+  })
+
+  it('exclut les alertes opt-out et sans territoire', async () => {
+    const city = await setupCity()
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: false }) // opt-out
+    await createAlert({ userId: 'student-2', maxPrice: 500, receiveNotifications: true }) // sans territoire
+    await createAlert({ userId: 'student-3', cityId: city.id, maxPrice: 500, receiveNotifications: true }) // éligible
+
+    const { alertsProcessed, jobsCreated } = await backfillAlertJobs()
+
+    expect(alertsProcessed).toBe(1)
+    expect(jobsCreated).toBe(1)
+    expect(await jobsFor(accom.id)).toHaveLength(1)
+  })
+
+  it('idempotent : un second run ne crée pas de doublon', async () => {
+    const city = await setupCity()
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    await createAlert({ userId: 'student-1', cityId: city.id, maxPrice: 500, receiveNotifications: true })
+
+    expect((await backfillAlertJobs()).jobsCreated).toBe(1)
+    expect((await backfillAlertJobs()).jobsCreated).toBe(0)
     expect(await jobsFor(accom.id)).toHaveLength(1)
   })
 })
