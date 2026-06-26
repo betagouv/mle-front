@@ -232,3 +232,69 @@ export async function enqueueJobsForNewAlert(alertId: number): Promise<number> {
   const inserted = await db.insert(alertJobs).values(jobRows).onConflictDoNothing().returning({ id: alertJobs.id })
   return inserted.length
 }
+
+/**
+ * Backfill ponctuel (flux « pull » de masse) : pour **toutes** les alertes actives déjà
+ * créées, enfile les jobs correspondant au **stock actuellement disponible** (`dispo > 0`).
+ *
+ * Sert à amorcer une première vague de notifications au démarrage du système : sans lui,
+ * les alertes existantes ne seraient jamais averties du stock déjà présent (ni delta côté
+ * push, ni création côté pull). À jouer **une seule fois**, explicitement (opt-in).
+ *
+ * Ne touche **pas** le snapshot (même raison qu'`enqueueJobsForNewAlert`). Idempotent :
+ * l'index unique partiel de `alert_job` empêche les doublons sur un re-run.
+ */
+export async function backfillAlertJobs(
+  options: { dryRun?: boolean; verbose?: boolean } = {},
+): Promise<{ alertsProcessed: number; jobsCreated: number }> {
+  const activeAlerts = await db
+    .select({
+      id: studentAlerts.id,
+      userId: studentAlerts.userId,
+      cityId: studentAlerts.cityId,
+      departmentId: studentAlerts.departmentId,
+      academyId: studentAlerts.academyId,
+      hasColiving: studentAlerts.hasColiving,
+      isAccessible: studentAlerts.isAccessible,
+      maxPrice: studentAlerts.maxPrice,
+    })
+    .from(studentAlerts)
+    // Mêmes garde-fous que le détecteur : opt-in + territoire défini (sinon match national).
+    .where(
+      and(
+        eq(studentAlerts.receiveNotifications, true),
+        or(isNotNull(studentAlerts.cityId), isNotNull(studentAlerts.departmentId), isNotNull(studentAlerts.academyId)),
+      ),
+    )
+
+  const jobRows: { userId: string; studentAlertId: number; accommodationId: number }[] = []
+  for (const alert of activeAlerts) {
+    const matchInput: AlertMatchInput = {
+      cityId: alert.cityId,
+      departmentId: alert.departmentId,
+      academyId: alert.academyId,
+      hasColiving: alert.hasColiving,
+      isAccessible: alert.isAccessible,
+      maxPrice: alert.maxPrice,
+    }
+    const matched = await db
+      .select({ id: accommodations.id })
+      .from(accommodations)
+      .where(and(sql`${currentAvailableCount} > 0`, ...buildAlertMatchConditions(matchInput)))
+
+    for (const m of matched) {
+      jobRows.push({ userId: alert.userId, studentAlertId: alert.id, accommodationId: m.id })
+    }
+  }
+
+  if (options.verbose) {
+    console.log(`  alertes actives : ${activeAlerts.length}, jobs candidats : ${jobRows.length}`)
+  }
+
+  if (options.dryRun || jobRows.length === 0) {
+    return { alertsProcessed: activeAlerts.length, jobsCreated: jobRows.length }
+  }
+
+  const inserted = await db.insert(alertJobs).values(jobRows).onConflictDoNothing().returning({ id: alertJobs.id })
+  return { alertsProcessed: activeAlerts.length, jobsCreated: inserted.length }
+}

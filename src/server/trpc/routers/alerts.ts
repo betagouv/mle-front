@@ -241,6 +241,13 @@ export const alertsRouter = createTRPCRouter({
       .where(and(eq(studentAlerts.id, id), eq(studentAlerts.userId, userId)))
       .returning()
 
+    try {
+      await enqueueJobsForNewAlert(row.id)
+    } catch (error) {
+      console.error('enqueueJobsForNewAlert failed:', error)
+      Sentry.captureException(error)
+    }
+
     return row
   }),
 
