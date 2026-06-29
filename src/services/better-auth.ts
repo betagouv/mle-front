@@ -72,6 +72,8 @@ export const auth = betterAuth({
   },
   plugins: [
     magicLink({
+      expiresIn: 600,
+      allowedAttempts: 3,
       sendMagicLink: async ({ email, url }) => {
         const usr = await db.query.user.findFirst({
           where: eq(schema.user.email, email),
