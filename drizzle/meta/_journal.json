@@ -288,6 +288,13 @@
       "when": 1782215808257,
       "tag": "0040_alert_job_active_partial_index",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1782808518394,
+      "tag": "0041_add-alert-job-source-nullable-student-alert-id",
+      "breakpoints": true
     }
   ]
 }

@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { db } from '~/server/db'
 import { accommodationAddresses } from '~/server/db/schema/accommodation-addresses'
 import { accommodations } from '~/server/db/schema/accommodations'
+import { alertJobs } from '~/server/db/schema/alert-jobs'
 import { cities } from '~/server/db/schema/cities'
 import { favoriteAccommodations } from '~/server/db/schema/favorite-accommodations'
 import { owners } from '~/server/db/schema/owners'
@@ -224,12 +225,26 @@ export const favoritesRouter = createTRPCRouter({
   remove: userProcedure.input(z.object({ slug: z.string() })).mutation(async ({ ctx, input }) => {
     const userId = ctx.session.user.id
 
+    const accom = await db.query.accommodations.findFirst({
+      where: eq(accommodations.slug, input.slug),
+      columns: { id: true },
+    })
+
+    if (!accom) return { success: true }
+
     await db
       .delete(favoriteAccommodations)
+      .where(and(eq(favoriteAccommodations.userId, userId), eq(favoriteAccommodations.accommodationId, accom.id)))
+
+    // Annuler les jobs pending issus de ce favori pour éviter un email post-suppression.
+    await db
+      .delete(alertJobs)
       .where(
         and(
-          eq(favoriteAccommodations.userId, userId),
-          sql`${favoriteAccommodations.accommodationId} = (SELECT ${accommodations.id} FROM ${accommodations} WHERE ${accommodations.slug} = ${input.slug} LIMIT 1)`,
+          eq(alertJobs.userId, userId),
+          eq(alertJobs.accommodationId, accom.id),
+          eq(alertJobs.source, 'favorite'),
+          eq(alertJobs.status, 'pending'),
         ),
       )
 

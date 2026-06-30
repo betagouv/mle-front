@@ -1,6 +1,6 @@
 import { and, eq, inArray, isNotNull, or, sql } from 'drizzle-orm'
 import { db } from '~/server/db'
-import { accommodations, alertAvailabilitySnapshots, alertJobs, owners, studentAlerts } from '~/server/db/schema'
+import { accommodations, alertAvailabilitySnapshots, alertJobs, favoriteAccommodations, owners, studentAlerts } from '~/server/db/schema'
 import { type AlertMatchInput, accommodationAvailableCount, buildAlertMatchConditions } from './alert-matching'
 
 export type AlertDetectorResult = {
@@ -20,6 +20,10 @@ const inScopeCondition = and(
   eq(accommodations.published, true),
   sql`(${accommodations.ownerId} IS NULL OR ${accommodations.ownerId} NOT IN (SELECT ${owners.id} FROM ${owners} WHERE ${owners.slug} = 'crous'))`,
 )
+
+function toFavoriteJobRow(f: { userId: string; accommodationId: number }) {
+  return { userId: f.userId, studentAlertId: null, accommodationId: f.accommodationId, source: 'favorite' as const }
+}
 
 /**
  * Détecte les hausses de disponibilité et crée les jobs d'alerte (status `pending`)
@@ -74,7 +78,7 @@ export async function detectAlertJobs(
   const seeded = isFirstRun ? rows.length : rows.filter((r) => !r.hasSnapshot).length
 
   // Croisement avec les alertes actives (opt-in via receiveNotifications).
-  const jobRows: { userId: string; studentAlertId: number; accommodationId: number }[] = []
+  const alertJobRows: { userId: string; studentAlertId: number; accommodationId: number; source: 'alert' }[] = []
   if (triggeredIds.length > 0) {
     const activeAlerts = await db
       .select({
@@ -112,25 +116,37 @@ export async function detectAlertJobs(
         .where(and(inArray(accommodations.id, triggeredIds), ...buildAlertMatchConditions(matchInput)))
 
       for (const m of matched) {
-        jobRows.push({ userId: alert.userId, studentAlertId: alert.id, accommodationId: m.id })
+        alertJobRows.push({ userId: alert.userId, studentAlertId: alert.id, accommodationId: m.id, source: 'alert' })
       }
     }
   }
 
+  // Croisement avec les favoris : étudiants ayant épinglé une résidence dont la dispo a augmenté.
+  const favJobRows =
+    triggeredIds.length > 0
+      ? (
+          await db
+            .select({ userId: favoriteAccommodations.userId, accommodationId: favoriteAccommodations.accommodationId })
+            .from(favoriteAccommodations)
+            .where(inArray(favoriteAccommodations.accommodationId, triggeredIds))
+        ).map(toFavoriteJobRow)
+      : []
+
+  const allJobRows = [...alertJobRows, ...favJobRows]
+
   if (options.verbose) {
     console.log(
-      `  ${isFirstRun ? '[baseline] ' : ''}résidences en périmètre : ${rows.length}, hausses : ${triggeredIds.length}, jobs candidats : ${jobRows.length}`,
+      `  ${isFirstRun ? '[baseline] ' : ''}résidences en périmètre : ${rows.length}, hausses : ${triggeredIds.length}, jobs candidats : ${allJobRows.length} (alertes: ${alertJobRows.length}, favoris: ${favJobRows.length})`,
     )
   }
 
-  let jobsCreated = jobRows.length
+  let jobsCreated = allJobRows.length
   if (!options.dryRun) {
     jobsCreated = await db.transaction(async (tx) => {
-      // Création des jobs : onConflictDoNothing s'appuie sur l'index unique partiel
-      // (un seul job actif par couple étudiant/alerte/résidence).
+      // Création des jobs : onConflictDoNothing s'appuie sur les deux index uniques partiels.
       let created = 0
-      if (jobRows.length > 0) {
-        const inserted = await tx.insert(alertJobs).values(jobRows).onConflictDoNothing().returning({ id: alertJobs.id })
+      if (allJobRows.length > 0) {
+        const inserted = await tx.insert(alertJobs).values(allJobRows).onConflictDoNothing().returning({ id: alertJobs.id })
         created = inserted.length
       }
 
@@ -228,21 +244,22 @@ export async function enqueueJobsForNewAlert(alertId: number): Promise<number> {
 
   if (matched.length === 0) return 0
 
-  const jobRows = matched.map((m) => ({ userId: alert.userId, studentAlertId: alert.id, accommodationId: m.id }))
+  const jobRows = matched.map((m) => ({ userId: alert.userId, studentAlertId: alert.id, accommodationId: m.id, source: 'alert' as const }))
   const inserted = await db.insert(alertJobs).values(jobRows).onConflictDoNothing().returning({ id: alertJobs.id })
   return inserted.length
 }
 
 /**
- * Backfill ponctuel (flux « pull » de masse) : pour **toutes** les alertes actives déjà
- * créées, enfile les jobs correspondant au **stock actuellement disponible** (`dispo > 0`).
+ * Backfill ponctuel (flux « pull » de masse) : pour **toutes** les alertes actives ET pour
+ * **tous les favoris**, enfile les jobs correspondant au **stock actuellement disponible**
+ * (`dispo > 0`).
  *
  * Sert à amorcer une première vague de notifications au démarrage du système : sans lui,
- * les alertes existantes ne seraient jamais averties du stock déjà présent (ni delta côté
- * push, ni création côté pull). À jouer **une seule fois**, explicitement (opt-in).
+ * les alertes et favoris existants ne seraient jamais avertis du stock déjà présent. À jouer
+ * **une seule fois**, explicitement (opt-in).
  *
  * Ne touche **pas** le snapshot (même raison qu'`enqueueJobsForNewAlert`). Idempotent :
- * l'index unique partiel de `alert_job` empêche les doublons sur un re-run.
+ * les index uniques partiels de `alert_job` empêchent les doublons sur un re-run.
  */
 export async function backfillAlertJobs(
   options: { dryRun?: boolean; verbose?: boolean } = {},
@@ -267,7 +284,7 @@ export async function backfillAlertJobs(
       ),
     )
 
-  const jobRows: { userId: string; studentAlertId: number; accommodationId: number }[] = []
+  const alertJobRows: { userId: string; studentAlertId: number; accommodationId: number; source: 'alert' }[] = []
   for (const alert of activeAlerts) {
     const matchInput: AlertMatchInput = {
       cityId: alert.cityId,
@@ -283,18 +300,31 @@ export async function backfillAlertJobs(
       .where(and(sql`${currentAvailableCount} > 0`, ...buildAlertMatchConditions(matchInput)))
 
     for (const m of matched) {
-      jobRows.push({ userId: alert.userId, studentAlertId: alert.id, accommodationId: m.id })
+      alertJobRows.push({ userId: alert.userId, studentAlertId: alert.id, accommodationId: m.id, source: 'alert' })
     }
   }
 
+  // Favoris : toutes les résidences épinglées actuellement disponibles dans le périmètre.
+  const favJobRows = (
+    await db
+      .select({ userId: favoriteAccommodations.userId, accommodationId: favoriteAccommodations.accommodationId })
+      .from(favoriteAccommodations)
+      .innerJoin(accommodations, eq(favoriteAccommodations.accommodationId, accommodations.id))
+      .where(and(inScopeCondition, sql`${currentAvailableCount} > 0`))
+  ).map(toFavoriteJobRow)
+
+  const allJobRows = [...alertJobRows, ...favJobRows]
+
   if (options.verbose) {
-    console.log(`  alertes actives : ${activeAlerts.length}, jobs candidats : ${jobRows.length}`)
+    console.log(
+      `  alertes actives : ${activeAlerts.length}, jobs alertes candidats : ${alertJobRows.length}, jobs favoris candidats : ${favJobRows.length}`,
+    )
   }
 
-  if (options.dryRun || jobRows.length === 0) {
-    return { alertsProcessed: activeAlerts.length, jobsCreated: jobRows.length }
+  if (options.dryRun || allJobRows.length === 0) {
+    return { alertsProcessed: activeAlerts.length, jobsCreated: allJobRows.length }
   }
 
-  const inserted = await db.insert(alertJobs).values(jobRows).onConflictDoNothing().returning({ id: alertJobs.id })
+  const inserted = await db.insert(alertJobs).values(allJobRows).onConflictDoNothing().returning({ id: alertJobs.id })
   return { alertsProcessed: activeAlerts.length, jobsCreated: inserted.length }
 }

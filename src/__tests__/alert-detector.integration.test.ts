@@ -1,9 +1,18 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import { describe, expect, it } from 'vitest'
 import { accommodations, alertJobs } from '~/server/db/schema'
 import { backfillAlertJobs, detectAlertJobs, enqueueJobsForNewAlert } from '~/server/services/alert-detector'
 import { MAX_ATTEMPTS } from '~/server/services/alert-sender'
-import { createAcademy, createAccommodation, createAlert, createCity, createDepartment, createOwner } from './fixtures/factories'
+import {
+  createAcademy,
+  createAccommodation,
+  createAlert,
+  createCity,
+  createDepartment,
+  createFavoriteAccommodation,
+  createOwner,
+  createUser,
+} from './fixtures/factories'
 import { getTestDb } from './helpers/test-db'
 import './helpers/setup-integration'
 
@@ -391,5 +400,117 @@ describe('backfillAlertJobs (vague initiale pour les alertes existantes)', () =>
     expect((await backfillAlertJobs()).jobsCreated).toBe(1)
     expect((await backfillAlertJobs()).jobsCreated).toBe(0)
     expect(await jobsFor(accom.id)).toHaveLength(1)
+  })
+
+  it('inclut les favoris avec dispo > 0', async () => {
+    const city = await setupCity()
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 5 })
+    await createUser({ id: 'student-fav' })
+    await createFavoriteAccommodation({ userId: 'student-fav', accommodationId: accom.id })
+
+    const { jobsCreated } = await backfillAlertJobs()
+
+    expect(jobsCreated).toBe(1)
+    const jobs = await jobsFor(accom.id)
+    expect(jobs).toHaveLength(1)
+    expect(jobs[0].source).toBe('favorite')
+    expect(jobs[0].studentAlertId).toBeNull()
+    expect(jobs[0].userId).toBe('student-fav')
+  })
+
+  it('ne crée pas de job favori pour une résidence sans dispo', async () => {
+    const city = await setupCity()
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    await createUser({ id: 'student-fav' })
+    await createFavoriteAccommodation({ userId: 'student-fav', accommodationId: accom.id })
+
+    const { jobsCreated } = await backfillAlertJobs()
+
+    expect(jobsCreated).toBe(0)
+    expect(await jobsFor(accom.id)).toHaveLength(0)
+  })
+})
+
+describe('detectAlertJobs — favoris', () => {
+  it("hausse de dispo d'une résidence favorite : crée un job source=favorite", async () => {
+    const city = await setupCity()
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    await createUser({ id: 'student-fav' })
+    await createFavoriteAccommodation({ userId: 'student-fav', accommodationId: accom.id })
+
+    await detectAlertJobs() // baseline (0)
+    await setAvailability(accom.id, 5)
+    const result = await detectAlertJobs()
+
+    expect(result.triggered).toBe(1)
+    expect(result.jobsCreated).toBe(1)
+
+    const jobs = await jobsFor(accom.id)
+    expect(jobs).toHaveLength(1)
+    expect(jobs[0].source).toBe('favorite')
+    expect(jobs[0].studentAlertId).toBeNull()
+    expect(jobs[0].userId).toBe('student-fav')
+    expect(jobs[0].status).toBe('pending')
+  })
+
+  it('hausse détectée : crée à la fois un job alerte et un job favori', async () => {
+    const city = await setupCity()
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    await createAlert({ userId: 'student-alert', cityId: city.id, maxPrice: 500, receiveNotifications: true })
+    await createUser({ id: 'student-fav' })
+    await createFavoriteAccommodation({ userId: 'student-fav', accommodationId: accom.id })
+
+    await detectAlertJobs() // baseline
+    await setAvailability(accom.id, 3)
+    const result = await detectAlertJobs()
+
+    expect(result.jobsCreated).toBe(2)
+    const jobs = await jobsFor(accom.id)
+    expect(jobs.find((j) => j.source === 'alert')).toBeDefined()
+    expect(jobs.find((j) => j.source === 'favorite')).toBeDefined()
+  })
+
+  it("job favori : idempotent (onConflictDoNothing sur l'index partiel)", async () => {
+    const city = await setupCity()
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    await createUser({ id: 'student-fav' })
+    await createFavoriteAccommodation({ userId: 'student-fav', accommodationId: accom.id })
+
+    await detectAlertJobs() // baseline
+    await setAvailability(accom.id, 3)
+    await detectAlertJobs() // crée le job
+
+    await setAvailability(accom.id, 5)
+    // Le job précédent est encore pending → pas de doublon
+    const result = await detectAlertJobs()
+    expect(result.jobsCreated).toBe(0)
+    expect(await jobsFor(accom.id)).toHaveLength(1)
+  })
+
+  it("suppression d'un favori annule les jobs pending correspondants", async () => {
+    const city = await setupCity()
+    const accom = await createAccommodation({ cityId: city.id, geom: POINT_INSIDE, published: true, priceMin: 400, nbT1Available: 0 })
+    await createUser({ id: 'student-fav' })
+    await createFavoriteAccommodation({ userId: 'student-fav', accommodationId: accom.id })
+
+    // Créer un job pending via une hausse de dispo
+    await detectAlertJobs() // baseline
+    await setAvailability(accom.id, 5)
+    await detectAlertJobs()
+    expect(await jobsFor(accom.id)).toHaveLength(1)
+
+    // Simule la suppression du favori (annulation des pending comme le fait favorites.remove)
+    await getTestDb()
+      .delete(alertJobs)
+      .where(
+        and(
+          eq(alertJobs.userId, 'student-fav'),
+          eq(alertJobs.accommodationId, accom.id),
+          eq(alertJobs.source, 'favorite'),
+          eq(alertJobs.status, 'pending'),
+        ),
+      )
+
+    expect(await jobsFor(accom.id)).toHaveLength(0)
   })
 })

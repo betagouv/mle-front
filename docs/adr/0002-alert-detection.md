@@ -97,22 +97,46 @@ sans hausse de dispo.
 - **Retour à « non-renseigné »** : passif — on mémorise l'état, on ne déclenche pas.
 - **Granularité** : on suit le **total** de la résidence, pas par typologie (T1/T2…).
 
-### Re-notification et index unique partiel
+### Favoris
 
-Pour autoriser une **2ᵉ notification** quand la dispo remonte (`x → y` après un envoi déjà
-fait), la contrainte unique de `alert_job` est remplacée par un **index unique partiel** qui ne
-porte que sur les jobs **actifs** — en attente (`pending`) ou en échec encore réessayable
-(`failed` sous le plafond de tentatives) :
+Les **favoris** (`accommodation_favoriteaccommodation`) sont intégrés dans deux flux :
+
+- **Push** : `detectAlertJobs` crée des jobs `source = 'favorite'` pour chaque étudiant
+  ayant épinglé une résidence dont la dispo vient d'augmenter.
+- **Backfill** : `backfillAlertJobs` inclut les favoris dans son scan initial.
+- **Suppression** : `favorites.remove` annule les jobs `pending` du favori supprimé pour
+  éviter un email post-unfavorite.
+
+Les jobs favoris ont `student_alert_id = null` et `source = 'favorite'`. Le sender les groupe
+par utilisateur (clé `'favorite:<userId>'`) et envoie un email avec `alertName = 'Mes favoris'`.
+
+### Schema `alert_job` — colonne `source` et deux index
+
+`student_alert_id` est devenu **nullable** (null = job issu d'un favori). Une colonne `source`
+(`enum 'alert' | 'favorite'`, default `'alert'`) discrimine les deux cas.
+
+Deux index uniques partiels remplacent l'ancien index unique :
 
 ```sql
-CREATE UNIQUE INDEX alert_job_active_unique
+-- Jobs issus d'une alerte
+CREATE UNIQUE INDEX alert_job_alert_active_unique
   ON alert_job (user_id, student_alert_id, accommodation_id)
-  WHERE status = 'pending' OR (status = 'failed' AND attempts < 3);
+  WHERE source = 'alert'
+    AND (status = 'pending' OR (status = 'failed' AND attempts < 3));
+
+-- Jobs issus d'un favori (student_alert_id NULL : PostgreSQL traite chaque NULL comme
+-- distinct dans un index, d'où cet index séparé sur (user_id, accommodation_id))
+CREATE UNIQUE INDEX alert_job_favorite_active_unique
+  ON alert_job (user_id, accommodation_id)
+  WHERE source = 'favorite'
+    AND (status = 'pending' OR (status = 'failed' AND attempts < 3));
 ```
 
 > Le `3` doit rester en phase avec `MAX_ATTEMPTS` (`alert-sender.ts`).
 
-Effet :
+### Re-notification et index unique partiel
+
+Effet des index :
 - plusieurs hausses **avant** l'envoi → un seul job actif (coalescence → un seul email) ;
 - une hausse **après** un envoi → nouvelle ligne → re-notification ;
 ## Récurrence

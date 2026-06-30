@@ -5,6 +5,7 @@ import { user } from './auth'
 import { studentAlerts } from './student-alerts'
 
 export const alertJobStatusEnum = pgEnum('alert_job_status', ['pending', 'sent', 'failed'])
+export const alertJobSourceEnum = pgEnum('alert_job_source', ['alert', 'favorite'])
 
 export const alertJobs = pgTable(
   'alert_job',
@@ -13,12 +14,14 @@ export const alertJobs = pgTable(
     userId: text('user_id')
       .notNull()
       .references(() => user.id, { onDelete: 'cascade' }),
-    studentAlertId: bigint('student_alert_id', { mode: 'number' })
-      .notNull()
-      .references(() => studentAlerts.id, { onDelete: 'cascade' }),
+    // null pour les jobs issus d'un favori (source = 'favorite')
+    studentAlertId: bigint('student_alert_id', { mode: 'number' }).references(() => studentAlerts.id, {
+      onDelete: 'cascade',
+    }),
     accommodationId: bigint('accommodation_id', { mode: 'number' })
       .notNull()
       .references(() => accommodations.id, { onDelete: 'cascade' }),
+    source: alertJobSourceEnum().notNull().default('alert'),
     status: alertJobStatusEnum().notNull().default('pending'),
     attempts: integer().notNull().default(0),
     sentAt: timestamp('sent_at', { withTimezone: true }),
@@ -28,8 +31,11 @@ export const alertJobs = pgTable(
   (t) => [
     index('alert_job_user_id_idx').on(t.userId),
     index('alert_job_status_idx').on(t.status),
-    uniqueIndex('alert_job_active_unique')
+    uniqueIndex('alert_job_alert_active_unique')
       .on(t.userId, t.studentAlertId, t.accommodationId)
-      .where(sql`${t.status} = 'pending' OR (${t.status} = 'failed' AND ${t.attempts} < 3)`),
+      .where(sql`${t.source} = 'alert' AND (${t.status} = 'pending' OR (${t.status} = 'failed' AND ${t.attempts} < 3))`),
+    uniqueIndex('alert_job_favorite_active_unique')
+      .on(t.userId, t.accommodationId)
+      .where(sql`${t.source} = 'favorite' AND (${t.status} = 'pending' OR (${t.status} = 'failed' AND ${t.attempts} < 3))`),
   ],
 )

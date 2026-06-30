@@ -15,8 +15,10 @@ export type AlertSenderResult = {
   requeued: number
 }
 
-// Un envoi = une alerte : un étudiant ayant plusieurs alertes reçoit plusieurs résidences définies par les critères de l'alerte.
-// un mail par alerte, ce qui évite aussi qu'une résidence matchée par 2 alertes soit dupliquée.
+// Un envoi = une alerte ou un groupe de favoris par utilisateur.
+// Pour les alertes : un mail par alerte, pour éviter que la même résidence apparaisse
+// dans deux emails (si elle matche deux alertes du même étudiant).
+// Pour les favoris : un mail par utilisateur, regroupant tous ses favoris devenus disponibles.
 type AlertBatch = {
   email: string
   firstname: string | null
@@ -51,6 +53,8 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
   const pendingJobs = await db
     .select({
       jobId: alertJobs.id,
+      source: alertJobs.source,
+      userId: alertJobs.userId,
       studentAlertId: alertJobs.studentAlertId,
       alertName: studentAlerts.name,
       userEmail: user.email,
@@ -61,7 +65,8 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
     })
     .from(alertJobs)
     .innerJoin(user, eq(alertJobs.userId, user.id))
-    .innerJoin(studentAlerts, eq(alertJobs.studentAlertId, studentAlerts.id))
+    // leftJoin : les jobs favoris n'ont pas de studentAlertId (null).
+    .leftJoin(studentAlerts, eq(alertJobs.studentAlertId, studentAlerts.id))
     .innerJoin(accommodations, eq(alertJobs.accommodationId, accommodations.id))
     // Ville pour construire l'URL de détail. En `leftJoin` (+ adresse principale) pour ne
     // jamais écarter un job d'une résidence sans adresse principale/ville renseignée.
@@ -74,18 +79,24 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
 
   if (pendingJobs.length === 0) return { sent: 0, failed: 0, requeued }
 
-  const byAlert = new Map<number, AlertBatch>()
+  // Clé de regroupement :
+  // - alerte → 'alert:<studentAlertId>' (un email par alerte)
+  // - favori  → 'favorite:<userId>'     (un email par utilisateur, tous favoris groupés)
+  const byBatch = new Map<string, AlertBatch>()
   for (const job of pendingJobs) {
-    if (!byAlert.has(job.studentAlertId)) {
-      byAlert.set(job.studentAlertId, {
+    const key = job.source === 'favorite' ? `favorite:${job.userId}` : `alert:${job.studentAlertId}`
+    const batchAlertName = job.source === 'favorite' ? 'Mes favoris' : (job.alertName ?? 'Mon alerte')
+
+    if (!byBatch.has(key)) {
+      byBatch.set(key, {
         email: job.userEmail,
         firstname: job.userFirstname,
-        alertName: job.alertName,
+        alertName: batchAlertName,
         jobIds: [],
         accommodations: [],
       })
     }
-    const batch = byAlert.get(job.studentAlertId)!
+    const batch = byBatch.get(key)!
     batch.jobIds.push(job.jobId)
     // Sans ville résolue, on retombe sur la page de recherche plutôt qu'un lien cassé.
     const path = job.cityName ? getAccommodationPath(job.cityName, job.accommodationSlug) : '/trouver-un-logement-etudiant'
@@ -98,7 +109,7 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
   let sent = 0
   let failed = 0
 
-  for (const batch of byAlert.values()) {
+  for (const batch of byBatch.values()) {
     if (options.dryRun) {
       if (options.verbose) {
         console.log(`  [dry-run] ${batch.email} — alerte « ${batch.alertName} » — ${batch.accommodations.length} logement(s)`)
