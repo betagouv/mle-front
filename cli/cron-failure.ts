@@ -21,6 +21,7 @@ export const CRON_COMMANDS = new Set([
   'detect-alert-jobs',
   'expire-alerts',
   'purge-contact-requests',
+  'purge-logs',
   'cron-selftest',
 ])
 

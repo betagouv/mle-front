@@ -9,6 +9,6 @@
     { "command": "0 4 * * * npx tsx cli/index.ts import initiall" },
     { "command": "*/30 * * * * npx tsx cli/index.ts send-alert-jobs" },
     { "command": "0 8 * * * npx tsx cli/index.ts detect-alert-jobs ; npx tsx cli/index.ts expire-alerts" },
-    { "command": "30 3 * * * npx tsx cli/index.ts purge-contact-requests" }
+    { "command": "30 3 * * * npx tsx cli/index.ts purge-contact-requests ; npx tsx cli/index.ts purge-logs" }
   ]
 }

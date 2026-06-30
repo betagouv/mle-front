@@ -120,6 +120,32 @@ Lit les tables Django existantes dans la BDD locale (typiquement après un `impo
 
 À utiliser une seule fois après la migration Django → tRPC/Drizzle.
 
+#### `purge-logs` — Purger les tables de logs (rétention 6 mois)
+
+```bash
+pnpm cli purge-logs --dry-run --verbose   # simulation, détail par table
+pnpm cli purge-logs                        # purge (rétention 6 mois)
+pnpm cli purge-logs --retention-months 12  # rétention personnalisée
+```
+
+Supprime les lignes plus vieilles que la rétention (défaut **6 mois**, filtre sur `created_at`) dans les tables append-only qui grossissent indéfiniment :
+
+- **`activity_log`** — journal d'actions admin/bailleurs.
+- **`alert_job`** — file de jobs d'alerte, **uniquement les jobs terminés** (`status` ∈ `sent`, `failed`) ; les `pending` sont conservés car encore actionnables par le sender.
+- **`import_jobs`** — audit trail des imports de résidences.
+
+`tracking_event`, `stats` et `event_stats` sont volontairement exclus (historique analytics / agrégats de reporting). Idempotente, jouée quotidiennement via cron (voir plus bas).
+
+Options :
+
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Compte les lignes sans les supprimer |
+| `--verbose` | Affiche le détail du filtre par table |
+| `--retention-months <n>` | Nombre de mois à conserver (défaut : 6) |
+
+Variable d'env requise : `DATABASE_URL`
+
 #### `backfill-brevo-contacts` — Rattraper les contacts Brevo
 
 ```bash
@@ -586,7 +612,7 @@ Les migrations Drizzle sont appliquées au déploiement via le hook `postdeploy`
 | `0 4 1 * *` | `sync rents` | 1er du mois à 4h |
 | `10 4 1 * *` | `sync students` | 1er du mois à 4h10 |
 | `0 3 * * *` | `sync stats` | Tous les jours à 3h |
-| `30 3 * * *` | `purge-contact-requests` | Tous les jours à 3h30 |
+| `30 3 * * *` | `purge-contact-requests` puis `purge-logs` | Tous les jours à 3h30 |
 | `0 6 * * *` | `expire-alerts` | Tous les jours à 6h |
 
 Pour vérifier les crons actifs : `scalingo --app <app> cron-tasks`

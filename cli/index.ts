@@ -17,6 +17,7 @@ import { importCrousTypologies } from './commands/import-crous-typologies'
 import { migrate } from './commands/migrate'
 import { migrateUsers } from './commands/migrate-users'
 import { purgeContactRequests } from './commands/purge-contact-requests'
+import { purgeLogs } from './commands/purge-logs'
 import { seedAlertSnapshotCommand } from './commands/seed-alert-snapshot'
 import { sendAlertJobs } from './commands/send-alert-jobs'
 import { auditStorage } from './commands/storage/auditStorage'
@@ -59,6 +60,14 @@ program
   .action((opts) => backfillGeocoding({ ...opts, dryRun: !opts.apply }))
 
 program.command('migrate').description('Apply Drizzle migrations').action(migrate)
+
+program
+  .command('purge-logs')
+  .description('Purge les tables de logs (activity_log, alert_job terminés, import_jobs) au-delà de la rétention')
+  .option('--dry-run', 'Compter sans supprimer')
+  .option('--verbose', 'Afficher le détail par table')
+  .option('--retention-months <n>', 'Nombre de mois à conserver (défaut : 6)', parseInt)
+  .action((opts) => purgeLogs({ ...opts, retentionMonths: opts.retentionMonths ?? 6 }))
 
 program
   .command('compare-crous <file>')
