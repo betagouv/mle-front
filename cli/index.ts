@@ -2,6 +2,7 @@ import { program } from 'commander'
 import { backfillAlertJobsCommand } from './commands/backfill-alert-jobs'
 import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
 import { backfillBrevoOwners } from './commands/backfill-brevo-owners'
+import { clearSessions } from './commands/clear-sessions'
 import { compareCrous } from './commands/compare-crous'
 import { detectAlertJobsCommand } from './commands/detect-alert-jobs'
 import { healthcheck, healthcheckCities } from './commands/healthcheck'
@@ -40,6 +41,12 @@ program
   .action((opts) => backfillBrevoOwners(opts))
 
 program.command('migrate').description('Apply Drizzle migrations').action(migrate)
+
+program
+  .command('clear-sessions')
+  .description('Supprime toutes les sessions actives (post-deploy) pour forcer la reconnexion et éviter un cache incohérent')
+  .option('--dry-run', 'Compter sans supprimer')
+  .action((opts) => clearSessions(opts))
 
 program
   .command('compare-crous <file>')

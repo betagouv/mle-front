@@ -118,6 +118,23 @@ Lit les tables Django existantes dans la BDD locale (typiquement après un `impo
 
 À utiliser une seule fois après la migration Django → tRPC/Drizzle.
 
+#### `clear-sessions` — Supprimer toutes les sessions actives
+
+```bash
+pnpm cli clear-sessions --dry-run   # compter sans supprimer
+pnpm cli clear-sessions             # purge
+```
+
+Vide la table `session`, ce qui déconnecte tous les utilisateurs et les force à se reconnecter. Jouée automatiquement au déploiement (hook `postdeploy`, après la migration) pour éviter qu'une session continue de servir du contenu issu d'un cache devenu incohérent.
+
+Fonctionne car le `cookieCache` de Better Auth n'est pas activé : chaque vérification de session interroge la base, donc vider la table déconnecte réellement au prochain rendu. Idempotente.
+
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Compte les sessions sans les supprimer |
+
+Variable d'env requise : `DATABASE_URL`
+
 #### `backfill-brevo-contacts` — Rattraper les contacts Brevo
 
 ```bash
@@ -460,7 +477,7 @@ Variables d'env requises : `MATOMO_URL`, `MATOMO_TOKEN`, `MATOMO_ID_SITE`
 ### Cron jobs (Scalingo)
 
 Les tâches planifiées sont définies dans `cron.json` à la racine. Scalingo lit ce fichier au déploiement.
-Les migrations Drizzle sont appliquées au déploiement via le hook `postdeploy` défini dans `Procfile`.
+Au déploiement, le hook `postdeploy` (défini dans `Procfile`) applique les migrations Drizzle puis purge les sessions actives (`clear-sessions`) — l'enchaînement `&&` ne purge les sessions que si la migration a réussi.
 
 | Cron | Commande | Fréquence |
 |------|----------|-----------|
