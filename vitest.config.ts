@@ -14,6 +14,7 @@ export default defineConfig({
       {
         resolve: {
           alias: {
+            'server-only': path.resolve(srcDir, '__tests__/helpers/server-only-stub.ts'),
             '~': srcDir,
           },
         },
@@ -44,12 +45,15 @@ export default defineConfig({
             MATOMO_URL: 'https://matomo.example.com/',
             MATOMO_TOKEN: 'test-token',
             MATOMO_ID_SITE: '1',
+            RAMSESE_API_URL: 'https://ramsese.example.com/ramsese-webservice',
+            RAMSESE_CODE_APPLICATION: '00',
           },
         },
       },
       {
         resolve: {
           alias: [
+            { find: 'server-only', replacement: path.resolve(srcDir, '__tests__/helpers/server-only-stub.ts') },
             { find: /^~\/server\/db$/, replacement: path.resolve(srcDir, '__tests__/helpers/test-db-module.ts') },
             { find: '~', replacement: srcDir },
           ],

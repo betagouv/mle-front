@@ -13,6 +13,7 @@ import AccommodationDescription from '~/app/(public)/trouver-un-logement-etudian
 import { AccommodationEquipments } from '~/app/(public)/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-equipments'
 import { AccommodationLocalisation } from '~/app/(public)/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-localisation'
 import AccommodationMap from '~/app/(public)/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-map'
+import { AccommodationNearbyEtablissements } from '~/app/(public)/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-nearby-etablissements'
 import { AccommodationResidence } from '~/app/(public)/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-residence'
 import { AccommodationVirtualTour } from '~/app/(public)/trouver-un-logement-etudiant/ville/[location]/[slug]/accommodation-virtual-tour'
 import { AccommodationImages } from '~/components/accommodation/accommodation-images'
@@ -47,7 +48,7 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
   const t = await getTranslations('accomodation')
   const commonT = await getTranslations()
   const { slug } = await params
-  const { accommodation, cityBbox, dehydratedState, latitude, longitude, nbAvailable, nearbyAccommodations, user } =
+  const { accommodation, cityBbox, dehydratedState, latitude, longitude, nbAvailable, nearbyAccommodations, nearbyEtablissements, user } =
     await getAccommodationPageContext(slug)
 
   const {
@@ -178,6 +179,7 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
             <AccommodationVirtualTour url={virtual_tour_url} />
             <AccommodationEquipments accommodation={accommodation} />
             <AccommodationLocalisation addresses={addressList} positions={mapPositions} />
+            <AccommodationNearbyEtablissements etablissements={nearbyEtablissements} />
             <AccommodationDescription title={name} description={description} />
           </div>
           <div className="fr-hidden-sm">{<AccommodationMap positions={mapPositions} />}</div>

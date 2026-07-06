@@ -15,6 +15,7 @@ import { seedAlertSnapshotCommand } from './commands/seed-alert-snapshot'
 import { sendAlertJobs } from './commands/send-alert-jobs'
 import { auditStorage } from './commands/storage/auditStorage'
 import { uploadImages } from './commands/upload-images'
+import { verifyRamsese } from './commands/verify-ramsese'
 import { runImport, runSync } from './factory'
 
 program.name('mle').description('MLE CLI tools')
@@ -166,5 +167,17 @@ program
   .option('--dry-run', 'Simuler sans envoyer ni modifier la BDD')
   .option('--verbose', 'Afficher le détail par utilisateur')
   .action((opts) => sendAlertJobs(opts))
+
+program
+  .command('verify-ramsese')
+  .description('Vérifie la connectivité RAMSESE + le parsing des établissements (à lancer en one-off Scalingo)')
+  .option('--cp <codePostal>', 'Code postal à tester', '94000')
+  .option('--slug <slug>', 'Résidence : récupère CP + coordonnées depuis la BDD (prioritaire)')
+  .option('--lat <lat>', 'Latitude de la résidence pour le calcul de distance')
+  .option('--lng <lng>', 'Longitude de la résidence pour le calcul de distance')
+  .option('--limit <n>', 'Limiter le nombre de détails UAI affichés', parseInt)
+  .option('--no-natures', 'Ne pas filtrer par la liste blanche métier (diagnostic)')
+  .option('--dump', 'Afficher le payload JSON complet du 1er UAI')
+  .action((opts) => verifyRamsese(opts))
 
 program.parse()

@@ -240,6 +240,10 @@
       },
       "count": "{count} logements"
     },
+    "nearbyEtablissements": {
+      "title": "Educational institutions near the residence",
+      "distance": "{distance} km"
+    },
     "studio": "Studio {type}",
     "colocation": "Colocation",
     "appartement": "Appartement {type}",
