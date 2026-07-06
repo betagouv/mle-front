@@ -198,7 +198,7 @@ export async function getEtablissementsSuperieurByCodePostal(
     .filter((e): e is TEtablissementSuperieur => e !== null && isSuperieur(e.natureCodes))
 }
 
-// Exports internes pour les tests unitaires.
+// for tests purpose
 export const _internal = {
   fetchInseeCodesByPostalCode,
   fetchUaisByCommunes,

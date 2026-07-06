@@ -34,7 +34,7 @@ describe('getNearbyEtablissements', () => {
     mockRamsese.mockReset()
   })
 
-  it('trie par distance croissante et limite au top 5', async () => {
+  it('trie par distance croissante et retourne la liste complète', async () => {
     // Longitudes croissantes → distances croissantes depuis la résidence (2.4556).
     mockRamsese.mockResolvedValue([
       etab('F', 2.53, 48.79),
@@ -47,8 +47,7 @@ describe('getNearbyEtablissements', () => {
 
     const result = await getNearbyEtablissements(RESIDENCE)
 
-    expect(result.map((e) => e.numeroUai)).toEqual(['A', 'B', 'C', 'D', 'E'])
-    expect(result).toHaveLength(5)
+    expect(result.map((e) => e.numeroUai)).toEqual(['A', 'B', 'C', 'D', 'E', 'F'])
     // distances strictement croissantes
     for (let i = 1; i < result.length; i++) {
       expect(result[i].distanceMeters).toBeGreaterThan(result[i - 1].distanceMeters)

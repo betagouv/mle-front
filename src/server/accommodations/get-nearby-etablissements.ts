@@ -5,8 +5,6 @@ import { NATURES_ETABLISSEMENTS } from '~/schemas/ramsese/natures'
 import { getEtablissementsSuperieurByCodePostal } from '~/server/services/ramsese'
 import { haversineMeters, parseRamseseCoordonnees } from '~/utils/geo'
 
-const NEARBY_LIMIT = 5
-
 type TGetNearbyEtablissementsParams = {
   codePostal: string
   lat: number
@@ -15,11 +13,12 @@ type TGetNearbyEtablissementsParams = {
 
 /**
  * Établissements d'enseignement supérieur (périmètre métier `NATURES_ETABLISSEMENTS`)
- * les plus proches d'une résidence, triés par distance croissante et limités au top 5.
+ * proches d'une résidence, triés par distance croissante. Retourne la liste **complète**
+ * (le composant affiche les 5 premiers et déplie le reste). Renvoie `[]` si le code postal
+ * est inconnu, si RAMSESE est muet, ou si aucun établissement n'est géolocalisé.
  *
  * Source : service RAMSESE (par code postal). Les coordonnées RAMSESE sont normalisées
- * en WGS84 puis la distance à la résidence est calculée par haversine. Renvoie `[]` si
- * le code postal est inconnu, si RAMSESE est muet, ou si aucun établissement n'est géolocalisé.
+ * en WGS84 puis la distance à la résidence est calculée par haversine.
  */
 export const getNearbyEtablissements = cache(
   async ({ codePostal, lat, lng }: TGetNearbyEtablissementsParams): Promise<TNearbyEtablissement[]> => {
@@ -28,7 +27,6 @@ export const getNearbyEtablissements = cache(
     const etablissements = await getEtablissementsSuperieurByCodePostal(codePostal, {
       natures: [...NATURES_ETABLISSEMENTS],
     })
-    console.log('eta', etablissements)
 
     const residence = { lat, lng }
 
@@ -50,6 +48,5 @@ export const getNearbyEtablissements = cache(
         ]
       })
       .sort((a, b) => a.distanceMeters - b.distanceMeters)
-      .slice(0, NEARBY_LIMIT)
   },
 )

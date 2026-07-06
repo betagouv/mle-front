@@ -242,7 +242,9 @@
     },
     "nearbyEtablissements": {
       "title": "Établissements à proximité de la résidence",
-      "distance": "{distance} km"
+      "distance": "{distance} km",
+      "showMore": "Plus d'établissements",
+      "showLess": "Voir moins"
     },
     "studio": "Studio {type}",
     "colocation": "Colocation",

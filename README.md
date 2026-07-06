@@ -232,6 +232,42 @@ Variables d'env requises : `DATABASE_URL`, `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKE
 
 ---
 
+### RAMSESE — établissements d'enseignement supérieur
+
+Le web service RAMSESE (référentiel des établissements du MEN, passerelle Omogen) est sur le **réseau RIE** et protégé par **IP whitelistée** + **clé d'API**. Il n'est donc joignable que depuis un environnement autorisé — typiquement un **one-off Scalingo** sortant par l'IP whitelistée. Variables d'env : `RAMSESE_API_URL`, `RAMSESE_CODE_APPLICATION`, `RAMSESE_API_KEY` (envoyée en query param `api-key`).
+
+Le bloc « Établissements à proximité » de la fiche logement s'appuie sur ce service (`src/server/services/ramsese.ts` → `getEtablissementsSuperieurByCodePostal`).
+
+#### `verify-ramsese` — Diagnostiquer la connectivité et le parsing
+
+```bash
+pnpm cli verify-ramsese --dump                    # Créteil (94000) + payload JSON complet du 1er UAI
+pnpm cli verify-ramsese --cp 75013 --dump         # Paris 13e (arrondissement INSEE résolu automatiquement)
+pnpm cli verify-ramsese --insee 75113             # test direct par code INSEE (court-circuite geo.api)
+pnpm cli verify-ramsese --slug <slug-residence>   # CP + coordonnées réels tirés de la BDD
+pnpm cli verify-ramsese --no-natures              # diagnostic sans la liste blanche métier
+```
+
+> Conçue pour un one-off Scalingo. Sur Scalingo (vars injectées, pas de fichier `.env`), lancer directement `tsx cli/index.ts verify-ramsese --dump` plutôt que `pnpm cli` (qui charge `--env-file=.env`).
+
+Rejoue le pipeline complet de la fiche logement — code postal → communes INSEE (`geo.api.gouv.fr`, **arrondissements Paris/Lyon/Marseille inclus**) → `POST /v3/listeUai/filtres` → détails géolocalisés → distance haversine — en réutilisant le vrai code de parsing (`~/utils/geo`) et la liste blanche des natures. Affiche pour chaque UAI : nom, natures, coordonnées brutes + `SYSTEME_REFERENCE`, coordonnées reprojetées WGS84 et distance ; puis le top 5 (rendu attendu du bloc).
+
+Codes HTTP de l'étape filtres : `200` = OK ; `401/403` = IP non whitelistée ou clé absente ; `404` = préfixe `/v3` à ajuster ; `0/5xx` = réseau/passerelle.
+
+Options :
+
+| Option | Description |
+|--------|-------------|
+| `--cp <codePostal>` | Code postal à tester (défaut : `94000`) |
+| `--insee <codes>` | Codes INSEE directs séparés par des virgules (court-circuite geo.api) |
+| `--slug <slug>` | Résidence : récupère CP + coordonnées depuis la BDD (prioritaire) |
+| `--lat <lat>` / `--lng <lng>` | Coordonnées de la résidence pour le calcul de distance |
+| `--limit <n>` | Limiter le nombre de détails UAI affichés |
+| `--no-natures` | Ne pas filtrer par la liste blanche métier |
+| `--dump` | Afficher le payload JSON complet du 1er UAI |
+
+---
+
 ### Alertes étudiants (disponibilité)
 
 Pipeline événementiel de notification des étudiants quand un logement correspondant à leur alerte devient disponible (voir `docs/adr/0001-alert-sender.md` et `0002-alert-detection.md`). Les producteurs créent des `alert_job` ; le sender les draine. Ces commandes sont les opérations **hors-ligne** du système (la détection instantanée, elle, est branchée sur les écritures via les mutations bailleur et les imports).
