@@ -242,7 +242,9 @@
     },
     "nearbyEtablissements": {
       "title": "Educational institutions near the residence",
-      "distance": "{distance} km"
+      "distance": "{distance} km",
+      "showMore": "More institutions",
+      "showLess": "Show less"
     },
     "studio": "Studio {type}",
     "colocation": "Colocation",
