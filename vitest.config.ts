@@ -47,6 +47,7 @@ export default defineConfig({
             MATOMO_ID_SITE: '1',
             RAMSESE_API_URL: 'https://ramsese.example.com/ramsese-webservice',
             RAMSESE_CODE_APPLICATION: '00',
+            RAMSESE_API_KEY: 'test-ramsese-key',
           },
         },
       },

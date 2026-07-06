@@ -19,8 +19,17 @@ import { haversineMeters, parseRamseseCoordonnees } from '~/utils/geo'
 
 const BASE = env.RAMSESE_API_URL
 const CODEAPP = env.RAMSESE_CODE_APPLICATION
+const API_KEY = env.RAMSESE_API_KEY
 const HEADERS = { 'Content-Type': 'application/json', codeApplication: CODEAPP }
 const FETCH_TIMEOUT_MS = 15_000
+
+// Ajoute /v3 + la clé passerelle Omogen en query param `api-key` (si définie).
+function ramseseUrl(path: string): string {
+  const url = `${BASE}/v3${path}`
+  if (!API_KEY) return url
+  const separator = url.includes('?') ? '&' : '?'
+  return `${url}${separator}api-key=${encodeURIComponent(API_KEY)}`
+}
 
 const distanceFmt = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
@@ -94,7 +103,7 @@ async function fetchCommunes(cp: string): Promise<{ code: string; nom: string; c
 /** Étape 2 — communes INSEE -> numéros UAI. */
 async function fetchUais(communes: string[], natures: string[] | null): Promise<{ status: number; uais: string[] }> {
   try {
-    const res = await fetch(`${BASE}/v3/listeUai/filtres`, {
+    const res = await fetch(ramseseUrl('/listeUai/filtres'), {
       method: 'POST',
       headers: HEADERS,
       body: JSON.stringify({ communes, codeApplication: CODEAPP, ...(natures ? { natures } : {}) }),
@@ -117,7 +126,7 @@ async function fetchUais(communes: string[], natures: string[] | null): Promise<
 /** Étape 3 — détail d'un UAI (identification + localisation + géoloc). */
 async function fetchUaiDetail(uai: string): Promise<{ status: number; data: Json | null }> {
   try {
-    const res = await fetch(`${BASE}/v3/uai/${encodeURIComponent(uai)}?INCLURE_GEOLOCALISATION=true&ADMINISTRATION=true`, {
+    const res = await fetch(ramseseUrl(`/uai/${encodeURIComponent(uai)}?INCLURE_GEOLOCALISATION=true&ADMINISTRATION=true`), {
       headers: HEADERS,
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     })
@@ -135,7 +144,7 @@ function pickValeur(arr?: Json[]): string | null {
 
 export async function verifyRamsese(options: VerifyRamseseOptions) {
   console.log('🔎 Vérification RAMSESE')
-  console.log(`   BASE=${BASE}  codeApplication=${CODEAPP}`)
+  console.log(`   BASE=${BASE}  codeApplication=${CODEAPP}  api-key=${API_KEY ? 'définie' : 'ABSENTE'}`)
 
   // 1) Résolution CP + point résidence
   let codePostal = options.cp ?? '94000'
