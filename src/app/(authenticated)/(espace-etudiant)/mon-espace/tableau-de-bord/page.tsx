@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
 import { StudentMaximizeChances } from '~/components/student-space/dashboard/student-maximize-chances'
-import { StudentNews } from '~/components/student-space/dashboard/student-news'
 import { StudentSummary } from '~/components/student-space/dashboard/student-summary'
 import { StudentWelcome } from '~/components/student-space/dashboard/student-welcome'
 import { getServerSession } from '~/services/better-auth'
@@ -21,7 +20,7 @@ export default async function StudentDashboardPage() {
       <div className={styles.summaryContainer}>
         <StudentSummary />
         <StudentMaximizeChances />
-        <StudentNews />
+        {/*<StudentNews />*/}
       </div>
     </>
   )
