@@ -172,6 +172,7 @@ program
   .command('verify-ramsese')
   .description('Vérifie la connectivité RAMSESE + le parsing des établissements (à lancer en one-off Scalingo)')
   .option('--cp <codePostal>', 'Code postal à tester', '94000')
+  .option('--insee <codes>', 'Codes INSEE directs (séparés par des virgules), court-circuite geo.api')
   .option('--slug <slug>', 'Résidence : récupère CP + coordonnées depuis la BDD (prioritaire)')
   .option('--lat <lat>', 'Latitude de la résidence pour le calcul de distance')
   .option('--lng <lng>', 'Longitude de la résidence pour le calcul de distance')

@@ -35,6 +35,7 @@ const distanceFmt = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, m
 
 interface VerifyRamseseOptions {
   cp?: string
+  insee?: string // codes INSEE directs (séparés par des virgules), court-circuite geo.api
   slug?: string
   lat?: string
   lng?: string
@@ -87,17 +88,27 @@ async function resolveFromSlug(slug: string): Promise<{ codePostal: string; resi
   }
 }
 
-/** Étape 1 — CP -> communes INSEE (+ centre pour approximer la résidence si pas de coords). */
+/** Étape 1 — CP -> communes INSEE (arrondissements Paris/Lyon/Marseille inclus). */
 async function fetchCommunes(cp: string): Promise<{ code: string; nom: string; centre?: LatLng }[]> {
-  const url = `https://geo.api.gouv.fr/communes?codePostal=${encodeURIComponent(cp)}&fields=code,nom,centre`
-  const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
-  if (!res.ok) return []
-  const data = (await res.json()) as Json[]
-  return data.map((c) => ({
-    code: c.code,
-    nom: c.nom,
-    centre: c.centre ? { lng: c.centre.coordinates[0], lat: c.centre.coordinates[1] } : undefined,
-  }))
+  const cpe = encodeURIComponent(cp)
+  const urls = [
+    `https://geo.api.gouv.fr/communes?codePostal=${cpe}&fields=code,nom,centre`,
+    `https://geo.api.gouv.fr/communes?codePostal=${cpe}&type=arrondissement-municipal&fields=code,nom,centre`,
+  ]
+  const byCode = new Map<string, { code: string; nom: string; centre?: LatLng }>()
+  for (const url of urls) {
+    const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
+    if (!res.ok) continue
+    const data = (await res.json()) as Json[]
+    for (const c of data) {
+      byCode.set(c.code, {
+        code: c.code,
+        nom: c.nom,
+        centre: c.centre ? { lng: c.centre.coordinates[0], lat: c.centre.coordinates[1] } : undefined,
+      })
+    }
+  }
+  return [...byCode.values()]
 }
 
 /** Étape 2 — communes INSEE -> numéros UAI. */
@@ -161,12 +172,18 @@ export async function verifyRamsese(options: VerifyRamseseOptions) {
     console.log(`   Résidence "${options.slug}" : CP=${codePostal}  résidence=${residence.lat},${residence.lng}`)
   }
 
-  const communes = await fetchCommunes(codePostal)
-  if (communes.length === 0) {
-    console.error(`✗ Aucune commune pour le CP ${codePostal} (geo.api.gouv.fr)`)
-    process.exit(1)
+  let communes: { code: string; nom: string; centre?: LatLng }[]
+  if (options.insee) {
+    communes = options.insee.split(',').map((code) => ({ code: code.trim(), nom: '(insee direct)' }))
+    console.log(`\n1) Codes INSEE fournis directement : ${communes.map((c) => c.code).join(', ')}`)
+  } else {
+    communes = await fetchCommunes(codePostal)
+    if (communes.length === 0) {
+      console.error(`✗ Aucune commune pour le CP ${codePostal} (geo.api.gouv.fr)`)
+      process.exit(1)
+    }
+    console.log(`\n1) CP ${codePostal} -> communes INSEE : ${communes.map((c) => `${c.code} ${c.nom}`).join(', ')}`)
   }
-  console.log(`\n1) CP ${codePostal} -> communes INSEE : ${communes.map((c) => `${c.code} ${c.nom}`).join(', ')}`)
 
   if (!residence) {
     residence = communes[0].centre ?? { lat: 0, lng: 0 }
