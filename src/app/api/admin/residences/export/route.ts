@@ -4,9 +4,11 @@ import { db } from '~/server/db'
 import { accommodationAddresses } from '~/server/db/schema/accommodation-addresses'
 import { accommodations } from '~/server/db/schema/accommodations'
 import { cities } from '~/server/db/schema/cities'
+import { departments } from '~/server/db/schema/departments'
 import { owners } from '~/server/db/schema/owners'
 import { getServerSession } from '~/services/better-auth'
 import { calculateAvailability } from '~/utils/calculateAvailability'
+import { getRegionByDepartmentCode } from '~/utils/french-regions'
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession()
@@ -35,6 +37,8 @@ export async function GET(request: NextRequest) {
       targetAudience: accommodations.target_audience,
       published: accommodations.published,
       city: cities.name,
+      departmentCode: departments.code,
+      departmentName: departments.name,
       ownerName: owners.name,
       nbTotalApartments: accommodations.nbTotalApartments,
       nbAccessibleApartments: accommodations.nbAccessibleApartments,
@@ -118,6 +122,7 @@ export async function GET(request: NextRequest) {
       and(eq(accommodationAddresses.accommodationId, accommodations.id), eq(accommodationAddresses.isMain, true)),
     )
     .leftJoin(cities, eq(accommodationAddresses.cityId, cities.id))
+    .leftJoin(departments, eq(cities.departmentId, departments.id))
     .where(where)
     .orderBy(accommodations.name)
 
@@ -144,10 +149,14 @@ export async function GET(request: NextRequest) {
     }
     const disponibiliteRenseignee = Object.values(availability).some((v) => v !== null && v !== undefined)
     const nbLogementsDisponibles = calculateAvailability(availability, stock)
-    return { ...row, disponibiliteRenseignee, nbLogementsDisponibles }
+    const region = getRegionByDepartmentCode(row.departmentCode)
+    return { ...row, region, disponibiliteRenseignee, nbLogementsDisponibles }
   })
 
-  const headers = enriched[0] ? Object.keys(enriched[0]) : []
+  // region est calculée hors select : on la replace juste après departmentName pour regrouper les colonnes territoire
+  const headers = enriched[0] ? Object.keys(enriched[0]).filter((h) => h !== 'region') : []
+  const deptIndex = headers.indexOf('departmentName')
+  if (deptIndex !== -1) headers.splice(deptIndex + 1, 0, 'region')
   const lines = [
     headers.join(';'),
     ...enriched.map((row) =>
