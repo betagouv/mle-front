@@ -28,8 +28,14 @@ const ramseseHeaders = {
   codeApplication: env.RAMSESE_CODE_APPLICATION,
 }
 
-// L'URL de base n'inclut pas /v3 ; on ajoute le préfixe des paths du swagger ici.
-const ramseseUrl = (path: string) => `${env.RAMSESE_API_URL}/v3${path}`
+// L'URL de base n'inclut pas /v3 ; on ajoute le préfixe des paths du swagger ici,
+// et la clé passerelle Omogen en query param `api-key` (si définie).
+const ramseseUrl = (path: string) => {
+  const url = `${env.RAMSESE_API_URL}/v3${path}`
+  if (!env.RAMSESE_API_KEY) return url
+  const separator = url.includes('?') ? '&' : '?'
+  return `${url}${separator}api-key=${encodeURIComponent(env.RAMSESE_API_KEY)}`
+}
 
 type TValeurHist = { VALEUR?: string; DATE_FIN?: string }
 type TCodeHist = { CODE?: string; DATE_FIN?: string }
