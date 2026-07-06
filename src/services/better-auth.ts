@@ -80,7 +80,13 @@ export const auth = betterAuth({
         })
         // Only send magic links to owners and admins, never to students (role 'user')
         if (!usr || usr.role === 'user') return
-        await sendMagicLinkEmail(email, url)
+        // On n'envoie pas le lien de vérification Better Auth directement : les scanners
+        // de mail d'entreprise (Safe Links, Proofpoint…) pré-ouvrent les liens en GET et
+        // brûleraient le token à usage unique. On passe par une page tampon qui ne
+        // déclenche la vérification qu'en JavaScript (voir /connexion/verification).
+        const buffer = new URL('/connexion/verification', env.BASE_URL)
+        buffer.searchParams.set('url', url)
+        await sendMagicLinkEmail(email, buffer.toString())
       },
     }),
     nextCookies(),

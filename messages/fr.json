@@ -113,6 +113,10 @@
       "title": "Erreur de vérification",
       "description": "Une erreur est survenue lors de la vérification de votre compte. Veuillez réessayer ou contacter le support."
     },
+    "verificationBuffer": {
+      "title": "Vérification du lien de connexion",
+      "description": "Vérification de votre lien de connexion en cours, vous allez être redirigé automatiquement."
+    },
     "accessibility": {
       "title": "Accessibilité",
       "description": "Déclaration d'accessibilité de Mon Logement Étudiant : notre engagement pour rendre la plateforme accessible à tous."
@@ -945,6 +949,12 @@
       "buttons": {
         "login": "Se connecter"
       }
+    },
+    "buffer": {
+      "title": "Vérification du lien de connexion",
+      "description": "Vous allez être redirigé dans quelques instants.",
+      "fallbackText": "Si rien ne se passe, cliquez sur le lien suivant :",
+      "fallbackLink": "Se connecter"
     }
   },
   "shared": {
