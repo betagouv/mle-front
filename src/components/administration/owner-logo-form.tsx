@@ -109,6 +109,16 @@ export const OwnerLogoForm = ({ ownerId, imageBase64 }: OwnerLogoFormProps) => {
             Supprimer le logo
           </Button>
         )}
+        {imageBase64 && !selectedFile && (
+          <Button
+            priority="tertiary"
+            size="small"
+            iconId="fr-icon-download-line"
+            linkProps={{ href: `/api/admin/bailleurs/logos/export?ownerId=${ownerId}` }}
+          >
+            Exporter le logo
+          </Button>
+        )}
       </div>
 
       <span className="fr-text--xs fr-text-mention--grey">Formats acceptés : JPG, PNG, WebP. Taille maximale : 2 Mo</span>
