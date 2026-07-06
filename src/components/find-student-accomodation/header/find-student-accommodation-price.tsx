@@ -38,7 +38,7 @@ export const FindStudentAccommodationPrice = ({ pageSize, widget }: FindStudentA
   return (
     <Select
       label={t('header.rangeLabel')}
-      style={{ width: '260px' }}
+      style={{ width: '180px' }}
       className="fr-mb-0"
       nativeSelectProps={{
         value: prix ?? '',

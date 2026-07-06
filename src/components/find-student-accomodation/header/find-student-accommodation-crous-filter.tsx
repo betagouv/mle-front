@@ -4,10 +4,13 @@ import { SegmentedControl } from '@codegouvfr/react-dsfr/SegmentedControl'
 import { useTranslations } from 'next-intl'
 import { parseAsBoolean, parseAsInteger, useQueryStates } from 'nuqs'
 import { FC } from 'react'
+import { useAccomodations } from '~/hooks/use-accomodations'
 import { trackEvent } from '~/lib/tracking'
 
 export const FindStudentAccommodationCrousFilter: FC = () => {
   const t = useTranslations('findAccomodation.header')
+  const { data } = useAccomodations()
+  const counts = data?.crousCounts
   const [queryStates, setQueryStates] = useQueryStates({
     crous: parseAsBoolean,
     page: parseAsInteger,
@@ -25,7 +28,7 @@ export const FindStudentAccommodationCrousFilter: FC = () => {
             },
             checked: !!queryStates.crous,
           },
-          label: t('crous'),
+          label: counts ? `${t('crous')} (${counts.crous})` : t('crous'),
         },
         {
           nativeInputProps: {
@@ -35,7 +38,7 @@ export const FindStudentAccommodationCrousFilter: FC = () => {
             },
             checked: queryStates.crous === false || queryStates.crous === null,
           },
-          label: t('others'),
+          label: counts ? `${t('others')} (${counts.others})` : t('others'),
         },
       ]}
     />
