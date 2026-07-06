@@ -1202,7 +1202,10 @@
           "searchPlaceholder": "Rechercher",
           "empty": "Aucune ville",
           "search": "recherche",
-          "alert": "alerte"
+          "alert": "alerte",
+          "sortLabel": "Trier les villes",
+          "sortSearchesDesc": "Plus recherchées",
+          "sortSearchesAsc": "Moins recherchées"
         },
         "residences": {
           "title": "Détail par résidence",
@@ -1212,7 +1215,10 @@
           "unpublished": "(dépubliée)",
           "view": "visite",
           "favorite": "favori",
-          "redirection": "redirection"
+          "redirection": "redirection",
+          "sortLabel": "Trier les résidences",
+          "sortViewsDesc": "Plus vues",
+          "sortViewsAsc": "Moins vues"
         },
         "loading": "Chargement…"
       }

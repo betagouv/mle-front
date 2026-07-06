@@ -1,13 +1,14 @@
 'use client'
 
 import { Input } from '@codegouvfr/react-dsfr/Input'
+import Select from '@codegouvfr/react-dsfr/Select'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs'
 import type { ReactNode } from 'react'
 import { Pagination } from '~/components/ui/pagination'
-import { useOwnerStatistics } from '~/hooks/use-owner-statistics'
+import { type CitySort, type ResidenceSort, useOwnerStatistics } from '~/hooks/use-owner-statistics'
 import { sPluriel } from '~/utils/sPluriel'
 import styles from './engagement-statistics.module.css'
 
@@ -29,12 +30,14 @@ interface EngagementStatisticsProps {
 
 export function EngagementStatistics({ ownerId }: EngagementStatisticsProps) {
   const t = useTranslations('bailleur.dashboard.engagementStatistics')
-  const [{ period, residencePage, residenceSearch, cityPage, citySearch }, setQueryStates] = useQueryStates({
+  const [{ period, residencePage, residenceSearch, residenceSort, cityPage, citySearch, citySort }, setQueryStates] = useQueryStates({
     period: parseAsStringLiteral(PERIODS).withDefault('7d'),
     residencePage: parseAsInteger.withDefault(1),
     residenceSearch: parseAsString.withDefault(''),
+    residenceSort: parseAsStringLiteral(['views_desc', 'views_asc'] as const).withDefault('views_desc'),
     cityPage: parseAsInteger.withDefault(1),
     citySearch: parseAsString.withDefault(''),
+    citySort: parseAsStringLiteral(['searches_desc', 'searches_asc'] as const).withDefault('searches_desc'),
   })
 
   const { overview, byAccommodation, byCity } = useOwnerStatistics({
@@ -42,8 +45,10 @@ export function EngagementStatistics({ ownerId }: EngagementStatisticsProps) {
     ownerId,
     residencePage,
     residenceSearch,
+    residenceSort,
     cityPage,
     citySearch,
+    citySort,
   })
 
   const kpis = overview.data
@@ -115,20 +120,34 @@ export function EngagementStatistics({ ownerId }: EngagementStatisticsProps) {
 
       <div className={clsx(styles.body, 'fr-mt-2w')}>
         <div className="fr-flex fr-direction-column fr-border fr-height-full">
-          <div className="fr-flex fr-justify-content-space-between fr-align-items-center fr-flex-gap-4v fr-border-bottom fr-p-3w">
+          <div className="fr-flex fr-justify-content-space-between fr-align-items-center fr-flex-wrap fr-flex-gap-4v fr-border-bottom fr-p-3w">
             <span className="fr-text--bold fr-text--lg fr-mb-0 fr-whitespace-nowrap">{t('cities.title')}</span>
-            <Input
-              label=""
-              hideLabel
-              nativeInputProps={{
-                placeholder: t('cities.searchPlaceholder'),
-                'aria-label': t('cities.searchLabel'),
-                value: citySearch,
-                onChange: (e) => setQueryStates({ citySearch: e.target.value, cityPage: 1 }),
-              }}
-              iconId="ri-search-line"
-              className={clsx('fr-mb-0 fr-flex-shrink-0', styles.searchField)}
-            />
+            <div className="fr-flex fr-flex-gap-2v fr-flex-shrink-0">
+              <Input
+                label=""
+                hideLabel
+                nativeInputProps={{
+                  placeholder: t('cities.searchPlaceholder'),
+                  'aria-label': t('cities.searchLabel'),
+                  value: citySearch,
+                  onChange: (e) => setQueryStates({ citySearch: e.target.value, cityPage: 1 }),
+                }}
+                iconId="ri-search-line"
+                className={clsx('fr-mb-0', styles.searchField)}
+              />
+              <Select
+                label=""
+                nativeSelectProps={{
+                  'aria-label': t('cities.sortLabel'),
+                  value: citySort,
+                  onChange: (e) => setQueryStates({ citySort: e.target.value as CitySort, cityPage: 1 }),
+                }}
+                className="fr-mb-0"
+              >
+                <option value="searches_desc">{t('cities.sortSearchesDesc')}</option>
+                <option value="searches_asc">{t('cities.sortSearchesAsc')}</option>
+              </Select>
+            </div>
           </div>
           {byCity.isLoading ? (
             <div className="fr-text--center fr-p-4w fr-text-mention--grey">{t('loading')}</div>
@@ -177,18 +196,32 @@ export function EngagementStatistics({ ownerId }: EngagementStatisticsProps) {
         <aside className="fr-flex fr-direction-column fr-flex-gap-2v fr-border fr-height-full">
           <div className="fr-flex fr-justify-content-space-between fr-align-items-center fr-flex-wrap fr-flex-gap-4v fr-border-bottom fr-p-3w">
             <span className="fr-text--bold fr-text--lg fr-mb-0">{t('residences.title')}</span>
-            <Input
-              label=""
-              hideLabel
-              nativeInputProps={{
-                placeholder: t('residences.searchPlaceholder'),
-                'aria-label': t('residences.searchLabel'),
-                value: residenceSearch,
-                onChange: (e) => setQueryStates({ residenceSearch: e.target.value, residencePage: 1 }),
-              }}
-              iconId="ri-search-line"
-              className={clsx('fr-mb-0 fr-flex-shrink-0', styles.searchField)}
-            />
+            <div className="fr-flex fr-flex-gap-2v fr-flex-shrink-0">
+              <Input
+                label=""
+                hideLabel
+                nativeInputProps={{
+                  placeholder: t('residences.searchPlaceholder'),
+                  'aria-label': t('residences.searchLabel'),
+                  value: residenceSearch,
+                  onChange: (e) => setQueryStates({ residenceSearch: e.target.value, residencePage: 1 }),
+                }}
+                iconId="ri-search-line"
+                className={clsx('fr-mb-0', styles.searchField)}
+              />
+              <Select
+                label=""
+                nativeSelectProps={{
+                  'aria-label': t('residences.sortLabel'),
+                  value: residenceSort,
+                  onChange: (e) => setQueryStates({ residenceSort: e.target.value as ResidenceSort, residencePage: 1 }),
+                }}
+                className="fr-mb-0"
+              >
+                <option value="views_desc">{t('residences.sortViewsDesc')}</option>
+                <option value="views_asc">{t('residences.sortViewsAsc')}</option>
+              </Select>
+            </div>
           </div>
           {byAccommodation.isLoading ? (
             <div className="fr-text--center fr-p-4w fr-text-mention--grey">{t('loading')}</div>
