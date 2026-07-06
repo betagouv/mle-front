@@ -314,6 +314,7 @@
       "advancedFiltersHide": "Fermer",
       "applyFilters": "Appliquer",
       "priceChip": "Moins de {prix}€",
+      "priceAll": "Tous",
       "removeFilter": "Retirer le filtre {filter}",
       "crous": "Crous",
       "others": "Autres résidences"

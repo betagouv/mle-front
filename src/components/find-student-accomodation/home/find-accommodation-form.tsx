@@ -1,7 +1,7 @@
 'use client'
 
 import Button from '@codegouvfr/react-dsfr/Button'
-import Range from '@codegouvfr/react-dsfr/Range'
+import Select from '@codegouvfr/react-dsfr/Select'
 import { useTranslations } from 'next-intl'
 import { parseAsBoolean, parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 import { FC } from 'react'
@@ -11,19 +11,20 @@ import { FindStudentAccessibleAccomodationSwitch } from '~/components/find-stude
 import { FindStudentColivingAccomodationSwitch } from '~/components/find-student-accomodation/header/find-student-coliving-accomodation'
 import { FindStudentAccommodationCitiesAutocompleteInput } from '~/components/find-student-accomodation/home/autocomplete/find-student-accommodations-cities-autocomplete-input'
 import { useAccomodations } from '~/hooks/use-accomodations'
+import { buildPriceOptions } from '~/lib/accommodations-search-params'
 import { trackEvent } from '~/lib/tracking'
 
 export const FindAccommodationForm: FC = () => {
   const t = useTranslations('home')
+  const tHeader = useTranslations('findAccomodation.header')
   const { classes } = useStyles()
-  const { data, isLoading } = useAccomodations()
+  const { data } = useAccomodations()
 
-  const step = 50
-  const min = data?.min_price ? Math.floor(data.min_price / step) * step : undefined
+  // Borne haute = max des résultats de la recherche, arrondi à la centaine supérieure.
   const max = data?.max_price ? Math.ceil(data.max_price / 100) * 100 : undefined
 
   const [queryStates, setQueryStates] = useQueryStates({
-    prix: parseAsInteger.withDefault(max ?? 1000),
+    prix: parseAsInteger,
     q: parseAsString,
     bbox: parseAsString,
     colocation: parseAsBoolean.withDefault(false),
@@ -32,7 +33,6 @@ export const FindAccommodationForm: FC = () => {
 
   const form = useForm({
     values: {
-      maxPrice: queryStates.prix,
       q: queryStates.q,
       bbox: queryStates.bbox,
       coliving: queryStates.colocation,
@@ -40,16 +40,17 @@ export const FindAccommodationForm: FC = () => {
     },
   })
 
-  const handleOnChangeBudget = (event: React.ChangeEvent<HTMLInputElement>) => setQueryStates({ prix: Number(event.target.value) })
+  const prix = queryStates.prix
+  const priceOptions = buildPriceOptions(max, prix)
 
   const city = queryStates.q
   const basePath = city ? `/trouver-un-logement-etudiant/ville/${encodeURIComponent(city)}` : '/trouver-un-logement-etudiant'
 
   const searchParams = new URLSearchParams({
-    prix: form.getValues('maxPrice').toString(),
     colocation: form.getValues('coliving') ? 'true' : 'false',
     accessible: form.getValues('accessible') ? 'true' : 'false',
   })
+  if (prix != null) searchParams.set('prix', prix.toString())
   // Only include bbox when not navigating to a specific city (city uses boundary polygon instead)
   if (!city) {
     const bbox = form.getValues('bbox')
@@ -61,16 +62,20 @@ export const FindAccommodationForm: FC = () => {
   return (
     <>
       <FindStudentAccommodationCitiesAutocompleteInput />
-      <Range
+      <Select
         label={t('header.rangeLabel')}
-        max={max ?? 1000}
-        min={min ?? 0}
-        hideMinMax
-        disabled={isLoading}
-        step={step}
-        suffix=" €"
-        nativeInputProps={{ onChange: handleOnChangeBudget, value: Math.min(queryStates.prix, max ?? 1000) }}
-      />
+        nativeSelectProps={{
+          value: prix ?? '',
+          onChange: (e) => setQueryStates({ prix: e.target.value ? Number(e.target.value) : null }),
+        }}
+      >
+        <option value="">{tHeader('priceAll')}</option>
+        {priceOptions.map((p) => (
+          <option key={p} value={p}>
+            {tHeader('priceChip', { prix: p })}
+          </option>
+        ))}
+      </Select>
       <div className={classes.switchContainer}>
         <FindStudentColivingAccomodationSwitch />
         <FindStudentAccessibleAccomodationSwitch />
