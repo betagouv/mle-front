@@ -38,6 +38,11 @@ const envSchema = z.object({
   // Geocoding
   GEOCODING_API_URL: z.url().default('https://data.geopf.fr/geocodage/search'),
 
+  // RAMSESE (référentiel des établissements du MEN — réseau RIE / passerelle Omogen)
+  // NB : l'URL de base n'inclut PAS le préfixe /v3, ajouté dans le service.
+  RAMSESE_API_URL: z.url().default('https://omogen-api-pr.phm.education.gouv.fr/ramsese-webservice'),
+  RAMSESE_CODE_APPLICATION: z.string().length(2).default('00'),
+
   // DossierFacile OAuth
   DOSSIERFACILE_CLIENT_ID: requiredInProd,
   DOSSIERFACILE_CLIENT_SECRET: requiredInProd,
