@@ -27,57 +27,57 @@ export const ZUpdateResidence = z.object({
   nb_t1_available: z.number().min(0).nullish(),
   price_min_t1: z.number().min(0).nullish(),
   price_max_t1: z.number().min(0).nullish(),
-  superficie_min_t1: z.number().min(1).nullish(),
-  superficie_max_t1: z.number().min(1).nullish(),
+  superficie_min_t1: z.number().min(0).nullish(),
+  superficie_max_t1: z.number().min(0).nullish(),
 
   nb_t1_bis: z.number().min(0).nullish(),
   nb_t1_bis_available: z.number().min(0).nullish(),
   price_min_t1_bis: z.number().min(0).nullish(),
   price_max_t1_bis: z.number().min(0).nullish(),
-  superficie_min_t1_bis: z.number().min(1).nullish(),
-  superficie_max_t1_bis: z.number().min(1).nullish(),
+  superficie_min_t1_bis: z.number().min(0).nullish(),
+  superficie_max_t1_bis: z.number().min(0).nullish(),
 
   nb_t2: z.number().min(0).nullish(),
   nb_t2_available: z.number().min(0).nullish(),
   price_min_t2: z.number().min(0).nullish(),
   price_max_t2: z.number().min(0).nullish(),
-  superficie_min_t2: z.number().min(1).nullish(),
-  superficie_max_t2: z.number().min(1).nullish(),
+  superficie_min_t2: z.number().min(0).nullish(),
+  superficie_max_t2: z.number().min(0).nullish(),
 
   nb_t3: z.number().min(0).nullish(),
   nb_t3_available: z.number().min(0).nullish(),
   price_min_t3: z.number().min(0).nullish(),
   price_max_t3: z.number().min(0).nullish(),
-  superficie_min_t3: z.number().min(1).nullish(),
-  superficie_max_t3: z.number().min(1).nullish(),
+  superficie_min_t3: z.number().min(0).nullish(),
+  superficie_max_t3: z.number().min(0).nullish(),
 
   nb_t4: z.number().min(0).nullish(),
   nb_t4_available: z.number().min(0).nullish(),
   price_min_t4: z.number().min(0).nullish(),
   price_max_t4: z.number().min(0).nullish(),
-  superficie_min_t4: z.number().min(1).nullish(),
-  superficie_max_t4: z.number().min(1).nullish(),
+  superficie_min_t4: z.number().min(0).nullish(),
+  superficie_max_t4: z.number().min(0).nullish(),
 
   nb_t5: z.number().min(0).nullish(),
   nb_t5_available: z.number().min(0).nullish(),
   price_min_t5: z.number().min(0).nullish(),
   price_max_t5: z.number().min(0).nullish(),
-  superficie_min_t5: z.number().min(1).nullish(),
-  superficie_max_t5: z.number().min(1).nullish(),
+  superficie_min_t5: z.number().min(0).nullish(),
+  superficie_max_t5: z.number().min(0).nullish(),
 
   nb_t6: z.number().min(0).nullish(),
   nb_t6_available: z.number().min(0).nullish(),
   price_min_t6: z.number().min(0).nullish(),
   price_max_t6: z.number().min(0).nullish(),
-  superficie_min_t6: z.number().min(1).nullish(),
-  superficie_max_t6: z.number().min(1).nullish(),
+  superficie_min_t6: z.number().min(0).nullish(),
+  superficie_max_t6: z.number().min(0).nullish(),
 
   nb_t7_more: z.number().min(0).nullish(),
   nb_t7_more_available: z.number().min(0).nullish(),
   price_min_t7_more: z.number().min(0).nullish(),
   price_max_t7_more: z.number().min(0).nullish(),
-  superficie_min_t7_more: z.number().min(1).nullish(),
-  superficie_max_t7_more: z.number().min(1).nullish(),
+  superficie_min_t7_more: z.number().min(0).nullish(),
+  superficie_max_t7_more: z.number().min(0).nullish(),
 
   nb_accessible_apartments: z.number().nullish(),
   nb_coliving_apartments: z.number().nullish(),
@@ -269,22 +269,24 @@ export const createUpdateResidenceSchema = (existingData: {
     ]
 
     for (const { total, min, max, minPath, maxPath, type } of superficieValidations) {
-      // Si la typologie a des logements, la superficie est obligatoire
-      if (total != null && total > 0) {
-        if (min == null) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `La superficie minimum est requise pour ${type}`,
-            path: [minPath],
-          })
-        }
-        if (max == null) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `La superficie maximum est requise pour ${type}`,
-            path: [maxPath],
-          })
-        }
+      // La superficie n'a de sens que pour une typologie ayant des logements.
+      // Les typologies absentes sont stockées à 0 en base : on les ignore.
+      if (total == null || total <= 0) continue
+
+      // La superficie est obligatoire
+      if (min == null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `La superficie minimum est requise pour ${type}`,
+          path: [minPath],
+        })
+      }
+      if (max == null) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `La superficie maximum est requise pour ${type}`,
+          path: [maxPath],
+        })
       }
       // Validation valeur > 0
       if (min != null && min <= 0) {

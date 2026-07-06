@@ -21,14 +21,13 @@ import { classifyActions, computeDiff } from '~/server/services/accommodation-di
 import { logActivity } from '~/server/services/activity-logger'
 import { triggerAlertDetection } from '~/server/services/alert-detection-trigger'
 import { sendOwnerWelcomeEmail, syncBrevoDataUpdated } from '~/server/services/brevo'
-
 import { computeDerivedFields, generateSlug, geocodeAddress } from '~/server/trpc/utils/accommodation-helpers'
 import { AVAILABILITY_FIELD_MAP, mapFields, UPDATE_FIELD_MAP } from '~/server/trpc/utils/field-mapping'
 import { resolveCityId } from '~/server/trpc/utils/resolve-city'
 import { getJwtSecret } from '~/server/utils/jwt-secret'
 import { findAvailableSlug } from '~/server/utils/slug'
-
 import { normalizeAccommodationName } from '~/utils/normalize-accommodation-name'
+import { RICH_TEXT_ALLOWED_ATTR, RICH_TEXT_ALLOWED_TAGS } from '~/utils/sanitize-config'
 import { bailleurProcedure, createTRPCRouter, ownerProcedure } from '../init'
 import { mapToGeoJsonFeature, priceMaxComputed } from './accommodations'
 
@@ -322,7 +321,9 @@ export const bailleurRouter = createTRPCRouter({
         slug,
         residenceType: fields.residence_type ?? null,
         target_audience: fields.target_audience ?? null,
-        description: fields.description ? DOMPurify.sanitize(fields.description, { ALLOWED_TAGS: [] }) : null,
+        description: fields.description
+          ? DOMPurify.sanitize(fields.description, { ALLOWED_TAGS: RICH_TEXT_ALLOWED_TAGS, ALLOWED_ATTR: RICH_TEXT_ALLOWED_ATTR })
+          : null,
         rentalChargesDetails: fields.rental_charges_details ?? null,
         externalUrl: fields.external_url || null,
         acceptWaitingList: fields.accept_waiting_list ?? false,
@@ -450,7 +451,10 @@ export const bailleurRouter = createTRPCRouter({
         camelFields.name = normalizeAccommodationName(camelFields.name)
       }
       if (typeof camelFields.description === 'string') {
-        camelFields.description = DOMPurify.sanitize(camelFields.description, { ALLOWED_TAGS: [] })
+        camelFields.description = DOMPurify.sanitize(camelFields.description, {
+          ALLOWED_TAGS: RICH_TEXT_ALLOWED_TAGS,
+          ALLOWED_ATTR: RICH_TEXT_ALLOWED_ATTR,
+        })
       }
       const userProvidedKeys = new Set(Object.keys(camelFields))
 
