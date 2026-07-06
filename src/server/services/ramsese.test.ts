@@ -43,7 +43,8 @@ describe('ramsese service — getEtablissementsSuperieurByCodePostal', () => {
 
   it('enchaîne CP → communes → UAIs → détails et ne garde que le supérieur', async () => {
     fetchMock
-      .mockResolvedValueOnce(jsonResponse([{ code: '34172', nom: 'Montpellier' }])) // geo.api
+      .mockResolvedValueOnce(jsonResponse([{ code: '34172', nom: 'Montpellier' }])) // geo.api communes
+      .mockResolvedValueOnce(jsonResponse([])) // geo.api arrondissements (aucun)
       .mockResolvedValueOnce(jsonResponse({ UAIS: ['0341089Z', '0340001A'] })) // filtres
       .mockResolvedValueOnce(jsonResponse(UAI_DETAIL_SUP)) // détail 1
       .mockResolvedValueOnce(jsonResponse(UAI_DETAIL_ECOLE)) // détail 2
@@ -66,25 +67,41 @@ describe('ramsese service — getEtablissementsSuperieurByCodePostal', () => {
   })
 
   it('poste les communes INSEE (pas le code postal) au filtre RAMSESE', async () => {
-    fetchMock.mockResolvedValueOnce(jsonResponse([{ code: '34172', nom: 'Montpellier' }])).mockResolvedValueOnce(jsonResponse({ UAIS: [] }))
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse([{ code: '34172', nom: 'Montpellier' }])) // communes
+      .mockResolvedValueOnce(jsonResponse([])) // arrondissements
+      .mockResolvedValueOnce(jsonResponse({ UAIS: [] })) // filtres
 
     const { getEtablissementsSuperieurByCodePostal } = await import('./ramsese')
     await getEtablissementsSuperieurByCodePostal('34090')
 
-    const filtresCall = fetchMock.mock.calls[1]
+    const filtresCall = fetchMock.mock.calls[2]
     expect(filtresCall[0]).toContain('/listeUai/filtres')
     const body = JSON.parse(filtresCall[1].body)
     expect(body.communes).toEqual(['34172'])
   })
 
+  it('inclut le code INSEE d’arrondissement pour Paris (75013 → 75056 + 75113)', async () => {
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse([{ code: '75056', nom: 'Paris' }])) // communes
+      .mockResolvedValueOnce(jsonResponse([{ code: '75113', nom: 'Paris 13e Arrondissement' }])) // arrondissements
+      .mockResolvedValueOnce(jsonResponse({ UAIS: [] })) // filtres
+
+    const { getEtablissementsSuperieurByCodePostal } = await import('./ramsese')
+    await getEtablissementsSuperieurByCodePostal('75013')
+
+    const body = JSON.parse(fetchMock.mock.calls[2][1].body)
+    expect(body.communes).toEqual(['75056', '75113'])
+  })
+
   it('retourne [] quand le code postal est inconnu (aucun appel RAMSESE)', async () => {
-    fetchMock.mockResolvedValueOnce(jsonResponse([]))
+    fetchMock.mockResolvedValueOnce(jsonResponse([])).mockResolvedValueOnce(jsonResponse([])) // communes + arrondissements
 
     const { getEtablissementsSuperieurByCodePostal } = await import('./ramsese')
     const result = await getEtablissementsSuperieurByCodePostal('00000')
 
     expect(result).toEqual([])
-    expect(fetchMock).toHaveBeenCalledOnce()
+    expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
   it('exclut les natures fermées (DATE_FIN renseignée)', async () => {

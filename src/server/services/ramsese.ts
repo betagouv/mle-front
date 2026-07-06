@@ -53,15 +53,27 @@ function activeCodes(codes?: TCodeHist[]): string[] {
   return codes.filter((c) => !c.DATE_FIN && c.CODE).map((c) => c.CODE as string)
 }
 
-/** Étape 1 — code postal → codes commune INSEE. */
+/** Étape 1 — code postal → codes commune INSEE (arrondissements municipaux inclus). */
 async function fetchInseeCodesByPostalCode(codePostal: string): Promise<string[]> {
-  const url = `https://geo.api.gouv.fr/communes?codePostal=${encodeURIComponent(codePostal)}&fields=code,nom`
+  const cp = encodeURIComponent(codePostal)
+  // Paris / Lyon / Marseille : RAMSESE code les UAI au niveau arrondissement
+  // (ex. 75113 pour Paris 13e), alors que geo.api renvoie la commune chef-lieu
+  // (75056) qui ne matche aucun UAI. On interroge donc aussi les arrondissements
+  // municipaux et on fusionne les codes.
+  const urls = [
+    `https://geo.api.gouv.fr/communes?codePostal=${cp}&fields=code,nom`,
+    `https://geo.api.gouv.fr/communes?codePostal=${cp}&type=arrondissement-municipal&fields=code,nom`,
+  ]
   try {
-    const res = await fetch(url, { next: { revalidate: UAI_DETAIL_REVALIDATE_S } })
-    if (!res.ok) return []
-    const parsed = ZGeoApiCommunes.safeParse(await res.json())
-    if (!parsed.success) return []
-    return parsed.data.map((c) => c.code)
+    const lists = await Promise.all(
+      urls.map(async (url) => {
+        const res = await fetch(url, { next: { revalidate: UAI_DETAIL_REVALIDATE_S } })
+        if (!res.ok) return []
+        const parsed = ZGeoApiCommunes.safeParse(await res.json())
+        return parsed.success ? parsed.data.map((c) => c.code) : []
+      }),
+    )
+    return [...new Set(lists.flat())]
   } catch {
     return []
   }
