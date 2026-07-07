@@ -3,7 +3,6 @@ import { Avatar } from '@codegouvfr/react-dsfr/picto'
 import { HydrationBoundary } from '@tanstack/react-query'
 import { notFound } from 'next/navigation'
 import { CandidaturesList } from '~/components/bailleur/candidatures/candidatures-list'
-import { getServerSession } from '~/services/better-auth'
 import { buildHref } from '~/utils/preserve-query-params'
 import { getCandidaturesPageContext } from './get-candidatures-page-context'
 
@@ -23,13 +22,12 @@ type CandidaturesPageProps = {
 }
 
 export default async function CandidaturesPage({ searchParams }: CandidaturesPageProps) {
-  const session = await getServerSession()
-  if (!session?.user.owner?.acceptDossierFacileApplications) {
+  const awaitedSearchParams = await searchParams
+  const { dehydratedState, ctx } = await getCandidaturesPageContext(awaitedSearchParams)
+
+  if (!ctx.owner.acceptDossierFacileApplications) {
     return notFound()
   }
-
-  const awaitedSearchParams = await searchParams
-  const { dehydratedState } = await getCandidaturesPageContext(awaitedSearchParams)
 
   return (
     <HydrationBoundary state={dehydratedState}>

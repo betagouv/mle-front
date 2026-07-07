@@ -16,7 +16,7 @@ export default async function EditBailleurUserPage({
   const awaitedParams = await params
   const awaitedSearchParams = await searchParams
   const ctx = await getBailleurContext(awaitedSearchParams.ownerId)
-  if (!ctx.hasPermission('manage_users')) redirect('/bailleur/tableau-de-bord')
+  if (!ctx.hasPermission('manage_users')) redirect(buildHref('/bailleur/tableau-de-bord', awaitedSearchParams))
 
   const t = await getTranslations('bailleur.users')
   const canGrantAdmin = canGrantAdministratorRights(ctx.user)

@@ -7,6 +7,7 @@ import { parseAsInteger, useQueryStates } from 'nuqs'
 import { createToast } from '~/components/ui/createToast'
 import { TCreateResidence } from '~/schemas/accommodations/create-residence'
 import { useTRPC, useTRPCClient } from '~/server/trpc/client'
+import { buildHref } from '~/utils/preserve-query-params'
 
 export const useCreateResidence = () => {
   const queryClient = useQueryClient()
@@ -60,9 +61,9 @@ export const useCreateResidence = () => {
         message: t('residenceCreated'),
       })
       if (data?.slug) {
-        router.push(`/bailleur/residences/${data.slug}`)
+        router.push(buildHref(`/bailleur/residences/${data.slug}`, { ownerId: ownerId?.toString() }))
       } else {
-        router.push('/bailleur/residences')
+        router.push(buildHref('/bailleur/residences', { ownerId: ownerId?.toString() }))
       }
     },
     onError: () => {
