@@ -32,35 +32,21 @@ const nextConfig = {
       },
     ]
   },
-  async rewrites() {
+  async redirects() {
     return [
+      // Assets statiques WordPress (Bedrock : `app` = `wp-content` renommé). Ils sont déjà
+      // référencés en absolu depuis `info.` ; on renvoie le navigateur en direct plutôt que
+      // de relayer les octets à travers le container. Les pages éditoriales, elles, passent
+      // par des Route Handlers cachés — cf. src/utils/wp-proxy.ts.
       {
-        source: '/preparer-sa-vie-etudiante',
-        destination: 'https://info.monlogementetudiant.beta.gouv.fr',
-      },
-      {
-        source: '/preparer-sa-vie-etudiante/:path*',
-        destination: 'https://info.monlogementetudiant.beta.gouv.fr/preparer-sa-vie-etudiante/:path*/',
-      },
-      {
-        source: '/foire-aux-questions',
-        destination: 'https://info.monlogementetudiant.beta.gouv.fr/foire-aux-questions/',
-      },
-      {
-        source: '/landing',
-        destination: 'https://info.monlogementetudiant.beta.gouv.fr/partenariat/',
-      },
-      {
-        source: '/landing/:path*',
-        destination: 'https://info.monlogementetudiant.beta.gouv.fr/partenariat/:path*/',
+        source: '/wp-content/:path*',
+        destination: 'https://info.monlogementetudiant.beta.gouv.fr/wp-content/:path*',
+        permanent: true,
       },
       {
         source: '/app/:path*',
         destination: 'https://info.monlogementetudiant.beta.gouv.fr/app/:path*',
-      },
-      {
-        source: '/wp-content/:path*',
-        destination: 'https://info.monlogementetudiant.beta.gouv.fr/wp-content/:path*',
+        permanent: true,
       },
     ]
   },
