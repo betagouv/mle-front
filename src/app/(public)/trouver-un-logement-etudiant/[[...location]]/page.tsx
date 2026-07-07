@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 import { HydrationBoundary } from '@tanstack/react-query'
 import { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
+import { FindStudentAccommodationCrousAlert } from '~/components/find-student-accomodation/crous-alert/find-student-accommodation-crous-alert'
 import { FindStudentAccommodationBanner } from '~/components/find-student-accomodation/find-student-accommodation-banner'
 import { FindStudentAccommodationTitle } from '~/components/find-student-accomodation/header/find-student-accommodation-title'
 import { FindStudentAccomodationHeader } from '~/components/find-student-accomodation/header/find-student-accomodation-header'
@@ -104,6 +105,7 @@ export default async function FindStudentAccommodationPage({
         <FindStudentAccommodationTitle location={territory?.name} />
         <FindStudentAccomodationHeader />
         <FindStudentAccomodationSortView territory={territory} />
+        {awaitedSearchParams.crous === 'true' && <FindStudentAccommodationCrousAlert />}
         {!!territory && <FindStudentAccommodationBanner territory={territory} categoryKey={routeCategoryKey} />}
         <FindStudentAccomodationResultsSections
           territory={territory}
