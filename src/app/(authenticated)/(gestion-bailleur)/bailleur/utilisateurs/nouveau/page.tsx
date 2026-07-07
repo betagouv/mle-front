@@ -9,7 +9,7 @@ import { NewBailleurUserForm } from './new-bailleur-user-form'
 export default async function NewBailleurUserPage({ searchParams }: { searchParams: Promise<{ ownerId?: string }> }) {
   const awaited = await searchParams
   const ctx = await getBailleurContext(awaited.ownerId)
-  if (!ctx.hasPermission('manage_users')) redirect('/bailleur/tableau-de-bord')
+  if (!ctx.hasPermission('manage_users')) redirect(buildHref('/bailleur/tableau-de-bord', awaited))
 
   const t = await getTranslations('bailleur.users')
   const canGrantAdmin = canGrantAdministratorRights(ctx.user)

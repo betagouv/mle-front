@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { createToast } from '~/components/ui/createToast'
 import type { CreateBailleurUserInput, UpdateBailleurUserInput } from '~/schemas/bailleur-users/bailleur-user-form'
 import { useTRPC, useTRPCClient } from '~/server/trpc/client'
+import { buildHref } from '~/utils/preserve-query-params'
 
 export const useBailleurUsers = (params: { search?: string; ownerId?: number } = {}) => {
   const trpc = useTRPC()
@@ -26,10 +27,10 @@ export const useCreateBailleurUser = () => {
 
   return useMutation({
     mutationFn: (data: CreateBailleurUserInput & { ownerId?: number }) => trpcClient.bailleur.users.create.mutate(data),
-    onSuccess: async () => {
+    onSuccess: async (_created, variables) => {
       await queryClient.invalidateQueries({ queryKey: trpc.bailleur.users.list.queryKey() })
       createToast({ priority: 'success', message: t('created') })
-      router.push('/bailleur/utilisateurs')
+      router.push(buildHref('/bailleur/utilisateurs', { ownerId: variables.ownerId?.toString() }))
     },
     onError: (error) => {
       createToast({ priority: 'error', message: error.message || t('createError') })
@@ -52,7 +53,7 @@ export const useUpdateBailleurUser = () => {
         queryClient.invalidateQueries({ queryKey: trpc.bailleur.users.getById.queryKey({ id: variables.id, ownerId: variables.ownerId }) }),
       ])
       createToast({ priority: 'success', message: t('updated') })
-      router.push('/bailleur/utilisateurs')
+      router.push(buildHref('/bailleur/utilisateurs', { ownerId: variables.ownerId?.toString() }))
     },
     onError: (error) => {
       createToast({ priority: 'error', message: error.message || t('updateError') })

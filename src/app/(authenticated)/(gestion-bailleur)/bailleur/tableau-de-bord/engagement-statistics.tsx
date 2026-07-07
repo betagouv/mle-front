@@ -9,6 +9,7 @@ import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } f
 import type { ReactNode } from 'react'
 import { Pagination } from '~/components/ui/pagination'
 import { type CitySort, type ResidenceSort, useOwnerStatistics } from '~/hooks/use-owner-statistics'
+import { buildHref } from '~/utils/preserve-query-params'
 import { sPluriel } from '~/utils/sPluriel'
 import styles from './engagement-statistics.module.css'
 
@@ -232,7 +233,10 @@ export function EngagementStatistics({ ownerId }: EngagementStatisticsProps) {
               <ul className={clsx(styles.residenceList, 'fr-flex fr-direction-column fr-flex-grow-1')}>
                 {residenceItems.map((row) => (
                   <li key={row.accommodationId} className={clsx(styles.residenceItem, 'fr-flex fr-direction-column fr-p-3w')}>
-                    <Link className="fr-link fr-link--no-underline" href={`/bailleur/residences/${row.slug}`}>
+                    <Link
+                      className="fr-link fr-link--no-underline"
+                      href={buildHref(`/bailleur/residences/${row.slug}`, { ownerId: ownerId?.toString() })}
+                    >
                       <span className="fr-text--bold fr-text-title--blue-france">{row.name}</span>
                     </Link>
                     {!row.published && <span className="fr-text--xs fr-text-mention--grey"> {t('residences.unpublished')}</span>}

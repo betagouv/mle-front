@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { cache } from 'react'
 import { getBailleurContext } from '~/server/bailleur/get-bailleur-context'
 import { getQueryClient, trpc } from '~/server/trpc/server'
+import { buildHref } from '~/utils/preserve-query-params'
 
 type SearchParams = {
   page?: string
@@ -14,7 +15,7 @@ type SearchParams = {
 
 export const getCandidaturesPageContext = cache(async (searchParams: SearchParams) => {
   const ctx = await getBailleurContext(searchParams.ownerId)
-  if (!ctx.hasPermission('manage_applications')) redirect('/bailleur/tableau-de-bord')
+  if (!ctx.hasPermission('manage_applications')) redirect(buildHref('/bailleur/tableau-de-bord', searchParams))
 
   const queryClient = getQueryClient()
 

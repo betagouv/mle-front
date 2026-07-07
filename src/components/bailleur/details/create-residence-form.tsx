@@ -3,6 +3,7 @@
 import Button from '@codegouvfr/react-dsfr/Button'
 import { zodResolver } from '@hookform/resolvers/zod'
 import clsx from 'clsx'
+import { useSearchParams } from 'next/navigation'
 import { FormProvider, useForm } from 'react-hook-form'
 import { CreateResidenceAccommodationList } from '~/components/bailleur/details/create-residence-accommodation-list'
 import { CreateResidenceEquipments } from '~/components/bailleur/details/create-residence-equipments'
@@ -16,11 +17,13 @@ import { ResidenceVirtualTour } from '~/components/bailleur/details/residence-vi
 import { useCreateResidence } from '~/hooks/use-create-residence'
 import { trackEvent } from '~/lib/tracking'
 import { TCreateResidence, ZCreateResidence } from '~/schemas/accommodations/create-residence'
+import { buildHref } from '~/utils/preserve-query-params'
 import { sanitizeHTML } from '~/utils/sanitize-html'
 import styles from './update-residence-form.module.css'
 
 export const CreateResidenceForm = () => {
   const createMutation = useCreateResidence()
+  const searchParams = useSearchParams()
 
   const form = useForm<TCreateResidence>({
     resolver: zodResolver(ZCreateResidence),
@@ -97,7 +100,7 @@ export const CreateResidenceForm = () => {
               <Button type="submit" iconId="ri-add-line" disabled={createMutation.isPending}>
                 Créer la résidence
               </Button>
-              <Button priority="secondary" linkProps={{ href: '/bailleur/residences' }}>
+              <Button priority="secondary" linkProps={{ href: buildHref('/bailleur/residences', searchParams) }}>
                 Annuler
               </Button>
             </div>
