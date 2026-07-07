@@ -1010,6 +1010,9 @@
         "quote": "« Bienvenue sur votre Espace Gestionnaire. Ensemble, nous rendons la recherche de logement étudiant plus simple. 🙂 »"
       }
     },
+    "informations": {
+      "title": "S'informer pour bien se loger"
+    },
     "todo": {
       "title": "Ma liste de priorités",
       "description": "Complétez votre liste de priorités pour mettre toutes les chances de votre côté"
