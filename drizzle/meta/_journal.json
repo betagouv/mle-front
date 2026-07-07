@@ -295,6 +295,20 @@
       "when": 1782808518394,
       "tag": "0041_add-alert-job-source-nullable-student-alert-id",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1783438350587,
+      "tag": "0042_notification_preferences",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1783456170662,
+      "tag": "0043_student_profile_fields",
+      "breakpoints": true
     }
   ]
 }

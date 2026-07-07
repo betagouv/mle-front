@@ -975,7 +975,8 @@
       "todoList": "Mes priorités ({done}/{total})",
       "housingAid": "Aides au logement",
       "favorites": "Favoris",
-      "alerts": "Alertes logements"
+      "alerts": "Alertes logements",
+      "personalInformations": "Informations personnelles"
     },
     "welcome": {
       "subtitle": "Bienvenue dans votre espace personnel"

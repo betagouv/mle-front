@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm'
-import { bigint, boolean, index, integer, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import { bigint, boolean, date, index, integer, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 
+export const scholarshipStatusEnum = pgEnum('scholarship_status', ['yes', 'no', 'unknown'])
 export const bailleurRoleEnum = pgEnum('bailleur_role', ['administrator', 'gestionnaire'])
 export const bailleurPermissionEnum = pgEnum('bailleur_permission', [
   'manage_users',
@@ -28,6 +29,11 @@ export const user = pgTable(
     ownerId: bigint('owner_id', { mode: 'number' }),
     bailleurRole: bailleurRoleEnum('bailleur_role'),
     bailleurPermissions: bailleurPermissionEnum('bailleur_permissions').array().notNull().default(sql`ARRAY[]::bailleur_permission[]`),
+    notifSimilarAlert: boolean('notif_similar_alert').notNull().default(true),
+    notifFavoriteAlert: boolean('notif_favorite_alert').notNull().default(true),
+    phone: text('phone'),
+    birthdate: date('birthdate', { mode: 'string' }),
+    scholarshipStatus: scholarshipStatusEnum('scholarship_status'),
   },
   (t) => [index('user_owner_id_idx').on(t.ownerId)],
 )
