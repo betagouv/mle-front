@@ -177,7 +177,10 @@ program
   .option('--lat <lat>', 'Latitude de la résidence pour le calcul de distance')
   .option('--lng <lng>', 'Longitude de la résidence pour le calcul de distance')
   .option('--limit <n>', 'Limiter le nombre de détails UAI affichés', parseInt)
+  .option('--concurrency <n>', 'Nb de requêtes détail en parallèle (pool borné, défaut 8)', parseInt)
   .option('--no-natures', 'Ne pas filtrer par la liste blanche métier (diagnostic)')
+  .option('--national', 'Périmètre national : liste blanche des natures, sans filtre par localisation')
+  .option('--json <fichier>', 'Écrire la liste complète des établissements (non tronquée) dans ce fichier .json')
   .option('--dump', 'Afficher le payload JSON complet du 1er UAI')
   .action((opts) => verifyRamsese(opts))
 
