@@ -98,6 +98,10 @@ cli/
     sync-rents.ts        # Sync loyers moyens (data.gouv.fr)
     sync-students.ts     # Sync nb étudiants (enseignementsup)
     sync-stats.ts        # Sync stats Matomo
+    seed-alert-snapshot.ts  # Amorce la baseline du snapshot de dispo (silencieux)
+    backfill-alert-jobs.ts  # Vague initiale : jobs pour le stock dispo × alertes existantes
+    detect-alert-jobs.ts    # Détecte les hausses de dispo et crée les jobs (réconciliation)
+    send-alert-jobs.ts      # Draine la file de jobs et envoie les emails d'alerte
 ```
 
 ---
@@ -225,6 +229,93 @@ Options :
 | `--write` | Applique les corrections : supprime les URLs cassées des tableaux `imagesUrls` en base (et met à jour `imagesCount`), supprime les fichiers orphelins de S3 |
 
 Variables d'env requises : `DATABASE_URL`, `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, `S3_ACCESS_KEY_ID`, `S3_SECRET_ACCESS_KEY`
+
+---
+
+### RAMSESE — établissements d'enseignement supérieur
+
+Le web service RAMSESE (référentiel des établissements du MEN, passerelle Omogen) est sur le **réseau RIE** et protégé par **IP whitelistée** + **clé d'API**. Il n'est donc joignable que depuis un environnement autorisé — typiquement un **one-off Scalingo** sortant par l'IP whitelistée. Variables d'env : `RAMSESE_API_URL`, `RAMSESE_CODE_APPLICATION`, `RAMSESE_API_KEY` (envoyée en query param `api-key`).
+
+Le bloc « Établissements à proximité » de la fiche logement s'appuie sur ce service (`src/server/services/ramsese.ts` → `getEtablissementsSuperieurByCodePostal`).
+
+#### `verify-ramsese` — Diagnostiquer la connectivité et le parsing
+
+```bash
+pnpm cli verify-ramsese --dump                    # Créteil (94000) + payload JSON complet du 1er UAI
+pnpm cli verify-ramsese --cp 75013 --dump         # Paris 13e (arrondissement INSEE résolu automatiquement)
+pnpm cli verify-ramsese --insee 75113             # test direct par code INSEE (court-circuite geo.api)
+pnpm cli verify-ramsese --slug <slug-residence>   # CP + coordonnées réels tirés de la BDD
+pnpm cli verify-ramsese --no-natures              # diagnostic sans la liste blanche métier
+```
+
+> Conçue pour un one-off Scalingo. Sur Scalingo (vars injectées, pas de fichier `.env`), lancer directement `tsx cli/index.ts verify-ramsese --dump` plutôt que `pnpm cli` (qui charge `--env-file=.env`).
+
+Rejoue le pipeline complet de la fiche logement — code postal → communes INSEE (`geo.api.gouv.fr`, **arrondissements Paris/Lyon/Marseille inclus**) → `POST /v3/listeUai/filtres` → détails géolocalisés → distance haversine — en réutilisant le vrai code de parsing (`~/utils/geo`) et la liste blanche des natures. Affiche pour chaque UAI : nom, natures, coordonnées brutes + `SYSTEME_REFERENCE`, coordonnées reprojetées WGS84 et distance ; puis le top 5 (rendu attendu du bloc).
+
+Codes HTTP de l'étape filtres : `200` = OK ; `401/403` = IP non whitelistée ou clé absente ; `404` = préfixe `/v3` à ajuster ; `0/5xx` = réseau/passerelle.
+
+Options :
+
+| Option | Description |
+|--------|-------------|
+| `--cp <codePostal>` | Code postal à tester (défaut : `94000`) |
+| `--insee <codes>` | Codes INSEE directs séparés par des virgules (court-circuite geo.api) |
+| `--slug <slug>` | Résidence : récupère CP + coordonnées depuis la BDD (prioritaire) |
+| `--lat <lat>` / `--lng <lng>` | Coordonnées de la résidence pour le calcul de distance |
+| `--limit <n>` | Limiter le nombre de détails UAI affichés |
+| `--no-natures` | Ne pas filtrer par la liste blanche métier |
+| `--dump` | Afficher le payload JSON complet du 1er UAI |
+
+---
+
+### Alertes étudiants (disponibilité)
+
+Pipeline événementiel de notification des étudiants quand un logement correspondant à leur alerte devient disponible (voir `docs/adr/0001-alert-sender.md` et `0002-alert-detection.md`). Les producteurs créent des `alert_job` ; le sender les draine. Ces commandes sont les opérations **hors-ligne** du système (la détection instantanée, elle, est branchée sur les écritures via les mutations bailleur et les imports).
+
+> **Ordre de mise en route** : `seed-alert-snapshot` une fois → (optionnel) `backfill-alert-jobs` une fois → puis `detect-alert-jobs` (réconciliation, espacée) et `send-alert-jobs` (drain, court) en cron.
+
+#### `seed-alert-snapshot` — Amorcer la baseline du snapshot
+
+```bash
+pnpm cli seed-alert-snapshot --dry-run   # simulation
+pnpm cli seed-alert-snapshot             # amorçage réel
+```
+
+Enregistre la disponibilité courante de tout le stock publié hors CROUS dans `alert_availability_snapshot`, **sans créer de job ni notifier**. À jouer **une fois avant** d'activer la détection événementielle : ensuite, « pas de ligne de snapshot » signifie « résidence réellement nouvelle ». Idempotente (upsert), rejouable sans risque.
+
+#### `backfill-alert-jobs` — Vague initiale pour les alertes existantes
+
+```bash
+pnpm cli backfill-alert-jobs --dry-run --verbose   # chiffrer le volume sans rien écrire
+pnpm cli backfill-alert-jobs                        # enfiler les jobs
+```
+
+Enfile les jobs pour le **stock déjà disponible** qui matche les **alertes existantes** (flux « pull » de masse). Sans elle, ces alertes ne seraient jamais averties du stock présent au démarrage (ni delta côté push, ni création côté pull). À jouer **une seule fois**, explicitement : c'est un envoi de masse. Ne touche pas le snapshot ; idempotente (l'index unique partiel d'`alert_job` empêche les doublons). **N'envoie rien elle-même** — c'est `send-alert-jobs` qui draine ensuite la file.
+
+| Option | Description |
+|--------|-------------|
+| `--dry-run` | Simule sans enfiler de jobs |
+| `--verbose` | Affiche le nombre d'alertes actives et de jobs candidats |
+
+#### `detect-alert-jobs` — Détecter les hausses de disponibilité
+
+```bash
+pnpm cli detect-alert-jobs --dry-run --verbose
+pnpm cli detect-alert-jobs
+```
+
+Compare la dispo courante au snapshot et crée un job pour chaque hausse (`dispo > 0` ET `dispo > dispo_précédente`) croisée avec une alerte active. Sert de **filet de réconciliation** : la détection instantanée est déjà branchée sur les écritures, cette commande rattrape les chemins non hookés (toggles `published`, hooks best-effort échoués). À espacer en cron (ex. 1×/nuit). Verrou single-flight en mode réel (pas de scan concurrent).
+
+#### `send-alert-jobs` — Envoyer les emails d'alerte
+
+```bash
+pnpm cli send-alert-jobs --dry-run --verbose
+pnpm cli send-alert-jobs
+```
+
+Draine la file des jobs `pending`, regroupe par étudiant (un mail listant ses résidences) et envoie via Brevo. À jouer en cron **court** (ex. `*/5 * * * *`) pour le quasi-instantané. Verrou single-flight en mode réel (pas de double-envoi si deux runs se chevauchent).
+
+> **Garde-fou anti-spam** : `sendStudentAlertEmail` n'envoie réellement qu'en `NEXT_PUBLIC_APP_ENV === 'production'`. En dev/staging, les jobs sont traités mais aucun mail ne part.
 
 ---
 

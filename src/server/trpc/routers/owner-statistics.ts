@@ -309,36 +309,39 @@ export const ownerStatisticsRouter = createTRPCRouter({
     return Array.from(series.values()).sort((a, b) => a.date.localeCompare(b.date))
   }),
 
-  byAccommodation: ownerProcedure.input(paginatedInput).query(async ({ ctx, input }) => {
-    const owner = await resolveOwnerOrThrow(ctx.session.user.id, input.ownerId)
-    const { from, to } = getDateRange(input.period)
-    const fromIso = from.toISOString()
-    const toIso = to.toISOString()
+  byAccommodation: ownerProcedure
+    .input(paginatedInput.extend({ sort: z.enum(['views_desc', 'views_asc']).default('views_desc') }))
+    .query(async ({ ctx, input }) => {
+      const owner = await resolveOwnerOrThrow(ctx.session.user.id, input.ownerId)
+      const { from, to } = getDateRange(input.period)
+      const fromIso = from.toISOString()
+      const toIso = to.toISOString()
 
-    const search = input.search.trim()
-    const conditions = [eq(accommodations.ownerId, owner.id)]
-    if (search) {
-      conditions.push(sql`immutable_unaccent(${accommodations.name}) ILIKE immutable_unaccent(${`%${search}%`})`)
-    }
-    const where = and(...conditions)
-    const offset = (input.page - 1) * ACCOMMODATIONS_PAGE_SIZE
+      const search = input.search.trim()
+      const conditions = [eq(accommodations.ownerId, owner.id)]
+      if (search) {
+        conditions.push(sql`immutable_unaccent(${accommodations.name}) ILIKE immutable_unaccent(${`%${search}%`})`)
+      }
+      const where = and(...conditions)
+      const offset = (input.page - 1) * ACCOMMODATIONS_PAGE_SIZE
 
-    const searchSql = search ? sql`AND immutable_unaccent(a.name) ILIKE immutable_unaccent(${`%${search}%`})` : sql``
+      const searchSql = search ? sql`AND immutable_unaccent(a.name) ILIKE immutable_unaccent(${`%${search}%`})` : sql``
+      const orderBy = input.sort === 'views_asc' ? sql`ORDER BY "nbViews" ASC, a.name ASC` : sql`ORDER BY "nbViews" DESC, a.name ASC`
 
-    const [[{ count: total = 0 } = { count: 0 }], items] = await Promise.all([
-      withQueryLogging('byAccommodation:count', () => db.select({ count: sql<number>`count(*)::int` }).from(accommodations).where(where)),
-      withQueryLogging('byAccommodation:items', () =>
-        db.execute<{
-          accommodationId: number
-          name: string
-          slug: string
-          published: boolean
-          postalCode: string | null
-          cityName: string | null
-          nbViews: number
-          nbConsultOffer: number
-          nbFavorites: number
-        }>(sql`
+      const [[{ count: total = 0 } = { count: 0 }], items] = await Promise.all([
+        withQueryLogging('byAccommodation:count', () => db.select({ count: sql<number>`count(*)::int` }).from(accommodations).where(where)),
+        withQueryLogging('byAccommodation:items', () =>
+          db.execute<{
+            accommodationId: number
+            name: string
+            slug: string
+            published: boolean
+            postalCode: string | null
+            cityName: string | null
+            nbViews: number
+            nbConsultOffer: number
+            nbFavorites: number
+          }>(sql`
           SELECT
             a.id::int AS "accommodationId",
             a.name AS "name",
@@ -369,44 +372,48 @@ export const ownerStatisticsRouter = createTRPCRouter({
           LEFT JOIN territories_city c ON c.id = addr.city_id
           WHERE a.owner_id = ${owner.id}
           ${searchSql}
-          ORDER BY a.name
+          ${orderBy}
           LIMIT ${ACCOMMODATIONS_PAGE_SIZE}
           OFFSET ${offset}
         `),
-      ),
-    ])
+        ),
+      ])
 
-    return { items, total, pageSize: ACCOMMODATIONS_PAGE_SIZE }
-  }),
+      return { items, total, pageSize: ACCOMMODATIONS_PAGE_SIZE }
+    }),
 
-  byCity: ownerProcedure.input(paginatedInput).query(async ({ ctx, input }) => {
-    const owner = await resolveOwnerOrThrow(ctx.session.user.id, input.ownerId)
-    const { from, to } = getDateRange(input.period)
-    const fromIso = from.toISOString()
-    const toIso = to.toISOString()
-    const { cityIds } = await getOwnerTerritories(owner.id)
+  byCity: ownerProcedure
+    .input(paginatedInput.extend({ sort: z.enum(['searches_desc', 'searches_asc']).default('searches_desc') }))
+    .query(async ({ ctx, input }) => {
+      const owner = await resolveOwnerOrThrow(ctx.session.user.id, input.ownerId)
+      const { from, to } = getDateRange(input.period)
+      const fromIso = from.toISOString()
+      const toIso = to.toISOString()
+      const { cityIds } = await getOwnerTerritories(owner.id)
 
-    if (cityIds.length === 0) return { items: [], total: 0, pageSize: CITIES_PAGE_SIZE }
+      if (cityIds.length === 0) return { items: [], total: 0, pageSize: CITIES_PAGE_SIZE }
 
-    const search = input.search.trim()
-    const cityConditions = [inArray(cities.id, cityIds)]
-    if (search) {
-      cityConditions.push(sql`immutable_unaccent(${cities.name}) ILIKE immutable_unaccent(${`%${search}%`})`)
-    }
-    const cityWhere = and(...cityConditions)
-    const offset = (input.page - 1) * CITIES_PAGE_SIZE
+      const search = input.search.trim()
+      const cityConditions = [inArray(cities.id, cityIds)]
+      if (search) {
+        cityConditions.push(sql`immutable_unaccent(${cities.name}) ILIKE immutable_unaccent(${`%${search}%`})`)
+      }
+      const cityWhere = and(...cityConditions)
+      const offset = (input.page - 1) * CITIES_PAGE_SIZE
 
-    const searchSql = search ? sql`AND immutable_unaccent(c.name) ILIKE immutable_unaccent(${`%${search}%`})` : sql``
+      const searchSql = search ? sql`AND immutable_unaccent(c.name) ILIKE immutable_unaccent(${`%${search}%`})` : sql``
+      const orderBy =
+        input.sort === 'searches_asc' ? sql`ORDER BY "nbSearches" ASC, c.name ASC` : sql`ORDER BY "nbSearches" DESC, c.name ASC`
 
-    const [[{ count: total = 0 } = { count: 0 }], items] = await Promise.all([
-      withQueryLogging('byCity:count', () => db.select({ count: sql<number>`count(*)::int` }).from(cities).where(cityWhere)),
-      withQueryLogging('byCity:items', () =>
-        db.execute<{
-          cityId: number
-          name: string
-          nbSearches: number
-          nbAlerts: number
-        }>(sql`
+      const [[{ count: total = 0 } = { count: 0 }], items] = await Promise.all([
+        withQueryLogging('byCity:count', () => db.select({ count: sql<number>`count(*)::int` }).from(cities).where(cityWhere)),
+        withQueryLogging('byCity:items', () =>
+          db.execute<{
+            cityId: number
+            name: string
+            nbSearches: number
+            nbAlerts: number
+          }>(sql`
           SELECT
             c.id::int AS "cityId",
             c.name AS "name",
@@ -424,13 +431,13 @@ export const ownerStatisticsRouter = createTRPCRouter({
           FROM territories_city c
           WHERE c.id IN (${sql.join(cityIds, sql`, `)})
           ${searchSql}
-          ORDER BY c.name
+          ${orderBy}
           LIMIT ${CITIES_PAGE_SIZE}
           OFFSET ${offset}
         `),
-      ),
-    ])
+        ),
+      ])
 
-    return { items, total, pageSize: CITIES_PAGE_SIZE }
-  }),
+      return { items, total, pageSize: CITIES_PAGE_SIZE }
+    }),
 })

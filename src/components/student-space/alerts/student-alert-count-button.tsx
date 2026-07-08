@@ -46,7 +46,7 @@ export const StudentAlertCountButton = ({ alert }: { alert: TAlert }) => {
   }
 
   return (
-    <Button priority="secondary" linkProps={{ href: getHref() }}>
+    <Button priority="secondary" linkProps={{ href: getHref(), target: '_blank' }}>
       {alert.count} résidence{sPluriel(alert.count)}
       <span className={clsx(styles.icon, 'fr-ml-1w ri-arrow-right-line')} />
     </Button>

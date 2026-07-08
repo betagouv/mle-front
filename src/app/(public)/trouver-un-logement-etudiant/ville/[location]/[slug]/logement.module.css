@@ -104,6 +104,47 @@
   gap: 1rem;
 }
 
+.etablissementList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.etablissementRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.markerIcon {
+  flex: 0 0 auto;
+}
+
+.markerIcon::before {
+  --icon-size: 1.5rem; /* marker 24 x 24 px */
+}
+
+.etablissementName {
+  font-weight: 500;
+}
+
+/* Ligne de points reliant le nom à la distance (leader dots) */
+.leader {
+  flex: 1 1 auto;
+  align-self: center;
+  margin-top: 0.25rem;
+  border-bottom: 2px dotted var(--border-default-grey);
+}
+
+.distance {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  color: var(--text-mention-grey);
+}
+
 .equipmentsGrid {
   display: grid;
   gap: 1rem;

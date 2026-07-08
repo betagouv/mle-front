@@ -14,6 +14,7 @@ export default defineConfig({
       {
         resolve: {
           alias: {
+            'server-only': path.resolve(srcDir, '__tests__/helpers/server-only-stub.ts'),
             '~': srcDir,
           },
         },
@@ -32,7 +33,11 @@ export default defineConfig({
             BREVO_TEMPLATE_RESET_PASSWORD: '1',
             BREVO_TEMPLATE_OWNER_WELCOME: '1',
             BREVO_TEMPLATE_ADMIN_RESET_PASSWORD: '1',
+            BREVO_TEMPLATE_STUDENT_ALERT: '1',
+            BREVO_TEMPLATE_ALERT_CREATION: '43',
             BREVO_CONTACTS_API_URL: 'https://api.brevo.com/v3/contacts',
+            WP_FAQ_URL: 'https://info.monlogementetudiant.beta.gouv.fr',
+            WP_FAQ_PAGE_ID: '1774',
             S3_ENDPOINT: 'https://s3.example.com',
             S3_BUCKET: 'test-bucket',
             S3_ACCESS_KEY_ID: 'test-key-id',
@@ -40,12 +45,16 @@ export default defineConfig({
             MATOMO_URL: 'https://matomo.example.com/',
             MATOMO_TOKEN: 'test-token',
             MATOMO_ID_SITE: '1',
+            RAMSESE_API_URL: 'https://ramsese.example.com/ramsese-webservice',
+            RAMSESE_CODE_APPLICATION: '00',
+            RAMSESE_API_KEY: 'test-ramsese-key',
           },
         },
       },
       {
         resolve: {
           alias: [
+            { find: 'server-only', replacement: path.resolve(srcDir, '__tests__/helpers/server-only-stub.ts') },
             { find: /^~\/server\/db$/, replacement: path.resolve(srcDir, '__tests__/helpers/test-db-module.ts') },
             { find: '~', replacement: srcDir },
           ],
@@ -68,7 +77,11 @@ export default defineConfig({
             BREVO_TEMPLATE_RESET_PASSWORD: '1',
             BREVO_TEMPLATE_OWNER_WELCOME: '1',
             BREVO_TEMPLATE_ADMIN_RESET_PASSWORD: '1',
+            BREVO_TEMPLATE_STUDENT_ALERT: '1',
+            BREVO_TEMPLATE_ALERT_CREATION: '43',
             BREVO_CONTACTS_API_URL: 'https://api.brevo.com/v3/contacts',
+            WP_FAQ_URL: 'https://info.monlogementetudiant.beta.gouv.fr',
+            WP_FAQ_PAGE_ID: '1774',
             S3_ENDPOINT: 'https://s3.example.com',
             S3_BUCKET: 'test-bucket',
             S3_ACCESS_KEY_ID: 'test-key-id',

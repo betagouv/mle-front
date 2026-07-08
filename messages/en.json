@@ -113,6 +113,10 @@
       "title": "Erreur de vérification",
       "description": "Une erreur est survenue lors de la vérification de votre compte. Veuillez réessayer ou contacter le support."
     },
+    "verificationBuffer": {
+      "title": "Vérification du lien de connexion",
+      "description": "Vérification de votre lien de connexion en cours, vous allez être redirigé automatiquement."
+    },
     "accessibility": {
       "title": "Accessibilité",
       "description": "Déclaration d'accessibilité de Mon Logement Étudiant : notre engagement pour rendre la plateforme accessible à tous."
@@ -240,6 +244,12 @@
       },
       "count": "{count} logements"
     },
+    "nearbyEtablissements": {
+      "title": "Educational institutions near the residence",
+      "distance": "{distance} km",
+      "showMore": "More institutions",
+      "showLess": "Show less"
+    },
     "studio": "Studio {type}",
     "colocation": "Colocation",
     "appartement": "Appartement {type}",
@@ -314,6 +324,7 @@
       "advancedFiltersHide": "Fermer",
       "applyFilters": "Appliquer",
       "priceChip": "Moins de {prix}€",
+      "priceAll": "Tous",
       "removeFilter": "Retirer le filtre {filter}",
       "crous": "Crous",
       "others": "Autres résidences"
@@ -938,6 +949,12 @@
       "buttons": {
         "login": "Se connecter"
       }
+    },
+    "buffer": {
+      "title": "Vérification du lien de connexion",
+      "description": "Vous allez être redirigé dans quelques instants.",
+      "fallbackText": "Si rien ne se passe, cliquez sur le lien suivant :",
+      "fallbackLink": "Se connecter"
     }
   },
   "shared": {
@@ -992,6 +1009,9 @@
       "testimonial": {
         "quote": "« Bienvenue sur votre Espace Gestionnaire. Ensemble, nous rendons la recherche de logement étudiant plus simple. 🙂 »"
       }
+    },
+    "informations": {
+      "title": "S'informer pour bien se loger"
     },
     "todo": {
       "title": "Ma liste de priorités",
@@ -1185,7 +1205,10 @@
           "searchPlaceholder": "Rechercher",
           "empty": "Aucune ville",
           "search": "recherche",
-          "alert": "alerte"
+          "alert": "alerte",
+          "sortLabel": "Trier les villes",
+          "sortSearchesDesc": "Plus recherchées",
+          "sortSearchesAsc": "Moins recherchées"
         },
         "residences": {
           "title": "Détail par résidence",
@@ -1195,7 +1218,10 @@
           "unpublished": "(dépubliée)",
           "view": "visite",
           "favorite": "favori",
-          "redirection": "redirection"
+          "redirection": "redirection",
+          "sortLabel": "Trier les résidences",
+          "sortViewsDesc": "Plus vues",
+          "sortViewsAsc": "Moins vues"
         },
         "loading": "Chargement…"
       }

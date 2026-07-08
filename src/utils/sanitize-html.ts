@@ -1,4 +1,5 @@
 import DOMPurify from 'dompurify'
+import { RICH_TEXT_ALLOWED_ATTR, RICH_TEXT_ALLOWED_TAGS } from '~/utils/sanitize-config'
 
 export function sanitizeHTML(html: string): string {
   if (typeof window === 'undefined') {
@@ -6,8 +7,8 @@ export function sanitizeHTML(html: string): string {
   }
 
   return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 'blockquote', 'a'],
-    ALLOWED_ATTR: ['href', 'target'],
+    ALLOWED_TAGS: RICH_TEXT_ALLOWED_TAGS,
+    ALLOWED_ATTR: RICH_TEXT_ALLOWED_ATTR,
     ALLOW_DATA_ATTR: false,
   })
 }

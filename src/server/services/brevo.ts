@@ -82,6 +82,60 @@ export async function sendAdminResetPasswordEmail(email: string): Promise<void> 
   })
 }
 
+export async function sendAlertCreationConfirmationEmail(
+  email: string,
+  params: {
+    alertName: string
+    city?: string
+    academy?: string
+    maxBudget: number
+  },
+): Promise<void> {
+  try {
+    const UNDEFINED = 'Non définie'
+    await sendTemplateEmail({
+      to: email,
+      templateId: env.BREVO_TEMPLATE_ALERT_CREATION,
+      params: {
+        alertName: params.alertName,
+        maxBudget: String(params.maxBudget),
+        city: params.city ?? UNDEFINED,
+        academy: params.academy ?? UNDEFINED,
+      },
+    })
+  } catch (error) {
+    console.error('sendAlertCreationConfirmationEmail failed:', error)
+  }
+}
+
+export async function sendStudentAlertEmail(
+  email: string,
+  params: { firstName: string; alertName?: string; accommodations: { nom: string; url: string }[] },
+): Promise<void> {
+  // Anti-spam : on n'envoie réellement les alertes qu'en production.
+  // Jamais en dev, jamais en staging. Eviter les spam intempestifs.
+  if (env.NEXT_PUBLIC_APP_ENV !== 'production') {
+    console.info(`[${env.NEXT_PUBLIC_APP_ENV}] email d'alerte non envoyé à ${email}`)
+    return
+  }
+
+  const response = await fetch(env.BREVO_API_URL, {
+    method: 'POST',
+    headers: brevoHeaders,
+    body: JSON.stringify({
+      to: [{ email }],
+      templateId: env.BREVO_TEMPLATE_STUDENT_ALERT,
+      replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      params,
+    }),
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    throw new Error(`Brevo student alert email failed: ${response.status} ${error}`)
+  }
+}
+
 // --- Brevo Contacts ---
 type BrevoEspaceGestionnaire = {
   COMPTE_ESPACE_GESTIONNAIRE: boolean
@@ -113,7 +167,6 @@ async function updateBrevoContactAttributes(email: string, attributes: BrevoData
 
 export async function syncBrevoOwnerCreated(
   email: string,
-  // createdAt par défaut à aujourd'hui (flux live de création) ; surchargé lors du rattrapage de la base
   { firstname, lastname, createdAt }: { firstname: string; lastname: string; createdAt?: Date },
 ): Promise<void> {
   await updateBrevoContactAttributes(email, {

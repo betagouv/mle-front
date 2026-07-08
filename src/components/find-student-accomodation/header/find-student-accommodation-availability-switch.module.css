@@ -1,5 +1,6 @@
 .label {
   width: unset !important;
+  white-space: nowrap;
 }
 
 .label::before {

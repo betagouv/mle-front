@@ -267,6 +267,34 @@
       "when": 1780903581533,
       "tag": "0037_add_owner_landing_url",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1781513011829,
+      "tag": "0038_add-alert-jobs",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1782201386655,
+      "tag": "0039_add_alert_availability_snapshot_and_partial_unique",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1782215808257,
+      "tag": "0040_alert_job_active_partial_index",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1782808518394,
+      "tag": "0041_add-alert-job-source-nullable-student-alert-id",
+      "breakpoints": true
     }
   ]
 }

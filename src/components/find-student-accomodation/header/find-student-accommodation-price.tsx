@@ -1,11 +1,10 @@
 'use client'
 
-import Range from '@codegouvfr/react-dsfr/Range'
+import Select from '@codegouvfr/react-dsfr/Select'
 import { useTranslations } from 'next-intl'
 import { parseAsBoolean, parseAsInteger, useQueryStates } from 'nuqs'
-import { useEffect, useState } from 'react'
-import { useDebouncedCallback } from 'use-debounce'
 import { useAccomodations } from '~/hooks/use-accomodations'
+import { buildPriceOptions } from '~/lib/accommodations-search-params'
 import { trackEvent } from '~/lib/tracking'
 
 type FindStudentAccommodationPriceProps = {
@@ -17,47 +16,42 @@ export const FindStudentAccommodationPrice = ({ pageSize, widget }: FindStudentA
   const t = useTranslations('findAccomodation')
   const { data, isLoading } = useAccomodations({ pageSize })
 
-  const step = 50
-  const min = data?.min_price ? Math.floor(data.min_price / step) * step : undefined
+  // Borne haute = max des résultats de la recherche, arrondi à la centaine supérieure.
   const max = data?.max_price ? Math.ceil(data.max_price / 100) * 100 : undefined
 
   const [queryStates, setQueryStates] = useQueryStates({
-    prix: parseAsInteger.withDefault(max ?? 1000),
+    prix: parseAsInteger,
     page: parseAsInteger,
     crous: parseAsBoolean,
   })
   const isCrous = !!queryStates.crous
 
-  const prix = Math.min(queryStates.prix, max ?? 1000)
-  const [localPrix, setLocalPrix] = useState(prix)
+  const prix = queryStates.prix
+  const options = buildPriceOptions(max, prix)
 
-  useEffect(() => {
-    setLocalPrix(prix)
-  }, [prix])
-
-  const debouncedSetPrix = useDebouncedCallback((nextPrix: number) => {
-    trackEvent({ category: 'Recherche', action: 'filtre prix', value: nextPrix })
+  const handleChange = (value: string) => {
+    const nextPrix = value ? Number(value) : null
+    trackEvent({ category: 'Recherche', action: 'filtre prix', value: nextPrix ?? 0 })
     setQueryStates({ prix: nextPrix, page: 1 })
-  }, 300)
+  }
 
   return (
-    <Range
+    <Select
       label={t('header.rangeLabel')}
-      max={max ?? 1000}
-      min={min ?? 0}
-      hideMinMax
-      disabled={isLoading || (widget && isCrous)}
-      step={step}
-      suffix=" €"
-      style={{ width: '260px' }}
-      nativeInputProps={{
-        value: localPrix,
-        onChange: (e) => {
-          const nextPrix = Number(e.target.value)
-          setLocalPrix(nextPrix)
-          debouncedSetPrix(nextPrix)
-        },
+      style={{ width: '180px' }}
+      className="fr-mb-0"
+      nativeSelectProps={{
+        value: prix ?? '',
+        disabled: isLoading || (widget && isCrous),
+        onChange: (e) => handleChange(e.target.value),
       }}
-    />
+    >
+      <option value="">{t('header.priceAll')}</option>
+      {options.map((p) => (
+        <option key={p} value={p}>
+          {t('header.priceChip', { prix: p })}
+        </option>
+      ))}
+    </Select>
   )
 }

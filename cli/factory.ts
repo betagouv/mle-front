@@ -1,8 +1,16 @@
-import { eq } from 'drizzle-orm'
+import { eq, inArray } from 'drizzle-orm'
 import type { TImportJobType } from '~/schemas/import-jobs'
 import { closeDb, db } from '~/server/db'
-import { importJobs } from '~/server/db/schema'
+import { accommodations, importJobs } from '~/server/db/schema'
+import { detectAlertJobs } from '~/server/services/alert-detector'
+import { captureCliException } from './sentry'
 import type { ImportCommand, ImportOptions, ImportResult, SyncCommand, SyncOptions, SyncResult } from './types'
+
+// Imports qui écrivent la disponibilité (`nb_t*_available`) : après leur passage, on
+// déclenche une détection scopée pour notifier les hausses sans attendre le cron. Les
+// autres imports (sans dispo) et les chemins oubliés restent couverts par le cron de
+// réconciliation, qui sert de filet de sécurité.
+const IMPORTS_WRITING_AVAILABILITY = new Set(['arpej-ibail', 'fac-habitat'])
 
 type ImportLoader = () => Promise<{ default: ImportCommand }>
 type SyncLoader = () => Promise<{ default: SyncCommand }>
@@ -79,6 +87,18 @@ export async function runImport(type: string, options: ImportOptions): Promise<v
           },
         })
         .where(eq(importJobs.id, jobId))
+    }
+
+    if (!options.dryRun && IMPORTS_WRITING_AVAILABILITY.has(type) && result.residences?.length) {
+      try {
+        const slugs = result.residences.map((r) => r.slug)
+        const touched = await db.select({ id: accommodations.id }).from(accommodations).where(inArray(accommodations.slug, slugs))
+        const { triggered, jobsCreated } = await detectAlertJobs({ accommodationIds: touched.map((t) => t.id) })
+        console.log(`  🔔 Détection alertes : ${triggered} hausse(s), ${jobsCreated} job(s) créé(s)`)
+      } catch (error) {
+        console.error('  ⚠️ Détection alertes après import échouée :', error instanceof Error ? error.message : String(error))
+        await captureCliException(error)
+      }
     }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)

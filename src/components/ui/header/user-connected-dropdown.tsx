@@ -1,12 +1,15 @@
 'use client'
 
 import Button from '@codegouvfr/react-dsfr/Button'
+import { useSearchParams } from 'next/navigation'
 import { createToast } from '~/components/ui/createToast'
 import { Dropdown } from '~/components/ui/dropdown'
 import { TUser } from '~/lib/types'
 import { signOut } from '~/services/better-auth-client'
+import { buildHref } from '~/utils/preserve-query-params'
 
 export const UserConnectedDropdown = ({ user }: { user: TUser }) => {
+  const searchParams = useSearchParams()
   const handleSignout = async () => {
     createToast({
       priority: 'success',
@@ -18,18 +21,15 @@ export const UserConnectedDropdown = ({ user }: { user: TUser }) => {
     })
   }
 
-  const workspaceUrl = user.role === 'user' ? '/mon-espace' : '/bailleur/tableau-de-bord'
+  const bailleurWorkspaceUrl = buildHref('/bailleur/tableau-de-bord', searchParams)
+  const workspaceUrl = user.role === 'user' ? '/mon-espace' : bailleurWorkspaceUrl
   const isAdmin = user.role === 'admin'
   return (
     <>
       <div className="fr-hidden-sm">
         {isAdmin ? (
           <>
-            <Button
-              priority="tertiary no outline"
-              iconId="ri-building-line"
-              linkProps={{ href: '/bailleur/tableau-de-bord', target: '_self' }}
-            >
+            <Button priority="tertiary no outline" iconId="ri-building-line" linkProps={{ href: bailleurWorkspaceUrl, target: '_self' }}>
               Espace gestionnaire
             </Button>
             <Button
@@ -58,7 +58,7 @@ export const UserConnectedDropdown = ({ user }: { user: TUser }) => {
                   <Button
                     priority="tertiary no outline"
                     className="fr-text--sm"
-                    linkProps={{ href: '/bailleur/tableau-de-bord', target: '_self' }}
+                    linkProps={{ href: bailleurWorkspaceUrl, target: '_self' }}
                   >
                     <span className="ri-building-line fr-icon--sm fr-mr-1w fr-text-label--blue-france" />
                     <span className="fr-text-mention--black fr-text--normal">Aller à l’espace gestionnaire</span>

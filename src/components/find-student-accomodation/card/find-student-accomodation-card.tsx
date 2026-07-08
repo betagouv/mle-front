@@ -18,6 +18,7 @@ import { trackEvent } from '~/lib/tracking'
 import { TUser } from '~/lib/types'
 import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
 import { calculateAvailability } from '~/utils/calculateAvailability'
+import { getAccommodationPath } from '~/utils/get-accommodation-url'
 import styles from './find-student-accomodation-card.module.css'
 
 type AccomodationCardProps = {
@@ -94,7 +95,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
       }
     : {}
 
-  const redirectUri = href ?? `/trouver-un-logement-etudiant/ville/${encodeURIComponent(city)}/${accomodation.properties.slug}`
+  const redirectUri = href ?? getAccommodationPath(city, accomodation.properties.slug)
 
   const handleCardClick = (event: React.MouseEvent) => {
     const target = event.target as HTMLElement

@@ -3,6 +3,7 @@ import { cache } from 'react'
 import { expandBbox } from '~/components/map/map-utils'
 import { getAccommodationById } from '~/server/accommodations/get-accommodation-by-id'
 import { getAccommodations } from '~/server/accommodations/get-accommodations'
+import { getNearbyEtablissements } from '~/server/accommodations/get-nearby-etablissements'
 import { getQueryClient, trpc } from '~/server/trpc/server'
 import { getServerSession } from '~/services/better-auth'
 import { calculateAvailability } from '~/utils/calculateAvailability'
@@ -31,7 +32,11 @@ export const getAccommodationPageContext = cache(async (slug: string) => {
       queryClient.prefetchQuery(trpc.dossierFacile.listApplications.queryOptions({ accommodationSlug: slug })),
     )
   }
-  const [nearbyAccommodations] = await Promise.all([getAccommodations({ center: `${longitude},${latitude}` }), ...prefetchPromises])
+  const [nearbyAccommodations, nearbyEtablissements] = await Promise.all([
+    getAccommodations({ center: `${longitude},${latitude}` }),
+    getNearbyEtablissements({ codePostal: accommodation.postal_code, lat: latitude, lng: longitude }),
+    ...prefetchPromises,
+  ])
 
   const nbAvailable = calculateAvailability({
     nb_t1_available: accommodation.nb_t1_available,
@@ -52,6 +57,7 @@ export const getAccommodationPageContext = cache(async (slug: string) => {
     longitude,
     nbAvailable,
     nearbyAccommodations,
+    nearbyEtablissements,
     user: session?.user,
   }
 })

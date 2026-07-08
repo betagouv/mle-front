@@ -163,6 +163,9 @@ export default function OwnersPage() {
               },
             ]}
           />
+          <Button iconId="fr-icon-download-line" priority="secondary" linkProps={{ href: '/api/admin/bailleurs/logos/export' }}>
+            Export Logos
+          </Button>
           <Button iconId="fr-icon-add-line" linkProps={{ href: '/administration/bailleurs/nouveau' }}>
             Nouveau Gestionnaire
           </Button>

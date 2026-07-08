@@ -1,7 +1,9 @@
 import { program } from 'commander'
+import { backfillAlertJobsCommand } from './commands/backfill-alert-jobs'
 import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
 import { backfillBrevoOwners } from './commands/backfill-brevo-owners'
 import { compareCrous } from './commands/compare-crous'
+import { detectAlertJobsCommand } from './commands/detect-alert-jobs'
 import { healthcheck, healthcheckCities } from './commands/healthcheck'
 import { importBackup } from './commands/import-backup'
 import { importCrousRents } from './commands/import-crous-rents'
@@ -9,8 +11,11 @@ import { importCrousSurfaces } from './commands/import-crous-surfaces'
 import { importCrousTypologies } from './commands/import-crous-typologies'
 import { migrate } from './commands/migrate'
 import { migrateUsers } from './commands/migrate-users'
+import { seedAlertSnapshotCommand } from './commands/seed-alert-snapshot'
+import { sendAlertJobs } from './commands/send-alert-jobs'
 import { auditStorage } from './commands/storage/auditStorage'
 import { uploadImages } from './commands/upload-images'
+import { verifyRamsese } from './commands/verify-ramsese'
 import { runImport, runSync } from './factory'
 
 program.name('mle').description('MLE CLI tools')
@@ -135,5 +140,45 @@ program
   .option('--verbose', 'Afficher le détail de chaque problème')
   .option('--write', 'Appliquer les corrections (URLs cassées retirées de la base, fichiers orphelins supprimés de S3)')
   .action((opts) => auditStorage(opts))
+
+program
+  .command('seed-alert-snapshot')
+  .description('Amorce le snapshot de dispo (baseline) — à jouer une fois avant la détection événementielle')
+  .option('--dry-run', 'Simuler sans modifier le snapshot')
+  .action((opts) => seedAlertSnapshotCommand(opts))
+
+program
+  .command('backfill-alert-jobs')
+  .description('Vague initiale : enfile les jobs pour le stock déjà dispo qui matche les alertes existantes (envoi de masse ponctuel)')
+  .option('--dry-run', 'Simuler sans enfiler de jobs')
+  .option('--verbose', 'Afficher le nombre de jobs candidats')
+  .action((opts) => backfillAlertJobsCommand(opts))
+
+program
+  .command('detect-alert-jobs')
+  .description("Détecte les hausses de disponibilité et crée les jobs d'alerte (pending)")
+  .option('--dry-run', 'Simuler sans créer de jobs ni modifier le snapshot')
+  .option('--verbose', 'Afficher le détail des hausses détectées')
+  .action((opts) => detectAlertJobsCommand(opts))
+
+program
+  .command('send-alert-jobs')
+  .description("Batcher envoyant les emails d'alertes aux étudiants")
+  .option('--dry-run', 'Simuler sans envoyer ni modifier la BDD')
+  .option('--verbose', 'Afficher le détail par utilisateur')
+  .action((opts) => sendAlertJobs(opts))
+
+program
+  .command('verify-ramsese')
+  .description('Vérifie la connectivité RAMSESE + le parsing des établissements (à lancer en one-off Scalingo)')
+  .option('--cp <codePostal>', 'Code postal à tester', '94000')
+  .option('--insee <codes>', 'Codes INSEE directs (séparés par des virgules), court-circuite geo.api')
+  .option('--slug <slug>', 'Résidence : récupère CP + coordonnées depuis la BDD (prioritaire)')
+  .option('--lat <lat>', 'Latitude de la résidence pour le calcul de distance')
+  .option('--lng <lng>', 'Longitude de la résidence pour le calcul de distance')
+  .option('--limit <n>', 'Limiter le nombre de détails UAI affichés', parseInt)
+  .option('--no-natures', 'Ne pas filtrer par la liste blanche métier (diagnostic)')
+  .option('--dump', 'Afficher le payload JSON complet du 1er UAI')
+  .action((opts) => verifyRamsese(opts))
 
 program.parse()

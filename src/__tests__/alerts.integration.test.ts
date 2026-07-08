@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createAcademy, createAlert, createCity, createDepartment, createUser } from './fixtures/factories'
-import { authenticatedCaller, authenticatedCaller2, caller } from './helpers/test-caller'
 import './helpers/setup-integration'
+import { authenticatedCaller, authenticatedCaller2, caller } from './helpers/test-caller'
 
 beforeEach(async () => {
   await createUser({ id: 'test-user-id' })
@@ -62,9 +62,16 @@ describe('alerts.create', () => {
     )
   })
 
+  // An alert shall have a territory reference
+  // otherwise it will send the student every accommodations in the database, filtered by price.
   it('creates an alert', async () => {
+    const academy = await createAcademy({ name: 'Académie Test' })
+    const dept = await createDepartment({ academyId: academy.id })
+    const city = await createCity({ departmentId: dept.id })
+
     const result = await authenticatedCaller.alerts.create({
       name: 'Mon alerte',
+      city_id: city.id,
       has_coliving: true,
       is_accessible: false,
       max_price: 600,

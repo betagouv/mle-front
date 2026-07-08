@@ -69,6 +69,8 @@ export const priceMaxComputed = sql<number | null>`GREATEST(
   ${accommodations.priceMaxT7More}
 )`
 
+const crousExistsCondition = sql`EXISTS (SELECT 1 FROM ${externalSources} WHERE ${externalSources.accommodationId} = ${accommodations.id} AND ${externalSources.source} = 'crous')`
+
 const residenceTypeValues = new Set<string>(Object.values(EResidenceType))
 const targetAudienceValues = new Set<string>(Object.values(ETargetAudience))
 
@@ -87,10 +89,12 @@ type TCommonListFiltersInput = {
   ownerSlug?: string
   priceMax?: number
   viewCrous: boolean
+  // Quand true, ne pas appliquer le filtre crous ici (l'appelant l'applique lui-même, ex. pour compter les deux buckets).
+  skipCrous?: boolean
 }
 
 const applyCommonListFilters = async (conditions: SQL[], input: TCommonListFiltersInput) => {
-  const { hasColiving, isAccessible, onlyWithAvailability, ownerSlug, priceMax, viewCrous } = input
+  const { hasColiving, isAccessible, onlyWithAvailability, ownerSlug, priceMax, viewCrous, skipCrous } = input
 
   if (isAccessible) {
     conditions.push(sql`${accommodations.nbAccessibleApartments} > 0`)
@@ -109,14 +113,8 @@ const applyCommonListFilters = async (conditions: SQL[], input: TCommonListFilte
     conditions.push(sql`${accommodations.priceMin} IS NOT NULL AND ${accommodations.priceMin} <= ${priceMax}`)
   }
 
-  if (viewCrous) {
-    conditions.push(
-      sql`EXISTS (SELECT 1 FROM ${externalSources} WHERE ${externalSources.accommodationId} = ${accommodations.id} AND ${externalSources.source} = 'crous')`,
-    )
-  } else {
-    conditions.push(
-      sql`NOT EXISTS (SELECT 1 FROM ${externalSources} WHERE ${externalSources.accommodationId} = ${accommodations.id} AND ${externalSources.source} = 'crous')`,
-    )
+  if (!skipCrous) {
+    conditions.push(viewCrous ? crousExistsCondition : sql`NOT (${crousExistsCondition})`)
   }
 
   if (ownerSlug) {
@@ -140,11 +138,14 @@ const listAccommodationsWithConditions = async ({
   page,
   pageSize,
   where,
+  whereWithoutCrous,
   addressOrderHint,
 }: {
   page: number
   pageSize: number
   where: SQL | undefined
+  // Mêmes conditions que `where` mais sans le filtre crous : sert à compter les deux buckets (crous / autres).
+  whereWithoutCrous?: SQL
   addressOrderHint?: SQL
 }) => {
   const offset = (page - 1) * pageSize
@@ -152,7 +153,7 @@ const listAccommodationsWithConditions = async ({
   const whereClause = where ? sql`WHERE ${where}` : sql``
 
   // Use a CTE: first deduplicate with DISTINCT ON, then sort + paginate on top
-  const [countResult, priceBounds, results] = await Promise.all([
+  const [countResult, priceBounds, results, crousCountsResult] = await Promise.all([
     db
       .select({ count: sql<number>`count(DISTINCT ${accommodations.id})::int` })
       .from(accommodations)
@@ -278,6 +279,19 @@ const listAccommodationsWithConditions = async ({
       ORDER BY ${priorityOrder} ASC, ${totalAvailable} DESC
       LIMIT ${pageSize} OFFSET ${offset}
     `),
+
+    // Counts par bucket crous / autres, sur les mêmes conditions mais sans le filtre crous.
+    whereWithoutCrous
+      ? db
+          .select({
+            crous: sql<number>`count(DISTINCT ${accommodations.id}) FILTER (WHERE ${crousExistsCondition})::int`,
+            others: sql<number>`count(DISTINCT ${accommodations.id}) FILTER (WHERE NOT (${crousExistsCondition}))::int`,
+          })
+          .from(accommodations)
+          .innerJoin(accommodationAddresses, eq(accommodationAddresses.accommodationId, accommodations.id))
+          .innerJoin(cities, eq(accommodationAddresses.cityId, cities.id))
+          .where(whereWithoutCrous)
+      : Promise.resolve(null),
   ])
 
   const count = countResult[0]?.count ?? 0
@@ -288,6 +302,7 @@ const listAccommodationsWithConditions = async ({
     page_size: pageSize,
     min_price: priceBounds[0]?.minPrice != null ? Number(priceBounds[0].minPrice) : null,
     max_price: priceBounds[0]?.maxPrice != null ? Number(priceBounds[0].maxPrice) : null,
+    crousCounts: crousCountsResult?.[0] ? { crous: crousCountsResult[0].crous, others: crousCountsResult[0].others } : undefined,
     next: page < totalPages ? String(page + 1) : null,
     previous: page > 1 ? String(page - 1) : null,
     results: {
@@ -408,7 +423,9 @@ export const accommodationsRouter = createTRPCRouter({
       const { bbox, center, radius, page, pageSize, academyId } = input
 
       const conditions: SQL[] = [eq(accommodations.published, true), sql`${accommodationAddresses.geom} IS NOT NULL`]
-      await applyCommonListFilters(conditions, input)
+      // On applique tous les filtres SAUF crous : les conditions résultantes servent à compter les deux buckets,
+      // puis on ajoute le filtre crous par-dessus pour les résultats paginés.
+      await applyCommonListFilters(conditions, { ...input, skipCrous: true })
 
       let addressOrderHint: SQL | undefined
       if (input.cityId) {
@@ -431,8 +448,9 @@ export const accommodationsRouter = createTRPCRouter({
         applyCenterRadiusFilter(conditions, center, radius)
       }
 
-      const where = and(...conditions)
-      return listAccommodationsWithConditions({ page, pageSize, where, addressOrderHint })
+      const whereWithoutCrous = and(...conditions)
+      const where = and(whereWithoutCrous, input.viewCrous ? crousExistsCondition : sql`NOT (${crousExistsCondition})`)
+      return listAccommodationsWithConditions({ page, pageSize, where, whereWithoutCrous, addressOrderHint })
     }),
 
   listExpandedByCity: baseProcedure

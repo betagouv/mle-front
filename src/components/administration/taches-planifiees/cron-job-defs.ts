@@ -25,6 +25,11 @@ const CRON_JOB_DEF_MAP: Record<CronJobType, Omit<CronJobDef, 'type'>> = {
     schedule: 'Le 1er de chaque mois à 4h10',
   },
   'sync-stats': { label: 'Sync Statistiques', description: 'Statistiques Matomo', schedule: 'Tous les jours à 3h00' },
+  'alert-detection': {
+    label: 'Détection alertes',
+    description: 'Hausses de disponibilité → jobs d’alerte',
+    schedule: 'Tous les jours à 9h00 et 17h00',
+  },
 }
 
 export const CRON_JOB_DEFS: CronJobDef[] = CRON_JOB_TYPES.map((type) => ({ type, ...CRON_JOB_DEF_MAP[type] }))

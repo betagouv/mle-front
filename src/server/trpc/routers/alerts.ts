@@ -1,67 +1,19 @@
-import { and, eq, inArray, type SQL, sql } from 'drizzle-orm'
+import * as Sentry from '@sentry/nextjs'
+import { and, eq, inArray, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { ZCreateAlertRequest } from '~/schemas/alerts/create-alert'
 import { ZUpdateAlertRequest } from '~/schemas/alerts/update-alert'
 import { db } from '~/server/db'
 import { academies } from '~/server/db/schema/academies'
-import { accommodationAddresses } from '~/server/db/schema/accommodation-addresses'
 import { accommodations } from '~/server/db/schema/accommodations'
 import { cities } from '~/server/db/schema/cities'
 import { departments } from '~/server/db/schema/departments'
-import { owners } from '~/server/db/schema/owners'
 import { studentAlerts } from '~/server/db/schema/student-alerts'
+import { enqueueJobsForNewAlert } from '~/server/services/alert-detector'
+import { type AlertMatchInput, buildAlertMatchConditions } from '~/server/services/alert-matching'
+import { sendAlertCreationConfirmationEmail } from '~/server/services/brevo'
 import { bboxSelect } from '~/server/trpc/utils/spatial-helpers'
 import { createTRPCRouter, userProcedure } from '../init'
-
-type AlertMatchInput = {
-  cityId: number | null
-  departmentId: number | null
-  academyId: number | null
-  hasColiving: boolean
-  isAccessible: boolean
-  maxPrice: number
-}
-
-/**
- * Build the spatial intersection condition for the alert's territory level.
- * Returns a single SQL condition or null if no territory is set.
- */
-function buildTerritoryCondition(alert: Pick<AlertMatchInput, 'cityId' | 'departmentId' | 'academyId'>): SQL | null {
-  const territoryLevels: { id: number | null; table: typeof cities | typeof departments | typeof academies }[] = [
-    { id: alert.cityId, table: cities },
-    { id: alert.departmentId, table: departments },
-    { id: alert.academyId, table: academies },
-  ]
-
-  for (const { id, table } of territoryLevels) {
-    if (id) {
-      return sql`EXISTS (SELECT 1 FROM ${accommodationAddresses} WHERE ${accommodationAddresses.accommodationId} = ${accommodations.id} AND ST_Intersects(${accommodationAddresses.geom}, (SELECT ${table.boundary} FROM ${table} WHERE ${table.id} = ${id})))`
-    }
-  }
-  return null
-}
-
-function buildAlertMatchConditions(alert: AlertMatchInput): SQL[] {
-  const conditions: SQL[] = [
-    eq(accommodations.published, true),
-    sql`${accommodations.priceMin} <= ${alert.maxPrice}`,
-    sql`(${accommodations.ownerId} IS NULL OR ${accommodations.ownerId} NOT IN (SELECT ${owners.id} FROM ${owners} WHERE ${owners.slug} = 'crous'))`,
-  ]
-
-  if (alert.hasColiving) {
-    conditions.push(sql`${accommodations.nbColivingApartments} > 0`)
-  }
-  if (alert.isAccessible) {
-    conditions.push(sql`${accommodations.nbAccessibleApartments} > 0`)
-  }
-
-  const territory = buildTerritoryCondition(alert)
-  if (territory) {
-    conditions.push(territory)
-  }
-
-  return conditions
-}
 
 function countQuery(alert: AlertMatchInput) {
   return db
@@ -255,6 +207,25 @@ export const alertsRouter = createTRPCRouter({
       })
       .returning()
 
+    const [[cityRow], [academyRow]] = await Promise.all([
+      input.city_id ? db.select({ name: cities.name }).from(cities).where(eq(cities.id, input.city_id)) : [],
+      input.academy_id ? db.select({ name: academies.name }).from(academies).where(eq(academies.id, input.academy_id)) : [],
+    ])
+
+    await sendAlertCreationConfirmationEmail(ctx.session.user.email, {
+      alertName: input.name,
+      city: cityRow?.name,
+      academy: academyRow?.name,
+      maxBudget: input.max_price,
+    })
+
+    try {
+      await enqueueJobsForNewAlert(row.id)
+    } catch (error) {
+      console.error('enqueueJobsForNewAlert failed:', error)
+      Sentry.captureException(error)
+    }
+
     return row
   }),
 
@@ -269,6 +240,13 @@ export const alertsRouter = createTRPCRouter({
       .set(updateData)
       .where(and(eq(studentAlerts.id, id), eq(studentAlerts.userId, userId)))
       .returning()
+
+    try {
+      await enqueueJobsForNewAlert(row.id)
+    } catch (error) {
+      console.error('enqueueJobsForNewAlert failed:', error)
+      Sentry.captureException(error)
+    }
 
     return row
   }),

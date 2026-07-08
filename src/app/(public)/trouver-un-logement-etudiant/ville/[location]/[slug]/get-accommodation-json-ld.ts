@@ -1,5 +1,6 @@
 import { getCanonicalUrl } from '~/utils/canonical'
 import { formatCityWithA } from '~/utils/french-contraction'
+import { getAccommodationPath } from '~/utils/get-accommodation-url'
 import { type BreadcrumbItem, type LodgingData } from '~/utils/schema'
 
 type AccommodationJsonLdParams = {
@@ -18,7 +19,7 @@ type AccommodationJsonLdParams = {
 
 export function getAccommodationBreadcrumbItems(name: string, city: string, slug: string): BreadcrumbItem[] {
   const cityFormatted = formatCityWithA(city)
-  const accommodationUrl = getCanonicalUrl(`/trouver-un-logement-etudiant/ville/${encodeURIComponent(city)}/${slug}`)
+  const accommodationUrl = getCanonicalUrl(getAccommodationPath(city, slug))
 
   return [
     { name: 'Accueil', item: getCanonicalUrl('/') },
