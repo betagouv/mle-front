@@ -1,6 +1,7 @@
 import { and, eq, inArray, isNotNull, or, sql } from 'drizzle-orm'
 import { db } from '~/server/db'
 import { accommodations, alertAvailabilitySnapshots, alertJobs, favoriteAccommodations, owners, studentAlerts } from '~/server/db/schema'
+import { user } from '~/server/db/schema/auth'
 import { type AlertMatchInput, accommodationAvailableCount, buildAlertMatchConditions } from './alert-matching'
 
 export type AlertDetectorResult = {
@@ -121,14 +122,16 @@ export async function detectAlertJobs(
     }
   }
 
-  // Croisement avec les favoris : étudiants ayant épinglé une résidence dont la dispo a augmenté.
+  // Croisement avec les favoris : étudiants ayant épinglé une résidence dont la dispo a augmenté,
+  // et ayant conservé la préférence de notification favoris activée.
   const favJobRows =
     triggeredIds.length > 0
       ? (
           await db
             .select({ userId: favoriteAccommodations.userId, accommodationId: favoriteAccommodations.accommodationId })
             .from(favoriteAccommodations)
-            .where(inArray(favoriteAccommodations.accommodationId, triggeredIds))
+            .innerJoin(user, eq(favoriteAccommodations.userId, user.id))
+            .where(and(inArray(favoriteAccommodations.accommodationId, triggeredIds), eq(user.notifFavoriteAlert, true)))
         ).map(toFavoriteJobRow)
       : []
 
@@ -304,13 +307,15 @@ export async function backfillAlertJobs(
     }
   }
 
-  // Favoris : toutes les résidences épinglées actuellement disponibles dans le périmètre.
+  // Favoris : toutes les résidences épinglées actuellement disponibles dans le périmètre,
+  // pour les utilisateurs ayant la préférence de notification favoris activée.
   const favJobRows = (
     await db
       .select({ userId: favoriteAccommodations.userId, accommodationId: favoriteAccommodations.accommodationId })
       .from(favoriteAccommodations)
       .innerJoin(accommodations, eq(favoriteAccommodations.accommodationId, accommodations.id))
-      .where(and(inScopeCondition, sql`${currentAvailableCount} > 0`))
+      .innerJoin(user, eq(favoriteAccommodations.userId, user.id))
+      .where(and(inScopeCondition, sql`${currentAvailableCount} > 0`, eq(user.notifFavoriteAlert, true)))
   ).map(toFavoriteJobRow)
 
   const allJobRows = [...alertJobRows, ...favJobRows]
