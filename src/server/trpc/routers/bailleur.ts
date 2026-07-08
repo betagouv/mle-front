@@ -1,6 +1,6 @@
 import { TRPCError } from '@trpc/server'
 import { and, asc, count, desc, eq, gt, ilike, inArray, ne, or, sql } from 'drizzle-orm'
-import DOMPurify from 'isomorphic-dompurify'
+import { sanitize } from 'isomorphic-dompurify'
 import { SignJWT } from 'jose'
 
 import { z } from 'zod'
@@ -322,7 +322,7 @@ export const bailleurRouter = createTRPCRouter({
         residenceType: fields.residence_type ?? null,
         target_audience: fields.target_audience ?? null,
         description: fields.description
-          ? DOMPurify.sanitize(fields.description, { ALLOWED_TAGS: RICH_TEXT_ALLOWED_TAGS, ALLOWED_ATTR: RICH_TEXT_ALLOWED_ATTR })
+          ? sanitize(fields.description, { ALLOWED_TAGS: RICH_TEXT_ALLOWED_TAGS, ALLOWED_ATTR: RICH_TEXT_ALLOWED_ATTR })
           : null,
         rentalChargesDetails: fields.rental_charges_details ?? null,
         externalUrl: fields.external_url || null,
@@ -451,7 +451,7 @@ export const bailleurRouter = createTRPCRouter({
         camelFields.name = normalizeAccommodationName(camelFields.name)
       }
       if (typeof camelFields.description === 'string') {
-        camelFields.description = DOMPurify.sanitize(camelFields.description, {
+        camelFields.description = sanitize(camelFields.description, {
           ALLOWED_TAGS: RICH_TEXT_ALLOWED_TAGS,
           ALLOWED_ATTR: RICH_TEXT_ALLOWED_ATTR,
         })
