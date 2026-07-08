@@ -1,0 +1,57 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem;
+  background: var(--background-default-grey);
+  border: 1px solid var(--border-default-grey);
+  border-bottom: 4px solid var(--border-default-grey);
+  cursor: grab;
+  touch-action: none;
+}
+
+.card:active {
+  cursor: grabbing;
+}
+
+.overlay {
+  box-shadow: 0 8px 24px rgba(0, 0, 18, 0.24);
+  cursor: grabbing;
+}
+
+.name {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.nameActive {
+  color: var(--text-active-blue-france);
+}
+
+.nameMuted {
+  color: var(--text-default-grey);
+}
+
+.boursier {
+  font-size: 0.875rem;
+  color: var(--text-mention-grey);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.dfLogo {
+  font-size: 0.875rem;
+  color: var(--text-default-grey);
+}
+
+.arrow {
+  --icon-size: 1rem;
+
+  margin-left: auto;
+}

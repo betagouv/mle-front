@@ -38,8 +38,9 @@ export const user = pgTable(
     bailleurPermissions: bailleurPermissionEnum('bailleur_permissions').array().notNull().default(sql`ARRAY[]::bailleur_permission[]`),
     similarAccommodationAlertsEnabled: boolean('similar_accommodation_alerts_enabled').notNull().default(true),
     favoriteAlertsEnabled: boolean('favorite_alerts_enabled').notNull().default(true),
+    // Infos étudiant (nullable : les comptes existants ne les ont pas → détection profil incomplet)
     phone: text('phone'),
-    birthdate: date('birthdate', { mode: 'string' }),
+    birthdate: date('birthdate', { mode: 'string' }), // 'YYYY-MM-DD'
     scholarshipStatus: scholarshipStatusEnum('scholarship_status'),
     scholarshipType: scholarshipTypeEnum('scholarship_type'),
   },

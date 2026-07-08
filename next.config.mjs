@@ -48,6 +48,17 @@ const nextConfig = {
         destination: 'https://info.monlogementetudiant.beta.gouv.fr/app/:path*',
         permanent: true,
       },
+      // L'espace « Candidatures » du gestionnaire est devenu l'espace « Contacts ».
+      {
+        source: '/bailleur/candidatures',
+        destination: '/bailleur/contacts',
+        permanent: true,
+      },
+      {
+        source: '/bailleur/candidatures/:path*',
+        destination: '/bailleur/contacts',
+        permanent: true,
+      },
     ]
   },
   webpack: (config) => {

@@ -9,6 +9,7 @@ import { OwnerDetailsAlert } from '~/components/find-student-accomodation/owner-
 import { AvailabilityBadge } from '~/components/shared/availability-badge'
 import { WaitingListBadge } from '~/components/shared/waiting-list-badge'
 import { type ApartmentType } from '~/enums/apartment-type'
+import type { OwnerContactMode } from '~/enums/owner-contact-mode'
 import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
 import { formatDayjs } from '~/utils/dayjs'
 import styles from './owner-details.module.css'
@@ -25,7 +26,7 @@ interface OwnerDetailsProps {
   isAuthenticated: boolean
   accommodationSlug: string
   availableApartmentTypes: ApartmentType[]
-  acceptDossierFacile: boolean
+  contactMode: OwnerContactMode
   updatedAt: Date
 }
 
@@ -41,11 +42,12 @@ export const OwnerDetails = async ({
   isAuthenticated,
   accommodationSlug,
   availableApartmentTypes,
-  acceptDossierFacile,
+  contactMode,
   updatedAt,
 }: OwnerDetailsProps) => {
   const [t, locale] = await Promise.all([getTranslations('accomodation'), getLocale()])
   const ownerUrl = externalUrl || owner?.url
+  const isDossierFacile = contactMode === 'dossier_facile'
   const badgeAvailability = (
     <AvailabilityBadge
       nbAvailable={nbAvailable}
@@ -83,7 +85,7 @@ export const OwnerDetails = async ({
         accommodationSlug={accommodationSlug}
         availableApartmentTypes={availableApartmentTypes}
         isAuthenticated={isAuthenticated}
-        acceptDossierFacile={acceptDossierFacile}
+        contactMode={contactMode}
       />
       <div className={styles.sidebarOwner}>
         <WaitingListBadge
@@ -93,11 +95,7 @@ export const OwnerDetails = async ({
           className="fr-mb-1w fr-width-full"
         />
         {!!ownerUrl && (
-          <ConsultOfferButton
-            href={ownerUrl}
-            slug={slug ?? ''}
-            priority={!isAuthenticated || !acceptDossierFacile ? 'primary' : 'tertiary'}
-          />
+          <ConsultOfferButton href={ownerUrl} slug={slug ?? ''} priority={!isAuthenticated || !isDossierFacile ? 'primary' : 'tertiary'} />
         )}
       </div>
       {nbAvailable === 0 && (

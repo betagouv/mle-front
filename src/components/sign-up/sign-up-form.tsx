@@ -10,9 +10,10 @@ import { useTranslations } from 'next-intl'
 import { FC } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { tss } from 'tss-react'
+import { StudentProfileFields } from '~/components/student-space/profile/student-profile-fields'
 import { usePasswordRuleMessages } from '~/hooks/use-password-rule-messages'
 import { useStudentRegistration } from '~/hooks/use-student-registration'
-import { ZSignUpForm } from '~/schemas/sign-up/sign-up'
+import { type TSignUpForm, ZSignUpForm } from '~/schemas/sign-up/sign-up'
 
 export const SignUpForm: FC = () => {
   const t = useTranslations('signUp')
@@ -20,25 +21,28 @@ export const SignUpForm: FC = () => {
 
   const { classes } = useStyles()
 
-  const loginForm = useForm({
+  const loginForm = useForm<TSignUpForm>({
     defaultValues: {
       firstname: '',
       lastname: '',
       email: '',
       password: '',
+      phone: '',
+      birthdate: '',
+      // scholarshipStatus laissé indéfini jusqu'à sélection
     },
     resolver: zodResolver(ZSignUpForm),
   })
-  const { formState, getValues, handleSubmit, register } = loginForm
+  const { formState, handleSubmit, register } = loginForm
 
-  const onSubmit = async () => await mutateAsync(getValues())
+  const onSubmit = handleSubmit(async (data) => await mutateAsync(data))
 
   const { errors } = formState
   const { lastname, firstname, email, password } = errors || {}
   const passwordRules = usePasswordRuleMessages(!!password)
   return (
     <FormProvider {...loginForm}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={onSubmit}>
         <Input
           label={t('labels.lastname')}
           state={lastname ? 'error' : undefined}
@@ -63,6 +67,8 @@ export const SignUpForm: FC = () => {
             ...register('email'),
           }}
         />
+
+        <StudentProfileFields />
 
         <PasswordInput
           label={t('labels.password')}
