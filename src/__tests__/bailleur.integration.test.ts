@@ -1,5 +1,5 @@
 import { eq } from 'drizzle-orm'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { accommodations } from '../server/db/schema/accommodations'
 import { activityLog } from '../server/db/schema/activity-log'
 import { owners } from '../server/db/schema/owners'
@@ -15,7 +15,7 @@ import {
 } from './fixtures/factories'
 import { getTestDb } from './helpers/test-db'
 import './helpers/setup-integration'
-import { adminCaller, authenticatedCaller, caller, ownerCaller, ownerCaller2 } from './helpers/test-caller'
+import { adminCaller, authenticatedCaller, caller, gestionnaireCallerFactory, ownerCaller, ownerCaller2 } from './helpers/test-caller'
 
 type AccommodationOverrides = NonNullable<Parameters<typeof createAccommodation>[0]>
 type AccommodationGeom = NonNullable<AccommodationOverrides['geom']>
@@ -736,5 +736,60 @@ describe('bailleur.list owner isolation', () => {
     const result = await adminCaller.bailleur.list({ page: 1, ownerId: unlinkedOwner.id })
     expect(result.count).toBe(1)
     expect(result.results[0].name).toBe('Résidence Linked')
+  })
+})
+
+describe('bailleur.setContactMode', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  it('rejects a gestionnaire without the manage_applications permission', async () => {
+    await createUser({ id: 'test-gestionnaire-id', name: 'Gestionnaire', email: 'gestionnaire@test.com', role: 'owner' })
+    await createOwner({ name: 'Owner NoPerm', slug: 'owner-no-perm', userId: 'test-gestionnaire-id' })
+
+    const noPermCaller = gestionnaireCallerFactory()
+    await expect(noPermCaller.bailleur.setContactMode({ mode: 'contacts' })).rejects.toThrow('Permission denied: manage_applications')
+  })
+
+  it('accepts a gestionnaire holding manage_applications', async () => {
+    await createUser({ id: 'test-gestionnaire-id', name: 'Gestionnaire', email: 'gestionnaire@test.com', role: 'owner' })
+    const owner = await createOwner({ name: 'Owner Perm', slug: 'owner-perm', userId: 'test-gestionnaire-id' })
+
+    const permCaller = gestionnaireCallerFactory({ permissions: ['manage_applications'] })
+    const result = await permCaller.bailleur.setContactMode({ mode: 'contacts' })
+    expect(result.contactMode).toBe('contacts')
+
+    const db = getTestDb()
+    const updated = await db.query.owners.findFirst({ where: eq(owners.id, owner.id) })
+    expect(updated!.contactMode).toBe('contacts')
+  })
+
+  it('accepts an owner administrator', async () => {
+    await createOwner({ name: 'Owner Admin Mode', slug: 'owner-admin-mode', userId: 'test-owner-id' })
+
+    const result = await ownerCaller.bailleur.setContactMode({ mode: 'contacts' })
+    expect(result.contactMode).toBe('contacts')
+  })
+
+  it('allows dossier_facile outside production', async () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_ENV', 'development')
+    await createOwner({ name: 'Owner DF Dev', slug: 'owner-df-dev', userId: 'test-owner-id' })
+
+    const result = await ownerCaller.bailleur.setContactMode({ mode: 'dossier_facile' })
+    expect(result.contactMode).toBe('dossier_facile')
+  })
+
+  it('rejects dossier_facile in production', async () => {
+    vi.stubEnv('NEXT_PUBLIC_APP_ENV', 'production')
+    const owner = await createOwner({ name: 'Owner DF Prod', slug: 'owner-df-prod', userId: 'test-owner-id' })
+
+    await expect(ownerCaller.bailleur.setContactMode({ mode: 'dossier_facile' })).rejects.toThrow('DossierFacile is not available yet')
+
+    // Les autres modes restent activables.
+    await ownerCaller.bailleur.setContactMode({ mode: 'contacts' })
+    const db = getTestDb()
+    const updated = await db.query.owners.findFirst({ where: eq(owners.id, owner.id) })
+    expect(updated!.contactMode).toBe('contacts')
   })
 })

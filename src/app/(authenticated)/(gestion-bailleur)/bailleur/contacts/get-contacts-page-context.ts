@@ -6,25 +6,25 @@ import { getQueryClient, trpc } from '~/server/trpc/server'
 import { buildHref } from '~/utils/preserve-query-params'
 
 type SearchParams = {
-  page?: string
-  status?: string
   recherche?: string
-  tri?: string
   ownerId?: string
 }
 
-export const getCandidaturesPageContext = cache(async (searchParams: SearchParams) => {
+export const getContactsPageContext = cache(async (searchParams: SearchParams) => {
   const ctx = await getBailleurContext(searchParams.ownerId)
   if (!ctx.hasPermission('manage_applications')) redirect(buildHref('/bailleur/tableau-de-bord', searchParams))
 
   const queryClient = getQueryClient()
 
-  const page = searchParams.page ? Number(searchParams.page) : 1
-  const status = searchParams.status as 'pending' | 'accepted' | 'rejected' | undefined
-  const search = searchParams.recherche || undefined
-  const sort = (searchParams.tri as 'date_desc' | 'date_asc') || 'date_desc'
-
-  await queryClient.prefetchQuery(trpc.bailleur.listCandidatures.queryOptions({ page, status, search, sort }))
+  if (ctx.owner.contactMode !== 'none') {
+    const search = searchParams.recherche || undefined
+    await queryClient.prefetchQuery(
+      trpc.bailleur.listResidencesWithContactCounts.queryOptions({
+        search,
+        ownerId: searchParams.ownerId ? Number(searchParams.ownerId) : undefined,
+      }),
+    )
+  }
 
   return {
     dehydratedState: dehydrate(queryClient),

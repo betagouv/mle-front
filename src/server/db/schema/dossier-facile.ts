@@ -47,7 +47,7 @@ export const dossierFacileApplications = pgTable(
       .references(() => dossierFacileTenants.id, { onDelete: 'cascade' }),
     accommodationSlug: varchar('accommodation_slug', { length: 255 }).notNull(),
     apartmentType: text('apartment_type').notNull(),
-    status: text('status').notNull().default('pending'),
+    status: text('status').notNull().default('a_moderer'),
     reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

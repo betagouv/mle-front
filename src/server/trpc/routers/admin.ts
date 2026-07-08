@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server'
 import { and, between, count, desc, eq, ilike, inArray, isNull, or, sql } from 'drizzle-orm'
 import { getTranslations } from 'next-intl/server'
 import { z } from 'zod'
+import { ZOwnerContactMode } from '~/enums/owner-contact-mode'
 import { FEATURES } from '~/lib/features'
 import { IMPORT_JOB_TYPES, ZImportJobType } from '~/schemas/import-jobs'
 import { BAILLEUR_PERMISSIONS, BAILLEUR_ROLES } from '~/server/bailleur/permissions'
@@ -451,7 +452,7 @@ const ownersRouter = createTRPCRouter({
         name: z.string().min(1).optional(),
         url: z.string().url().nullable().optional(),
         landingUrl: z.string().url().nullable().optional(),
-        acceptDossierFacileApplications: z.boolean().optional(),
+        contactMode: ZOwnerContactMode.optional(),
       }),
     )
     .mutation(async ({ input }) => {
@@ -461,8 +462,7 @@ const ownersRouter = createTRPCRouter({
       if (fields.name !== undefined) updateData.name = fields.name
       if (fields.url !== undefined) updateData.url = fields.url
       if (fields.landingUrl !== undefined) updateData.landingUrl = fields.landingUrl
-      if (fields.acceptDossierFacileApplications !== undefined)
-        updateData.acceptDossierFacileApplications = fields.acceptDossierFacileApplications
+      if (fields.contactMode !== undefined) updateData.contactMode = fields.contactMode
 
       const [updated] = await db.update(owners).set(updateData).where(eq(owners.id, id)).returning()
       if (!updated) {

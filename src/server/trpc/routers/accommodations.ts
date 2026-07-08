@@ -200,7 +200,7 @@ export const accommodationsRouter = createTRPCRouter({
         ownerUrl: owners.url,
         ownerLandingUrl: owners.landingUrl,
         ownerImage: owners.image,
-        ownerAcceptDossierFacile: owners.acceptDossierFacileApplications,
+        ownerContactMode: owners.contactMode,
         citySlug: cities.slug,
         cityBbox: bboxSelect(cities),
         departmentCode: departments.code,
@@ -295,7 +295,7 @@ export const accommodationsRouter = createTRPCRouter({
             url: row.ownerUrl ?? '',
             landingUrl: row.ownerLandingUrl ?? null,
             imageBase64: row.ownerImage ? `data:image/jpeg;base64,${Buffer.from(row.ownerImage).toString('base64')}` : null,
-            acceptDossierFacileApplications: row.ownerAcceptDossierFacile ?? false,
+            contactMode: row.ownerContactMode ?? 'none',
           }
         : null,
       citySlug: row.citySlug,

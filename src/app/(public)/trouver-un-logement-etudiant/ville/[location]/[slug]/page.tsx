@@ -197,7 +197,7 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
               isAuthenticated={!!user}
               accommodationSlug={slug}
               availableApartmentTypes={getAvailableApartmentTypes(accommodation.typologies)}
-              acceptDossierFacile={owner?.acceptDossierFacileApplications ?? false}
+              contactMode={owner?.contactMode ?? 'none'}
             />
             <NearbyAccommodations nearbyAccommodations={nearbyAccommodations} accommodation={accommodation} />
           </div>

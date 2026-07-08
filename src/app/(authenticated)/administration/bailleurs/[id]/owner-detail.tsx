@@ -92,7 +92,7 @@ export function OwnerDetail({ id }: { id: string }) {
       name: data.name,
       url: data.url || undefined,
       landingUrl: data.landingUrl || undefined,
-      acceptDossierFacileApplications: data.acceptDossierFacileApplications,
+      contactMode: data.contactMode,
     })
   }
 
@@ -197,7 +197,7 @@ export function OwnerDetail({ id }: { id: string }) {
                       name: ownerData.name,
                       url: ownerData.url ?? '',
                       landingUrl: ownerData.landingUrl ?? '',
-                      acceptDossierFacileApplications: ownerData.acceptDossierFacileApplications,
+                      contactMode: ownerData.contactMode,
                     }}
                     onSubmit={handleSubmit}
                     isPending={updateOwner.isPending}

@@ -4,6 +4,7 @@ import { SignJWT } from 'jose'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { APARTMENT_TYPES } from '~/enums/apartment-type'
+import { DF_TENANT_STATUSES_BLOCKING_APPLICATION, type DFTenantStatus } from '~/enums/dossier-facile-tenant-status'
 import { db } from '~/server/db'
 import { accommodations, accommodationTypologies, dossierFacileApplications, dossierFacileTenants } from '~/server/db/schema'
 import { buildDossierFacileAuthorizationUrl, validateDossierFacileConfig } from '~/server/services/dossier-facile/sync'
@@ -82,8 +83,10 @@ export const dossierFacileRouter = createTRPCRouter({
       if (!tenant) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'No DossierFacile tenant linked' })
       }
-      if (tenant.status !== 'verified') {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Tenant dossier is not verified' })
+      // Le dossier n'a pas besoin d'être validé pour candidater : la candidature reste masquée
+      // du board gestionnaire tant que DossierFacile ne l'a pas validée (cf. bailleur router).
+      if (DF_TENANT_STATUSES_BLOCKING_APPLICATION.includes(tenant.status as DFTenantStatus)) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'DossierFacile access is revoked' })
       }
 
       const accommodation = await db.query.accommodations.findFirst({

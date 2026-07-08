@@ -2,7 +2,13 @@ import { eq } from 'drizzle-orm'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { dossierFacileApplications, dossierFacileTenants } from '../server/db/schema'
 import { typologyDraft } from '../server/lib/typologies'
-import { createAccommodation, createDossierFacileApplication, createDossierFacileTenant, createUser } from './fixtures/factories'
+import {
+  createAccommodation,
+  createDossierFacileApplication,
+  createDossierFacileTenant,
+  createOwner,
+  createUser,
+} from './fixtures/factories'
 import './helpers/setup-integration'
 import { authenticatedCaller, caller, ownerCaller } from './helpers/test-caller'
 import { getTestDb } from './helpers/test-db'
@@ -346,13 +352,21 @@ describe('DossierFacile tRPC', () => {
       )
     })
 
-    it('rejects when tenant is not verified', async () => {
-      await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-app-1', status: 'pending' })
+    it('allows applying while the dossier is still being reviewed', async () => {
+      await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-app-1', status: 'to_process' })
       await createAccommodation({ slug: 'res-unverified' }, [typologyDraft('t1', { nbAvailable: 5 })])
 
+      const result = await authenticatedCaller.dossierFacile.application({ accommodationSlug: 'res-unverified', apartmentType: 't1' })
+      expect(result?.accommodationSlug).toBe('res-unverified')
+    })
+
+    it('rejects when DossierFacile access is revoked', async () => {
+      await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-app-1b', status: 'access_revoked' })
+      await createAccommodation({ slug: 'res-revoked' }, [typologyDraft('t1', { nbAvailable: 5 })])
+
       await expect(
-        authenticatedCaller.dossierFacile.application({ accommodationSlug: 'res-unverified', apartmentType: 't1' }),
-      ).rejects.toThrow('Tenant dossier is not verified')
+        authenticatedCaller.dossierFacile.application({ accommodationSlug: 'res-revoked', apartmentType: 't1' }),
+      ).rejects.toThrow('DossierFacile access is revoked')
     })
 
     it('rejects when accommodation does not exist', async () => {
@@ -396,5 +410,77 @@ describe('DossierFacile tRPC', () => {
       })
       expect(second).toBeNull()
     })
+  })
+})
+
+// ─── Webhook → board du gestionnaire ─────────────────────────────────────────
+
+describe('webhook visibility on the bailleur board', () => {
+  async function setupApplication(tenantStatus: string) {
+    const owner = await createOwner({
+      name: 'Owner Board',
+      slug: 'owner-board',
+      userId: 'test-owner-id',
+      contactMode: 'dossier_facile',
+    })
+    await createAccommodation({ slug: 'res-board', ownerId: owner!.id }, [typologyDraft('t1', { nbAvailable: 5 })])
+    const tenant = await createDossierFacileTenant({
+      userId: 'test-user-id',
+      tenantId: 'df-board-1',
+      status: tenantStatus,
+      name: 'Nom Périmé',
+    })
+    await createDossierFacileApplication({
+      tenantId: tenant.id,
+      accommodationSlug: 'res-board',
+      apartmentType: 't1',
+      status: 'a_contacter',
+    })
+    return tenant
+  }
+
+  it('hides the application while the dossier is not verified', async () => {
+    await setupApplication('to_process')
+
+    const board = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    expect(board.items).toHaveLength(0)
+
+    const residences = await ownerCaller.bailleur.listResidencesWithContactCounts({})
+    expect(residences.residences.find((r) => r.slug === 'res-board')?.aRappelerCount).toBe(0)
+  })
+
+  it('reveals the application as a card once the webhook validates the dossier', async () => {
+    await setupApplication('to_process')
+
+    const res = await callWebhook({
+      partnerCallBackType: 'VERIFIED_ACCOUNT',
+      onTenantId: 'df-board-1',
+      tenants: [{ firstName: 'Kevin', lastName: 'Gallet', documents: [], guarantors: [] }],
+    })
+    expect(res.status).toBe(200)
+
+    const board = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    expect(board.mode).toBe('dossier_facile')
+    expect(board.items).toHaveLength(1)
+    // Le nom affiché sur la carte vient du payload fraîchement persisté.
+    expect(board.items[0]!.studentName).toBe('Kevin Gallet')
+    expect(board.items[0]!.source).toBe('dossier_facile')
+
+    const residences = await ownerCaller.bailleur.listResidencesWithContactCounts({})
+    expect(residences.residences.find((r) => r.slug === 'res-board')?.aRappelerCount).toBe(1)
+  })
+
+  it('hides the card again when the dossier is denied', async () => {
+    await setupApplication('verified')
+
+    const before = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    expect(before.items).toHaveLength(1)
+    const candidatureId = before.items[0]!.id
+
+    await callWebhook({ partnerCallBackType: 'DENIED_ACCOUNT', onTenantId: 'df-board-1' })
+
+    const after = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    expect(after.items).toHaveLength(0)
+    await expect(ownerCaller.bailleur.getCandidature({ id: candidatureId })).rejects.toThrow('Candidature not found')
   })
 })
