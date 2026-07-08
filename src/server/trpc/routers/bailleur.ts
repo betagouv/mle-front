@@ -4,6 +4,9 @@ import { sanitize } from 'isomorphic-dompurify'
 import { SignJWT } from 'jose'
 
 import { z } from 'zod'
+import { A_RAPPELER_STATUS, ZContactStatus } from '~/enums/contact-status'
+import { DF_TENANT_STATUS_VERIFIED } from '~/enums/dossier-facile-tenant-status'
+import { ZOwnerContactMode } from '~/enums/owner-contact-mode'
 import { ZCreateResidence } from '~/schemas/accommodations/create-residence'
 import { getTypologyLabel } from '~/schemas/accommodations/typology'
 import { ZUpdateResidence } from '~/schemas/accommodations/update-residence'
@@ -17,6 +20,8 @@ import { accommodationTypologies } from '~/server/db/schema/accommodation-typolo
 import { accommodations } from '~/server/db/schema/accommodations'
 import { user } from '~/server/db/schema/auth'
 import { cities } from '~/server/db/schema/cities'
+import { contactRequests } from '~/server/db/schema/contacts'
+import { departments } from '~/server/db/schema/departments'
 import { dossierFacileApplications, dossierFacileDocuments, dossierFacileTenants } from '~/server/db/schema/dossier-facile'
 import { owners } from '~/server/db/schema/owners'
 import { persistTypologies, typologyAggregates } from '~/server/lib/typologies'
@@ -28,10 +33,24 @@ import { generateSlug, geocodeAddress } from '~/server/trpc/utils/accommodation-
 import { resolveCityId } from '~/server/trpc/utils/resolve-city'
 import { getJwtSecret } from '~/server/utils/jwt-secret'
 import { findAvailableSlug } from '~/server/utils/slug'
+import { isDossierFacileSelectable } from '~/utils/feature-flags'
 import { normalizeAccommodationName } from '~/utils/normalize-accommodation-name'
 import { RICH_TEXT_ALLOWED_ATTR, RICH_TEXT_ALLOWED_TAGS } from '~/utils/sanitize-config'
 import { bailleurProcedure, createTRPCRouter, ownerProcedure } from '../init'
 import { priceMaxComputed, rowsToAccommodationDTOs } from './accommodations'
+
+// Somme des disponibilités (tous types d'appartement) d'une résidence.
+// Agrégat dénormalisé maintenu sur l'accommodation (détail par typologie dans `accommodation_typology`).
+const DISPONIBILITES_SQL = sql<number>`coalesce(${accommodations.nbAvailableApartments}, 0)::int`
+
+/**
+ * Une candidature DossierFacile n'est visible du gestionnaire que si le dossier de l'étudiant est
+ * validé. L'étudiant peut candidater dès qu'il a lié son compte ; c'est le webhook DossierFacile
+ * (`/api/dossier-facile/webhook`), qui persiste `dossier_facile_tenant.status`, qui fait
+ * apparaître (VALIDATED) ou disparaître (DENIED, ARCHIVED, ACCESS_REVOKED) la carte du board,
+ * sans jamais toucher au statut de la candidature trié par le gestionnaire.
+ */
+const VERIFIED_TENANT = eq(dossierFacileTenants.status, DF_TENANT_STATUS_VERIFIED)
 
 async function verifyOwnerAccess(userId: string, accommodationSlug: string) {
   const usr = await db.query.user.findFirst({
@@ -530,7 +549,7 @@ export const bailleurRouter = createTRPCRouter({
         return { items: [], total: 0, page: input.page, pageSize: PAGE_SIZE }
       }
 
-      const conditions = [inArray(dossierFacileApplications.accommodationSlug, slugs)]
+      const conditions = [inArray(dossierFacileApplications.accommodationSlug, slugs), VERIFIED_TENANT]
 
       if (input.status) {
         conditions.push(eq(dossierFacileApplications.status, input.status))
@@ -597,7 +616,9 @@ export const bailleurRouter = createTRPCRouter({
         },
       })
 
-      if (!application) {
+      // Même règle que le board : une candidature dont le dossier n'est pas (ou plus) validé
+      // n'est pas consultable, même par URL directe.
+      if (!application || application.tenant.status !== DF_TENANT_STATUS_VERIFIED) {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Candidature not found' })
       }
 
@@ -640,8 +661,12 @@ export const bailleurRouter = createTRPCRouter({
         apartmentType: application.apartmentType,
         createdAt: application.createdAt,
         reviewedAt: application.reviewedAt,
+        accommodationSlug: application.accommodationSlug,
         studentName: application.tenant.name ?? tenantUser?.name ?? null,
         studentEmail: tenantUser?.email ?? null,
+        studentPhone: tenantUser?.phone ?? null,
+        studentBirthdate: tenantUser?.birthdate ?? null,
+        scholarshipStatus: tenantUser?.scholarshipStatus ?? null,
         dfTenantId: application.tenant.id,
         hasTenantUrl: !!application.tenant.url,
         hasPdfUrl: !!application.tenant.pdfUrl,
@@ -715,53 +740,228 @@ export const bailleurRouter = createTRPCRouter({
       return { redirectUrl: `/api/df-redirect?token=${token}` }
     }),
 
-  updateCandidatureStatus: bailleurProcedure('manage_applications')
-    .input(
-      z.object({
-        id: z.string().uuid(),
-        status: z.enum(['accepted', 'rejected']),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      const application = await db.query.dossierFacileApplications.findFirst({
-        where: eq(dossierFacileApplications.id, input.id),
-      })
+  // ─── Espace Contacts ─────────────────────────────────────────────────────
 
-      if (!application) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Candidature not found' })
+  // Active/change le mode de réception des candidatures (self-service).
+  setContactMode: bailleurProcedure('manage_applications')
+    .input(z.object({ mode: ZOwnerContactMode, ownerId: z.number().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      if (input.mode === 'dossier_facile' && !isDossierFacileSelectable()) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'DossierFacile is not available yet' })
       }
 
-      const usr = await db.query.user.findFirst({
-        where: eq(user.id, ctx.session.user.id),
-        with: { owner: true },
-      })
+      const owner = await getOwnerForUser(ctx.session.user.id, input.ownerId)
+      if (!owner) throw new TRPCError({ code: 'NOT_FOUND', message: 'Owner not found' })
 
-      const isAdmin = usr?.role === 'admin'
+      await db.update(owners).set({ contactMode: input.mode }).where(eq(owners.id, owner.id))
+      return { contactMode: input.mode }
+    }),
 
-      const [accommodation] = await db
-        .select({ ownerId: accommodations.ownerId })
+  // Grille de résidences avec le nombre de contacts « à rappeler » (statut a_contacter).
+  listResidencesWithContactCounts: bailleurProcedure('manage_applications')
+    .input(z.object({ search: z.string().optional(), ownerId: z.number().optional() }))
+    .query(async ({ ctx, input }) => {
+      const owner = await getOwnerForUser(ctx.session.user.id, input.ownerId)
+      if (!owner) return { mode: 'none' as const, residences: [] }
+
+      const conditions = [eq(accommodations.ownerId, owner.id)]
+      if (input.search && input.search.length >= 2) {
+        conditions.push(ilike(accommodations.name, `%${input.search}%`))
+      }
+
+      const residencesRows = await db
+        .select({
+          id: accommodations.id,
+          slug: accommodations.slug,
+          name: accommodations.name,
+          cityName: cities.name,
+          departmentCode: departments.code,
+          disponibilites: DISPONIBILITES_SQL,
+        })
         .from(accommodations)
-        .where(eq(accommodations.slug, application.accommodationSlug))
+        .leftJoin(
+          accommodationAddresses,
+          and(eq(accommodationAddresses.accommodationId, accommodations.id), eq(accommodationAddresses.isMain, true)),
+        )
+        .leftJoin(cities, eq(accommodationAddresses.cityId, cities.id))
+        .leftJoin(departments, eq(cities.departmentId, departments.id))
+        .where(and(...conditions))
+        .orderBy(asc(accommodations.name))
+
+      const slugs = residencesRows.map((r) => r.slug)
+      const countMap = new Map<string, number>()
+
+      if (slugs.length > 0 && owner.contactMode === 'dossier_facile') {
+        const counts = await db
+          .select({ slug: dossierFacileApplications.accommodationSlug, n: sql<number>`count(*)::int` })
+          .from(dossierFacileApplications)
+          .innerJoin(dossierFacileTenants, eq(dossierFacileApplications.tenantId, dossierFacileTenants.id))
+          .where(
+            and(
+              inArray(dossierFacileApplications.accommodationSlug, slugs),
+              eq(dossierFacileApplications.status, A_RAPPELER_STATUS),
+              VERIFIED_TENANT,
+            ),
+          )
+          .groupBy(dossierFacileApplications.accommodationSlug)
+        for (const c of counts) countMap.set(c.slug, c.n)
+      } else if (slugs.length > 0 && owner.contactMode === 'contacts') {
+        const counts = await db
+          .select({ slug: contactRequests.accommodationSlug, n: sql<number>`count(*)::int` })
+          .from(contactRequests)
+          .where(and(inArray(contactRequests.accommodationSlug, slugs), eq(contactRequests.status, A_RAPPELER_STATUS)))
+          .groupBy(contactRequests.accommodationSlug)
+        for (const c of counts) countMap.set(c.slug, c.n)
+      }
+
+      return {
+        mode: owner.contactMode,
+        residences: residencesRows.map((r) => ({ ...r, aRappelerCount: countMap.get(r.slug) ?? 0 })),
+      }
+    }),
+
+  // Détail d'une résidence + ses contacts (source selon le mode du gestionnaire).
+  listContactsByResidence: bailleurProcedure('manage_applications')
+    .input(z.object({ slug: z.string() }))
+    .query(async ({ ctx, input }) => {
+      await verifyOwnerAccess(ctx.session.user.id, input.slug)
+
+      const [residence] = await db
+        .select({
+          name: accommodations.name,
+          cityName: cities.name,
+          departmentCode: departments.code,
+          disponibilites: DISPONIBILITES_SQL,
+          mode: owners.contactMode,
+        })
+        .from(accommodations)
+        .leftJoin(
+          accommodationAddresses,
+          and(eq(accommodationAddresses.accommodationId, accommodations.id), eq(accommodationAddresses.isMain, true)),
+        )
+        .leftJoin(cities, eq(accommodationAddresses.cityId, cities.id))
+        .leftJoin(departments, eq(cities.departmentId, departments.id))
+        .leftJoin(owners, eq(accommodations.ownerId, owners.id))
+        .where(eq(accommodations.slug, input.slug))
         .limit(1)
 
-      if (!accommodation) {
-        throw new TRPCError({ code: 'NOT_FOUND', message: 'Accommodation not found' })
+      if (!residence) throw new TRPCError({ code: 'NOT_FOUND', message: 'Accommodation not found' })
+
+      const mode = residence.mode ?? 'none'
+
+      let items: Array<{
+        id: string
+        studentName: string | null
+        scholarshipStatus: string | null
+        apartmentType: string | null
+        status: string
+        createdAt: Date
+        source: 'dossier_facile' | 'contact'
+      }> = []
+
+      if (mode === 'dossier_facile') {
+        items = await db
+          .select({
+            id: dossierFacileApplications.id,
+            // Nom porté par le dernier payload DossierFacile persisté, à défaut celui du compte.
+            studentName: sql<string | null>`coalesce(${dossierFacileTenants.name}, ${user.name})`,
+            scholarshipStatus: user.scholarshipStatus,
+            apartmentType: dossierFacileApplications.apartmentType,
+            status: dossierFacileApplications.status,
+            createdAt: dossierFacileApplications.createdAt,
+            source: sql<'dossier_facile'>`'dossier_facile'`,
+          })
+          .from(dossierFacileApplications)
+          .innerJoin(dossierFacileTenants, eq(dossierFacileApplications.tenantId, dossierFacileTenants.id))
+          .leftJoin(user, eq(dossierFacileTenants.userId, user.id))
+          .where(and(eq(dossierFacileApplications.accommodationSlug, input.slug), VERIFIED_TENANT))
+          .orderBy(desc(dossierFacileApplications.createdAt))
+      } else if (mode === 'contacts') {
+        items = await db
+          .select({
+            id: contactRequests.id,
+            studentName: user.name,
+            scholarshipStatus: user.scholarshipStatus,
+            apartmentType: contactRequests.apartmentType,
+            status: contactRequests.status,
+            createdAt: contactRequests.createdAt,
+            source: sql<'contact'>`'contact'`,
+          })
+          .from(contactRequests)
+          .leftJoin(user, eq(contactRequests.userId, user.id))
+          .where(eq(contactRequests.accommodationSlug, input.slug))
+          .orderBy(desc(contactRequests.createdAt))
       }
 
-      if (!isAdmin && (!usr?.owner || accommodation.ownerId !== usr.owner.id)) {
-        throw new TRPCError({ code: 'FORBIDDEN', message: 'You do not own this accommodation' })
+      return {
+        residence: {
+          name: residence.name,
+          cityName: residence.cityName,
+          departmentCode: residence.departmentCode,
+          disponibilites: residence.disponibilites,
+        },
+        mode,
+        items,
       }
+    }),
+
+  // Détail des coordonnées d'un contact (mode contacts).
+  getContact: bailleurProcedure('manage_applications')
+    .input(z.object({ id: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const request = await db.query.contactRequests.findFirst({
+        where: eq(contactRequests.id, input.id),
+        with: { user: true },
+      })
+      if (!request) throw new TRPCError({ code: 'NOT_FOUND', message: 'Contact not found' })
+
+      await verifyOwnerAccess(ctx.session.user.id, request.accommodationSlug)
+
+      return {
+        id: request.id,
+        status: request.status,
+        apartmentType: request.apartmentType,
+        createdAt: request.createdAt,
+        reviewedAt: request.reviewedAt,
+        accommodationSlug: request.accommodationSlug,
+        studentName: request.user?.name ?? null,
+        studentEmail: request.user?.email ?? null,
+        studentPhone: request.user?.phone ?? null,
+        studentBirthdate: request.user?.birthdate ?? null,
+        scholarshipStatus: request.user?.scholarshipStatus ?? null,
+      }
+    }),
+
+  // Changement de statut (drag & drop du board) — DossierFacile ou contact.
+  updateContactStatus: bailleurProcedure('manage_applications')
+    .input(z.object({ id: z.string().uuid(), status: ZContactStatus, source: z.enum(['dossier_facile', 'contact']) }))
+    .mutation(async ({ ctx, input }) => {
+      if (input.source === 'dossier_facile') {
+        const application = await db.query.dossierFacileApplications.findFirst({
+          where: eq(dossierFacileApplications.id, input.id),
+        })
+        if (!application) throw new TRPCError({ code: 'NOT_FOUND', message: 'Candidature not found' })
+
+        await verifyOwnerAccess(ctx.session.user.id, application.accommodationSlug)
+
+        const [updated] = await db
+          .update(dossierFacileApplications)
+          .set({ status: input.status, reviewedAt: new Date(), updatedAt: new Date() })
+          .where(eq(dossierFacileApplications.id, input.id))
+          .returning()
+        return updated
+      }
+
+      const request = await db.query.contactRequests.findFirst({ where: eq(contactRequests.id, input.id) })
+      if (!request) throw new TRPCError({ code: 'NOT_FOUND', message: 'Contact not found' })
+
+      await verifyOwnerAccess(ctx.session.user.id, request.accommodationSlug)
 
       const [updated] = await db
-        .update(dossierFacileApplications)
-        .set({
-          status: input.status,
-          reviewedAt: new Date(),
-          updatedAt: new Date(),
-        })
-        .where(eq(dossierFacileApplications.id, input.id))
+        .update(contactRequests)
+        .set({ status: input.status, reviewedAt: new Date(), updatedAt: new Date() })
+        .where(eq(contactRequests.id, input.id))
         .returning()
-
       return updated
     }),
 

@@ -59,6 +59,7 @@ export const FindStudentAccomodationNeighborsResults: FC<FindStudentAccomodation
     enabled: !!cityName,
   })
 
+  console.log('test', expandedAccommodations)
   const expandedFeatures = expandedAccommodations?.results || []
   const showLoadingState = !expandedAccommodations
 
