@@ -25,6 +25,20 @@ function toFavoriteJobRow(f: { userId: string; accommodationId: number }) {
   return { userId: f.userId, studentAlertId: null, accommodationId: f.accommodationId, source: 'favorite' as const }
 }
 
+async function insertAlertJobsInBatches(rows: (typeof alertJobs.$inferInsert)[], conn: Pick<typeof db, 'insert'> = db): Promise<number> {
+  const BATCH_SIZE = 1000
+  let total = 0
+  for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+    const inserted = await conn
+      .insert(alertJobs)
+      .values(rows.slice(i, i + BATCH_SIZE))
+      .onConflictDoNothing()
+      .returning({ id: alertJobs.id })
+    total += inserted.length
+  }
+  return total
+}
+
 /**
  * Détecte les hausses de disponibilité et crée les jobs d'alerte (status `pending`)
  * pour les étudiants concernés. Produit uniquement des jobs ; l'envoi est assuré par
@@ -146,8 +160,7 @@ export async function detectAlertJobs(
       // Création des jobs : onConflictDoNothing s'appuie sur les deux index uniques partiels.
       let created = 0
       if (allJobRows.length > 0) {
-        const inserted = await tx.insert(alertJobs).values(allJobRows).onConflictDoNothing().returning({ id: alertJobs.id })
-        created = inserted.length
+        created = await insertAlertJobsInBatches(allJobRows, tx)
       }
 
       // Mise à jour de la mémoire : dispo courante de toutes les résidences en périmètre.
@@ -245,8 +258,7 @@ export async function enqueueJobsForNewAlert(alertId: number): Promise<number> {
   if (matched.length === 0) return 0
 
   const jobRows = matched.map((m) => ({ userId: alert.userId, studentAlertId: alert.id, accommodationId: m.id, source: 'alert' as const }))
-  const inserted = await db.insert(alertJobs).values(jobRows).onConflictDoNothing().returning({ id: alertJobs.id })
-  return inserted.length
+  return insertAlertJobsInBatches(jobRows)
 }
 
 /**
@@ -325,6 +337,6 @@ export async function backfillAlertJobs(
     return { alertsProcessed: activeAlerts.length, jobsCreated: allJobRows.length }
   }
 
-  const inserted = await db.insert(alertJobs).values(allJobRows).onConflictDoNothing().returning({ id: alertJobs.id })
-  return { alertsProcessed: activeAlerts.length, jobsCreated: inserted.length }
+  const jobsCreated = await insertAlertJobsInBatches(allJobRows)
+  return { alertsProcessed: activeAlerts.length, jobsCreated }
 }
