@@ -8,6 +8,7 @@ import { magicLink } from 'better-auth/plugins'
 import { and, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { cache } from 'react'
+import type { OwnerContactMode } from '~/enums/owner-contact-mode'
 import { verifyDjangoPassword } from '~/lib/django-password'
 import { db } from '~/server/db'
 import * as schema from '~/server/db/schema'
@@ -107,6 +108,9 @@ export const auth = betterAuth({
     additionalFields: {
       firstname: { type: 'string', defaultValue: '', input: true },
       lastname: { type: 'string', defaultValue: '', input: true },
+      phone: { type: 'string', defaultValue: null, input: true },
+      birthdate: { type: 'string', defaultValue: null, input: true },
+      scholarshipStatus: { type: 'string', defaultValue: null, input: true },
       role: { type: 'string', defaultValue: 'user', input: false },
       legacyUser: { type: 'boolean', defaultValue: false, input: false },
       bailleurRole: { type: 'string', defaultValue: null, input: false },
@@ -144,7 +148,7 @@ export const getServerSession = cache(async () => {
     with: { owner: true },
   })
 
-  let adminOwners: Array<{ id: number; name: string; slug: string; url: string | null; acceptDossierFacileApplications: boolean }> = []
+  let adminOwners: Array<{ id: number; name: string; slug: string; url: string | null; contactMode: OwnerContactMode }> = []
 
   if (usr?.role === 'admin') {
     const links = await db.query.adminOwnerLinks.findMany({
@@ -156,7 +160,7 @@ export const getServerSession = cache(async () => {
       name: l.owner.name,
       slug: l.owner.slug,
       url: l.owner.url,
-      acceptDossierFacileApplications: l.owner.acceptDossierFacileApplications,
+      contactMode: l.owner.contactMode,
     }))
   }
 

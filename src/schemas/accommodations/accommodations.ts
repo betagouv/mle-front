@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ZOwnerContactMode } from '~/enums/owner-contact-mode'
 import { EResidenceType } from '~/enums/residence-type'
 import { ETargetAudience } from '~/enums/target-audience'
 import { TYPOLOGY_TYPES } from './typology'
@@ -101,7 +102,7 @@ export const ZAccomodationDetails = ZAccomodation.extend(ZAmenities.shape).exten
       slug: z.string().max(250),
       url: z.string().max(500),
       landingUrl: z.string().max(500).nullable(),
-      acceptDossierFacileApplications: z.boolean(),
+      contactMode: ZOwnerContactMode,
     })
     .nullable(),
 })

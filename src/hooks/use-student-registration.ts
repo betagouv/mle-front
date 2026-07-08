@@ -11,6 +11,9 @@ export const postStudentRegistration = async (body: TSignUpForm): Promise<void> 
     name: `${body.firstname} ${body.lastname}`.trim(),
     firstname: body.firstname,
     lastname: body.lastname,
+    phone: body.phone,
+    birthdate: body.birthdate,
+    scholarshipStatus: body.scholarshipStatus,
     // Après activation, l'étudiant est renvoyé vers la page de connexion (réassurance).
     callbackURL: '/se-connecter?activated=1',
   })

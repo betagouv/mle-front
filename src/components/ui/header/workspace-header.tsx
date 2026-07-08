@@ -31,8 +31,9 @@ export const WorkspaceHeaderComponent: FC = async () => {
       adminOwners={adminOwners}
       defaultOwnerId={defaultOwnerId}
       showSwitcher={showSwitcher}
-      acceptDossierFacile={auth.user.owner?.acceptDossierFacileApplications ?? false}
+      contactMode={auth.user.owner?.contactMode ?? 'none'}
       canManageUsers={canManageUsers}
+      isAdmin={isAdmin}
     />
   )
 }
