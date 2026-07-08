@@ -1,10 +1,13 @@
-import { bigint, boolean, customType, pgTable, varchar } from 'drizzle-orm/pg-core'
+import { bigint, customType, pgEnum, pgTable, varchar } from 'drizzle-orm/pg-core'
 
 const bytea = customType<{ data: Buffer; driverData: Buffer }>({
   dataType() {
     return 'bytea'
   },
 })
+
+// Mode de réception des candidatures : aucun, coordonnées à recontacter, ou dossier complet DossierFacile.
+export const ownerContactModeEnum = pgEnum('owner_contact_mode', ['none', 'contacts', 'dossier_facile'])
 
 export const owners = pgTable('owner', {
   id: bigint({ mode: 'number' }).primaryKey().generatedByDefaultAsIdentity(),
@@ -13,5 +16,5 @@ export const owners = pgTable('owner', {
   url: varchar({ length: 500 }),
   landingUrl: varchar('landing_url', { length: 500 }),
   image: bytea('image'),
-  acceptDossierFacileApplications: boolean('accept_dossier_facile_applications').notNull().default(false),
+  contactMode: ownerContactModeEnum('contact_mode').notNull().default('none'),
 })

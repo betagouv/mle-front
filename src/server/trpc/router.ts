@@ -3,6 +3,7 @@ import { accommodationsRouter } from './routers/accommodations'
 import { adminRouter } from './routers/admin'
 import { alertsRouter } from './routers/alerts'
 import { bailleurRouter } from './routers/bailleur'
+import { contactsRouter } from './routers/contacts'
 import { dossierFacileRouter } from './routers/dossier-facile'
 import { favoritesRouter } from './routers/favorites'
 import { housingAidSimulationRouter } from './routers/housing-aid-simulation'
@@ -22,6 +23,7 @@ export const appRouter = createTRPCRouter({
   questionsAnswers: questionsAnswersRouter,
   admin: adminRouter,
   dossierFacile: dossierFacileRouter,
+  contacts: contactsRouter,
   tracking: trackingRouter,
   ownerStatistics: ownerStatisticsRouter,
   ownerFeedback: ownerFeedbackRouter,

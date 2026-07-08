@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import { ContactModePromoBanner } from '~/components/bailleur/contact-mode-promo-banner'
 import { OwnerFeedbackBanner } from '~/components/bailleur/owner-feedback-banner'
 import { CommonFooter } from '~/components/ui/footer/footer'
 import { WorkspaceHeaderComponent } from '~/components/ui/header/workspace-header'
@@ -34,6 +35,7 @@ export default async function WorkspaceLayout({
   return (
     <>
       <WorkspaceHeaderComponent />
+      <ContactModePromoBanner />
       <main className={styles.container}>{children}</main>
       {showFeedbackBanner && <OwnerFeedbackBanner />}
       <CommonFooter />
