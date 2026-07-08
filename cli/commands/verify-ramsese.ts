@@ -1,3 +1,4 @@
+import { writeFile } from 'node:fs/promises'
 import { and, eq, sql } from 'drizzle-orm'
 import { NATURES_ETABLISSEMENTS } from '~/schemas/ramsese/natures'
 import { env } from '~/server/env'
@@ -40,7 +41,10 @@ interface VerifyRamseseOptions {
   lat?: string
   lng?: string
   limit?: number
+  concurrency?: number // nb de requêtes détail en vol simultanément (pool borné). Défaut 8.
   natures?: boolean // commander: --no-natures => natures === false
+  national?: boolean // périmètre national : filtres sur les natures seules, sans communes
+  json?: string // chemin d'un fichier .json où écrire la liste complète (non tronquée)
   dump?: boolean
 }
 
@@ -117,7 +121,7 @@ async function fetchUais(communes: string[], natures: string[] | null): Promise<
     const res = await fetch(ramseseUrl('/listeUai/filtres'), {
       method: 'POST',
       headers: HEADERS,
-      body: JSON.stringify({ communes, codeApplication: CODEAPP, ...(natures ? { natures } : {}) }),
+      body: JSON.stringify({ ...(communes.length ? { communes } : {}), codeApplication: CODEAPP, ...(natures ? { natures } : {}) }),
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     })
     let uais: string[] = []
@@ -156,6 +160,26 @@ function pickValeur(arr?: Json[]): string | null {
 export async function verifyRamsese(options: VerifyRamseseOptions) {
   console.log('🔎 Vérification RAMSESE')
   console.log(`   BASE=${BASE}  codeApplication=${CODEAPP}  api-key=${API_KEY ? 'définie' : 'ABSENTE'}`)
+
+  // Périmètre national : on court-circuite CP/communes et on interroge filtres sur les
+  // seules natures (liste blanche). Pas de résidence => pas de distance ni de classement.
+  if (options.national) {
+    if (options.natures === false) {
+      console.error('✗ --national exige la liste blanche des natures (ne pas combiner avec --no-natures)')
+      process.exit(1)
+    }
+    const { status, uais } = await fetchUais([], [...NATURES_ETABLISSEMENTS])
+    console.log(`\n1) POST /v3/listeUai/filtres (national, sans communes) -> HTTP ${status} | UAIS=${uais.length}`)
+    if (status !== 200) {
+      console.log('   ⚠️  Status ≠ 200 : 400=`communes` requis (national non supporté) · 401/403=IP non whitelistée · 0/5xx=réseau')
+    }
+    if (uais.length === 0) {
+      console.log('\nAucun UAI. Fin.')
+      process.exit(status === 200 ? 0 : 1)
+    }
+    await detailAndReport(uais, null, options)
+    process.exit(0)
+  }
 
   // 1) Résolution CP + point résidence
   let codePostal = options.cp ?? '94000'
@@ -215,14 +239,30 @@ export async function verifyRamsese(options: VerifyRamseseOptions) {
   }
 
   // 3) détails + parsing + distance
+  await detailAndReport(uais, residence, options)
+  process.exit(0)
+}
+
+/**
+ * Étape 3 mutualisée : détaille chaque UAI, imprime le tableau + le top 5 (si une
+ * résidence est fournie), et écrit la liste complète en JSON si `--json` est passé.
+ * `residence === null` en périmètre national : pas de distance ni de classement.
+ */
+async function detailAndReport(uais: string[], residence: LatLng | null, options: VerifyRamseseOptions) {
   const limit = options.limit ?? uais.length
   const subset = uais.slice(0, limit)
-  console.log(`\n3) Détails de ${subset.length}/${uais.length} UAI (INCLURE_GEOLOCALISATION + ADMINISTRATION) :`)
+  // Pool borné : au plus `concurrency` requêtes en vol à la fois (jamais 5580 d'un coup,
+  // jamais du séquentiel). Monter la valeur pour le national, sans saturer la passerelle.
+  const concurrency = Math.max(1, options.concurrency ?? 8)
+  console.log(
+    `\n3) Détails de ${subset.length}/${uais.length} UAI (concurrence ${concurrency}, INCLURE_GEOLOCALISATION + ADMINISTRATION) :`,
+  )
 
-  const rows = await mapPool(subset, 8, async (uai) => {
+  const rows = await mapPool(subset, concurrency, async (uai) => {
     const { status: st, data } = await fetchUaiDetail(uai)
     if (!data) return { uai, status: st, error: true } as const
     const id = data.IDENTIFICATION ?? {}
+    const loc = data.LOCALISATION ?? {}
     const geo = data.GEOLOCALISATION ?? {}
     const nom = pickValeur(id.APPELLATIONS_OFFICIELLES) ?? pickValeur(id.DENOMINATIONS_PRINCIPALES) ?? '?'
     const natures: string[] = (id.NATURES ?? []).filter((n: Json) => !n.DATE_FIN).map((n: Json) => n.CODE)
@@ -231,8 +271,11 @@ export async function verifyRamsese(options: VerifyRamseseOptions) {
         ? { x: String(geo.COORDONNEES_X), y: String(geo.COORDONNEES_Y), systemeReference: geo.SYSTEME_REFERENCE ?? null }
         : null
     const point = rawCoords ? parseRamseseCoordonnees(rawCoords) : null
-    const distanceMeters = point ? haversineMeters(residence, point) : null
-    return { uai, status: st, nom, natures, rawCoords, point, distanceMeters }
+    const distanceMeters = residence && point ? haversineMeters(residence, point) : null
+    const adresse = pickValeur(loc.ADRESSES)
+    const codePostal = loc.CODE_POSTAL ?? null
+    const commune = loc.LOCALITE_ACHEMINEMENT ?? null
+    return { uai, status: st, nom, natures, adresse, codePostal, commune, rawCoords, point, distanceMeters }
   })
 
   const systems = new Set<string>()
@@ -250,14 +293,35 @@ export async function verifyRamsese(options: VerifyRamseseOptions) {
 
   console.log(`\n   Systèmes de référence rencontrés : ${systems.size ? [...systems].join(', ') : 'aucun'}`)
 
-  // Top 5 = ce que le bloc afficherait
+  // Liste complète (non tronquée) en JSON — les lignes en erreur sont exclues.
+  if (options.json) {
+    const etablissements = rows
+      .filter((r): r is Exclude<typeof r, { error: true }> => !('error' in r))
+      .map((r) => ({
+        numeroUai: r.uai,
+        denomination: r.nom,
+        natureCodes: r.natures,
+        adresse: r.adresse,
+        codePostal: r.codePostal,
+        commune: r.commune,
+        coordonnees: r.point,
+        rawCoordonnees: r.rawCoords,
+        distanceMeters: r.distanceMeters,
+      }))
+    await writeFile(options.json, JSON.stringify(etablissements, null, 2))
+    console.log(`\n💾 ${etablissements.length} établissements écrits dans ${options.json}`)
+  }
+
+  // Top 5 = ce que le bloc fiche logement afficherait (uniquement si une résidence est connue).
   const ranked = rows
-    .filter((r): r is Extract<typeof r, { distanceMeters: number | null }> => !('error' in r) && r.distanceMeters != null)
+    .filter((r): r is Exclude<typeof r, { error: true }> => !('error' in r) && r.distanceMeters != null)
     .sort((a, b) => (a.distanceMeters as number) - (b.distanceMeters as number))
     .slice(0, 5)
-  console.log('\n🏁 Top 5 (rendu attendu du bloc fiche logement) :')
-  for (const r of ranked) {
-    console.log(`   ${r.nom} — ${distanceFmt.format((r.distanceMeters as number) / 1000)} km`)
+  if (ranked.length) {
+    console.log('\n🏁 Top 5 (rendu attendu du bloc fiche logement) :')
+    for (const r of ranked) {
+      console.log(`   ${r.nom} — ${distanceFmt.format((r.distanceMeters as number) / 1000)} km`)
+    }
   }
 
   // Payload complet de référence
@@ -265,9 +329,5 @@ export async function verifyRamsese(options: VerifyRamseseOptions) {
     const { data } = await fetchUaiDetail(uais[0])
     console.log(`\n===== PAYLOAD COMPLET ${uais[0]} =====`)
     console.log(JSON.stringify(data, null, 2))
-  } else {
-    console.log('\n(relance avec --dump pour le payload JSON complet du 1er UAI)')
   }
-
-  process.exit(0)
 }
