@@ -246,7 +246,10 @@ pnpm cli verify-ramsese --cp 75013 --dump         # Paris 13e (arrondissement IN
 pnpm cli verify-ramsese --insee 75113             # test direct par code INSEE (court-circuite geo.api)
 pnpm cli verify-ramsese --slug <slug-residence>   # CP + coordonnées réels tirés de la BDD
 pnpm cli verify-ramsese --no-natures              # diagnostic sans la liste blanche métier
+pnpm cli verify-ramsese --national --json etablissements.json --concurrency 20  # liste nationale complète (sans filtre localisation) → .json
 ```
+
+> `--national` court-circuite le CP/les communes et interroge `POST /v3/listeUai/filtres` sur les seules natures (liste blanche), pour obtenir tous les établissements de France. Combiné à `--json <fichier>`, il écrit la liste complète non tronquée. Les détails sont récupérés via un **pool borné** (`--concurrency <n>`, défaut 8) : jamais toutes les requêtes d'un coup, jamais en séquentiel — au plus `n` en vol. ⚠️ Périmètre national = plusieurs milliers d'appels détail ; monter la concurrence (ex. 20) pour accélérer sans saturer la passerelle, ou `--limit <n>` pour un test. Si l'étape filtres renvoie `400`, l'API n'accepte pas d'appel sans `communes` (national non supporté).
 
 > Conçue pour un one-off Scalingo. Sur Scalingo (vars injectées, pas de fichier `.env`), lancer directement `tsx cli/index.ts verify-ramsese --dump` plutôt que `pnpm cli` (qui charge `--env-file=.env`).
 
