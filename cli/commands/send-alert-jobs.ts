@@ -1,3 +1,4 @@
+import { env } from '~/server/env'
 import { sendPendingAlertJobs } from '~/server/services/alert-sender'
 
 interface SendAlertJobsOptions {
@@ -6,6 +7,11 @@ interface SendAlertJobsOptions {
 }
 
 export async function sendAlertJobs(options: SendAlertJobsOptions): Promise<void> {
+  if (env.NEXT_PUBLIC_APP_ENV !== 'production' && !options.dryRun) {
+    console.info(`[${env.NEXT_PUBLIC_APP_ENV}] send-alert-jobs ignoré hors production (utilisez --dry-run pour simuler)`)
+    return
+  }
+
   console.log('📬 Envoi des alertes logements en attente...')
 
   const result = await sendPendingAlertJobs({
