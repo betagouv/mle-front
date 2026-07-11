@@ -21,6 +21,7 @@ import { sendAdminResetPasswordEmail, sendOwnerWelcomeEmail } from '~/server/ser
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '~/server/utils/slug'
 import { adminProcedure, createTRPCRouter } from '../init'
+import { consumersRouter } from './admin-consumers'
 
 const PAGE_SIZE = 20
 
@@ -1209,4 +1210,5 @@ export const adminRouter = createTRPCRouter({
   ownerUsage: ownerUsageRouter,
   imports: importsRouter,
   feedback: feedbackRouter,
+  consumers: consumersRouter,
 })

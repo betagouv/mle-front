@@ -597,6 +597,83 @@ public/
     test-calculatrice.html            # Page de test — widget calculatrice de budget
 ```
 
+## API publique v1
+
+API REST en lecture seule exposant le catalogue de résidences étudiantes et les territoires, pour des consommateurs tiers. Le contenu est **iso avec la carte** (mêmes filtres, même shape GeoJSON), servi en JSON pur (pas de superjson).
+
+Implémentation : [Hono](https://hono.dev) + `@hono/zod-openapi` monté sur un catch-all Next (`src/app/api/v1/[[...route]]/route.ts`), logique de requête partagée avec tRPC via `src/server/accommodations/list-query.ts`.
+
+### Documentation interactive (Scalar / OpenAPI)
+
+- **Doc Scalar** : `GET /api/v1/docs`
+- **Spec OpenAPI 3.1** : `GET /api/v1/openapi.json`
+
+Ces deux routes sont publiques (sans clé). Tous les endpoints de **données** requièrent une clé.
+
+### Authentification
+
+Une clé d'API est requise dans l'en-tête `x-api-key` :
+
+```bash
+curl -H 'x-api-key: mle_xxxxx' 'https://<host>/api/v1/accommodations?city_slugs=paris,lyon'
+```
+
+Les clés sont émises et gérées par un admin dans **`/administration` → onglet « Consommateurs »** (création, quota, activation/désactivation, révocation, statistiques). La clé en clair n'est affichée **qu'une seule fois** à la création. Réponses : `401` (clé absente/invalide), `429` (quota dépassé).
+
+Techniquement, les clés sont gérées par le plugin `@better-auth/api-key` (table `apikey`), qui assure le hashing et le rate-limit par clé, stocké en PostgreSQL (cohérent en multi-instance).
+
+**Rate-limit** : chaque clé porte un quota `N requêtes / fenêtre de T secondes` (défaut global via `API_V1_*`, surchargeable par consommateur). Au dépassement → `429`.
+
+**Statistiques de consommation** : chaque requête authentifiée incrémente un agrégat journalier (table `api_key_usage_daily`, une ligne par clé et par jour). L'onglet Consommateurs affiche le total sur 30 jours et le détail jour par jour (bouton « Stats »), permettant de suivre le volume de trafic par période et par consommateur.
+
+### Endpoints
+
+| Méthode | Chemin | Description |
+|---|---|---|
+| `GET` | `/api/v1/accommodations` | Liste paginée filtrée (FeatureCollection GeoJSON) |
+| `GET` | `/api/v1/accommodations/nearby` | Résidences à proximité (`center=lng,lat` ou `city=slug`) |
+| `GET` | `/api/v1/accommodations/{slug}` | Détail d'une résidence |
+| `GET` | `/api/v1/cities` | Villes + slugs (filtres `department`, `popular`, `search`) |
+| `GET` | `/api/v1/departments` | Départements (slug, code) — filtre `search` |
+| `GET` | `/api/v1/academies` | Académies (slug) — filtre `search` |
+| `GET` | `/api/v1/territories/search` | Recherche libre de territoires (`q`) |
+| `GET` | `/api/v1/openapi.json` | Spec OpenAPI (public) |
+| `GET` | `/api/v1/docs` | Doc Scalar (public) |
+
+Les endpoints territoires acceptent un paramètre `search` (recherche insensible à la casse sur le `nom`) : `GET /api/v1/cities?search=gren`, `.../departments?search=isère`, `.../academies?search=lyon`.
+
+### Filtres de `GET /api/v1/accommodations`
+
+Query params (les listes sont séparées par des virgules) :
+
+| Paramètre | Type | Description |
+|---|---|---|
+| `city_slugs` | CSV | Slugs de villes (filtre géométrique `ST_Within`, iso carte) |
+| `department` | CSV | Départements par **code** ou slug |
+| `academie` | CSV | Slugs d'académies |
+| `postal_codes` | CSV | Codes postaux (filtre attributaire) |
+| `bbox` | string | `xmin,ymin,xmax,ymax` (WGS84) |
+| `center` + `radius` | string + km | Recherche par rayon |
+| `price_max` | int | Loyer minimum maximal (€/mois) |
+| `crous` | bool | Absent = **toutes** · `true` = CROUS seul · `false` = hors CROUS |
+| `accessible` | bool | Logements PMR uniquement |
+| `coliving` | bool | Colocation uniquement |
+| `available` | bool | Avec disponibilités uniquement |
+| `owner_slug` | string | Slug d'un gestionnaire/bailleur |
+| `page` / `page_size` | int | Pagination (`page_size` max 100) |
+
+Les dimensions de localisation fournies (`city_slugs`/`department`/`academie`/`postal_codes`) sont combinées en **union (OR)**.
+
+### Variables d'environnement
+
+À ajouter dans `.env` (valeurs par défaut dans `.env.dist`) :
+
+| Variable | Défaut | Description |
+|---|---|---|
+| `API_V1_ENABLED` | `true` | Active/désactive l'API v1 (désactivée → `404` sur `/api/v1/*`) |
+| `API_V1_RATE_LIMIT_MAX` | `120` | Nombre de requêtes autorisées par fenêtre, par défaut, pour chaque clé (surchargeable par clé) |
+| `API_V1_RATE_LIMIT_WINDOW_MS` | `60000` | Durée de la fenêtre de rate-limit en millisecondes |
+
 ## Widget iframe — Logements
 
 Widget embarquable qui affiche une grille de résidences étudiantes sur des sites partenaires.

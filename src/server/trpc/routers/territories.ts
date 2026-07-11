@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { type AnyColumn, and, asc, eq, inArray, ne, type SQL, sql } from 'drizzle-orm'
+import { type AnyColumn, and, asc, eq, ilike, inArray, ne, type SQL, sql } from 'drizzle-orm'
 import { alias } from 'drizzle-orm/pg-core'
 import fs from 'fs'
 import path from 'path'
@@ -208,7 +208,7 @@ export const territoriesRouter = createTRPCRouter({
     }
   }),
 
-  listAcademies: baseProcedure.query(async () => {
+  listAcademies: baseProcedure.input(z.object({ search: z.string().optional() }).optional()).query(async ({ input }) => {
     const results = await db
       .select({
         id: academies.id,
@@ -217,6 +217,7 @@ export const territoriesRouter = createTRPCRouter({
         bbox: bboxSelect(academies),
       })
       .from(academies)
+      .where(input?.search ? ilike(academies.name, `%${input.search}%`) : undefined)
       .orderBy(asc(academies.name))
 
     return results.map((a) => ({
@@ -226,7 +227,9 @@ export const territoriesRouter = createTRPCRouter({
       bbox: a.bbox,
     }))
   }),
-  listDepartments: baseProcedure.query(async () => {
+  listDepartments: baseProcedure.input(z.object({ search: z.string().optional() }).optional()).query(async ({ input }) => {
+    const conditions: SQL[] = [ne(departments.name, '')]
+    if (input?.search) conditions.push(ilike(departments.name, `%${input.search}%`))
     const results = await db
       .select({
         id: departments.id,
@@ -236,7 +239,7 @@ export const territoriesRouter = createTRPCRouter({
         bbox: bboxSelect(departments),
       })
       .from(departments)
-      .where(ne(departments.name, ''))
+      .where(and(...conditions))
       .orderBy(asc(departments.name))
 
     return results.map((d) => ({
@@ -253,6 +256,7 @@ export const territoriesRouter = createTRPCRouter({
         .object({
           departmentCode: z.string().optional(),
           popular: z.boolean().optional(),
+          search: z.string().optional(),
         })
         .optional(),
     )
@@ -277,6 +281,7 @@ export const territoriesRouter = createTRPCRouter({
       const conditions: SQL[] = []
       if (departmentCode) conditions.push(eq(departments.code, departmentCode))
       if (popular) conditions.push(eq(cities.popular, true))
+      if (input?.search) conditions.push(ilike(cities.name, `%${input.search}%`))
 
       const results = await db
         .select({
