@@ -1,3 +1,4 @@
+import { apiKey } from '@better-auth/api-key'
 import * as Sentry from '@sentry/nextjs'
 import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
@@ -87,6 +88,17 @@ export const auth = betterAuth({
         const buffer = new URL('/connexion/verification', env.BASE_URL)
         buffer.searchParams.set('url', url)
         await sendMagicLinkEmail(email, buffer.toString())
+      },
+    }),
+    // Clés d'API pour l'API publique v1 : attribution du trafic + rate-limit par clé (stocké en PG).
+    // La vérification (`auth.api.verifyApiKey`) incrémente `requestCount` et applique le rate-limit.
+    apiKey({
+      apiKeyHeaders: 'x-api-key',
+      enableMetadata: true,
+      rateLimit: {
+        enabled: true,
+        timeWindow: env.API_V1_RATE_LIMIT_WINDOW_MS,
+        maxRequests: env.API_V1_RATE_LIMIT_MAX,
       },
     }),
     nextCookies(),

@@ -89,6 +89,15 @@ const envSchema = z.object({
   // WordPress FAQ (Espace Gestionnaire)
   WP_FAQ_URL: z.url(),
   WP_FAQ_PAGE_ID: z.coerce.number().int().positive(),
+
+  // API publique v1 (REST + OpenAPI/Scalar)
+  API_V1_ENABLED: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((v) => v === 'true'),
+  // Rate-limit par défaut appliqué à chaque clé d'API (surchargable par clé).
+  API_V1_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(120),
+  API_V1_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60_000),
 })
 
 export const env = envSchema.parse(process.env)
