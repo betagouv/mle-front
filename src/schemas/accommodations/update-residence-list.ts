@@ -21,14 +21,14 @@ export const createUpdateResidenceListSchema = (existingTotals: Partial<Record<T
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `Veuillez d'abord renseigner le nombre total de logements ${getTypologyLabel(entry.type)}`,
-          path: [i, 'nbAvailable'],
+          path: ['availability', i, 'nbAvailable'],
         })
       }
       if (total != null && entry.nbAvailable != null && entry.nbAvailable > total) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `Le nombre de logements ${getTypologyLabel(entry.type)} disponibles ne peut pas être supérieur au nombre total (${total})`,
-          path: [i, 'nbAvailable'],
+          path: ['availability', i, 'nbAvailable'],
         })
       }
     })

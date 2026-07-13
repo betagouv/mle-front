@@ -131,8 +131,8 @@ describe('API v1 — flux de données (iso carte)', () => {
     const res = await req('/accommodations?page_size=50', key)
     expect(res.status).toBe(200)
     expect(res.body.count).toBe(1)
-    const features = (res.body.results as { features: Array<{ properties: { slug: string } }> }).features
-    expect(features[0].properties.slug).toBe('pub-geom')
+    const results = res.body.results as Array<{ slug: string }>
+    expect(results[0].slug).toBe('pub-geom')
   })
 
   it('filtre par city_slugs (ST_Within, iso carte)', async () => {
@@ -147,8 +147,8 @@ describe('API v1 — flux de données (iso carte)', () => {
     const res = await req('/accommodations?city_slugs=testville&page_size=50', key)
     expect(res.status).toBe(200)
     expect(res.body.count).toBe(1)
-    const features = (res.body.results as { features: Array<{ properties: { slug: string } }> }).features
-    expect(features[0].properties.slug).toBe('in-testville')
+    const results = res.body.results as Array<{ slug: string }>
+    expect(results[0].slug).toBe('in-testville')
   })
 
   it('filtre par postal_codes (attributaire)', async () => {
@@ -159,18 +159,18 @@ describe('API v1 — flux de données (iso carte)', () => {
     const res = await req('/accommodations?postal_codes=75001&page_size=50', key)
     expect(res.status).toBe(200)
     expect(res.body.count).toBe(1)
-    const features = (res.body.results as { features: Array<{ properties: { postal_code: string } }> }).features
-    expect(features[0].properties.postal_code).toBe('75001')
+    const results = res.body.results as Array<{ postalCode: string }>
+    expect(results[0].postalCode).toBe('75001')
   })
 
-  it('renvoie le détail avec updated_at en string ISO', async () => {
+  it('renvoie le détail avec updatedAt en string ISO', async () => {
     const { key } = await makeKey()
     await createAccommodation({ slug: 'detail-me', geom: { type: 'Point', coordinates: [2.35, 48.85] } })
 
     const res = await req('/accommodations/detail-me', key)
     expect(res.status).toBe(200)
-    expect(typeof res.body.updated_at).toBe('string')
-    expect(() => new Date(res.body.updated_at as string).toISOString()).not.toThrow()
+    expect(typeof res.body.updatedAt).toBe('string')
+    expect(() => new Date(res.body.updatedAt as string).toISOString()).not.toThrow()
   })
 
   it('renvoie 404 pour un slug inexistant', async () => {
@@ -182,8 +182,7 @@ describe('API v1 — flux de données (iso carte)', () => {
 })
 
 const count = (res: { body: Record<string, unknown> }) => res.body.count as number
-const slugs = (res: { body: Record<string, unknown> }) =>
-  (res.body.results as { features: Array<{ properties: { slug: string } }> }).features.map((f) => f.properties.slug)
+const slugs = (res: { body: Record<string, unknown> }) => (res.body.results as Array<{ slug: string }>).map((f) => f.slug)
 
 const PARIS: [number, number] = [2.35, 48.85]
 const LYON: [number, number] = [4.83, 45.77]
