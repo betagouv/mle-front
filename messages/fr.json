@@ -975,7 +975,8 @@
       "todoList": "Mes priorités ({done}/{total})",
       "housingAid": "Aides au logement",
       "favorites": "Favoris",
-      "alerts": "Alertes logements"
+      "alerts": "Alertes logements",
+      "personalInformations": "Informations personnelles"
     },
     "welcome": {
       "subtitle": "Bienvenue dans votre espace personnel"
@@ -1016,6 +1017,41 @@
     "todo": {
       "title": "Ma liste de priorités",
       "description": "Complétez votre liste de priorités pour mettre toutes les chances de votre côté"
+    },
+    "personalInformations": {
+      "title": "Informations personnelles",
+      "subtitle": "Suivez vos résidences coup de cœur et tenez à jour vos candidatures",
+      "form": {
+        "lastname": "Nom",
+        "firstname": "Prénom",
+        "email": "E-mail",
+        "phone": "Téléphone portable",
+        "phonePlaceholder": "0612345678",
+        "birthdate": "Date de naissance",
+        "birthdateHint": "Format jj/mm/aaaa",
+        "scholarshipQuestion": "Êtes-vous boursier ?",
+        "scholarshipYes": "Oui",
+        "scholarshipNo": "Non",
+        "scholarshipUnknown": "Je ne sais pas",
+        "currentPassword": "Mot de passe actuel",
+        "newPassword": "Nouveau mot de passe",
+        "confirmPassword": "Confirmation du nouveau mot de passe",
+        "passwordHint": "12 caractères, composé de chiffres, lettres et caractères spéciaux",
+        "showPassword": "Afficher le mot de passe",
+        "hidePassword": "Masquer le mot de passe",
+        "submit": "Enregistrer",
+        "submitting": "Enregistrement...",
+        "passwordError": "Une erreur est survenue, le mot de passe actuel est erroné."
+      },
+      "notifications": {
+        "title": "Paramètres des notifications",
+        "similarAlert": "Je souhaite recevoir des offres de logement similaires à mes alertes",
+        "favoriteAlert": "Je souhaite des alertes de disponibilité dans une résidence ajoutée à mes favoris"
+      }
+    },
+    "alerts": {
+      "notificationToggle": "J'accepte de recevoir des offres de logement similaires à mes alertes",
+      "notificationEmailPrefix": "Vous recevez les notifications sur votre adresse e-mail"
     }
   },
   "loginRequiredModal": {
