@@ -21,7 +21,7 @@ export const FindAccommodationForm: FC = () => {
   const { data } = useAccomodations()
 
   // Borne haute = max des résultats de la recherche, arrondi à la centaine supérieure.
-  const max = data?.max_price ? Math.ceil(data.max_price / 100) * 100 : undefined
+  const max = data?.maxPrice ? Math.ceil(data.maxPrice / 100) * 100 : undefined
 
   const [queryStates, setQueryStates] = useQueryStates({
     prix: parseAsInteger,

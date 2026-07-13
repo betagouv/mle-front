@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { ZCreateAlertRequest } from './create-alert'
 
-const base = { name: 'Mon alerte', has_coliving: false, is_accessible: false, max_price: 500 }
+const base = { name: 'Mon alerte', hasColiving: false, isAccessible: false, maxPrice: 500 }
 
 describe('ZCreateAlertRequest', () => {
   it('rejette une alerte sans territoire', () => {
@@ -13,14 +13,14 @@ describe('ZCreateAlertRequest', () => {
   })
 
   it('accepte une alerte avec une ville', () => {
-    expect(ZCreateAlertRequest.safeParse({ ...base, city_id: 1 }).success).toBe(true)
+    expect(ZCreateAlertRequest.safeParse({ ...base, cityId: 1 }).success).toBe(true)
   })
 
   it('accepte une alerte avec un département', () => {
-    expect(ZCreateAlertRequest.safeParse({ ...base, department_id: 42 }).success).toBe(true)
+    expect(ZCreateAlertRequest.safeParse({ ...base, departmentId: 42 }).success).toBe(true)
   })
 
   it('accepte une alerte avec une académie', () => {
-    expect(ZCreateAlertRequest.safeParse({ ...base, academy_id: 7 }).success).toBe(true)
+    expect(ZCreateAlertRequest.safeParse({ ...base, academyId: 7 }).success).toBe(true)
   })
 })
