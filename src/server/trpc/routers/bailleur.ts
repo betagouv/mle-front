@@ -5,6 +5,7 @@ import { SignJWT } from 'jose'
 
 import { z } from 'zod'
 import { ZCreateResidence } from '~/schemas/accommodations/create-residence'
+import { getTypologyLabel } from '~/schemas/accommodations/typology'
 import { ZUpdateResidence } from '~/schemas/accommodations/update-residence'
 import { ZUpdateResidenceList } from '~/schemas/accommodations/update-residence-list'
 import { zCreateBailleurUser, zUpdateBailleurUser } from '~/schemas/bailleur-users/bailleur-user-form'
@@ -420,6 +421,27 @@ export const bailleurRouter = createTRPCRouter({
         .from(accommodationTypologies)
         .where(eq(accommodationTypologies.accommodationId, accommodationId))
       const availByType = new Map(availability.map((a) => [a.type, a.nbAvailable]))
+
+      // Validation serveur (miroir du client `createUpdateResidenceListSchema`) : la dispo ne peut
+      // dépasser le total de la typologie, et une typologie sans total ne peut recevoir de dispo.
+      const totalByType = new Map(currentRows.map((r) => [r.type, r.nbTotal]))
+      for (const entry of availability) {
+        if (entry.nbAvailable == null) continue
+        const total = totalByType.get(entry.type) ?? null
+        if (total == null) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `Veuillez d'abord renseigner le nombre total de logements ${getTypologyLabel(entry.type)}`,
+          })
+        }
+        if (entry.nbAvailable > total) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `Le nombre de logements ${getTypologyLabel(entry.type)} disponibles ne peut pas être supérieur au nombre total (${total})`,
+          })
+        }
+      }
+
       const newTypologies = currentRows.map((r) => ({
         type: r.type,
         priceMin: r.priceMin,
