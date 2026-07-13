@@ -17,8 +17,8 @@
 }
 
 .mainRowOpen {
-  align-items: start;
-  justify-items: start;
+  align-items: end;
+  justify-items: end;
 }
 
 .advancedRow {

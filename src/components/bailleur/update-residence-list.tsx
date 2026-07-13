@@ -35,6 +35,7 @@ export const UpdateResidenceList: FC<UpdateResidenceListProps> = ({ accommodatio
   })
 
   const { formState, handleSubmit, register, control } = form
+
   const { fields } = useFieldArray({ control, name: 'availability' })
 
   const onSubmit = async (data: TUpdateResidenceList) => {
