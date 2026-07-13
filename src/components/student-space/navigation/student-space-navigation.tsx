@@ -22,6 +22,14 @@ export const StudentSpaceNavigation = async () => {
           {t('dashboard')}
         </Button>
         <StudentSpaceTodoNavigationButton />
+        <Button
+          priority="tertiary no outline"
+          iconPosition="left"
+          iconId="fr-icon-money-euro-circle-line"
+          linkProps={{ href: '/mon-espace/aides-au-logement' }}
+        >
+          {t('housingAid')}
+        </Button>
         <Button priority="tertiary no outline" iconPosition="left" iconId="ri-heart-line" linkProps={{ href: '/mon-espace/favoris' }}>
           {t('favorites')}
         </Button>

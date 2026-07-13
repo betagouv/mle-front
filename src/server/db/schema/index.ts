@@ -15,6 +15,7 @@ export { dossierFacileApplications, dossierFacileDocuments, dossierFacileTenants
 export { eventStats } from './event-stats'
 export { externalSources } from './external-sources'
 export { favoriteAccommodations } from './favorite-accommodations'
+export { housingAidSimulations } from './housing-aid-simulations'
 export { importBlocklist } from './import-blocklist'
 export { importJobs } from './import-jobs'
 export { newsletterSubscriptions } from './newsletter-subscriptions'
@@ -34,6 +35,7 @@ export {
   dossierFacileTenantsRelations,
   externalSourcesRelations,
   favoriteAccommodationsRelations,
+  housingAidSimulationsRelations,
   ownersRelations,
   studentAlertsRelations,
   userRelations,
