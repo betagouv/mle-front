@@ -24,7 +24,7 @@ export const FindStudentAccommodationCrousFilter: FC = () => {
           nativeInputProps: {
             onChange: () => {
               trackEvent({ category: 'Recherche', action: 'filtre crous', name: 'active' })
-              setQueryStates({ crous: true, page: 1 })
+              setQueryStates({ crous: true, page: 1 }, { shallow: false })
             },
             checked: !!queryStates.crous,
           },
@@ -34,7 +34,7 @@ export const FindStudentAccommodationCrousFilter: FC = () => {
           nativeInputProps: {
             onChange: () => {
               trackEvent({ category: 'Recherche', action: 'filtre crous', name: 'inactive' })
-              setQueryStates({ crous: false, page: 1 })
+              setQueryStates({ crous: false, page: 1 }, { shallow: false })
             },
             checked: queryStates.crous === false || queryStates.crous === null,
           },
