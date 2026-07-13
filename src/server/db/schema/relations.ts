@@ -10,6 +10,7 @@ import { departments } from './departments'
 import { dossierFacileApplications, dossierFacileDocuments, dossierFacileTenants } from './dossier-facile'
 import { externalSources } from './external-sources'
 import { favoriteAccommodations } from './favorite-accommodations'
+import { housingAidSimulations } from './housing-aid-simulations'
 import { owners } from './owners'
 import { studentAlerts } from './student-alerts'
 
@@ -33,6 +34,11 @@ export const userRelations = relations(user, ({ one, many }) => ({
   dossierFacileTenant: one(dossierFacileTenants, { fields: [user.id], references: [dossierFacileTenants.userId] }),
   adminOwnerLinks: many(adminOwnerLinks),
   favoriteAccommodations: many(favoriteAccommodations),
+  housingAidSimulation: one(housingAidSimulations, { fields: [user.id], references: [housingAidSimulations.userId] }),
+}))
+
+export const housingAidSimulationsRelations = relations(housingAidSimulations, ({ one }) => ({
+  user: one(user, { fields: [housingAidSimulations.userId], references: [user.id] }),
 }))
 
 export const dossierFacileTenantsRelations = relations(dossierFacileTenants, ({ one, many }) => ({

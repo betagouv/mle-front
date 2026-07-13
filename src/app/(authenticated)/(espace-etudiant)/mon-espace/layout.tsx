@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { StudentSpaceNavigation } from '~/components/student-space/navigation/student-space-navigation'
+import { PendingSimulationSaver } from '~/components/student-space/pending-simulation-saver'
 import { StudentBreadcrumb } from '~/components/student-space/student-breadcrumb'
 import { CommonFooter } from '~/components/ui/footer/footer'
 import { CommonHeader } from '~/components/ui/header/common-header'
@@ -31,6 +32,7 @@ export default async function WorkspaceLayout({
 
   return (
     <>
+      <PendingSimulationSaver />
       <CommonHeader withNavigation={false} />
       <main className="primaryBackgroundColor">
         <div className="fr-container fr-pb-12w">
