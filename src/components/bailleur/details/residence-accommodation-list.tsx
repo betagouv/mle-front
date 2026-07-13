@@ -7,7 +7,7 @@ import { useFieldArray, useFormContext } from 'react-hook-form'
 import { AvailabilityBadge } from '~/components/shared/availability-badge'
 import { useIsAdmin } from '~/hooks/use-is-admin'
 import { TAccomodationMy } from '~/schemas/accommodations/accommodations'
-import { TYPOLOGIES, TYPOLOGY_TYPES } from '~/schemas/accommodations/typology'
+import { getTypologyLabel, TYPOLOGIES, TYPOLOGY_TYPES } from '~/schemas/accommodations/typology'
 import { TUpdateResidence } from '~/schemas/accommodations/update-residence'
 import { calculateAvailability } from '~/utils/calculateAvailability'
 import { TypologyTabContent } from './typology-tab-content'
@@ -81,7 +81,7 @@ export const ResidenceAccommodationList = ({ accommodation }: { accommodation: T
   const tabs = [
     ...sortedFieldsWithIndex.map(({ originalIndex, type }) => ({
       tabId: `tab-${originalIndex}`,
-      label: tabLabel(type || 'Nouveau', originalIndex),
+      label: tabLabel(type ? getTypologyLabel(type) : 'Nouveau', originalIndex),
     })),
     ...(canAddMore ? [{ tabId: 'tab-add', label: 'Ajouter' }] : []),
   ]

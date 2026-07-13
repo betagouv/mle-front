@@ -10,13 +10,15 @@ import {
   createOwner,
 } from '../../../src/__tests__/fixtures/factories'
 import { getTestDb } from '../../../src/__tests__/helpers/test-db'
-import { accommodationAddresses, accommodations, accommodationTypologies, externalSources } from '../../../src/server/db/schema'
+import { accommodationAddresses, accommodations, externalSources } from '../../../src/server/db/schema'
 import { typologiesByType, typologyDraft } from '../../../src/server/lib/typologies'
 
 async function loadTypologies(accommodationId: number) {
-  return typologiesByType(
-    await getTestDb().select().from(accommodationTypologies).where(eq(accommodationTypologies.accommodationId, accommodationId)),
-  )
+  const row = await getTestDb().query.accommodations.findFirst({
+    where: eq(accommodations.id, accommodationId),
+    with: { typologies: true },
+  })
+  return typologiesByType(row?.typologies ?? [])
 }
 
 const mockFetch = vi.fn()

@@ -75,7 +75,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ slu
       imagesUrls.push(url)
     }
 
-    return NextResponse.json({ images_urls: imagesUrls })
+    return NextResponse.json({ imagesUrls: imagesUrls })
   } catch (error) {
     Sentry.captureException(error, { tags: { route: 'upload' } })
     if (error instanceof Error) {

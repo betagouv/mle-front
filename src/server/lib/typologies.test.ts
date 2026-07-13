@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { type TTypologyView, typologiesByType, typologyAggregates, typologyDraft } from './typologies'
+import { groupTypologiesByAccommodation, type TTypologyView, typologiesByType, typologyAggregates, typologyDraft } from './typologies'
 
 describe('typologyDraft', () => {
   it('defaults every missing numeric field to null', () => {
@@ -109,5 +109,26 @@ describe('typologiesByType', () => {
 
   it('returns an empty object for no rows', () => {
     expect(typologiesByType([])).toEqual({})
+  })
+})
+
+describe('groupTypologiesByAccommodation', () => {
+  it('groups rows by accommodationId, preserving order', () => {
+    const rows = [
+      { accommodationId: 1, type: 't1' },
+      { accommodationId: 2, type: 't1' },
+      { accommodationId: 1, type: 't2' },
+    ]
+    const out = groupTypologiesByAccommodation(rows)
+    expect(out.get(1)).toEqual([
+      { accommodationId: 1, type: 't1' },
+      { accommodationId: 1, type: 't2' },
+    ])
+    expect(out.get(2)).toEqual([{ accommodationId: 2, type: 't1' }])
+    expect(out.get(3)).toBeUndefined()
+  })
+
+  it('returns an empty map for no rows', () => {
+    expect(groupTypologiesByAccommodation([]).size).toBe(0)
   })
 })

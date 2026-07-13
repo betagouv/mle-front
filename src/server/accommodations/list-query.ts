@@ -1,4 +1,5 @@
 import { and, eq, inArray, notInArray, or, type SQL, sql } from 'drizzle-orm'
+import { z } from 'zod'
 import { EResidenceType } from '~/enums/residence-type'
 import { ETargetAudience } from '~/enums/target-audience'
 import type { TAccomodation, TTypologiesRecord } from '~/schemas/accommodations/accommodations'
@@ -11,7 +12,7 @@ import { cities } from '~/server/db/schema/cities'
 import { departments } from '~/server/db/schema/departments'
 import { externalSources } from '~/server/db/schema/external-sources'
 import { owners } from '~/server/db/schema/owners'
-import { typologiesByType } from '~/server/lib/typologies'
+import { groupTypologiesByAccommodation, typologiesByType } from '~/server/lib/typologies'
 
 /**
  * Query builders partagés pour lister les accommodations.
@@ -56,6 +57,51 @@ export function toResidenceType(value: string | null): EResidenceType | null {
 export function toTargetAudience(value: string | null): ETargetAudience | null {
   return value && targetAudienceValues.has(value) ? (value as ETargetAudience) : null
 }
+
+/**
+ * Shape des rows consommées par `toAccommodationDTO`. Les selects Drizzle typés (favoris, bailleur,
+ * get-my) s'y conforment au compile-time ; la sortie brute du CTE de recherche (`db.execute`, non
+ * inférée par Drizzle) est validée par `ZAccommodationDTORow` avant d'y accéder.
+ *
+ * `id` remonte en string depuis le driver pour les colonnes bigint, en number depuis un select typé.
+ * `updatedAt` est nullable en base mais l'API (`ZAccomodation`) le contractualise non-null : en
+ * pratique toujours renseigné (voir le narrowing dans `toAccommodationDTO`).
+ */
+const ZAccommodationDTORow = z.object({
+  id: z.union([z.number(), z.string()]),
+  name: z.string(),
+  slug: z.string(),
+  city: z.string(),
+  postalCode: z.string(),
+  published: z.boolean(),
+  // `db.execute` (CTE brut) renvoie le timestamp en string, là où un select Drizzle typé renvoie une
+  // Date : on coerce pour aligner le chemin recherche sur le contrat `ZAccomodation` (updatedAt: Date).
+  updatedAt: z.coerce.date().nullable(),
+  residenceType: z.string().nullable(),
+  targetAudience: z.string().nullable(),
+  lat: z.number().nullable(),
+  lng: z.number().nullable(),
+  nbTotalApartments: z.number().nullable(),
+  nbAccessibleApartments: z.number().nullable(),
+  nbColivingApartments: z.number().nullable(),
+  priceMin: z.number().nullable(),
+  priceMaxComputed: z.number().nullable(),
+  imagesUrls: z.array(z.string()).nullable(),
+  citySlug: z.string().nullable().optional(),
+  address: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+  rentalChargesDetails: z.string().nullable().optional(),
+  externalUrl: z.string().nullable().optional(),
+  virtualTourUrl: z.string().nullable().optional(),
+  acceptWaitingList: z.boolean().nullable().optional(),
+  scholarshipHoldersPriority: z.boolean().nullable().optional(),
+  socialHousingRequired: z.boolean().nullable().optional(),
+  wifi: z.boolean().nullable().optional(),
+  ownerName: z.string().nullable().optional(),
+  ownerUrl: z.string().nullable().optional(),
+})
+
+export type TAccommodationDTORow = z.infer<typeof ZAccommodationDTORow>
 
 export type TCommonListFiltersInput = {
   hasColiving?: boolean
@@ -260,7 +306,14 @@ export const listAccommodationsWithConditions = async ({
   const count = countResult[0]?.count ?? 0
   const totalPages = Math.ceil(count / pageSize)
 
-  const rows = Array.isArray(results) ? results : (results as { rows: Record<string, unknown>[] }).rows
+  // Sortie brute du CTE (`db.execute`) : seule frontière non typée par Drizzle → on la valide avant
+  // de la passer au DTO. En cas de dérive de shape, on log et on renvoie une liste vide plutôt que
+  // de laisser des `undefined` se propager silencieusement.
+  const rawRows = Array.isArray(results) ? results : (results as { rows: unknown[] }).rows
+  const parsed = z.array(ZAccommodationDTORow).safeParse(rawRows)
+  if (!parsed.success) {
+    console.error('[queryAccommodations] Shape de rows accommodation invalide', parsed.error)
+  }
 
   return {
     count,
@@ -270,7 +323,7 @@ export const listAccommodationsWithConditions = async ({
     crousCounts: crousCountsResult?.[0] ? { crous: crousCountsResult[0].crous, others: crousCountsResult[0].others } : undefined,
     next: page < totalPages ? String(page + 1) : null,
     previous: page > 1 ? String(page - 1) : null,
-    results: await rowsToAccommodationDTOs(rows),
+    results: parsed.success ? await rowsToAccommodationDTOs(parsed.data) : [],
   }
 }
 
@@ -279,16 +332,11 @@ export const listAccommodationsWithConditions = async ({
  * Search ranking/pagination stays in the raw CTE (which uses the parent aggregates); this only
  * hydrates the typologies (keyed object) for the page being returned.
  */
-export async function rowsToAccommodationDTOs(rows: Record<string, unknown>[]): Promise<TAccomodation[]> {
-  const ids = rows.map((r) => (typeof r.id === 'string' ? Number(r.id) : (r.id as number)))
+export async function rowsToAccommodationDTOs(rows: TAccommodationDTORow[]): Promise<TAccomodation[]> {
+  const ids = rows.map((r) => (typeof r.id === 'string' ? Number(r.id) : r.id))
   const typologyRows =
     ids.length > 0 ? await db.select().from(accommodationTypologies).where(inArray(accommodationTypologies.accommodationId, ids)) : []
-  const byAccommodation = new Map<number, (typeof typologyRows)[number][]>()
-  for (const t of typologyRows) {
-    const list = byAccommodation.get(t.accommodationId) ?? []
-    list.push(t)
-    byAccommodation.set(t.accommodationId, list)
-  }
+  const byAccommodation = groupTypologiesByAccommodation(typologyRows)
   return rows.map((r) => {
     const id = typeof r.id === 'string' ? Number(r.id) : (r.id as number)
     return toAccommodationDTO(r, typologiesByType(byAccommodation.get(id) ?? []))
@@ -300,38 +348,39 @@ export async function rowsToAccommodationDTOs(rows: Record<string, unknown>[]): 
  * typologies object into the flat accommodation DTO. No GeoJSON wrapper: coordinates inline.
  * bigint id comes back as a string from raw SQL (db.execute) but as a number from typed selects.
  */
-export function toAccommodationDTO(row: Record<string, unknown>, typologies: TTypologiesRecord): TAccomodation {
-  const id = typeof row.id === 'string' ? Number(row.id) : (row.id as number)
+export function toAccommodationDTO(row: TAccommodationDTORow, typologies: TTypologiesRecord): TAccomodation {
+  const id = typeof row.id === 'string' ? Number(row.id) : row.id
   return {
     id,
-    name: row.name as string,
-    slug: row.slug as string,
-    citySlug: (row.citySlug as string) ?? undefined,
-    address: (row.address as string) ?? '',
-    city: row.city as string,
-    postalCode: row.postalCode as string,
-    residenceType: toResidenceType((row.residenceType as string | null) ?? null),
-    targetAudience: toTargetAudience((row.targetAudience as string | null) ?? null),
-    published: row.published as boolean,
-    acceptWaitingList: (row.acceptWaitingList as boolean) ?? false,
-    imagesUrls: (row.imagesUrls as string[]) ?? null,
-    description: (row.description as string) ?? null,
-    rentalChargesDetails: (row.rentalChargesDetails as string) ?? null,
-    externalUrl: (row.externalUrl as string) ?? undefined,
-    virtualTourUrl: (row.virtualTourUrl as string) ?? null,
+    name: row.name,
+    slug: row.slug,
+    citySlug: row.citySlug ?? undefined,
+    address: row.address ?? '',
+    city: row.city,
+    postalCode: row.postalCode,
+    residenceType: toResidenceType(row.residenceType),
+    targetAudience: toTargetAudience(row.targetAudience),
+    published: row.published,
+    acceptWaitingList: row.acceptWaitingList ?? false,
+    imagesUrls: row.imagesUrls ?? null,
+    description: row.description ?? null,
+    rentalChargesDetails: row.rentalChargesDetails ?? null,
+    externalUrl: row.externalUrl ?? undefined,
+    virtualTourUrl: row.virtualTourUrl ?? null,
+    // Colonne nullable en base, contractualisée non-null par l'API : en pratique toujours renseignée.
     updatedAt: row.updatedAt as Date,
-    scholarshipHoldersPriority: (row.scholarshipHoldersPriority as boolean) ?? false,
-    socialHousingRequired: (row.socialHousingRequired as boolean) ?? false,
-    wifi: (row.wifi as boolean) ?? false,
-    latitude: (row.lat as number | null) ?? null,
-    longitude: (row.lng as number | null) ?? null,
-    nbTotalApartments: (row.nbTotalApartments as number | null) ?? null,
-    nbAccessibleApartments: (row.nbAccessibleApartments as number | null) ?? null,
-    nbColivingApartments: (row.nbColivingApartments as number | null) ?? null,
-    priceMin: (row.priceMin as number | null) ?? null,
-    priceMax: (row.priceMaxComputed as number | null) ?? null,
-    ownerName: (row.ownerName as string) ?? null,
-    ownerUrl: (row.ownerUrl as string) ?? null,
+    scholarshipHoldersPriority: row.scholarshipHoldersPriority ?? false,
+    socialHousingRequired: row.socialHousingRequired ?? false,
+    wifi: row.wifi ?? false,
+    latitude: row.lat,
+    longitude: row.lng,
+    nbTotalApartments: row.nbTotalApartments,
+    nbAccessibleApartments: row.nbAccessibleApartments,
+    nbColivingApartments: row.nbColivingApartments,
+    priceMin: row.priceMin,
+    priceMax: row.priceMaxComputed,
+    ownerName: row.ownerName ?? null,
+    ownerUrl: row.ownerUrl ?? null,
     typologies,
   }
 }

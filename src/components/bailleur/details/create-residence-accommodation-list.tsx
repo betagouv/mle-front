@@ -4,7 +4,7 @@ import Tabs from '@codegouvfr/react-dsfr/Tabs'
 import { useTranslations } from 'next-intl'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useFieldArray, useFormContext } from 'react-hook-form'
-import { TCreateResidence, TYPOLOGIES, TYPOLOGY_TYPES } from '~/schemas/accommodations/create-residence'
+import { getTypologyLabel, TCreateResidence, TYPOLOGIES, TYPOLOGY_TYPES } from '~/schemas/accommodations/create-residence'
 import { TypologyTabContent } from './typology-tab-content'
 
 export const CreateResidenceAccommodationList = () => {
@@ -90,7 +90,7 @@ export const CreateResidenceAccommodationList = () => {
   const tabs = [
     ...sortedFieldsWithIndex.map(({ originalIndex, type }) => ({
       tabId: `tab-${originalIndex}`,
-      label: tabLabel(type || 'Nouveau', originalIndex),
+      label: tabLabel(type ? getTypologyLabel(type) : 'Nouveau', originalIndex),
     })),
     ...(canAddMore ? [{ tabId: 'tab-add', label: 'Ajouter' }] : []),
   ]

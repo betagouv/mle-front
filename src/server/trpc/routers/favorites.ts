@@ -9,7 +9,7 @@ import { alertJobs } from '~/server/db/schema/alert-jobs'
 import { cities } from '~/server/db/schema/cities'
 import { favoriteAccommodations } from '~/server/db/schema/favorite-accommodations'
 import { owners } from '~/server/db/schema/owners'
-import { typologiesByType } from '~/server/lib/typologies'
+import { groupTypologiesByAccommodation, typologiesByType } from '~/server/lib/typologies'
 import { createTRPCRouter, userProcedure } from '../init'
 import { priceMaxComputed, toAccommodationDTO } from './accommodations'
 
@@ -66,12 +66,7 @@ export const favoritesRouter = createTRPCRouter({
       accIds.length > 0
         ? await db.select().from(accommodationTypologies).where(inArray(accommodationTypologies.accommodationId, accIds))
         : []
-    const typologiesByAccommodation = new Map<number, (typeof typologyRows)[number][]>()
-    for (const tRow of typologyRows) {
-      const list = typologiesByAccommodation.get(tRow.accommodationId) ?? []
-      list.push(tRow)
-      typologiesByAccommodation.set(tRow.accommodationId, list)
-    }
+    const typologiesByAccommodation = groupTypologiesByAccommodation(typologyRows)
 
     return results.map((row) => ({
       id: row.id,
