@@ -25,6 +25,9 @@
       "todo": {
         "title": "Mes priorités"
       },
+      "housingAid": {
+        "title": "Mes aides au logement"
+      },
       "favorites": {
         "title": "Mes favoris"
       },
@@ -245,10 +248,10 @@
       "count": "{count} logements"
     },
     "nearbyEtablissements": {
-      "title": "Educational institutions near the residence",
+      "title": "Établissements à proximité de la résidence",
       "distance": "{distance} km",
-      "showMore": "More institutions",
-      "showLess": "Show less"
+      "showMore": "Plus d'établissements",
+      "showLess": "Voir moins"
     },
     "studio": "Studio {type}",
     "colocation": "Colocation",
@@ -849,6 +852,29 @@
       "titleLine2": "logement étudiant",
       "subtitle": "Plus de 1300 résidences étudiantes référencées partout en France",
       "button": "Trouver un logement"
+    },
+    "results": {
+      "localisation": {
+        "label": "Localisation",
+        "localAidsInfo": "<strong>{name}</strong> propose des aides complémentaires pour les étudiants"
+      },
+      "aids": {
+        "eligibleCount": "Aides disponibles ({count})",
+        "ineligibleCount": "Aides non disponibles ({count})",
+        "disclaimerTitle": "Important : les montants indiqués sont des estimations.",
+        "disclaimerSubtitle": "Pour connaître vos droits exacts, rendez-vous sur les sites officiels.",
+        "emptyEligible": "Aucune aide disponible selon vos critères.",
+        "emptyIneligible": "Toutes les aides sont disponibles pour vous."
+      },
+      "saveBanner": {
+        "titleLine1": "Conservez le résultat de cette simulation",
+        "titleLine2": "dans votre espace personnel",
+        "description": "Enregistrez dans votre <strong>espace étudiant</strong> les aides auxquelles vous êtes éligible afin de les garder à portée de main durant vos recherches de logement.",
+        "saveButton": "Conserver cette simulation",
+        "createAccountButton": "Créer un compte",
+        "successToast": "Simulation conservée dans votre espace personnel.",
+        "errorToast": "Une erreur est survenue lors de la sauvegarde de la simulation."
+      }
     }
   },
   "budgetSimulator": {
@@ -1017,6 +1043,13 @@
     "todo": {
       "title": "Ma liste de priorités",
       "description": "Complétez votre liste de priorités pour mettre toutes les chances de votre côté"
+    },
+    "housingAid": {
+      "title": "Mes aides au logement",
+      "description": "Retrouvez les aides auxquelles vous êtes éligible d'après votre dernière simulation",
+      "emptyState": "Vous n'avez pas encore conservé de simulation d'aides au logement.",
+      "emptyCta": "Simuler mes aides",
+      "restartCta": "Recommencer la simulation d'aides"
     },
     "personalInformations": {
       "title": "Informations personnelles",

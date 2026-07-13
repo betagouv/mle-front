@@ -70,6 +70,7 @@ export async function cleanTables() {
       external_source,
       import_blocklist,
       favorite_accommodation,
+      housing_aid_simulation,
       newsletter_subscription,
       student_alert,
       stats,
