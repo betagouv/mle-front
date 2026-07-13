@@ -216,7 +216,7 @@ export const bailleurRouter = createTRPCRouter({
         previous: input.page > 1 ? String(input.page - 1) : null,
         minPrice: priceBounds[0]?.minPrice != null ? Number(priceBounds[0].minPrice) : null,
         maxPrice: priceBounds[0]?.maxPrice != null ? Number(priceBounds[0].maxPrice) : null,
-        results: await rowsToAccommodationDTOs(results as unknown as Record<string, unknown>[]),
+        results: await rowsToAccommodationDTOs(results),
       }
     }),
   create: bailleurProcedure('manage_residences')
@@ -651,7 +651,7 @@ export const bailleurRouter = createTRPCRouter({
           tenant: tenantDocs.filter((d) => d.ownerType === 'tenant').map(({ url: _url, ...rest }) => rest),
           guarantor: tenantDocs.filter((d) => d.ownerType === 'guarantor').map(({ url: _url, ...rest }) => rest),
         },
-        accommodation: (await rowsToAccommodationDTOs([accommodation as unknown as Record<string, unknown>]))[0],
+        accommodation: (await rowsToAccommodationDTOs([accommodation]))[0],
       }
     }),
 

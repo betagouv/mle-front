@@ -81,14 +81,22 @@ WHERE "nb_t6" IS NOT NULL OR "nb_t6_available" IS NOT NULL OR "price_min_t6" IS 
 INSERT INTO "accommodation_typology" ("accommodation_id","type","price_min","price_max","superficie_min","superficie_max","nb_total","nb_available","colocation")
 SELECT "id",'t7_more',"price_min_t7_more","price_max_t7_more","superficie_min_t7_more","superficie_max_t7_more","nb_t7_more","nb_t7_more_available",true FROM "accommodation"
 WHERE "nb_t7_more" IS NOT NULL OR "nb_t7_more_available" IS NOT NULL OR "price_min_t7_more" IS NOT NULL OR "price_max_t7_more" IS NOT NULL OR "superficie_min_t7_more" IS NOT NULL OR "superficie_max_t7_more" IS NOT NULL;--> statement-breakpoint
--- Backfill the new parent aggregates from the freshly inserted typology rows.
+-- Backfill ALL four parent aggregates from the freshly inserted typology rows, with the exact same
+-- semantics as typologyAggregates() (src/server/lib/typologies.ts) so a legacy row is never left with
+-- a mix of recomputed (price_max/nb_available) and stale-Django (price_min/nb_total) values — which
+-- would drift silently at the next write and skew alert matching / price filter (priceMin) and the
+-- displayed "N logements" total (nbTotalApartments).
 -- nb_available_apartments stays NULL when every child nb_available is NULL (preserves "unknown availability").
 UPDATE "accommodation" a SET
+  "price_min" = sub.price_min,
   "price_max" = sub.price_max,
+  "nb_total_apartments" = sub.nb_total,
   "nb_available_apartments" = sub.nb_available
 FROM (
   SELECT "accommodation_id",
+    MIN(NULLIF("price_min", 0)) AS price_min,
     MAX(NULLIF("price_max", 0)) AS price_max,
+    SUM("nb_total") AS nb_total,
     CASE WHEN bool_or("nb_available" IS NOT NULL) THEN SUM("nb_available") ELSE NULL END AS nb_available
   FROM "accommodation_typology"
   GROUP BY "accommodation_id"
