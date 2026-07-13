@@ -121,7 +121,7 @@ export const getMyAccommodations = async (searchParams?: {
     previous: page > 1 ? String(page - 1) : null,
     minPrice: priceBounds[0]?.minPrice != null ? Number(priceBounds[0].minPrice) : null,
     maxPrice: priceBounds[0]?.maxPrice != null ? Number(priceBounds[0].maxPrice) : null,
-    results: await rowsToAccommodationDTOs(results as unknown as Record<string, unknown>[]),
+    results: await rowsToAccommodationDTOs(results),
   }
 }
 

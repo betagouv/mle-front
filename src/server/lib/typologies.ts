@@ -39,6 +39,20 @@ export function typologiesByType(rows: TypologyRow[]): Partial<Record<TypologyTy
   return out
 }
 
+/**
+ * Group typology rows by their parent accommodation id. Used by list endpoints that batch-fetch
+ * the typologies for a page of rows (one `inArray` query) then hydrate each accommodation.
+ */
+export function groupTypologiesByAccommodation<T extends { accommodationId: number }>(rows: T[]): Map<number, T[]> {
+  const byAccommodation = new Map<number, T[]>()
+  for (const row of rows) {
+    const list = byAccommodation.get(row.accommodationId) ?? []
+    list.push(row)
+    byAccommodation.set(row.accommodationId, list)
+  }
+  return byAccommodation
+}
+
 /** Parent aggregates derived from a set of typologies (denormalized on `accommodation`). */
 export type TypologyAggregates = {
   nbTotalApartments: number | null

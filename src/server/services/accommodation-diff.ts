@@ -24,8 +24,9 @@ export type ActivityAction =
   | 'accommodation.updated'
   | 'accommodation.published'
   | 'accommodation.unpublished'
-  // Emitted directly by bailleur.updateAvailability (availability lives in the typology child table,
-  // so it never appears in a bailleur.update field diff).
+  // Émis directement par bailleur.updateAvailability : la disponibilité vit dans la table enfant
+  // accommodation_typologies, elle n'apparaît donc jamais dans le field-diff de bailleur.update et
+  // n'est pas produite par classifyActions ci-dessous.
   | 'accommodation.availability_updated'
 
 export function classifyActions(diff: Diff): { action: ActivityAction; diff: Diff }[] {
