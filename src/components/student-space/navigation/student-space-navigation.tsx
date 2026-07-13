@@ -33,6 +33,14 @@ export const StudentSpaceNavigation = async () => {
         >
           {t('alerts')}
         </Button>
+        <Button
+          priority="tertiary no outline"
+          iconPosition="left"
+          iconId="fr-icon-settings-5-line"
+          linkProps={{ href: '/mon-espace/informations-personnelles' }}
+        >
+          {t('personalInformations')}
+        </Button>
       </div>
     </>
   )

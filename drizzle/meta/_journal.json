@@ -309,6 +309,13 @@
       "when": 1783779120148,
       "tag": "0043_add_api_key_usage_daily",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1783925553959,
+      "tag": "0044_notification_and_profile_fields",
+      "breakpoints": true
     }
   ]
 }

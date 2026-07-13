@@ -8,6 +8,7 @@ import { favoritesRouter } from './routers/favorites'
 import { ownerFeedbackRouter } from './routers/owner-feedback'
 import { ownerStatisticsRouter } from './routers/owner-statistics'
 import { questionsAnswersRouter } from './routers/questions-answers'
+import { studentRouter } from './routers/student'
 import { territoriesRouter } from './routers/territories'
 import { trackingRouter } from './routers/tracking'
 
@@ -23,6 +24,7 @@ export const appRouter = createTRPCRouter({
   tracking: trackingRouter,
   ownerStatistics: ownerStatisticsRouter,
   ownerFeedback: ownerFeedbackRouter,
+  student: studentRouter,
 })
 
 export type AppRouter = typeof appRouter
