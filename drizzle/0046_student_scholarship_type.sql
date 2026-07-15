@@ -1,0 +1,2 @@
+CREATE TYPE "public"."scholarship_type" AS ENUM('crous_social', 'crous_annual_specific', 'french_government', 'health_social_training', 'other');--> statement-breakpoint
+ALTER TABLE "user" ADD COLUMN "scholarship_type" "scholarship_type";

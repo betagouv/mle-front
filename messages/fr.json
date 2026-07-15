@@ -1041,7 +1041,16 @@
         "hidePassword": "Masquer le mot de passe",
         "submit": "Enregistrer",
         "submitting": "Enregistrement...",
-        "passwordError": "Une erreur est survenue, le mot de passe actuel est erroné."
+        "passwordError": "Une erreur est survenue, le mot de passe actuel est erroné.",
+        "scholarshipType": "Précision sur la bourse",
+        "scholarshipTypePlaceholder": "Sélectionnez une option",
+        "scholarshipTypes": {
+          "crous_social": "Bourse sur critères sociaux du Crous",
+          "crous_annual_specific": "Aide spécifique annuelle du Crous",
+          "french_government": "Bourse du gouvernement Français",
+          "health_social_training": "Bourse Formation Sanitaire et Sociale",
+          "other": "Autre"
+        }
       },
       "notifications": {
         "title": "Paramètres des notifications",

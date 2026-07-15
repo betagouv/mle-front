@@ -26,6 +26,7 @@ export default async function StudentPersonalInformationsPage() {
             phone: profile.phone,
             birthdate: profile.birthdate,
             scholarshipStatus: profile.scholarshipStatus,
+            scholarshipType: profile.scholarshipType,
           }}
         />
         <div className="fr-border-top fr-pt-5w">
