@@ -3,6 +3,7 @@
 import Button from '@codegouvfr/react-dsfr/Button'
 import { Input } from '@codegouvfr/react-dsfr/Input'
 import { RadioButtons } from '@codegouvfr/react-dsfr/RadioButtons'
+import Select from '@codegouvfr/react-dsfr/Select'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
@@ -10,7 +11,7 @@ import { useForm } from 'react-hook-form'
 import { RequiredLabel } from '~/components/helps-simulator/required-label'
 import { createToast } from '~/components/ui/createToast'
 import { useUpdateStudentProfile } from '~/hooks/use-update-student-profile'
-import { type TUpdateStudentProfileForm, ZUpdateStudentProfileForm } from '~/schemas/student/update-profile'
+import { SCHOLARSHIP_TYPES, type TUpdateStudentProfileForm, ZUpdateStudentProfileForm } from '~/schemas/student/update-profile'
 import { authClient } from '~/services/better-auth-client'
 
 type StudentProfileFormProps = {
@@ -21,6 +22,7 @@ type StudentProfileFormProps = {
     phone: string | null
     birthdate: string | null
     scholarshipStatus: 'yes' | 'no' | 'unknown' | null
+    scholarshipType: (typeof SCHOLARSHIP_TYPES)[number] | null
   }
 }
 
@@ -45,6 +47,7 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
       phone: initialValues.phone ?? '',
       birthdate: initialValues.birthdate ?? '',
       scholarshipStatus: initialValues.scholarshipStatus ?? undefined,
+      scholarshipType: initialValues.scholarshipType ?? undefined,
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
@@ -72,6 +75,7 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
       phone: data.phone || null,
       birthdate: data.birthdate || null,
       scholarshipStatus: data.scholarshipStatus ?? null,
+      scholarshipType: data.scholarshipStatus === 'yes' ? (data.scholarshipType ?? null) : null,
     })
   }
 
@@ -118,6 +122,9 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
             nativeInputProps={{ ...register('birthdate'), type: 'date' }}
           />
         </div>
+      </div>
+
+      <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-12 fr-col-md-6 fr-flex fr-align-items-center">
           <RadioButtons
             legend={t('scholarshipQuestion')}
@@ -137,7 +144,10 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
                 nativeInputProps: {
                   value: 'no',
                   checked: scholarshipStatus === 'no',
-                  onChange: () => setValue('scholarshipStatus', 'no'),
+                  onChange: () => {
+                    setValue('scholarshipStatus', 'no')
+                    setValue('scholarshipType', undefined)
+                  },
                 },
               },
               {
@@ -145,12 +155,32 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
                 nativeInputProps: {
                   value: 'unknown',
                   checked: scholarshipStatus === 'unknown',
-                  onChange: () => setValue('scholarshipStatus', 'unknown'),
+                  onChange: () => {
+                    setValue('scholarshipStatus', 'unknown')
+                    setValue('scholarshipType', undefined)
+                  },
                 },
               },
             ]}
           />
         </div>
+        {scholarshipStatus === 'yes' && (
+          <div className="fr-col-12 fr-col-md-6">
+            <Select
+              label={t('scholarshipType')}
+              state={errors.scholarshipType ? 'error' : undefined}
+              stateRelatedMessage={errors.scholarshipType?.message}
+              nativeSelectProps={register('scholarshipType', { setValueAs: (value) => value || null })}
+            >
+              <option value="">{t('scholarshipTypePlaceholder')}</option>
+              {SCHOLARSHIP_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {t(`scholarshipTypes.${type}`)}
+                </option>
+              ))}
+            </Select>
+          </div>
+        )}
       </div>
 
       <div className="fr-border-top fr-pt-4w fr-mt-2w fr-grid-row fr-grid-row--gutters">

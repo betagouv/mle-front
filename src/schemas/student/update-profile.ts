@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+export const SCHOLARSHIP_TYPES = ['crous_social', 'crous_annual_specific', 'french_government', 'health_social_training', 'other'] as const
+
 export const ZUpdateStudentProfileInput = z.object({
   firstname: z
     .string()
@@ -17,6 +19,7 @@ export const ZUpdateStudentProfileInput = z.object({
     .optional(),
   birthdate: z.string().nullable().optional(),
   scholarshipStatus: z.enum(['yes', 'no', 'unknown']).nullable().optional(),
+  scholarshipType: z.enum(SCHOLARSHIP_TYPES).nullable().optional(),
 })
 
 export type TUpdateStudentProfileInput = z.infer<typeof ZUpdateStudentProfileInput>
@@ -26,6 +29,10 @@ export const ZUpdateStudentProfileForm = ZUpdateStudentProfileInput.extend({
   newPassword: z.string().optional(),
   confirmPassword: z.string().optional(),
 }).superRefine((data, ctx) => {
+  if (data.scholarshipStatus === 'yes' && !data.scholarshipType) {
+    ctx.addIssue({ code: 'custom', path: ['scholarshipType'], message: 'Veuillez préciser votre bourse' })
+  }
+
   if (!data.newPassword) return
 
   if (!data.currentPassword) {

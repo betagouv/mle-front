@@ -2,6 +2,13 @@ import { sql } from 'drizzle-orm'
 import { bigint, boolean, date, index, integer, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
 
 export const scholarshipStatusEnum = pgEnum('scholarship_status', ['yes', 'no', 'unknown'])
+export const scholarshipTypeEnum = pgEnum('scholarship_type', [
+  'crous_social',
+  'crous_annual_specific',
+  'french_government',
+  'health_social_training',
+  'other',
+])
 export const bailleurRoleEnum = pgEnum('bailleur_role', ['administrator', 'gestionnaire'])
 export const bailleurPermissionEnum = pgEnum('bailleur_permission', [
   'manage_users',
@@ -34,6 +41,7 @@ export const user = pgTable(
     phone: text('phone'),
     birthdate: date('birthdate', { mode: 'string' }),
     scholarshipStatus: scholarshipStatusEnum('scholarship_status'),
+    scholarshipType: scholarshipTypeEnum('scholarship_type'),
   },
   (t) => [index('user_owner_id_idx').on(t.ownerId)],
 )
