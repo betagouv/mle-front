@@ -20,6 +20,11 @@ import { env } from '~/server/env'
  */
 
 const SUPERIEUR_NATURE_PREFIX = '5'
+/**
+ * Libellés « bouche-trou » saisis dans RAMSESE quand le nom réel n'est pas connu.
+ * Comparés sur une forme normalisée (sans accents, casse et ponctuation ignorées).
+ */
+const PLACEHOLDER_DENOMINATIONS = new Set(['A COMPLETER', 'A COMPLETER PAR ACADEMIE', 'NON RENSEIGNE', 'SANS OBJET'])
 const UAI_DETAIL_REVALIDATE_S = 86_400 // référentiel stable → cache Next.js 24 h
 const DETAIL_CONCURRENCY = 8
 
@@ -45,6 +50,22 @@ function pickCurrentValeur(values?: TValeurHist[]): string | null {
   if (!values?.length) return null
   const active = values.find((v) => !v.DATE_FIN && v.VALEUR)
   return (active ?? values.findLast((v) => v.VALEUR))?.VALEUR ?? null
+}
+
+/** Forme comparable d'un libellé : sans accents, en majuscules, ponctuation → espace simple. */
+function normalizeDenomination(value: string): string {
+  return value
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, ' ')
+    .trim()
+    .toUpperCase()
+}
+
+/** `true` si le libellé est vide ou un bouche-trou (« A compléter », « à COMPLETER »…). */
+function isPlaceholderDenomination(value: string | null): boolean {
+  if (!value) return true
+  return PLACEHOLDER_DENOMINATIONS.has(normalizeDenomination(value))
 }
 
 /** Codes actifs (sans DATE_FIN) d'une liste de codes historisés. */
@@ -149,10 +170,16 @@ function toEtablissement(uai: TUaiWs): TEtablissementSuperieur | null {
         }
       : null
 
+  // Une appellation bouche-trou (« A COMPLETER ») ne doit pas masquer une
+  // dénomination principale exploitable ; si les deux sont vides/bouche-trou,
+  // l'établissement est écarté en aval.
+  const appellation = pickCurrentValeur(uai.IDENTIFICATION?.APPELLATIONS_OFFICIELLES)
+  const denominationPrincipale = pickCurrentValeur(uai.IDENTIFICATION?.DENOMINATIONS_PRINCIPALES)
+  const denomination = [appellation, denominationPrincipale].find((v) => !isPlaceholderDenomination(v)) ?? null
+
   return {
     numeroUai,
-    denomination:
-      pickCurrentValeur(uai.IDENTIFICATION?.APPELLATIONS_OFFICIELLES) ?? pickCurrentValeur(uai.IDENTIFICATION?.DENOMINATIONS_PRINCIPALES),
+    denomination,
     sigle: pickCurrentValeur(uai.IDENTIFICATION?.SIGLES),
     natureCodes: activeCodes(uai.IDENTIFICATION?.NATURES),
     secteur: activeCodes(uai.IDENTIFICATION?.SECTEURS)[0] ?? null,
@@ -195,7 +222,7 @@ export async function getEtablissementsSuperieurByCodePostal(
 
   return details
     .map((uai) => (uai ? toEtablissement(uai) : null))
-    .filter((e): e is TEtablissementSuperieur => e !== null && isSuperieur(e.natureCodes))
+    .filter((e): e is TEtablissementSuperieur => e !== null && isSuperieur(e.natureCodes) && !isPlaceholderDenomination(e.denomination))
 }
 
 // for tests purpose
@@ -205,4 +232,5 @@ export const _internal = {
   fetchUaiDetail,
   toEtablissement,
   mapWithConcurrency,
+  isPlaceholderDenomination,
 }
