@@ -104,6 +104,52 @@ describe('ramsese service — getEtablissementsSuperieurByCodePostal', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
+  it('exclut les établissements dont le nom est un bouche-trou (accents/casse indifférents)', async () => {
+    const UAI_DETAIL_A_COMPLETER = {
+      IDENTIFICATION: {
+        NUMERO_UAI: '0340002B',
+        NATURES: [{ CODE: '520' }],
+        APPELLATIONS_OFFICIELLES: [{ VALEUR: 'à compléter' }],
+      },
+      LOCALISATION: { CODE_POSTAL: '34090', LOCALITE_ACHEMINEMENT: 'MONTPELLIER' },
+    }
+
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse([{ code: '34172', nom: 'Montpellier' }]))
+      .mockResolvedValueOnce(jsonResponse([]))
+      .mockResolvedValueOnce(jsonResponse({ UAIS: ['0341089Z', '0340002B'] }))
+      .mockResolvedValueOnce(jsonResponse(UAI_DETAIL_SUP))
+      .mockResolvedValueOnce(jsonResponse(UAI_DETAIL_A_COMPLETER))
+
+    const { getEtablissementsSuperieurByCodePostal } = await import('./ramsese')
+    const result = await getEtablissementsSuperieurByCodePostal('34090')
+
+    expect(result.map((e) => e.numeroUai)).toEqual(['0341089Z'])
+  })
+
+  it('normalise les variantes de « A COMPLETER »', async () => {
+    const { _internal } = await import('./ramsese')
+    const placeholders = ['A COMPLETER', 'à compléter', 'A Compléter', ' a-completer ', 'A_COMPLETER', 'Non renseigné', '', null]
+    for (const value of placeholders) {
+      expect(_internal.isPlaceholderDenomination(value)).toBe(true)
+    }
+    for (const value of ['Université de Montpellier', 'IUT à compléter les dossiers']) {
+      expect(_internal.isPlaceholderDenomination(value)).toBe(false)
+    }
+  })
+
+  it('retombe sur la dénomination principale si l’appellation officielle est un bouche-trou', async () => {
+    const { _internal } = await import('./ramsese')
+    const etab = _internal.toEtablissement({
+      IDENTIFICATION: {
+        NUMERO_UAI: '0341089Z',
+        APPELLATIONS_OFFICIELLES: [{ VALEUR: 'A COMPLETER' }],
+        DENOMINATIONS_PRINCIPALES: [{ VALEUR: 'Université de Montpellier' }],
+      },
+    })
+    expect(etab?.denomination).toBe('Université de Montpellier')
+  })
+
   it('exclut les natures fermées (DATE_FIN renseignée)', async () => {
     const { _internal } = await import('./ramsese')
     const etab = _internal.toEtablissement({
