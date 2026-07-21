@@ -1087,12 +1087,12 @@
       },
       "notifications": {
         "title": "Paramètres des notifications",
-        "similarAlert": "Je souhaite recevoir des offres de logement similaires à mes alertes",
-        "favoriteAlert": "Je souhaite des alertes de disponibilité dans une résidence ajoutée à mes favoris"
+        "similarAlert": "Je souhaite augmenter la distance (+10 km) et le budget (+25 %) autour de mes villes de recherche.",
+        "favoriteAlert": "Je souhaite des alertes de disponibilité dans mes résidences favorites"
       }
     },
     "alerts": {
-      "notificationToggle": "J'accepte de recevoir des offres de logement similaires à mes alertes",
+      "notificationToggle": "Je souhaite augmenter la distance (+10 km) et le budget (+25 %) autour de mes villes de recherche.",
       "notificationEmailPrefix": "Vous recevez les notifications sur votre adresse e-mail"
     }
   },

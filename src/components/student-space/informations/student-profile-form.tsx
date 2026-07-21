@@ -110,7 +110,16 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
             label={t('phone')}
             state={errors.phone ? 'error' : undefined}
             stateRelatedMessage={errors.phone?.message}
-            nativeInputProps={{ ...register('phone'), type: 'tel', placeholder: t('phonePlaceholder') }}
+            nativeInputProps={{
+              ...register('phone', {
+                onChange: (e) => {
+                  e.target.value = e.target.value.replace(/\D/g, '')
+                },
+              }),
+              type: 'tel',
+              placeholder: t('phonePlaceholder'),
+              maxLength: 10,
+            }}
           />
         </div>
         <div className="fr-col-12 fr-col-md-6">
