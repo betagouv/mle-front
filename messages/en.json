@@ -1094,6 +1094,10 @@
     "alerts": {
       "notificationToggle": "Je souhaite augmenter la distance (+10 km) et le budget (+25 %) autour de mes villes de recherche.",
       "notificationEmailPrefix": "Vous recevez les notifications sur votre adresse e-mail"
+    },
+    "favorites": {
+      "notificationToggle": "Je souhaite des alertes de disponibilité dans mes résidences favorites",
+      "notificationEmailPrefix": "Vous recevez les notifications sur votre adresse e-mail"
     }
   },
   "loginRequiredModal": {
