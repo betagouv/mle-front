@@ -5,26 +5,31 @@ import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { useUpdateNotificationPreferences } from '~/hooks/use-update-notification-preferences'
 
-type StudentAlertsNotificationToggleProps = {
+type NotificationPreference = 'similarAccommodationAlertsEnabled' | 'favoriteAlertsEnabled'
+
+type NotificationToggleProps = {
   email: string
   initialChecked: boolean
+  preference: NotificationPreference
+  translationNamespace: 'student.alerts' | 'student.favorites'
+  inputTitle: string
 }
 
-export const StudentAlertsNotificationToggle = ({ email, initialChecked }: StudentAlertsNotificationToggleProps) => {
-  const t = useTranslations('student.alerts')
+export const NotificationToggle = ({ email, initialChecked, preference, translationNamespace, inputTitle }: NotificationToggleProps) => {
+  const t = useTranslations(translationNamespace)
   const [checked, setChecked] = useState(initialChecked)
   const { mutate } = useUpdateNotificationPreferences()
 
   const handleChange = (newValue: boolean) => {
     setChecked(newValue)
-    mutate({ similarAccommodationAlertsEnabled: newValue })
+    mutate({ [preference]: newValue })
   }
 
   return (
     <div className="fr-flex fr-direction-column fr-flex-gap-0.5v fr-mt-8v">
       <ToggleSwitch
         label={t('notificationToggle')}
-        inputTitle="notif-similar-alert"
+        inputTitle={inputTitle}
         checked={checked}
         onChange={handleChange}
         showCheckedHint={false}
