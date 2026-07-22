@@ -1,11 +1,11 @@
 'use client'
 
-import { parseAsBoolean, parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsBoolean, parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs'
 import { useMemo } from 'react'
 import { type HelpSimulatorFormData } from '~/components/helps-simulator/help-simulator-schema'
 import { type CalculationResult, calculateAllAids } from '~/components/helps-simulator/results/aid-calculator'
 
-const statusOptions = ['student', 'apprentice', 'employed-student', 'lyceen'] as const
+const statusOptions = ['student', 'apprentice', 'employed-student', 'lyceen', 'boursier-crous'] as const
 const guarantorOptions = ['yes', 'no', 'unknown'] as const
 const yesNoUnknownOptions = ['yes', 'no', 'unknown'] as const
 const currentYearOptions = ['terminale', 'licence3', 'other'] as const
@@ -14,7 +14,8 @@ const scholarshipOptions = ['bourse-lycee', 'bourse-crous', 'allocation-speciale
 
 const formParsers = {
   age: parseAsInteger,
-  status: parseAsStringLiteral(statusOptions),
+  status: parseAsArrayOf(parseAsStringLiteral(statusOptions)),
+  isInternationalStudent: parseAsBoolean.withDefault(false),
   currentYear: parseAsStringLiteral(currentYearOptions),
   isProfessionalLicence: parseAsStringLiteral(professionalLicenceOptions),
   scholarship: parseAsStringLiteral(scholarshipOptions),
@@ -33,6 +34,7 @@ export const useHelpSimulatorData = () => {
     if (
       urlState.age === null ||
       urlState.status === null ||
+      urlState.status.length === 0 ||
       urlState.monthlyIncome === null ||
       (!urlState.rentUnknown && urlState.monthlyRent === null) ||
       !urlState.city ||
@@ -43,6 +45,7 @@ export const useHelpSimulatorData = () => {
     return {
       age: urlState.age,
       status: urlState.status,
+      isInternationalStudent: urlState.isInternationalStudent,
       currentYear: urlState.currentYear ?? undefined,
       isProfessionalLicence: urlState.isProfessionalLicence ?? undefined,
       scholarship: urlState.scholarship ?? undefined,
@@ -64,6 +67,7 @@ export const useHelpSimulatorData = () => {
     setUrlState({
       age: null,
       status: null,
+      isInternationalStudent: false,
       currentYear: null,
       isProfessionalLicence: null,
       scholarship: null,
