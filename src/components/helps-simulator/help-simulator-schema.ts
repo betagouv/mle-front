@@ -7,7 +7,10 @@ export const helpSimulatorSchema = z.object({
   age: requiredNumber('Veuillez renseigner votre âge')
     .refine((val) => val >= 16, { message: 'Vous devez avoir au moins 16 ans' })
     .refine((val) => val <= 99, { message: 'Âge invalide' }),
-  status: z.enum(['student', 'apprentice', 'employed-student', 'lyceen'], { error: 'Veuillez sélectionner votre statut' }),
+  status: z
+    .array(z.enum(['student', 'apprentice', 'employed-student', 'lyceen', 'boursier-crous']))
+    .min(1, { message: 'Veuillez sélectionner votre statut' }),
+  isInternationalStudent: z.boolean().optional(),
   currentYear: z.enum(['terminale', 'licence3', 'other']).optional(),
   isProfessionalLicence: z.enum(['yes', 'no', 'unknown']).optional(),
   scholarship: z.enum(['bourse-lycee', 'bourse-crous', 'allocation-speciale', 'non']).optional(),
@@ -24,7 +27,15 @@ export const helpSimulatorSchema = z.object({
 export type HelpSimulatorFormData = z.infer<typeof helpSimulatorSchema>
 
 export const step1Schema = helpSimulatorSchema
-  .pick({ age: true, status: true, currentYear: true, isProfessionalLicence: true, scholarship: true, changingRegion: true })
+  .pick({
+    age: true,
+    status: true,
+    isInternationalStudent: true,
+    currentYear: true,
+    isProfessionalLicence: true,
+    scholarship: true,
+    changingRegion: true,
+  })
   .superRefine((data, ctx) => {
     const isMobilityCandidate = data.currentYear === 'terminale' || data.currentYear === 'licence3'
 

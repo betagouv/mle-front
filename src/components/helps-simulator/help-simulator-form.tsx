@@ -28,7 +28,7 @@ const stepSchemas = {
 } as const
 
 const STEP_FIELDS: Record<number, (keyof HelpSimulatorFormData)[]> = {
-  1: ['age', 'status', 'currentYear', 'isProfessionalLicence', 'scholarship', 'changingRegion'],
+  1: ['age', 'status', 'isInternationalStudent', 'currentYear', 'isProfessionalLicence', 'scholarship', 'changingRegion'],
   2: ['city', 'hasGuarantor'],
   3: ['monthlyIncome', 'monthlyRent', 'rentUnknown'],
 }
@@ -46,6 +46,7 @@ export const HelpSimulatorForm: FC<HelpSimulatorFormProps> = ({ onScrollToTop })
     defaultValues: {
       age: urlState.age ?? undefined,
       status: urlState.status ?? undefined,
+      isInternationalStudent: urlState.isInternationalStudent ?? false,
       currentYear: urlState.currentYear ?? undefined,
       isProfessionalLicence: urlState.isProfessionalLicence ?? undefined,
       scholarship: urlState.scholarship ?? undefined,
@@ -63,8 +64,11 @@ export const HelpSimulatorForm: FC<HelpSimulatorFormProps> = ({ onScrollToTop })
     if (urlState.age !== null && urlState.age !== currentValues.age) {
       form.setValue('age', urlState.age)
     }
-    if (urlState.status !== null && urlState.status !== currentValues.status) {
+    if (urlState.status !== null && JSON.stringify(urlState.status) !== JSON.stringify(currentValues.status)) {
       form.setValue('status', urlState.status)
+    }
+    if (urlState.isInternationalStudent !== currentValues.isInternationalStudent) {
+      form.setValue('isInternationalStudent', urlState.isInternationalStudent)
     }
     if (urlState.currentYear !== null && urlState.currentYear !== currentValues.currentYear) {
       form.setValue('currentYear', urlState.currentYear)
@@ -147,6 +151,7 @@ export const HelpSimulatorForm: FC<HelpSimulatorFormProps> = ({ onScrollToTop })
       setUrlState({
         age: values.age,
         status: values.status,
+        isInternationalStudent: values.isInternationalStudent ?? false,
         currentYear: values.currentYear ?? null,
         isProfessionalLicence: values.isProfessionalLicence ?? null,
         scholarship: values.scholarship ?? null,
@@ -167,6 +172,7 @@ export const HelpSimulatorForm: FC<HelpSimulatorFormProps> = ({ onScrollToTop })
     form.reset({
       age: undefined,
       status: undefined,
+      isInternationalStudent: false,
       currentYear: undefined,
       isProfessionalLicence: undefined,
       scholarship: undefined,

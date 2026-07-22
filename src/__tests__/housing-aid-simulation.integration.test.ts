@@ -6,7 +6,7 @@ import './helpers/setup-integration'
 
 const baseInputs: HelpSimulatorFormData = {
   age: 20,
-  status: 'student',
+  status: ['student'],
   monthlyIncome: 800,
   monthlyRent: 500,
   rentUnknown: false,

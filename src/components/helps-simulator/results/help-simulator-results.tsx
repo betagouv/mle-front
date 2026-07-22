@@ -1,5 +1,6 @@
 'use client'
 
+import { Alert } from '@codegouvfr/react-dsfr/Alert'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { FC } from 'react'
@@ -23,6 +24,15 @@ export const HelpSimulatorResults: FC<HelpSimulatorResultsProps> = ({ onRestart 
 
   return (
     <div className="fr-flex fr-direction-column">
+      {formData.isInternationalStudent && (
+        <Alert
+          className="fr-mb-4w"
+          severity="warning"
+          small
+          description="Le décret n° 2026-552 du 27 juin 2026 entraine une modification d'attribution des APL pour les étudiants internationaux extra-communautaires, nous vous invitons à vous rapprocher de votre CAF pour vérifier vos droits."
+        />
+      )}
+
       <AidsResults results={results} view={view} onViewChange={setView} />
 
       <SaveSimulationBanner formData={formData} />
