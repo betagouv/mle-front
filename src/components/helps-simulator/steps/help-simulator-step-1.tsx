@@ -6,11 +6,24 @@ import { Money } from '@codegouvfr/react-dsfr/picto'
 import Avatar from '@codegouvfr/react-dsfr/picto/Avatar'
 import Backpack from '@codegouvfr/react-dsfr/picto/Backpack'
 import Ecosystem from '@codegouvfr/react-dsfr/picto/Ecosystem'
+import School from '@codegouvfr/react-dsfr/picto/School'
 import { RadioButtons } from '@codegouvfr/react-dsfr/RadioButtons'
-import { FC, useEffect } from 'react'
+import clsx from 'clsx'
+import { FC, ReactNode, useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { type HelpSimulatorFormData } from '~/components/helps-simulator/help-simulator-schema'
 import { RequiredLabel } from '~/components/helps-simulator/required-label'
+import styles from './help-simulator-step-1.module.css'
+
+type Status = HelpSimulatorFormData['status'][number]
+
+const STATUS_OPTIONS: { value: Status; label: string; illustration: ReactNode }[] = [
+  { value: 'lyceen', label: 'Lycéen', illustration: <Avatar width={56} height={56} /> },
+  { value: 'student', label: 'Étudiant', illustration: <Backpack width={56} height={56} /> },
+  { value: 'employed-student', label: 'Étudiant salarié', illustration: <Money width={56} height={56} /> },
+  { value: 'apprentice', label: 'Apprenti / Alternant', illustration: <Ecosystem width={56} height={56} /> },
+  { value: 'boursier-crous', label: 'Étudiant boursier du Crous', illustration: <School width={56} height={56} /> },
+]
 
 export const HelpSimulatorStep1: FC = () => {
   const {
@@ -20,8 +33,11 @@ export const HelpSimulatorStep1: FC = () => {
     formState: { errors },
   } = useFormContext<HelpSimulatorFormData>()
 
-  const status = watch('status')
+  const status = watch('status') ?? []
   const currentYear = watch('currentYear')
+  const isInternationalStudent = watch('isInternationalStudent') ?? false
+
+  const isLyceen = status.includes('lyceen')
 
   // Réinitialiser currentYear et les champs dépendants quand le statut change
   useEffect(() => {
@@ -29,23 +45,38 @@ export const HelpSimulatorStep1: FC = () => {
     setValue('isProfessionalLicence', undefined)
     setValue('scholarship', undefined)
     setValue('changingRegion', undefined)
-  }, [status, setValue])
+  }, [status.join(','), setValue])
 
-  const showTerminaleCheckbox = status === 'lyceen'
+  const showTerminaleCheckbox = isLyceen
 
-  const scholarshipOptions =
-    status === 'lyceen'
-      ? [
-          { label: 'Oui, bourse de lycée', value: 'bourse-lycee' as const },
-          { label: 'Non', value: 'non' as const },
-        ]
-      : [
-          { label: 'Oui, bourse du CROUS', value: 'bourse-crous' as const },
-          { label: 'Oui, allocation spécifique annuelle pour étudiant en difficulté', value: 'allocation-speciale' as const },
-          { label: 'Non', value: 'non' as const },
-        ]
-  const showLicence3Checkbox = status !== 'lyceen'
+  const scholarshipOptions = isLyceen
+    ? [
+        { label: 'Oui, bourse de lycée', value: 'bourse-lycee' as const },
+        { label: 'Non', value: 'non' as const },
+      ]
+    : [
+        { label: 'Oui, bourse du CROUS', value: 'bourse-crous' as const },
+        { label: 'Oui, allocation spécifique annuelle pour étudiant en difficulté', value: 'allocation-speciale' as const },
+        { label: 'Non', value: 'non' as const },
+      ]
+  const showLicence3Checkbox = status.length > 0 && !isLyceen
   const isMobilityCandidate = currentYear === 'terminale' || currentYear === 'licence3'
+
+  // Le statut est multi-sélectionnable, mais « Lycéen » reste exclusif des statuts étudiants.
+  const handleStatusChange = (value: Status, checked: boolean) => {
+    let next: Status[]
+    if (value === 'lyceen') {
+      next = checked ? ['lyceen'] : []
+    } else {
+      const withoutLyceen = status.filter((s) => s !== 'lyceen')
+      next = checked ? [...withoutLyceen, value] : withoutLyceen.filter((s) => s !== value)
+    }
+    setValue('status', next, { shouldValidate: !!errors.status })
+    // La question « étudiant international » ne concerne pas les lycéens
+    if (next.length === 0 || next.includes('lyceen')) {
+      setValue('isInternationalStudent', false)
+    }
+  }
 
   const handleCurrentYearChange = (year: 'terminale' | 'licence3', checked: boolean) => {
     setValue('currentYear', checked ? year : undefined)
@@ -70,51 +101,38 @@ export const HelpSimulatorStep1: FC = () => {
         }}
       />
 
-      <RadioButtons
-        legend={<RequiredLabel>Quel est votre statut ?</RequiredLabel>}
-        name="status"
-        state={errors.status ? 'error' : undefined}
-        stateRelatedMessage={errors.status?.message}
-        className="fr-mb-0"
-        classes={{
-          content: 'fr-flex fr-flex-gap-4v fr-align-items-center fr-flex-wrap',
-          inputGroup: 'fr-mb-0 fr-mt-0',
-        }}
-        options={[
-          {
-            illustration: <Avatar width={56} height={56} />,
-            label: 'Lycéen',
-            nativeInputProps: {
-              ...register('status'),
-              value: 'lyceen',
-            },
-          },
-          {
-            illustration: <Backpack width={56} height={56} />,
-            label: 'Étudiant',
-            nativeInputProps: {
-              ...register('status'),
-              value: 'student',
-            },
-          },
-          {
-            illustration: <Money width={56} height={56} />,
-            label: 'Étudiant salarié',
-            nativeInputProps: {
-              ...register('status'),
-              value: 'employed-student',
-            },
-          },
-          {
-            illustration: <Ecosystem width={56} height={56} />,
-            label: 'Apprenti / Alternant',
-            nativeInputProps: {
-              ...register('status'),
-              value: 'apprentice',
-            },
-          },
-        ]}
-      />
+      <fieldset className={styles.fieldset}>
+        <legend className={styles.legend}>
+          <RequiredLabel>Quel est votre statut ? (plusieurs choix possibles)</RequiredLabel>
+        </legend>
+        <div className={clsx(styles.grid, errors.status && styles.gridError)}>
+          {STATUS_OPTIONS.map(({ value, label, illustration }) => {
+            const checked = status.includes(value)
+            return (
+              <label key={value} className={clsx(styles.option, checked && styles.optionChecked)}>
+                <input
+                  type="checkbox"
+                  name="status"
+                  value={value}
+                  checked={checked}
+                  onChange={(e) => handleStatusChange(value, e.target.checked)}
+                  className={styles.input}
+                />
+                <span className={styles.indicator} aria-hidden="true" />
+                <span className={styles.body}>{label}</span>
+                <span className={styles.pictogram} aria-hidden="true">
+                  {illustration}
+                </span>
+              </label>
+            )
+          })}
+        </div>
+        {errors.status && (
+          <p className="fr-error-text fr-mt-1w" id="status-error">
+            {errors.status.message as string}
+          </p>
+        )}
+      </fieldset>
 
       {showTerminaleCheckbox && (
         <Checkbox
@@ -140,6 +158,13 @@ export const HelpSimulatorStep1: FC = () => {
               nativeInputProps: {
                 checked: currentYear === 'licence3',
                 onChange: (e) => handleCurrentYearChange('licence3', e.target.checked),
+              },
+            },
+            {
+              label: 'Je suis étudiant international extra-communautaire',
+              nativeInputProps: {
+                checked: isInternationalStudent,
+                onChange: (e) => setValue('isInternationalStudent', e.target.checked),
               },
             },
           ]}

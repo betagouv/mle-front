@@ -1,0 +1,129 @@
+/*
+ * Cartes de statut « riches » (picto) en cases à cocher multi-sélection.
+ * Le DSFR ne fournit pas de variante « rich » pour les cases à cocher
+ * (uniquement pour les boutons radio via .fr-radio-rich), on reproduit donc
+ * l'apparence des cartes DSFR en s'appuyant sur les tokens de couleur DSFR.
+ */
+
+.fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.legend {
+  margin-bottom: 0.75rem;
+  padding: 0;
+  color: var(--text-default-grey);
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 48em) {
+  .grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.option {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  margin: 0;
+  max-width: 100%;
+  cursor: pointer;
+}
+
+.input {
+  position: absolute;
+  top: calc(50% - 0.625rem);
+  left: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.body {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-height: 5.5rem;
+  padding: 0.75rem 1rem 0.75rem 2.75rem;
+  border: 1px solid var(--border-default-grey);
+  border-right: none;
+  background-color: var(--background-default-grey);
+  color: var(--text-default-grey);
+}
+
+.indicator {
+  position: absolute;
+  top: calc(50% - 0.625rem);
+  left: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 1px solid var(--border-action-high-blue-france);
+  border-radius: 0.25rem;
+  background-color: var(--background-default-grey);
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.pictogram {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 5.5rem;
+  min-width: 5.5rem;
+  min-height: 5.5rem;
+  padding: 0.25rem;
+  border: 1px solid var(--border-default-grey);
+  background-color: var(--background-default-grey);
+  pointer-events: none;
+}
+
+.pictogram svg,
+.pictogram img {
+  max-width: 3.5rem;
+  max-height: 3.5rem;
+}
+
+/* Survol */
+.option:hover .body,
+.option:hover .pictogram {
+  background-color: var(--background-default-grey-hover);
+}
+
+/* Focus clavier : l'anneau entoure toute la carte (l'input natif est masqué visuellement) */
+.option:focus-within {
+  outline: 2px solid #0a76f6;
+  outline-offset: 2px;
+}
+
+/* État coché */
+.optionChecked .indicator {
+  background-color: var(--background-active-blue-france);
+  border-color: var(--border-active-blue-france);
+  background-image: url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23f5f5fe' d='M10 15.17l9.2-9.2 1.4 1.42L10 18l-6.36-6.36 1.4-1.42z'/></svg>");
+}
+
+:global(:root[data-fr-theme="dark"]) .optionChecked .indicator {
+  background-image: url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23000091' d='M10 15.17l9.2-9.2 1.4 1.42L10 18l-6.36-6.36 1.4-1.42z'/></svg>");
+}
+
+/* État erreur (aucun statut sélectionné) */
+.gridError .body,
+.gridError .indicator,
+.gridError .pictogram {
+  border-color: var(--border-plain-error);
+}

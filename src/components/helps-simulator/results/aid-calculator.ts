@@ -211,6 +211,20 @@ function calculateCafAidesLogement(input: HelpSimulatorFormData): AidResult {
   const rentUnknown = input.rentUnknown === true
   const hasRent = (input.monthlyRent !== undefined && input.monthlyRent > 0) || rentUnknown
 
+  // Décret n° 2026-552 du 27 juin 2026 : les étudiants internationaux extra-communautaires
+  // perdent le droit aux APL, sauf s'ils sont salariés, boursiers du CROUS, ou apprentis/alternants.
+  const isInternationalStudent = input.isInternationalStudent === true
+  const hasQualifyingStatus =
+    input.status.includes('employed-student') || input.status.includes('boursier-crous') || input.status.includes('apprentice')
+
+  if (isInternationalStudent && !hasQualifyingStatus) {
+    return buildAidResult('caf-aides-logement', {
+      isEligible: false,
+      ineligibilityReason:
+        "En tant qu'étudiant international extra-communautaire, vous n'êtes plus éligible aux APL (décret n° 2026-552 du 27 juin 2026), sauf si vous êtes salarié, boursier du CROUS ou apprenti/alternant.",
+    })
+  }
+
   if (annualIncome >= 15800) {
     return buildAidResult('caf-aides-logement', {
       isEligible: false,
@@ -279,7 +293,7 @@ function calculateMobiliJeune(input: HelpSimulatorFormData): AidResult {
   const rentUnknown = input.rentUnknown === true
   const hasRent = (input.monthlyRent !== undefined && input.monthlyRent > 0) || rentUnknown
 
-  if (input.status !== 'apprentice') {
+  if (!input.status.includes('apprentice')) {
     return buildAidResult('mobili-jeune', {
       isEligible: false,
       ineligibilityReason: 'Réservé aux apprentis et alternants',
@@ -333,7 +347,7 @@ function calculateLocaPass(input: HelpSimulatorFormData): AidResult {
     })
   }
 
-  if (input.status === 'student' || input.status === 'lyceen') {
+  if (!input.status.includes('employed-student') && !input.status.includes('apprentice')) {
     return buildAidResult('loca-pass', {
       isEligible: false,
       ineligibilityReason: 'Réservé aux étudiants salariés et aux apprentis',
