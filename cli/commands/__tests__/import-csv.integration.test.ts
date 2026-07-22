@@ -48,6 +48,7 @@ function writeTmpCsv(rows: string[][], headers?: string[]): string {
     'city',
     'postal_code',
     'residence_type',
+    'target_audience',
     'latitude',
     'longitude',
     'owner_name',
@@ -110,6 +111,7 @@ function makeRow(overrides: Record<string, string> = {}): string[] {
     city: 'Paris',
     postal_code: '75001',
     residence_type: 'residence-etudiante',
+    target_audience: 'mixte-etudiants-jeunes-actifs',
     latitude: '48.8566',
     longitude: '2.3522',
     owner_name: 'Mon Bailleur',
@@ -166,6 +168,7 @@ function makeRow(overrides: Record<string, string> = {}): string[] {
     'city',
     'postal_code',
     'residence_type',
+    'target_audience',
     'latitude',
     'longitude',
     'owner_name',
@@ -238,6 +241,7 @@ describe('import-csv integration', () => {
     const [addr] = await db.select().from(accommodationAddresses).where(eq(accommodationAddresses.accommodationId, created!.id))
     expect(addr.postalCode).toBe('75001')
     expect(created!.residenceType).toBe('residence-etudiante')
+    expect(created!.targetAudience).toBe('mixte-etudiants-jeunes-actifs')
     expect(created!.published).toBe(true)
     const typos = await loadTypologies(created!.id)
     expect(typos.t1?.nbTotal).toBe(10)
@@ -533,6 +537,7 @@ describe('import-csv integration', () => {
       'city',
       'postal_code',
       'residence_type',
+      'target_audience',
       'latitude',
       'longitude',
       'owner_name',
@@ -663,6 +668,7 @@ describe('import-csv integration', () => {
       'city',
       'postal_code',
       'residence_type',
+      'target_audience',
       'latitude',
       'longitude',
       'owner_name',
