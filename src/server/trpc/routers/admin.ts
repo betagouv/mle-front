@@ -670,6 +670,12 @@ const statsRouter = createTRPCRouter({
             admins: sql<number>`count(*) filter (where role = 'admin')`.mapWith(Number),
             ownerUsers: sql<number>`count(*) filter (where role = 'owner')`.mapWith(Number),
             students: sql<number>`count(*) filter (where role = 'user')`.mapWith(Number),
+            boursiers: sql<number>`count(*) filter (where role = 'user' and scholarship_status = 'yes')`.mapWith(Number),
+            nonBoursiers: sql<number>`count(*) filter (where role = 'user' and scholarship_status = 'no')`.mapWith(Number),
+            bourseNonRenseignee:
+              sql<number>`count(*) filter (where role = 'user' and (scholarship_status = 'unknown' or scholarship_status is null))`.mapWith(
+                Number,
+              ),
           })
           .from(user),
         db.select({ count: count() }).from(owners),
@@ -710,6 +716,9 @@ const statsRouter = createTRPCRouter({
         admins: usersCount[0]?.admins ?? 0,
         owners: usersCount[0]?.ownerUsers ?? 0,
         students: usersCount[0]?.students ?? 0,
+        boursiers: usersCount[0]?.boursiers ?? 0,
+        nonBoursiers: usersCount[0]?.nonBoursiers ?? 0,
+        bourseNonRenseignee: usersCount[0]?.bourseNonRenseignee ?? 0,
       },
       owners: ownersCount[0]?.count ?? 0,
       accommodations: accommodationsCount[0]?.count ?? 0,

@@ -81,6 +81,8 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      <ScholarshipBreakdown data={data} isLoading={isLoading} />
+
       <KeyFigures data={data} isLoading={isLoading} />
 
       <MyLinkedOwners />
@@ -281,6 +283,37 @@ function LinkSelfToOwnerDialog({ userId }: { userId: string }) {
         </Button>
       </div>
     </linkSelfToOwnerModal.Component>
+  )
+}
+
+function ScholarshipBreakdown({ data, isLoading }: { data: ReturnType<typeof useAdminStats>['data']; isLoading: boolean }) {
+  const fmt = (n: number) => n.toLocaleString('fr-FR')
+
+  const lines = [
+    { label: 'Boursiers', value: data?.users.boursiers ?? 0 },
+    { label: 'Non-boursiers', value: data?.users.nonBoursiers ?? 0 },
+    { label: 'Non renseigné', value: data?.users.bourseNonRenseignee ?? 0 },
+  ]
+
+  return (
+    <div className="fr-mb-3w">
+      <div className={styles.card}>
+        <div className={styles.cardHeader}>
+          <span className={styles.cardTitle}>
+            <span className="fr-icon-award-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
+            Bourses des étudiants inscrits
+          </span>
+        </div>
+        <div className={styles.kpiRow}>
+          {lines.map((line) => (
+            <div key={line.label} className={styles.kpiItem}>
+              <div className={styles.kpiValue}>{isLoading ? '-' : fmt(line.value)}</div>
+              <div className={styles.kpiLabel}>{line.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   )
 }
 
