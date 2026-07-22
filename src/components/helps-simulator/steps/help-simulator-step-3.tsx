@@ -60,7 +60,7 @@ export const HelpSimulatorStep3: FC = () => {
             <ul className={classes.resultsList}>
               {data.map((city: TCity) => (
                 <li key={city.id} className={classes.resultItem} onClick={() => handleCitySelect(city)}>
-                  {city.name}
+                  {city.name} {city.departmentCode ? `(${city.departmentCode})` : ''}
                 </li>
               ))}
             </ul>

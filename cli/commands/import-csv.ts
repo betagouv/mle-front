@@ -2,6 +2,7 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { and, eq, sql } from 'drizzle-orm'
 import { z } from 'zod'
+import { ETargetAudience } from '~/enums/target-audience'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, geocodeAddressVerified, geocodeImportRow, reverseGeocode } from '~/server/lib/import/geocoder'
@@ -332,7 +333,7 @@ const command: ImportCommand = {
           name,
           description: row.description?.trim() || null,
           residenceType: normalizeEnum(row.residence_type),
-          target_audience: (normalizeEnum(row.target_audience) ?? 'etudiants') as 'etudiants' | 'mixte-etudiants-jeunes-actifs',
+          targetAudience: (normalizeEnum(row.target_audience) ?? 'etudiants') as ETargetAudience,
           published: true,
           priceMin: derived.priceMin,
           nbTotalApartments: toDigit(row.nb_total_apartments, true) ?? derived.nbTotalApartments,
