@@ -4,6 +4,7 @@ export const accommodationsParsers = {
   academie: parseAsString,
   accessible: parseAsBoolean,
   bbox: parseAsString,
+  city: parseAsString,
   colocation: parseAsBoolean,
   disponible: parseAsBoolean,
   gestionnaire: parseAsString,

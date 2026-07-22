@@ -12,7 +12,7 @@ interface UseAccomodationsOptions {
 
 export const useAccomodations = ({ cityId: cityIdOverride, citySlug, pageSize }: UseAccomodationsOptions = {}) => {
   const [queryStates] = useQueryStates(accommodationsParsers)
-  const { bbox, academie, accessible, colocation, disponible, gestionnaire, page, prix, crous } = queryStates
+  const { bbox, academie, accessible, city, colocation, disponible, gestionnaire, page, prix, crous } = queryStates
   const [rechercheParCarte] = useQueryState('recherche-par-carte', parseAsBoolean)
   const trpc = useTRPC()
 
@@ -22,7 +22,7 @@ export const useAccomodations = ({ cityId: cityIdOverride, citySlug, pageSize }:
   const citySlugFromPath = villeIndex !== -1 ? decodeURIComponent(pathSegments[villeIndex + 1] ?? '') || undefined : undefined
 
   const isMapSearch = !!rechercheParCarte
-  const effectiveCitySlug = citySlug ?? (citySlugFromPath && !isMapSearch ? citySlugFromPath : undefined)
+  const effectiveCitySlug = citySlug ?? city ?? (citySlugFromPath && !isMapSearch ? citySlugFromPath : undefined)
 
   const { data: territory } = useQuery({
     ...trpc.territories.getBySlug.queryOptions({
