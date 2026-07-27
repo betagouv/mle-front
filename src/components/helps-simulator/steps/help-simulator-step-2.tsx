@@ -6,7 +6,7 @@ import { Range } from '@codegouvfr/react-dsfr/Range'
 import { FC } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { type HelpSimulatorFormData } from '~/components/helps-simulator/help-simulator-schema'
-import { RequiredLabel } from '~/components/helps-simulator/required-label'
+import { RequiredLabel } from '~/components/ui/required-mark'
 
 export const HelpSimulatorStep2: FC = () => {
   const {

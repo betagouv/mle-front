@@ -2,37 +2,37 @@
 
 import Badge from '@codegouvfr/react-dsfr/Badge'
 import Breadcrumb from '@codegouvfr/react-dsfr/Breadcrumb'
+import clsx from 'clsx'
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { type ReactNode } from 'react'
-import { CONTACT_STATUS_CONFIG, type ContactStatus } from '~/enums/contact-status'
+import { CONTACT_STATUS_CONFIG, EContactStatus } from '~/enums/contact-status'
+import type { TContactDetail } from '~/schemas/contacts/contact-detail'
 import { buildHref } from '~/utils/preserve-query-params'
 import styles from './contact-detail.module.css'
 
 interface Props {
-  studentName: string | null
-  status: string
+  contact: TContactDetail
   slug: string
-  source: 'dossier_facile' | 'contact'
-  /** Colonne de gauche : informations candidat (+ bloc DossierFacile). */
   children: ReactNode
-  /** Colonne de droite : carte d'action contextuelle au statut. */
   actions: ReactNode
 }
 
-/** En-tête + grille commune aux fiches contact (mode `contacts`) et candidature (mode `dossier_facile`). */
-export const ContactDetailLayout = ({ studentName, status, slug, source, children, actions }: Props) => {
+export const ContactDetailLayout = ({ contact, slug, children, actions }: Props) => {
+  const t = useTranslations('bailleur.contacts')
   const searchParams = useSearchParams()
-  const config = CONTACT_STATUS_CONFIG[status as ContactStatus] ?? CONTACT_STATUS_CONFIG.a_contacter
-  const name = studentName ?? 'Candidat'
+  const config = CONTACT_STATUS_CONFIG[contact.status as EContactStatus] ?? CONTACT_STATUS_CONFIG[EContactStatus.A_CONTACTER]
+  const name = contact.studentName ?? t('defaultCandidateName')
 
   return (
     <div className="fr-container fr-pb-12w">
       <Breadcrumb
         currentPageLabel={name}
         segments={[
-          { label: 'Tableau de bord', linkProps: { href: buildHref('/bailleur/tableau-de-bord', searchParams) } },
+          { label: t('breadcrumbDashboard'), linkProps: { href: buildHref('/bailleur/tableau-de-bord', searchParams) } },
+          { label: t('breadcrumbContacts'), linkProps: { href: buildHref('/bailleur/contacts', searchParams) } },
           {
-            label: source === 'dossier_facile' ? 'Contacts avec DossierFacile' : 'Contacts',
+            label: t('residenceTitle', { name: contact.accommodationName }),
             linkProps: { href: buildHref(`/bailleur/contacts/${slug}`, searchParams) },
           },
         ]}
@@ -40,17 +40,19 @@ export const ContactDetailLayout = ({ studentName, status, slug, source, childre
       />
 
       <div className="fr-flex fr-justify-content-space-between fr-align-items-center fr-flex-gap-2v fr-mb-4w">
-        <h1 className="fr-h2 fr-mb-0">Contact de {name}</h1>
+        <h1 className="fr-h2 fr-mb-0">{t('detail.title', { name })}</h1>
         <Badge severity={config.severity ?? undefined} noIcon>
           {config.label}
         </Badge>
       </div>
 
-      <div className="fr-grid-row fr-grid-row--gutters">
-        <div className="fr-col-12 fr-col-md-8">
-          <div className={styles.panel}>{children}</div>
+      <div className="fr-border-top">
+        <div className={clsx(styles.detailGrid, 'fr-pt-4w')}>
+          <div>
+            <div className="fr-background-default--grey fr-border fr-p-8w">{children}</div>
+          </div>
+          <div>{actions}</div>
         </div>
-        <div className="fr-col-12 fr-col-md-4">{actions}</div>
       </div>
     </div>
   )

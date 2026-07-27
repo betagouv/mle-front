@@ -1,40 +1,39 @@
+import { useTranslations } from 'next-intl'
+import type { TContactDetail } from '~/schemas/contacts/contact-detail'
 import { computeAge } from '~/utils/dayjs'
 
-interface Props {
-  email: string | null
-  phone: string | null
-  birthdate: string | null
-  scholarshipStatus: string | null
-}
-
 const Line = ({ icon, children }: { icon: string; children: React.ReactNode }) => (
-  <li className="fr-flex fr-align-items-center fr-flex-gap-2v">
+  <li className="fr-flex fr-align-items-center fr-flex-gap-1v">
     <span className={icon} aria-hidden="true" />
     <span>{children}</span>
   </li>
 )
 
-/** Carte « À propos du candidat » : seules les informations connues sont affichées. */
-export const ContactDetailAbout = ({ email, phone, birthdate, scholarshipStatus }: Props) => {
-  const age = computeAge(birthdate)
+export const ContactDetailAbout = ({ contact }: { contact: TContactDetail }) => {
+  const t = useTranslations('bailleur.contacts.detail')
+  const age = computeAge(contact.studentBirthdate)
 
   return (
     <>
-      <h2 className="fr-h4 fr-mb-3w">À propos du candidat</h2>
+      <h2 className="fr-h4 fr-mb-3w">{t('aboutTitle')}</h2>
 
-      <ul className="fr-flex fr-direction-column fr-flex-gap-3v fr-p-0 fr-m-0" style={{ listStyle: 'none' }}>
-        {email && (
+      <ul className="fr-raw-list fr-flex fr-direction-column fr-flex-gap-6v">
+        {contact.studentEmail && (
           <Line icon="ri-mail-line">
-            <a href={`mailto:${email}`}>{email}</a>
+            <a className="fr-link" href={`mailto:${contact.studentEmail}`}>
+              {contact.studentEmail}
+            </a>
           </Line>
         )}
-        {phone && (
+        {contact.studentPhone && (
           <Line icon="ri-phone-line">
-            <a href={`tel:${phone}`}>{phone}</a>
+            <a className="fr-link" href={`tel:${contact.studentPhone}`}>
+              {contact.studentPhone}
+            </a>
           </Line>
         )}
-        {age !== null && <Line icon="ri-calendar-line">{age} ans</Line>}
-        {scholarshipStatus === 'yes' && <Line icon="ri-money-euro-circle-line">Boursier</Line>}
+        {age !== null && <Line icon="ri-calendar-line">{t('age', { count: age })}</Line>}
+        {contact.scholarshipStatus === 'yes' && <Line icon="ri-money-euro-circle-line">{t('scholarship')}</Line>}
       </ul>
     </>
   )

@@ -2,16 +2,12 @@
 
 import { Input } from '@codegouvfr/react-dsfr/Input'
 import { RadioButtons } from '@codegouvfr/react-dsfr/RadioButtons'
+import { useTranslations } from 'next-intl'
 import { useFormContext } from 'react-hook-form'
+import { RequiredLabel } from '~/components/ui/required-mark'
 
-const RequiredStar = () => <span style={{ color: 'var(--text-default-error)' }}>&nbsp;*</span>
-
-/**
- * Les trois champs « infos étudiant » (téléphone portable, date de naissance, boursier).
- * Partagé par le formulaire d'inscription et la modale de complétion — à rendre à
- * l'intérieur d'un `FormProvider` dont le schéma expose `phone` / `birthdate` / `scholarshipStatus`.
- */
 export const StudentProfileFields = () => {
+  const t = useTranslations('student.profile')
   const {
     register,
     formState: { errors },
@@ -24,42 +20,27 @@ export const StudentProfileFields = () => {
   return (
     <>
       <Input
-        label={
-          <>
-            Téléphone portable
-            <RequiredStar />
-          </>
-        }
+        label={<RequiredLabel>{t('phone')}</RequiredLabel>}
         state={phoneError ? 'error' : 'default'}
         stateRelatedMessage={phoneError}
         nativeInputProps={{ ...register('phone'), type: 'tel', autoComplete: 'tel' }}
       />
       <Input
-        label={
-          <>
-            Date de naissance
-            <RequiredStar />
-          </>
-        }
-        hintText="Format jj/mm/aaaa"
+        label={<RequiredLabel>{t('birthdate')}</RequiredLabel>}
+        hintText={t('birthdateHint')}
         state={birthdateError ? 'error' : 'default'}
         stateRelatedMessage={birthdateError}
         nativeInputProps={{ ...register('birthdate'), type: 'date' }}
       />
       <RadioButtons
-        legend={
-          <>
-            Êtes-vous boursier ?
-            <RequiredStar />
-          </>
-        }
+        legend={<RequiredLabel>{t('scholarship')}</RequiredLabel>}
         state={scholarshipStatusError ? 'error' : 'default'}
         stateRelatedMessage={scholarshipStatusError}
-        classes={{ content: 'fr-flex fr-flex-gap-4v fr-align-items-center fr-flex-wrap' }}
+        orientation="horizontal"
         options={[
-          { label: 'Oui', nativeInputProps: { ...register('scholarshipStatus'), value: 'yes' } },
-          { label: 'Non', nativeInputProps: { ...register('scholarshipStatus'), value: 'no' } },
-          { label: 'Je ne sais pas', nativeInputProps: { ...register('scholarshipStatus'), value: 'unknown' } },
+          { label: t('yes'), nativeInputProps: { ...register('scholarshipStatus'), value: 'yes' } },
+          { label: t('no'), nativeInputProps: { ...register('scholarshipStatus'), value: 'no' } },
+          { label: t('unknown'), nativeInputProps: { ...register('scholarshipStatus'), value: 'unknown' } },
         ]}
       />
     </>

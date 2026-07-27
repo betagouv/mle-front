@@ -12,6 +12,7 @@ import { importCrousSurfaces } from './commands/import-crous-surfaces'
 import { importCrousTypologies } from './commands/import-crous-typologies'
 import { migrate } from './commands/migrate'
 import { migrateUsers } from './commands/migrate-users'
+import { purgeContactRequests } from './commands/purge-contact-requests'
 import { seedAlertSnapshotCommand } from './commands/seed-alert-snapshot'
 import { sendAlertJobs } from './commands/send-alert-jobs'
 import { auditStorage } from './commands/storage/auditStorage'
@@ -178,6 +179,12 @@ program
   .option('--dry-run', 'Simuler sans envoyer ni modifier la BDD')
   .option('--verbose', 'Afficher le détail par utilisateur')
   .action((opts) => sendAlertJobs(opts))
+
+program
+  .command('purge-contact-requests')
+  .description('Purge RGPD : supprime les demandes visiteur non confirmées, anonymise les demandes expirées')
+  .option('--dry-run', 'Compter sans modifier la BDD')
+  .action((opts) => purgeContactRequests(opts))
 
 program
   .command('verify-ramsese')

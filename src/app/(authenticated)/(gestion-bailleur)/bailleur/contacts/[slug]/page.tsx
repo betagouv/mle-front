@@ -3,10 +3,14 @@ import Breadcrumb from '@codegouvfr/react-dsfr/Breadcrumb'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { notFound, redirect } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { ContactsBoard } from '~/components/bailleur/contacts/contacts-board'
+import { CONTACT_RETENTION_DAYS } from '~/enums/contact-status'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { getBailleurContext } from '~/server/bailleur/get-bailleur-context'
 import { getQueryClient, trpc } from '~/server/trpc/server'
 import { buildHref } from '~/utils/preserve-query-params'
+import { sPluriel } from '~/utils/sPluriel'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -19,10 +23,10 @@ type Props = {
 export default async function ResidenceContactsPage({ params, searchParams }: Props) {
   const { slug } = await params
   const awaitedSearchParams = await searchParams
-  const ctx = await getBailleurContext(awaitedSearchParams.ownerId)
+  const [t, ctx] = await Promise.all([getTranslations('bailleur.contacts'), getBailleurContext(awaitedSearchParams.ownerId)])
 
   if (!ctx.hasPermission('manage_applications')) redirect(buildHref('/bailleur/tableau-de-bord', awaitedSearchParams))
-  if (ctx.owner.contactMode === 'none') redirect(buildHref('/bailleur/contacts', awaitedSearchParams))
+  if (ctx.owner.contactMode === EOwnerContactMode.NONE) redirect(buildHref('/bailleur/contacts', awaitedSearchParams))
 
   const queryClient = getQueryClient()
   const data = await queryClient.fetchQuery(trpc.bailleur.listContactsByResidence.queryOptions({ slug })).catch(() => null)
@@ -35,19 +39,19 @@ export default async function ResidenceContactsPage({ params, searchParams }: Pr
     <HydrationBoundary state={dehydrate(queryClient)}>
       <div className="fr-container fr-pb-12w">
         <Breadcrumb
-          currentPageLabel={`Résidence ${residence.name}`}
+          currentPageLabel={t('residenceTitle', { name: residence.name })}
           segments={[
-            { label: 'Tableau de bord', linkProps: { href: buildHref('/bailleur/tableau-de-bord', awaitedSearchParams) } },
-            { label: 'Contacts', linkProps: { href: buildHref('/bailleur/contacts', awaitedSearchParams) } },
+            { label: t('breadcrumbDashboard'), linkProps: { href: buildHref('/bailleur/tableau-de-bord', awaitedSearchParams) } },
+            { label: t('breadcrumbContacts'), linkProps: { href: buildHref('/bailleur/contacts', awaitedSearchParams) } },
           ]}
           classes={{ root: 'fr-mt-0 fr-mb-2w fr-pt-4w' }}
         />
 
         <div className="fr-flex fr-align-items-center fr-justify-content-space-between fr-flex-wrap fr-flex-gap-2v fr-mb-1w">
           <h1 className="fr-mb-0 fr-flex fr-align-items-center fr-flex-gap-2v">
-            Résidence {residence.name}
+            {t('residenceTitle', { name: residence.name })}
             <Badge severity="success" noIcon as="span">
-              {residence.disponibilites} disponibilité{residence.disponibilites > 1 ? 's' : ''}
+              {t('availability', { count: residence.disponibilites, s: sPluriel(residence.disponibilites) })}
             </Badge>
           </h1>
           <Button
@@ -55,10 +59,10 @@ export default async function ResidenceContactsPage({ params, searchParams }: Pr
             iconId="ri-equalizer-line"
             linkProps={{ href: buildHref(`/bailleur/residences/${slug}`, awaitedSearchParams) }}
           >
-            Éditer la résidence
+            {t('editResidence')}
           </Button>
         </div>
-        <p className="fr-text-mention--grey fr-mb-4w">Chaque contact d'étudiant reste disponible pendant 30 jours.</p>
+        <p className="fr-text-mention--grey fr-mb-4w">{t('retentionNotice', { days: CONTACT_RETENTION_DAYS })}</p>
 
         <ContactsBoard slug={slug} />
       </div>

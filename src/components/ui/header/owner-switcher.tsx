@@ -6,8 +6,6 @@ import { useCallback } from 'react'
 
 import { buildHref } from '~/utils/preserve-query-params'
 
-// Les pages de détail (contact, résidence, utilisateur) sont rattachées à un bailleur :
-// on revient à la liste de la section quand on change de bailleur.
 const OWNER_SCOPED_SECTIONS = ['/bailleur/contacts', '/bailleur/residences', '/bailleur/utilisateurs']
 
 function getTargetPathname(pathname: string) {

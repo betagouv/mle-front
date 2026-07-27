@@ -8,6 +8,7 @@ import {
   DF_COLUMNS,
   ZContactStatus,
 } from '~/enums/contact-status'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 
 describe('contact statuses', () => {
   it('valide les 4 statuts', () => {
@@ -36,13 +37,13 @@ describe('contact statuses', () => {
 
 describe('columnsForMode', () => {
   it('DossierFacile : 4 colonnes avec à modérer', () => {
-    expect(columnsForMode('dossier_facile')).toEqual(DF_COLUMNS)
+    expect(columnsForMode(EOwnerContactMode.DOSSIER_FACILE)).toEqual(DF_COLUMNS)
     expect(DF_COLUMNS).toHaveLength(4)
     expect(DF_COLUMNS).toContain('a_moderer')
   })
 
   it('Contacts : 3 colonnes sans à modérer', () => {
-    expect(columnsForMode('contacts')).toEqual(CONTACTS_COLUMNS)
+    expect(columnsForMode(EOwnerContactMode.CONTACTS)).toEqual(CONTACTS_COLUMNS)
     expect(CONTACTS_COLUMNS).toHaveLength(3)
     expect(CONTACTS_COLUMNS).not.toContain('a_moderer')
   })

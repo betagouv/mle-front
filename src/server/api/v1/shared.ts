@@ -17,7 +17,7 @@ export const createApiHono = () =>
 
 // Caller tRPC public (contexte sans session) : réutilise la logique interne (territoires, détail d'une
 // résidence) sans repasser par le transport HTTP/superjson.
-export const publicCaller = createCallerFactory(appRouter)({ session: null })
+export const publicCaller = createCallerFactory(appRouter)({ session: null, clientIp: null })
 
 export const errorResponses = {
   400: { description: 'Paramètres invalides.', content: { 'application/json': { schema: ZApiError } } },

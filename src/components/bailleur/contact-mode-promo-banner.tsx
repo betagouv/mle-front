@@ -1,11 +1,8 @@
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { hasPermission } from '~/server/bailleur/permissions'
 import { getServerSession } from '~/services/better-auth'
 import { ContactModePromoBannerClient } from './contact-mode-promo-banner-client'
 
-/**
- * Bandeau incitant à activer la réception des candidatures.
- * N'apparaît que si le gestionnaire courant a `contactMode === 'none'`.
- */
 export const ContactModePromoBanner = async () => {
   const auth = await getServerSession()
   if (!auth?.user) return null
@@ -24,7 +21,7 @@ export const ContactModePromoBanner = async () => {
 
   return (
     <ContactModePromoBannerClient
-      contactMode={auth.user.owner?.contactMode ?? 'none'}
+      contactMode={auth.user.owner?.contactMode ?? EOwnerContactMode.NONE}
       adminOwners={adminOwners}
       defaultOwnerId={auth.user.owner?.id ?? adminOwners[0]?.id}
     />

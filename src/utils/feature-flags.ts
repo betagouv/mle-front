@@ -5,4 +5,5 @@
  *
  * Fonction et non constante : lue à l'appel, donc stubbable en test (`vi.stubEnv`).
  */
-export const isDossierFacileSelectable = () => process.env.NEXT_PUBLIC_APP_ENV !== 'production'
+export const isDossierFacileSelectable = () =>
+  process.env.NEXT_PUBLIC_APP_ENV !== 'production' && process.env.NEXT_PUBLIC_APP_ENV !== 'staging'

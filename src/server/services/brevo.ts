@@ -56,6 +56,21 @@ export async function sendMagicLinkEmail(email: string, url: string): Promise<vo
   })
 }
 
+/**
+ * Double opt-in d'une demande de contact laissée en visiteur : tant que ce lien n'est pas cliqué,
+ * les coordonnées ne sont pas transmises au gestionnaire.
+ */
+export async function sendContactRequestConfirmationEmail(
+  email: string,
+  params: { url: string; accommodationName: string },
+): Promise<void> {
+  await sendTemplateEmail({
+    to: email,
+    templateId: env.BREVO_TEMPLATE_CONTACT_CONFIRMATION,
+    params: { CONFIRMATION_LINK: params.url, ACCOMMODATION_NAME: params.accommodationName },
+  })
+}
+
 export async function sendOwnerAccountActivated(email: string, url: string): Promise<void> {
   await sendTemplateEmail({
     to: email,

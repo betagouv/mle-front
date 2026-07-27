@@ -1983,9 +1983,9 @@
           "primaryKey": false,
           "notNull": true
         },
-        "accommodation_slug": {
-          "name": "accommodation_slug",
-          "type": "varchar(255)",
+        "accommodation_id": {
+          "name": "accommodation_id",
+          "type": "bigint",
           "primaryKey": false,
           "notNull": true
         },
@@ -2024,11 +2024,11 @@
         }
       },
       "indexes": {
-        "contact_request_accommodation_slug_idx": {
-          "name": "contact_request_accommodation_slug_idx",
+        "contact_request_accommodation_id_idx": {
+          "name": "contact_request_accommodation_id_idx",
           "columns": [
             {
-              "expression": "accommodation_slug",
+              "expression": "accommodation_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -2053,16 +2053,29 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
+        },
+        "contact_request_accommodation_id_accommodation_id_fk": {
+          "name": "contact_request_accommodation_id_accommodation_id_fk",
+          "tableFrom": "contact_request",
+          "tableTo": "accommodation",
+          "columnsFrom": [
+            "accommodation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "contact_request_user_id_accommodation_slug_unique": {
-          "name": "contact_request_user_id_accommodation_slug_unique",
+        "contact_request_user_id_accommodation_id_unique": {
+          "name": "contact_request_user_id_accommodation_id_unique",
           "nullsNotDistinct": false,
           "columns": [
             "user_id",
-            "accommodation_slug"
+            "accommodation_id"
           ]
         }
       },

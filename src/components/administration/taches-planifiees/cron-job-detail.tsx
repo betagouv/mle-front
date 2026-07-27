@@ -115,6 +115,7 @@ export function CronJobDetail({ id }: { id: string }) {
   const residences = summary?.residences ?? []
   const label = (JOB_LABELS as Record<string, string>)[job.type] ?? job.type
   const isImport = isImportJob(job.type)
+  const isPurge = job.type === 'purge-contacts'
 
   return (
     <>
@@ -142,19 +143,28 @@ export function CronJobDetail({ id }: { id: string }) {
             <JobDuration startedAt={job.startedAt} endedAt={job.endedAt} className="fr-text-mention--grey" />
           </div>
 
-          {summary && (
-            <JobStatCards
-              created={isImport ? summary.created : undefined}
-              updated={summary.updated}
-              skipped={summary.skipped}
-              errors={summary.errors}
-              labels={{
-                created: 'Créées',
-                updated: isImport ? 'Mises à jour' : 'Mis à jour',
-                skipped: 'Ignorés',
-              }}
-            />
-          )}
+          {summary &&
+            (isPurge ? (
+              <JobStatCards
+                created={summary.deleted ?? 0}
+                updated={summary.anonymized ?? 0}
+                skipped={summary.dossiersPurged ?? 0}
+                errors={summary.errors}
+                labels={{ created: 'Supprimées', updated: 'Anonymisées', skipped: 'Dossiers purgés' }}
+              />
+            ) : (
+              <JobStatCards
+                created={isImport ? summary.created : undefined}
+                updated={summary.updated}
+                skipped={summary.skipped}
+                errors={summary.errors}
+                labels={{
+                  created: 'Créées',
+                  updated: isImport ? 'Mises à jour' : 'Mis à jour',
+                  skipped: 'Ignorés',
+                }}
+              />
+            ))}
         </div>
       </div>
 

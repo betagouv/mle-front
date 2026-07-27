@@ -1,6 +1,9 @@
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { dossierFacileApplications, dossierFacileTenants } from '../server/db/schema'
+import { EContactStatus } from '~/enums/contact-status'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
+import { purgeContactRequests } from '~/server/contacts/purge'
+import { dossierFacileApplications, dossierFacileDocuments, dossierFacileTenants } from '../server/db/schema'
 import { typologyDraft } from '../server/lib/typologies'
 import {
   createAccommodation,
@@ -421,7 +424,7 @@ describe('webhook visibility on the bailleur board', () => {
       name: 'Owner Board',
       slug: 'owner-board',
       userId: 'test-owner-id',
-      contactMode: 'dossier_facile',
+      contactMode: EOwnerContactMode.DOSSIER_FACILE,
     })
     await createAccommodation({ slug: 'res-board', ownerId: owner!.id }, [typologyDraft('t1', { nbAvailable: 5 })])
     const tenant = await createDossierFacileTenant({
@@ -434,7 +437,7 @@ describe('webhook visibility on the bailleur board', () => {
       tenantId: tenant.id,
       accommodationSlug: 'res-board',
       apartmentType: 't1',
-      status: 'a_contacter',
+      status: EContactStatus.A_CONTACTER,
     })
     return tenant
   }
@@ -482,5 +485,48 @@ describe('webhook visibility on the bailleur board', () => {
     const after = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
     expect(after.items).toHaveLength(0)
     await expect(ownerCaller.bailleur.getCandidature({ id: candidatureId })).rejects.toThrow('Candidature not found')
+  })
+
+  it('hides the candidature past the retention window and cuts document access', async () => {
+    const tenant = await setupApplication('verified')
+
+    const before = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    const candidatureId = before.items[0]!.id
+
+    await getTestDb()
+      .update(dossierFacileApplications)
+      .set({ createdAt: sql`now() - '31 days'::interval` })
+      .where(eq(dossierFacileApplications.id, candidatureId))
+
+    const after = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    expect(after.items).toHaveLength(0)
+
+    const residences = await ownerCaller.bailleur.listResidencesWithContactCounts({})
+    expect(residences.residences.find((r) => r.slug === 'res-board')?.aRappelerCount).toBe(0)
+
+    await expect(ownerCaller.bailleur.getCandidature({ id: candidatureId })).rejects.toThrow('Candidature not found')
+    // Le lien signé vers le dossier doit tomber en même temps que la fiche.
+    await expect(ownerCaller.bailleur.getDocumentSignedUrl({ type: 'tenantUrl', tenantId: tenant.id })).rejects.toThrow()
+  })
+
+  it('cuts the tenant documents and dossier links once every candidature is out of retention', async () => {
+    await setupApplication('verified')
+    const board = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    await getTestDb()
+      .update(dossierFacileApplications)
+      .set({ createdAt: sql`now() - '31 days'::interval` })
+      .where(eq(dossierFacileApplications.id, board.items[0]!.id))
+
+    const result = await purgeContactRequests()
+
+    expect(result.dossiersPurged).toBe(1)
+    const [tenant] = await getTestDb().select().from(dossierFacileTenants).where(eq(dossierFacileTenants.tenantId, 'df-board-1'))
+    expect(tenant!.url).toBeNull()
+    expect(tenant!.pdfUrl).toBeNull()
+    const docs = await getTestDb().select().from(dossierFacileDocuments).where(eq(dossierFacileDocuments.tenantId, tenant!.id))
+    expect(docs).toHaveLength(0)
+    // La candidature, elle, survit : l'historique reste consultable côté administration.
+    const [application] = await getTestDb().select().from(dossierFacileApplications)
+    expect(application).toBeDefined()
   })
 })

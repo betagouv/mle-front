@@ -7,7 +7,7 @@ import { FC, useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { tss } from 'tss-react'
 import { type HelpSimulatorFormData } from '~/components/helps-simulator/help-simulator-schema'
-import { RequiredLabel } from '~/components/helps-simulator/required-label'
+import { RequiredLabel } from '~/components/ui/required-mark'
 import { useSearchCities } from '~/hooks/use-search-cities'
 import { TCity } from '~/schemas/territories'
 

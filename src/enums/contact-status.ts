@@ -1,15 +1,22 @@
 import type { BadgeProps } from '@codegouvfr/react-dsfr/Badge'
 import { z } from 'zod'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 
 /**
  * Vocabulaire de statut partagé entre les candidatures DossierFacile
  * (`dossier_facile_application.status`) et les demandes de contact
  * (`contact_request.status`). Stocké en `text` libre, validé par `ZContactStatus`.
  */
-export const CONTACT_STATUSES = ['a_moderer', 'a_contacter', 'contacte', 'non_retenu'] as const
-export type ContactStatus = (typeof CONTACT_STATUSES)[number]
+export enum EContactStatus {
+  A_MODERER = 'a_moderer',
+  A_CONTACTER = 'a_contacter',
+  CONTACTE = 'contacte',
+  NON_RETENU = 'non_retenu',
+}
 
-export const ZContactStatus = z.enum(CONTACT_STATUSES)
+export const CONTACT_STATUSES = Object.values(EContactStatus)
+
+export const ZContactStatus = z.enum(EContactStatus)
 
 interface StatusConfig {
   label: string
@@ -19,19 +26,33 @@ interface StatusConfig {
   barColor: string
 }
 
-export const CONTACT_STATUS_CONFIG: Record<ContactStatus, StatusConfig> = {
-  a_moderer: { label: 'À modérer', severity: 'new', barColor: '#c3992a' },
-  non_retenu: { label: 'Non retenu', severity: null, barColor: '#929292' },
-  a_contacter: { label: 'À contacter', severity: 'error', barColor: '#e1000f' },
-  contacte: { label: 'Contacté', severity: 'success', barColor: '#18753c' },
+export const CONTACT_STATUS_CONFIG: Record<EContactStatus, StatusConfig> = {
+  [EContactStatus.A_MODERER]: { label: 'À modérer', severity: 'new', barColor: '#c3992a' },
+  [EContactStatus.NON_RETENU]: { label: 'Non retenu', severity: null, barColor: '#929292' },
+  [EContactStatus.A_CONTACTER]: { label: 'À contacter', severity: 'error', barColor: '#e1000f' },
+  [EContactStatus.CONTACTE]: { label: 'Contacté', severity: 'success', barColor: '#18753c' },
 }
 
 /** Colonnes du board selon le mode (ordre d'affichage = ordre des écrans). */
-export const DF_COLUMNS: readonly ContactStatus[] = ['a_moderer', 'non_retenu', 'a_contacter', 'contacte']
-export const CONTACTS_COLUMNS: readonly ContactStatus[] = ['a_contacter', 'non_retenu', 'contacte']
+export const DF_COLUMNS: readonly EContactStatus[] = [
+  EContactStatus.A_MODERER,
+  EContactStatus.NON_RETENU,
+  EContactStatus.A_CONTACTER,
+  EContactStatus.CONTACTE,
+]
+export const CONTACTS_COLUMNS: readonly EContactStatus[] = [EContactStatus.A_CONTACTER, EContactStatus.NON_RETENU, EContactStatus.CONTACTE]
 
 /** Statut « à rappeler » compté dans le badge des cartes résidence. */
-export const A_RAPPELER_STATUS: ContactStatus = 'a_contacter'
+export const A_RAPPELER_STATUS: EContactStatus = EContactStatus.A_CONTACTER
 
-export const columnsForMode = (mode: 'contacts' | 'dossier_facile'): readonly ContactStatus[] =>
-  mode === 'dossier_facile' ? DF_COLUMNS : CONTACTS_COLUMNS
+/** Durée de conservation des coordonnées d'une demande de contact, à compter de son dépôt (jours). */
+export const CONTACT_RETENTION_DAYS = 30
+
+/**
+ * Délai au-delà duquel une demande visiteur jamais confirmée par double opt-in est supprimée.
+ * Ces lignes n'ont jamais été visibles de personne : rien à conserver.
+ */
+export const UNCONFIRMED_CONTACT_RETENTION_DAYS = 7
+
+export const columnsForMode = (mode: EOwnerContactMode.CONTACTS | EOwnerContactMode.DOSSIER_FACILE): readonly EContactStatus[] =>
+  mode === EOwnerContactMode.DOSSIER_FACILE ? DF_COLUMNS : CONTACTS_COLUMNS
