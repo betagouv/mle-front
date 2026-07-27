@@ -20,11 +20,7 @@ export default async function AdminLoginPage() {
       </div>
       <div className={clsx(authStyles.container, fr.cx('fr-container'))}>
         <h1>Se connecter à l'Espace Administration</h1>
-        <p>
-          {t('subTitlePart1')}
-          &nbsp;<span className={clsx(fr.cx('fr-text--bold'), authStyles.required)}>*</span>
-          &nbsp;{t('subTitlePart2')}
-        </p>
+        <p>{t('requiredFieldsNotice')}</p>
         <MagicLinkSignInForm callbackURL="/administration/tableau-de-bord" type="admin" />
       </div>
     </>
