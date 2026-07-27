@@ -337,7 +337,8 @@
       "accommodationsWithLocation": "résidence{pluralize} {locationFormatted}",
       "grid": "Liste",
       "map": "Carte",
-      "sortByPrice": "Triés par prix"
+      "sortByPrice": "Triés par prix",
+      "view": "Affichage des résultats"
     },
     "card": {
       "priceFrom": "À partir de",
@@ -1002,7 +1003,8 @@
       "housingAid": "Aides au logement",
       "favorites": "Favoris",
       "alerts": "Alertes logements",
-      "personalInformations": "Informations personnelles"
+      "personalInformations": "Informations personnelles",
+      "menuTitle": "Mon espace"
     },
     "welcome": {
       "subtitle": "Bienvenue dans votre espace personnel"

@@ -1,7 +1,7 @@
 'use client'
 
 import { fr } from '@codegouvfr/react-dsfr'
-import Button from '@codegouvfr/react-dsfr/Button'
+import { SegmentedControl } from '@codegouvfr/react-dsfr/SegmentedControl'
 import { useTranslations } from 'next-intl'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { FC } from 'react'
@@ -48,30 +48,34 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
           </option>
         </Select> */}
         <div className={fr.cx('fr-hidden', 'fr-unhidden-md')}>
-          <div>
-            <Button
-              iconId="ri-layout-grid-2-line"
-              priority={queryStates.vue === 'grille' ? 'secondary' : 'tertiary'}
-              className={classes.button}
-              onClick={() => {
-                trackEvent({ category: 'Recherche', action: 'changement vue', name: 'grille' })
-                setQueryStates({ vue: 'grille' })
-              }}
-            >
-              {t('grid')}
-            </Button>
-            <Button
-              iconId="ri-road-map-fill"
-              priority={queryStates.vue === 'carte' ? 'secondary' : 'tertiary'}
-              className={classes.button}
-              onClick={() => {
-                trackEvent({ category: 'Recherche', action: 'changement vue', name: 'carte' })
-                setQueryStates({ vue: 'carte' })
-              }}
-            >
-              {t('map')}
-            </Button>
-          </div>
+          <SegmentedControl
+            hideLegend
+            legend={t('view')}
+            segments={[
+              {
+                label: t('grid'),
+                iconId: 'ri-layout-grid-2-line',
+                nativeInputProps: {
+                  checked: queryStates.vue === 'grille',
+                  onChange: () => {
+                    trackEvent({ category: 'Recherche', action: 'changement vue', name: 'grille' })
+                    setQueryStates({ vue: 'grille' })
+                  },
+                },
+              },
+              {
+                label: t('map'),
+                iconId: 'ri-road-map-fill',
+                nativeInputProps: {
+                  checked: queryStates.vue === 'carte',
+                  onChange: () => {
+                    trackEvent({ category: 'Recherche', action: 'changement vue', name: 'carte' })
+                    setQueryStates({ vue: 'carte' })
+                  },
+                },
+              },
+            ]}
+          />
         </div>
       </div>
     </div>
@@ -86,9 +90,6 @@ const useStyles = tss.withParams<{ hasResults?: boolean }>().create(({ hasResult
     '50%': {
       opacity: 0.5,
     },
-  },
-  button: {
-    borderRadius: '0.25rem',
   },
   container: {
     display: 'flex',
