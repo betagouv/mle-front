@@ -1,9 +1,33 @@
-import Button from '@codegouvfr/react-dsfr/Button'
-import { getTranslations } from 'next-intl/server'
-import { StudentSpaceTodoNavigationButton } from '~/components/student-space/navigation/student-space-todo-navigation-button'
+'use client'
 
-export const StudentSpaceNavigation = async () => {
-  const t = await getTranslations('student.navigation')
+import Button from '@codegouvfr/react-dsfr/Button'
+import SideMenu from '@codegouvfr/react-dsfr/SideMenu'
+import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { useLocalStorage } from 'usehooks-ts'
+import { ALL_TODOS } from '~/components/student-space/todo/student-todo-list'
+
+const NAV_ITEMS = [
+  { href: '/mon-espace/tableau-de-bord', labelKey: 'dashboard' },
+  { href: '/mon-espace/to-do', labelKey: 'todoList' },
+  { href: '/mon-espace/aides-au-logement', labelKey: 'housingAid' },
+  { href: '/mon-espace/favoris', labelKey: 'favorites' },
+  { href: '/mon-espace/alertes', labelKey: 'alerts' },
+  { href: '/mon-espace/informations-personnelles', labelKey: 'personalInformations' },
+] as const
+
+export const StudentSpaceNavigation = () => {
+  const t = useTranslations('student.navigation')
+  const pathname = usePathname()
+  // initializeWithValue: false → renvoie [] au SSR et au 1er rendu client (évite le mismatch d'hydratation),
+  // puis lit le localStorage après montage.
+  const [completedTodos] = useLocalStorage<string[]>('student-completed-todos', [], { initializeWithValue: false })
+
+  const items = NAV_ITEMS.map(({ href, labelKey }) => ({
+    isActive: pathname === href || pathname.startsWith(`${href}/`),
+    linkProps: { href },
+    text: labelKey === 'todoList' ? t('todoList', { done: completedTodos.length, total: ALL_TODOS.length }) : t(labelKey),
+  }))
 
   return (
     <>
@@ -12,44 +36,7 @@ export const StudentSpaceNavigation = async () => {
           {t('backToHome')}
         </Button>
       </div>
-      <div className="fr-flex fr-direction-column fr-flex-gap-2v fr-p-3w">
-        <Button
-          priority="tertiary no outline"
-          iconPosition="left"
-          iconId="fr-icon-user-line"
-          linkProps={{ href: '/mon-espace/tableau-de-bord' }}
-        >
-          {t('dashboard')}
-        </Button>
-        <StudentSpaceTodoNavigationButton />
-        <Button
-          priority="tertiary no outline"
-          iconPosition="left"
-          iconId="fr-icon-money-euro-circle-line"
-          linkProps={{ href: '/mon-espace/aides-au-logement' }}
-        >
-          {t('housingAid')}
-        </Button>
-        <Button priority="tertiary no outline" iconPosition="left" iconId="ri-heart-line" linkProps={{ href: '/mon-espace/favoris' }}>
-          {t('favorites')}
-        </Button>
-        <Button
-          priority="tertiary no outline"
-          iconPosition="left"
-          iconId="ri-notification-3-line"
-          linkProps={{ href: '/mon-espace/alertes' }}
-        >
-          {t('alerts')}
-        </Button>
-        <Button
-          priority="tertiary no outline"
-          iconPosition="left"
-          iconId="fr-icon-settings-5-line"
-          linkProps={{ href: '/mon-espace/informations-personnelles' }}
-        >
-          {t('personalInformations')}
-        </Button>
-      </div>
+      <SideMenu align="left" burgerMenuButtonText={t('menuTitle')} items={items} />
     </>
   )
 }
