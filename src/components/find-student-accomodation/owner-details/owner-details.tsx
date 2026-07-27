@@ -9,7 +9,7 @@ import { OwnerDetailsAlert } from '~/components/find-student-accomodation/owner-
 import { AvailabilityBadge } from '~/components/shared/availability-badge'
 import { WaitingListBadge } from '~/components/shared/waiting-list-badge'
 import { type ApartmentType } from '~/enums/apartment-type'
-import type { OwnerContactMode } from '~/enums/owner-contact-mode'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
 import { formatDayjs } from '~/utils/dayjs'
 import styles from './owner-details.module.css'
@@ -26,7 +26,7 @@ interface OwnerDetailsProps {
   isAuthenticated: boolean
   accommodationSlug: string
   availableApartmentTypes: ApartmentType[]
-  contactMode: OwnerContactMode
+  contactMode: EOwnerContactMode
   updatedAt: Date
 }
 
@@ -47,7 +47,7 @@ export const OwnerDetails = async ({
 }: OwnerDetailsProps) => {
   const [t, locale] = await Promise.all([getTranslations('accomodation'), getLocale()])
   const ownerUrl = externalUrl || owner?.url
-  const isDossierFacile = contactMode === 'dossier_facile'
+  const isDossierFacile = contactMode === EOwnerContactMode.DOSSIER_FACILE
   const badgeAvailability = (
     <AvailabilityBadge
       nbAvailable={nbAvailable}

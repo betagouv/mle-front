@@ -36,7 +36,7 @@
         "title": "Mes aides au logement"
       },
       "favorites": {
-        "title": "Mes favoris"
+        "title": "Favoris et candidatures"
       },
       "alerts": {
         "title": "Alertes logements"
@@ -239,7 +239,32 @@
         "dossierFacileDescription": "Dossier de location numérique certifié",
         "link": "Copier le lien",
         "email": "Envoyer par email",
-        "print": "Imprimer"
+        "print": "Imprimer",
+        "dossierFacileLoading": "Loading",
+        "contactRequestLoading": "Chargement en cours",
+        "contactRequestSent": "Coordonnées transmises",
+        "contactRequest": "Être recontacté",
+        "contactRequestDescription": "Laissez vos coordonnées, le gestionnaire vous recontactera par e-mail ou téléphone.",
+        "contactRequestSuccess": "Vos coordonnées ont bien été transmises au gestionnaire.",
+        "contactRequestError": "Une erreur est survenue. Veuillez réessayer."
+      },
+      "contactRequestModal": {
+        "title": "Être recontacté",
+        "description": "Vous avez la possibilité de partager vos coordonnées au gestionnaire pour être éventuellement recontacté selon les disponibilités de la résidence.",
+        "firstname": "Prénom",
+        "lastname": "Nom",
+        "email": "E-mail",
+        "phone": "Téléphone",
+        "consentStart": "J’accepte de partager ces informations afin d’être recontacté selon la",
+        "privacyPolicy": "politique de confidentialité",
+        "consentEnd": "de Mon Logement Étudiant",
+        "cancel": "Annuler",
+        "submit": "Partager mes coordonnées",
+        "submitting": "Envoi en cours...",
+        "successTitle": "Coordonnées transmises",
+        "successDescriptionAuthenticated": "Vos coordonnées ont été mises à disposition du gestionnaire pour être éventuellement recontacté selon les disponibilités de la résidence.",
+        "successDescriptionGuest": "Check your inbox: you will receive an email to confirm your request. Your contact details will only be shared with the manager once confirmed. You can also create an account to make your housing search easier.",
+        "createAccount": "Créer un compte"
       },
       "alert": {
         "title": "Restez alerté des disponibilités",
@@ -1004,7 +1029,7 @@
       "dashboard": "Tableau de bord",
       "todoList": "Mes priorités ({done}/{total})",
       "housingAid": "Aides au logement",
-      "favorites": "Favoris",
+      "favorites": "Favoris et candidatures",
       "alerts": "Alertes logements",
       "personalInformations": "Informations personnelles",
       "menuTitle": "Mon espace"
@@ -1102,7 +1127,28 @@
     },
     "favorites": {
       "notificationToggle": "Je souhaite des alertes de disponibilité dans mes résidences favorites",
-      "notificationEmailPrefix": "Vous recevez les notifications sur votre adresse e-mail"
+      "notificationEmailPrefix": "Vous recevez les notifications sur votre adresse e-mail",
+      "application": {
+        "sent": "Application sent",
+        "withDossierFacile": "With <b>DossierFacile</b>",
+        "contactShared": "Contact details shared with managers"
+      }
+    },
+    "profile": {
+      "modalTitle": "Complétez votre profil",
+      "modalIntro": "Pour finaliser votre compte, merci de renseigner les informations suivantes.",
+      "later": "Plus tard",
+      "save": "Enregistrer",
+      "saving": "Enregistrement...",
+      "saveError": "Une erreur est survenue. Veuillez réessayer.",
+      "saveSuccess": "Vos informations ont bien été enregistrées.",
+      "phone": "Téléphone portable",
+      "birthdate": "Date de naissance",
+      "birthdateHint": "Format jj/mm/aaaa",
+      "scholarship": "Êtes-vous boursier ?",
+      "yes": "Oui",
+      "no": "Non",
+      "unknown": "Je ne sais pas"
     }
   },
   "loginRequiredModal": {
@@ -1259,6 +1305,10 @@
             "badge": "DISPONIBILITES",
             "status": "Résidence Ariane"
           },
+          "contactMode": {
+            "title": "Choisir le mode de gestion des candidatures",
+            "badge": "CANDIDATURES"
+          },
           "applications": {
             "title": "Modérer vos candidatures",
             "badge": "CANDIDATURES",
@@ -1374,6 +1424,125 @@
       "ratingRequired": "Veuillez sélectionner une note.",
       "successToast": "Merci pour votre retour !",
       "errorToast": "Erreur lors de l'envoi"
+    },
+    "contacts": {
+      "breadcrumbDashboard": "Tableau de bord",
+      "breadcrumbContacts": "Contacts",
+      "breadcrumbContactsDossierFacile": "Contacts avec DossierFacile",
+      "title": "Contacts",
+      "titleDossierFacile": "Contacts avec DossierFacile",
+      "loading": "Chargement...",
+      "defaultCandidateName": "Candidat",
+      "searchResidenceLabel": "Rechercher une résidence",
+      "settingsButtonTitle": "Réglages du mode de contact",
+      "noResidence": "Aucune résidence.",
+      "toBeCalledBack": "{count} à rappeler",
+      "residenceTitle": "Résidence {name}",
+      "availability": "{count} disponibilité{s}",
+      "editResidence": "Éditer la résidence",
+      "retentionNotice": "Chaque contact d'étudiant reste disponible pendant {days} jours.",
+      "statusChangeError": "Le changement de statut a échoué.",
+      "card": {
+        "postedOn": "Postée le {date}",
+        "scholarship": "Boursier",
+        "viewCandidate": "Voir {name}",
+        "viewCandidateFallback": "le candidat"
+      },
+      "detail": {
+        "title": "Contact de {name}",
+        "aboutTitle": "À propos du candidat",
+        "age": "{count} ans",
+        "scholarship": "Boursier"
+      },
+      "actions": {
+        "statusChangeError": "Le changement de statut a échoué. Veuillez réessayer.",
+        "contactedTitle": "Contact avec l'étudiant réalisé",
+        "contactedRetention": "Les détails du contact seront encore disponibles pendant {days} jour{s}.",
+        "rejectedTitle": "Contact non retenu",
+        "rejectedDescription": "Vous ne donnerez pas suite à cette demande de contact.",
+        "moderateTitle": "Souhaitez-vous en savoir plus sur la demande ?",
+        "moderateAccess": "Accéder au DossierFacile",
+        "moderateReject": "Non",
+        "toContactTitle": "Avez-vous contacté l'étudiant ?",
+        "toContactConfirm": "Oui, j'ai contacté l'étudiant",
+        "toContactRejectDossierFacile": "Non, je ne souhaite pas retenir sa candidature",
+        "toContactRejectContact": "Ignorer la demande"
+      },
+      "dossierFacile": {
+        "openButton": "DossierFacile",
+        "lockedAlert": "Veuillez modérer la demande de contact pour accéder au DossierFacile de l'étudiant",
+        "pdfLink": "Dossier DossierFacile (PDF)",
+        "categories": {
+          "IDENTIFICATION": "Pièce d’identité",
+          "RESIDENCY": "Justificatif de domicile",
+          "PROFESSIONAL": "Justificatif de situation professionnelle",
+          "FINANCIAL": "Justificatif de ressources",
+          "TAX": "Avis d’imposition"
+        },
+        "subCategories": {
+          "FRENCH_IDENTITY_CARD": "Carte d’identité",
+          "FRENCH_PASSPORT": "Passeport",
+          "GUEST": "Hébergé",
+          "TENANT": "Locataire",
+          "OWNER": "Propriétaire",
+          "OTHER_TAX": "Autre document fiscal",
+          "MY_NAME": "À mon nom",
+          "LESS_THAN_YEAR": "Moins d’un an",
+          "NO_INCOME": "Sans revenu",
+          "STUDENT": "Étudiant",
+          "CDI": "CDI",
+          "CDD": "CDD",
+          "ALTERNATION": "Alternance",
+          "INTERNSHIP": "Stage"
+        }
+      },
+      "landing": {
+        "title": "Recevez facilement des contacts de candidats",
+        "subtitle": "Centralisez les demandes d'informations sur votre espace gestionnaire en activant des demandes de contacts de la part des étudiants.",
+        "or": "OU",
+        "contactsTitle": "Recevez les coordonnées d'étudiants à recontacter",
+        "contactsDescription": "Accédez aux coordonnées des candidats intéressés par un logement et recontactez-les directement par e-mail ou par téléphone.",
+        "contactsCta": "Recevoir les contacts",
+        "dossierFacileLogoAlt": "Dossier Facile Logo",
+        "dossierFacileTitle": "Activez DossierFacile pour gagner en réactivité",
+        "dossierFacileDescription": "Recevez un dossier complet des candidats : pièce d'identité, avis d'imposition, justificatifs de ressources, etc.",
+        "dossierFacileCta": "Recevoir les dossiers avec DossierFacile",
+        "comingSoon": "Bientôt disponible",
+        "activationSuccess": "Mode de réception des candidatures activé.",
+        "activationError": "Une erreur est survenue lors de l'activation."
+      },
+      "settingsModal": {
+        "title": "Paramètres des candidatures",
+        "description": "Modifiez la manière dont vous centralisez les candidatures d'étudiants sur votre espace gestionnaire, via les fiches candidatures ou DossierFacile.",
+        "legend": "Mode de réception des candidatures",
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "saving": "Enregistrement...",
+        "success": "Mode de réception mis à jour.",
+        "error": "Une erreur est survenue.",
+        "contactsLabel": "Recevoir les coordonnées d'étudiants",
+        "contactsHint": "Nom, prénom, âge, e-mail, téléphone, niveau d'études et situation boursière",
+        "dossierFacileLabel": "Activer DossierFacile pour gagner en réactivité",
+        "dossierFacileHint": "Recevez un dossier complet des candidats : pièce d'identité, avis d'imposition, justificatifs de ressources, etc.",
+        "noneLabel": "Désactiver les candidatures",
+        "noneHint": "Les visiteurs sont redirigés vers votre site Internet",
+        "lockedHint": "{hint} — bientôt disponible"
+      },
+      "promoBanner": {
+        "title": "Recevez facilement des candidatures",
+        "text": "d'étudiants sur votre espace",
+        "link": "Recevoir des candidatures",
+        "dismiss": "Masquer ce message"
+      }
+    },
+    "ownerForm": {
+      "name": "Nom du gestionnaire",
+      "url": "Site web (optionnel)",
+      "landingUrl": "Page de présentation du bailleur (optionnel)",
+      "landingUrlHint": "URL affichée sur la fiche logement, sous « gérée par le gestionnaire »",
+      "contactMode": "Mode de réception des candidatures",
+      "submit": "Enregistrer",
+      "submitting": "Enregistrement..."
     }
   }
 }

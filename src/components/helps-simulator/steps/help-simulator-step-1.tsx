@@ -12,7 +12,7 @@ import clsx from 'clsx'
 import { FC, ReactNode, useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { type HelpSimulatorFormData } from '~/components/helps-simulator/help-simulator-schema'
-import { RequiredLabel } from '~/components/helps-simulator/required-label'
+import { RequiredLabel } from '~/components/ui/required-mark'
 import styles from './help-simulator-step-1.module.css'
 
 type Status = HelpSimulatorFormData['status'][number]

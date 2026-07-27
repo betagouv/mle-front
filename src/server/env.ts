@@ -26,6 +26,7 @@ const envSchema = z.object({
   BREVO_TEMPLATE_ADMIN_RESET_PASSWORD: z.coerce.number().int().positive(),
   BREVO_TEMPLATE_STUDENT_ALERT: z.coerce.number().int().positive(),
   BREVO_TEMPLATE_ALERT_CREATION: z.coerce.number().int().positive(),
+  BREVO_TEMPLATE_CONTACT_CONFIRMATION: z.coerce.number().int().positive(),
 
   // S3
   S3_ENDPOINT: z.url(),

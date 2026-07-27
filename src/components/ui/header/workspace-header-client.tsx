@@ -4,21 +4,21 @@ import { Header } from '@codegouvfr/react-dsfr/Header'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { BrandTop } from '~/components/ui/brand-top'
-import type { OwnerContactMode } from '~/enums/owner-contact-mode'
+import type { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { TUser } from '~/lib/types'
 import { buildHref } from '~/utils/preserve-query-params'
 import { OwnerSwitcher } from './owner-switcher'
 import { UserConnectedDropdown } from './user-connected-dropdown'
 import { WorkspaceHeaderNavigation } from './workspace-navigation'
 
-type OwnerOption = { id: number; name: string; slug: string; contactMode?: OwnerContactMode }
+type OwnerOption = { id: number; name: string; slug: string; contactMode?: EOwnerContactMode }
 
 type WorkspaceHeaderClientProps = {
   user: TUser
   adminOwners: OwnerOption[]
   defaultOwnerId?: number
   showSwitcher: boolean
-  contactMode: OwnerContactMode
+  contactMode: EOwnerContactMode
   canManageUsers: boolean
   isAdmin: boolean
 }

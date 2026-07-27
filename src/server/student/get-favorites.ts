@@ -12,7 +12,9 @@ export const getFavorites = async () => {
 
   const favorites = await fetchFavorites()
   return {
-    count: favorites.length,
+    // `results` contient aussi les résidences suivies via une seule candidature : le compteur
+    // « favoris » du tableau de bord ne doit compter que les vrais coups de cœur.
+    count: favorites.filter((favorite) => favorite.isFavorite).length,
     results: favorites,
   }
 }

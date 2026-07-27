@@ -3,7 +3,11 @@ import { appRouter } from '~/server/trpc/router'
 
 const createCaller = createCallerFactory(appRouter)
 
-export const caller = createCaller({ session: null })
+export const caller = createCaller({ session: null, clientIp: null })
+
+/** Caller visiteur avec une IP simulée, pour exercer le rate-limit de `contacts.create`. */
+export const guestCallerWithIp = (clientIp: string) =>
+  createCaller({ session: null, clientIp } as unknown as Parameters<typeof createCaller>[0])
 
 export const authenticatedCaller = createCaller({
   session: {

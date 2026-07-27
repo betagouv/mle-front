@@ -1,5 +1,7 @@
+import { eq, sql } from 'drizzle-orm'
 import { SignJWT } from 'jose'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { dossierFacileApplications, dossierFacileTenants } from '../server/db/schema'
 import { getJwtSecret } from '../server/utils/jwt-secret'
 import {
   createAccommodation,
@@ -11,8 +13,18 @@ import {
 } from './fixtures/factories'
 import './helpers/setup-integration'
 import { adminCaller, authenticatedCaller, caller, ownerCaller } from './helpers/test-caller'
+import { getTestDb } from './helpers/test-db'
+
+// La route lit la session : hors contexte de requête Next, `headers()` n'existe pas. On simule donc
+// le compte connecté, que chaque test peut basculer via `signedInAs`.
+let signedInAs: string | null = 'test-owner-id'
+vi.mock('~/services/better-auth', async () => {
+  const actual = await vi.importActual<typeof import('~/services/better-auth')>('~/services/better-auth')
+  return { ...actual, getServerSession: async () => (signedInAs ? { user: { id: signedInAs } } : null) }
+})
 
 beforeEach(async () => {
+  signedInAs = 'test-owner-id'
   await createUser({ id: 'test-user-id', name: 'Test User', email: 'test@test.com', role: 'user' })
   await createUser({ id: 'test-owner-id', name: 'Test Owner', email: 'owner@test.com', role: 'owner' })
   await createUser({ id: 'test-admin-id', name: 'Test Admin', email: 'admin@test.com', role: 'admin' })
@@ -256,5 +268,61 @@ describe('/api/df-redirect', () => {
 
     expect(res.status).toBe(307)
     expect(res.headers.get('location')).toContain('/dossier-facile/error?error_type=doc_not_found')
+  })
+})
+
+// ─── Le jeton n'est pas une autorisation ────────────────────────────────────
+
+describe('/api/df-redirect is not a bearer token', () => {
+  it('refuses a valid token presented without a session', async () => {
+    const { tenant } = await createTestData()
+    const { redirectUrl } = await ownerCaller.bailleur.getDocumentSignedUrl({ type: 'tenantPdf', tenantId: tenant.id })
+    const token = new URL(redirectUrl, 'http://localhost').searchParams.get('token')!
+
+    signedInAs = null
+    const res = await callRedirect(token)
+
+    expect(res.headers.get('location')).toContain('error_type=doc_forbidden')
+  })
+
+  it('refuses a token issued to somebody else', async () => {
+    const { tenant } = await createTestData()
+    const { redirectUrl } = await ownerCaller.bailleur.getDocumentSignedUrl({ type: 'tenantPdf', tenantId: tenant.id })
+    const token = new URL(redirectUrl, 'http://localhost').searchParams.get('token')!
+
+    // Jeton intercepté : le `sub` ne correspond plus au compte qui le présente.
+    signedInAs = 'test-owner-id-2'
+    await createUser({ id: 'test-owner-id-2', name: 'Autre', email: 'autre@test.com', role: 'owner' })
+    const res = await callRedirect(token)
+
+    expect(res.headers.get('location')).toContain('error_type=doc_forbidden')
+  })
+
+  it('refuses once the candidature has left the retention window', async () => {
+    const { tenant, application } = await createTestData()
+    const { redirectUrl } = await ownerCaller.bailleur.getDocumentSignedUrl({ type: 'tenantPdf', tenantId: tenant.id })
+    const token = new URL(redirectUrl, 'http://localhost').searchParams.get('token')!
+
+    // Le jeton a été émis alors que la candidature était visible ; elle ne l'est plus.
+    await getTestDb()
+      .update(dossierFacileApplications)
+      .set({ createdAt: sql`now() - '31 days'::interval` })
+      .where(eq(dossierFacileApplications.id, application.id))
+
+    const res = await callRedirect(token)
+
+    expect(res.headers.get('location')).toContain('error_type=doc_forbidden')
+  })
+
+  it('refuses once the dossier is no longer verified', async () => {
+    const { tenant } = await createTestData()
+    const { redirectUrl } = await ownerCaller.bailleur.getDocumentSignedUrl({ type: 'tenantPdf', tenantId: tenant.id })
+    const token = new URL(redirectUrl, 'http://localhost').searchParams.get('token')!
+
+    await getTestDb().update(dossierFacileTenants).set({ status: 'denied' }).where(eq(dossierFacileTenants.id, tenant.id))
+
+    const res = await callRedirect(token)
+
+    expect(res.headers.get('location')).toContain('error_type=doc_forbidden')
   })
 })

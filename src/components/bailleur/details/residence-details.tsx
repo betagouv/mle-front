@@ -6,6 +6,7 @@ import Select from '@codegouvfr/react-dsfr/Select'
 import ToggleSwitch from '@codegouvfr/react-dsfr/ToggleSwitch'
 import { useTranslations } from 'next-intl'
 import { Controller, useFormContext } from 'react-hook-form'
+import { RequiredLabel } from '~/components/ui/required-mark'
 import { EResidenceType, RESIDENCE_TYPE_LABELS } from '~/enums/residence-type'
 import { ETargetAudience } from '~/enums/target-audience'
 import { TUpdateResidence } from '~/schemas/accommodations/update-residence'
@@ -27,11 +28,7 @@ export const ResidenceDetails = () => {
             <div className="fr-col-12 fr-col-md-6">
               <Input
                 classes={{ message: 'fr-flex-gap-2v' }}
-                label={
-                  <>
-                    {t('accommodationName')} <span className="fr-text-default--error">*</span>{' '}
-                  </>
-                }
+                label={<RequiredLabel>{t('accommodationName')}</RequiredLabel>}
                 nativeInputProps={register('name')}
                 state={errors.name ? 'error' : 'info'}
                 stateRelatedMessage={errors.name?.message ?? t('accommodationNameHint')}
@@ -39,11 +36,7 @@ export const ResidenceDetails = () => {
             </div>
             <div className="fr-col-12 fr-col-md-6">
               <Select
-                label={
-                  <>
-                    {t('accommodationType')} <span className="fr-text-default--error">*</span>
-                  </>
-                }
+                label={<RequiredLabel>{t('accommodationType')}</RequiredLabel>}
                 nativeSelectProps={{
                   ...register('residenceType'),
                 }}
@@ -64,11 +57,7 @@ export const ResidenceDetails = () => {
 
           <div className={styles.radioGrid}>
             <RadioButtons
-              legend={
-                <>
-                  {t('targetAudience')} <span className="fr-text-default--error">*</span>
-                </>
-              }
+              legend={<RequiredLabel>{t('targetAudience')}</RequiredLabel>}
               name="targetAudience"
               state={errors.targetAudience ? 'error' : undefined}
               stateRelatedMessage={errors.targetAudience?.message}

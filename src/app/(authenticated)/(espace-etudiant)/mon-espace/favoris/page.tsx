@@ -16,7 +16,7 @@ export default async function StudentFavoritesPage() {
   return (
     <>
       <div className="fr-border-right fr-border-top fr-border-bottom fr-px-6w fr-py-5w">
-        <h1>Favoris</h1>
+        <h1>Favoris et candidatures</h1>
         <span className="fr-text--xl fr-text-mention--grey">Suivez vos résidences coup de coeur et tenez à jour vos candidatures</span>
       </div>
       <div

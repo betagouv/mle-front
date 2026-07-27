@@ -8,13 +8,18 @@ import { z } from 'zod'
  *
  * Doit rester synchronisé avec `ownerContactModeEnum` (src/server/db/schema/owners.ts).
  */
-export const OWNER_CONTACT_MODES = ['none', 'contacts', 'dossier_facile'] as const
-export type OwnerContactMode = (typeof OWNER_CONTACT_MODES)[number]
+export enum EOwnerContactMode {
+  NONE = 'none',
+  CONTACTS = 'contacts',
+  DOSSIER_FACILE = 'dossier_facile',
+}
 
-export const ZOwnerContactMode = z.enum(OWNER_CONTACT_MODES)
+export const OWNER_CONTACT_MODES = Object.values(EOwnerContactMode)
 
-export const OWNER_CONTACT_MODE_LABELS: Record<OwnerContactMode, string> = {
-  none: 'Aucun',
-  contacts: 'Coordonnées à recontacter',
-  dossier_facile: 'DossierFacile',
+export const ZOwnerContactMode = z.enum(EOwnerContactMode)
+
+export const OWNER_CONTACT_MODE_LABELS: Record<EOwnerContactMode, string> = {
+  [EOwnerContactMode.NONE]: 'Aucun',
+  [EOwnerContactMode.CONTACTS]: 'Coordonnées à recontacter',
+  [EOwnerContactMode.DOSSIER_FACILE]: 'DossierFacile',
 }
