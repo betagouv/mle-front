@@ -9,10 +9,6 @@
   justify-content: center;
 }
 
-.required {
-  color: red;
-}
-
 .imageContainer {
   @media (max-width: 768px) {
     height: 250px;

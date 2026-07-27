@@ -28,11 +28,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       </div>
       <div className={clsx(authStyles.container, fr.cx('fr-container'))}>
         <h1>{t('studentTitle')}</h1>
-        <p>
-          {t('subTitlePart1')}
-          &nbsp;<span className={clsx(fr.cx('fr-text--bold'), authStyles.required)}>*</span>
-          &nbsp;{t('subTitlePart2')}
-        </p>
+        <p>{t('requiredFieldsNotice')}</p>
         {activated && <Alert severity="success" small description={t('activated')} className={fr.cx('fr-mb-3w')} />}
         <CredentialsSignInForm />
         <div className={authStyles.dividerContainer}>
