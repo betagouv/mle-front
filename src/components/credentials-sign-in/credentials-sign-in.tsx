@@ -3,6 +3,7 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import Alert from '@codegouvfr/react-dsfr/Alert'
 import Button from '@codegouvfr/react-dsfr/Button'
+import { PasswordInput } from '@codegouvfr/react-dsfr/blocks/PasswordInput'
 import { Input } from '@codegouvfr/react-dsfr/Input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
@@ -139,18 +140,17 @@ export const CredentialsSignInForm: FC = () => {
                 ...register('email'),
               }}
             />
-            <Input
+            <PasswordInput
               label={
                 <>
                   {t('labels.password')}
                   &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
                 </>
               }
-              state={formState.errors.password ? 'error' : undefined}
-              stateRelatedMessage={formState.errors.password?.message}
+              messagesHint=""
+              messages={formState.errors.password ? [{ severity: 'error', message: formState.errors.password.message ?? '' }] : []}
               nativeInputProps={{
                 ...register('password'),
-                type: 'password',
               }}
             />
           </div>
