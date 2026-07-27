@@ -295,6 +295,8 @@ Le web service RAMSESE (référentiel des établissements du MEN, passerelle Omo
 
 Le bloc « Établissements à proximité » de la fiche logement s'appuie sur ce service (`src/server/services/ramsese.ts` → `getEtablissementsSuperieurByCodePostal`).
 
+**Établissements ouverts :** `POST /v3/listeUai/filtres` n'expose pas de critère « ouvert » (les filtres utilisés sont `communes`, `natures`, `secteurs`). L'état n'est disponible qu'au détail, dans `IDENTIFICATION.ETAT` — nomenclature `1` = ouvert, `2` = à ouvrir, `3` = fermé. Le service ne conserve donc que les UAI d'état `1` à l'étape détail (un `ETAT` absent est considéré ouvert, pour ne pas vider le bloc si le champ n'est plus servi). Pour re-tester si l'API accepte un critère d'état côté filtres : `--etats 1` (un `400` = critère non supporté).
+
 #### `verify-ramsese` — Diagnostiquer la connectivité et le parsing
 
 ```bash

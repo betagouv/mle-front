@@ -44,6 +44,7 @@ interface VerifyRamseseOptions {
   concurrency?: number // nb de requêtes détail en vol simultanément (pool borné). Défaut 8.
   natures?: boolean // commander: --no-natures => natures === false
   national?: boolean // périmètre national : filtres sur les natures seules, sans communes
+  etats?: string // codes état (ex. « 1 ») envoyés dans le body filtres, pour sonder le support côté API
   json?: string // chemin d'un fichier .json où écrire la liste complète (non tronquée)
   dump?: boolean
 }
@@ -115,13 +116,22 @@ async function fetchCommunes(cp: string): Promise<{ code: string; nom: string; c
   return [...byCode.values()]
 }
 
-/** Étape 2 — communes INSEE -> numéros UAI. */
-async function fetchUais(communes: string[], natures: string[] | null): Promise<{ status: number; uais: string[] }> {
+/**
+ * Étape 2 — communes INSEE -> numéros UAI.
+ * `etats` est une sonde : la clé n'est pas documentée côté filtres, un `400` signifie
+ * que l'API ne sait pas filtrer sur l'état (et qu'il faut le faire à l'étape détail).
+ */
+async function fetchUais(communes: string[], natures: string[] | null, etats?: string[]): Promise<{ status: number; uais: string[] }> {
   try {
     const res = await fetch(ramseseUrl('/listeUai/filtres'), {
       method: 'POST',
       headers: HEADERS,
-      body: JSON.stringify({ ...(communes.length ? { communes } : {}), codeApplication: CODEAPP, ...(natures ? { natures } : {}) }),
+      body: JSON.stringify({
+        ...(communes.length ? { communes } : {}),
+        codeApplication: CODEAPP,
+        ...(natures ? { natures } : {}),
+        ...(etats?.length ? { etats } : {}),
+      }),
       signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     })
     let uais: string[] = []
@@ -152,6 +162,18 @@ async function fetchUaiDetail(uai: string): Promise<{ status: number; data: Json
   }
 }
 
+/** `--etats 1,2` -> `['1','2']` ; absent -> `undefined` (aucune clé `etats` envoyée). */
+function parseEtats(raw?: string): string[] | undefined {
+  const codes = raw
+    ?.split(',')
+    .map((c) => c.trim())
+    .filter(Boolean)
+  return codes?.length ? codes : undefined
+}
+
+/** Nomenclature RAMSESE « état de l'UAI ». */
+const ETAT_LABELS: Record<string, string> = { '1': 'ouvert', '2': 'à ouvrir', '3': 'fermé' }
+
 function pickValeur(arr?: Json[]): string | null {
   if (!arr?.length) return null
   return (arr.find((v) => !v.DATE_FIN && v.VALEUR) ?? arr.findLast?.((v: Json) => v.VALEUR))?.VALEUR ?? null
@@ -168,7 +190,7 @@ export async function verifyRamsese(options: VerifyRamseseOptions) {
       console.error('✗ --national exige la liste blanche des natures (ne pas combiner avec --no-natures)')
       process.exit(1)
     }
-    const { status, uais } = await fetchUais([], [...NATURES_ETABLISSEMENTS])
+    const { status, uais } = await fetchUais([], [...NATURES_ETABLISSEMENTS], parseEtats(options.etats))
     console.log(`\n1) POST /v3/listeUai/filtres (national, sans communes) -> HTTP ${status} | UAIS=${uais.length}`)
     if (status !== 200) {
       console.log('   ⚠️  Status ≠ 200 : 400=`communes` requis (national non supporté) · 401/403=IP non whitelistée · 0/5xx=réseau')
@@ -218,12 +240,16 @@ export async function verifyRamsese(options: VerifyRamseseOptions) {
   const useNatures = options.natures !== false
   const inseeCodes = communes.map((c) => c.code)
   const naturesArg = useNatures ? [...NATURES_ETABLISSEMENTS] : null
-  let { status, uais } = await fetchUais(inseeCodes, naturesArg)
+  const etatsArg = parseEtats(options.etats)
+  let { status, uais } = await fetchUais(inseeCodes, naturesArg, etatsArg)
   console.log(
-    `\n2) POST /v3/listeUai/filtres -> HTTP ${status} | UAIS=${uais.length}${useNatures ? ' (liste blanche)' : ' (sans filtre natures)'}`,
+    `\n2) POST /v3/listeUai/filtres -> HTTP ${status} | UAIS=${uais.length}${useNatures ? ' (liste blanche)' : ' (sans filtre natures)'}${
+      etatsArg ? ` (sonde etats=[${etatsArg.join(',')}])` : ''
+    }`,
   )
   if (status !== 200) {
     console.log('   ⚠️  Status ≠ 200 : 401/403=IP non whitelistée (ou auth) · 404=chemin /v3 à ajuster · 0/5xx=réseau/passerelle')
+    if (etatsArg) console.log("   ⚠️  Sonde --etats active : un 400 ici = l'API ne connaît pas ce critère (filtrer à l'étape détail).")
   }
   if (uais.length === 0 && useNatures) {
     const fallback = await fetchUais(inseeCodes, null)
@@ -275,23 +301,31 @@ async function detailAndReport(uais: string[], residence: LatLng | null, options
     const adresse = pickValeur(loc.ADRESSES)
     const codePostal = loc.CODE_POSTAL ?? null
     const commune = loc.LOCALITE_ACHEMINEMENT ?? null
-    return { uai, status: st, nom, natures, adresse, codePostal, commune, rawCoords, point, distanceMeters }
+    const etat: string | null = id.ETAT ?? null
+    return { uai, status: st, nom, etat, natures, adresse, codePostal, commune, rawCoords, point, distanceMeters }
   })
 
   const systems = new Set<string>()
+  const etatCounts = new Map<string, number>()
   for (const r of rows) {
     if ('error' in r) {
       console.log(`   ${r.uai} | HTTP ${r.status} | (pas de détail)`)
       continue
     }
     if (r.rawCoords?.systemeReference) systems.add(r.rawCoords.systemeReference)
+    const etatKey = r.etat ?? 'absent'
+    etatCounts.set(etatKey, (etatCounts.get(etatKey) ?? 0) + 1)
+    const etatStr = `etat=${etatKey}${r.etat && ETAT_LABELS[r.etat] ? `(${ETAT_LABELS[r.etat]})` : ''}`
     const coordsStr = r.rawCoords ? `X=${r.rawCoords.x} Y=${r.rawCoords.y} ref=${r.rawCoords.systemeReference}` : 'PAS DE GEOLOC'
     const parsed = r.point ? `-> ${r.point.lat.toFixed(5)},${r.point.lng.toFixed(5)}` : ''
     const dist = r.distanceMeters != null ? `| ${distanceFmt.format(r.distanceMeters / 1000)} km` : ''
-    console.log(`   ${r.uai} | ${r.nom} | nat=[${r.natures.join(',')}] | ${coordsStr} ${parsed} ${dist}`)
+    console.log(`   ${r.uai} | ${r.nom} | ${etatStr} | nat=[${r.natures.join(',')}] | ${coordsStr} ${parsed} ${dist}`)
   }
 
   console.log(`\n   Systèmes de référence rencontrés : ${systems.size ? [...systems].join(', ') : 'aucun'}`)
+  // Si l'étape filtres renvoyait déjà uniquement des ouverts, on ne verra que « 1 ».
+  const etatsRecap = [...etatCounts.entries()].map(([code, n]) => `${code}${ETAT_LABELS[code] ? `(${ETAT_LABELS[code]})` : ''}=${n}`)
+  console.log(`   États rencontrés : ${etatsRecap.length ? etatsRecap.join(', ') : 'aucun'}`)
 
   // Liste complète (non tronquée) en JSON — les lignes en erreur sont exclues.
   if (options.json) {
@@ -300,6 +334,7 @@ async function detailAndReport(uais: string[], residence: LatLng | null, options
       .map((r) => ({
         numeroUai: r.uai,
         denomination: r.nom,
+        etat: r.etat,
         natureCodes: r.natures,
         adresse: r.adresse,
         codePostal: r.codePostal,
