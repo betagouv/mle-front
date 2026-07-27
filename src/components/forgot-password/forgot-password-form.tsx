@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl'
 import { FC, ReactNode } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { tss } from 'tss-react'
+import { RequiredLabel } from '~/components/ui/required-mark'
 import { useForgotPassword } from '~/hooks/use-forgot-password'
 import { trackEvent } from '~/lib/tracking'
 import { ZForgotPasswordForm } from '~/schemas/forgot-password/forgot-password'
@@ -43,7 +44,7 @@ export const ForgotPasswordForm: FC = () => {
         <div className={classes.formContainer}>
           <div className={classes.inputContainer}>
             <Input
-              label={t('labels.email')}
+              label={<RequiredLabel>{t('labels.email')}</RequiredLabel>}
               nativeInputProps={{
                 ...register('email'),
               }}

@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { z } from 'zod'
 import { CalendlyLink } from '~/components/bailleur/calendly-link'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import avatarCecilia from '~/images/avatar-cecilia.svg'
 import avatarYasmine from '~/images/avatar-yasmine.svg'
 import { env } from '~/server/env'
@@ -24,7 +25,7 @@ export default async function TableauDeBordPage({ searchParams }: TableauDeBordP
   const calendlyUrl = z.string().parse(env.NEXT_PUBLIC_CALENDLY_URL)
   const awaitedSearchParams = await searchParams
   const t = await getTranslations('bailleur')
-  const { session, accommodations } = await getBailleurDashboardPageContext(awaitedSearchParams)
+  const { session, accommodations, ctx } = await getBailleurDashboardPageContext(awaitedSearchParams)
 
   if (!session || !session.user) {
     return notFound()
@@ -112,6 +113,25 @@ export default async function TableauDeBordPage({ searchParams }: TableauDeBordP
           <div>
             <span className="fr-h3 fr-text--bold">{t('dashboard.priorityActions.title')}</span>
             <div className={styles.actionsGrid}>
+              {ctx.owner.contactMode === EOwnerContactMode.NONE && ctx.hasPermission('manage_applications') && (
+                <div className={styles.actionCard}>
+                  <div className={styles.actionHeader}>
+                    <Link className="fr-link fr-link--no-underline" href={buildHref('/bailleur/contacts', awaitedSearchParams)}>
+                      <span className="fr-h6 fr-text-title--blue-france fr-mb-0">
+                        {t('dashboard.priorityActions.actions.contactMode.title')}
+                      </span>
+                    </Link>
+                    <Badge severity="new" className="fr-hidden fr-unhidden-md" noIcon>
+                      {t('dashboard.priorityActions.actions.contactMode.badge')}
+                    </Badge>
+                  </div>
+                  <div className={styles.actionFooter}>
+                    <Link className="fr-link fr-link--no-underline" href={buildHref('/bailleur/contacts', awaitedSearchParams)}>
+                      <span className="ri-arrow-right-line" />
+                    </Link>
+                  </div>
+                </div>
+              )}
               <div className={styles.actionCard}>
                 <div className={styles.actionHeader}>
                   <Link className="fr-link fr-link--no-underline" href={buildHref('/bailleur/residences', awaitedSearchParams)}>

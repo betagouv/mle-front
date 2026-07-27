@@ -1,0 +1,23 @@
+.footer {
+  display: flex;
+  padding-top: 1rem;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  border-top: 1px solid var(--border-default-grey);
+}
+
+.icon::before {
+  --icon-size: 1.5rem;
+
+  color: var(--text-active-blue-france);
+}
+
+.label {
+  margin-bottom: 0;
+}
+
+.detail {
+  display: block;
+  color: var(--text-mention-grey);
+}

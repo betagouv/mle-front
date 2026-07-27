@@ -1,13 +1,6 @@
+/* Évite qu'une colonne large ne déborde de la grille. */
 .column {
-  display: flex;
-  flex-direction: column;
   min-width: 0;
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
 }
 
 .icon {
@@ -16,18 +9,8 @@
   color: var(--column-icon-color);
 }
 
-.title {
-  font-size: 1.125rem;
-  font-weight: 700;
-}
-
 .dropzone {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
   min-height: 120px;
-  padding: 0.25rem;
-  border-radius: 4px;
   transition: background-color 0.15s ease;
 }
 
@@ -40,7 +23,6 @@
 /* Placeholder gardant la colonne à la même hauteur qu'une carte quand elle est vide. */
 .emptyCell {
   min-height: 10.5rem;
-  border: 1px solid var(--border-default-grey);
 }
 
 .dragging {

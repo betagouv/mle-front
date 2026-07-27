@@ -1,6 +1,7 @@
 import { dehydrate } from '@tanstack/react-query'
 import { redirect } from 'next/navigation'
 import { cache } from 'react'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { getBailleurContext } from '~/server/bailleur/get-bailleur-context'
 import { getQueryClient, trpc } from '~/server/trpc/server'
 import { buildHref } from '~/utils/preserve-query-params'
@@ -16,7 +17,7 @@ export const getContactsPageContext = cache(async (searchParams: SearchParams) =
 
   const queryClient = getQueryClient()
 
-  if (ctx.owner.contactMode !== 'none') {
+  if (ctx.owner.contactMode !== EOwnerContactMode.NONE) {
     const search = searchParams.recherche || undefined
     await queryClient.prefetchQuery(
       trpc.bailleur.listResidencesWithContactCounts.queryOptions({

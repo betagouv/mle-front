@@ -5,6 +5,7 @@ import Input from '@codegouvfr/react-dsfr/Input'
 import { useTranslations } from 'next-intl'
 import { useRef, useState } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
+import { RequiredLabel } from '~/components/ui/required-mark'
 import { AddressSuggestion, useAddressAutocomplete } from '~/hooks/use-address-autocomplete'
 import { TCreateResidence } from '~/schemas/accommodations/create-residence'
 import styles from './create-residence-location.module.css'
@@ -45,13 +46,7 @@ const AddressAutocompleteRow = ({ index, onRemove, isMain }: { index: number; on
   const addressErrors = errors.addresses?.[index]
   const hasAddressError = addressErrors?.address || addressErrors?.city || addressErrors?.postalCode
 
-  const label = isMain ? (
-    <>
-      {t('mainAddressLabel')} <span className="fr-text-default--error">*</span>
-    </>
-  ) : (
-    t('additionalAddressLabel', { index: index + 1 })
-  )
+  const label = isMain ? <RequiredLabel>{t('mainAddressLabel')}</RequiredLabel> : t('additionalAddressLabel', { index: index + 1 })
 
   return (
     <div className="fr-mb-2w">

@@ -14,14 +14,16 @@ import { StatusBadge } from '../imports/status-badge'
 import { JobDuration } from '../shared/job-duration'
 import { CRON_JOB_DEFS } from './cron-job-defs'
 
-function impactedCount(summary: TImportJobSummary | null): number | null {
+function impactedCount(type: string, summary: TImportJobSummary | null): number | null {
   if (!summary) return null
+  if (type === 'purge-contacts') return (summary.deleted ?? 0) + (summary.anonymized ?? 0) + (summary.dossiersPurged ?? 0)
   return (summary.created ?? 0) + (summary.updated ?? 0)
 }
 
 function impactedLabel(type: string, count: number): string {
   if (isImportJob(type)) return `${count} résidence${count > 1 ? 's' : ''}`
   if (type === 'sync-stats') return `${count} jour${count > 1 ? 's' : ''}`
+  if (type === 'purge-contacts') return `${count} donnée${count > 1 ? 's' : ''} purgée${count > 1 ? 's' : ''}`
   return `${count} entrée${count > 1 ? 's' : ''}`
 }
 
@@ -55,7 +57,7 @@ export function CronOverviewTable() {
               const job = lastByType.get(cron.type)
               const summary = (job?.summary as TImportJobSummary | null) ?? null
               const errorCount = summary?.errors?.length ?? 0
-              const count = job ? impactedCount(summary) : null
+              const count = job ? impactedCount(cron.type, summary) : null
 
               return (
                 <tr key={cron.type}>

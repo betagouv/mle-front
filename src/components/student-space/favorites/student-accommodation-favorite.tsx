@@ -17,13 +17,17 @@ import { AvailabilityBadge } from '~/components/shared/availability-badge'
 import { TooltipHoverOnly } from '~/components/tooltip-hover-only'
 import { TUser } from '~/lib/types'
 import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
+import type { TFavoriteApplicationKind } from '~/server/trpc/routers/favorites'
 import { calculateAvailability } from '~/utils/calculateAvailability'
+import { ApplicationStatus } from './application-status'
 
 type StudentAccommodationFavoriteProps = {
   accomodation: TAccomodationCard
   user?: TUser
+  /** Candidature déjà déposée sur cette résidence, le cas échéant. */
+  application?: TFavoriteApplicationKind | null
 }
-export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps> = ({ accomodation, user }) => {
+export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps> = ({ accomodation, user, application }) => {
   const t = useTranslations('findAccomodation.card')
   const router = useRouter()
   const { classes } = useStyles()
@@ -61,6 +65,7 @@ export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps>
       {...badgeProps}
       {...imageProps}
       classes={{
+        footer: classes.footer,
         header: classes.header,
         root: classes.hover,
       }}
@@ -102,6 +107,7 @@ export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps>
           <SaveAccommodationFavoriteButton slug={accomodation.slug} user={user} />
         </div>
       }
+      footer={application ? <ApplicationStatus kind={application} /> : undefined}
       size="small"
       title={name}
       titleAs="h2"
@@ -110,6 +116,10 @@ export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps>
 }
 
 export const useStyles = tss.create({
+  footer: {
+    paddingLeft: '0 !important',
+    paddingRight: '0 !important',
+  },
   header: {
     overflow: 'hidden',
   },

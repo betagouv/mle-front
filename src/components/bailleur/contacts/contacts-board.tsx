@@ -2,53 +2,66 @@
 
 import { DndContext, type DragEndEvent, DragOverlay, type DragStartEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo, useState } from 'react'
+import { useTranslations } from 'next-intl'
+import { useState } from 'react'
 import { createToast } from '~/components/ui/createToast'
-import { type ContactStatus, columnsForMode } from '~/enums/contact-status'
+import { columnsForMode, EContactStatus } from '~/enums/contact-status'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { useTRPC } from '~/server/trpc/client'
 import { ContactCard, type ContactItem } from './contact-card'
 import { ContactColumn } from './contact-column'
-import styles from './contacts-board.module.css'
 
 interface Props {
   slug: string
 }
 
+/** Référence stable : évite de recréer un tableau vide à chaque rendu tant que la requête charge. */
+const NO_ITEMS: ContactItem[] = []
+
 export const ContactsBoard = ({ slug }: Props) => {
+  const t = useTranslations('bailleur.contacts')
   const trpc = useTRPC()
   const queryClient = useQueryClient()
 
+  const boardQueryKey = trpc.bailleur.listContactsByResidence.queryKey({ slug })
   const { data } = useQuery(trpc.bailleur.listContactsByResidence.queryOptions({ slug }))
 
-  const [items, setItems] = useState<ContactItem[]>([])
+  // Le cache de la requête est la seule source de vérité : le déplacement d'une carte l'écrit
+  // directement (optimistic update), plutôt que d'entretenir une copie locale à resynchroniser.
+  const items = data?.items ?? NO_ITEMS
   const [activeId, setActiveId] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (data?.items) setItems(data.items)
-  }, [data?.items])
-
-  const mode = data?.mode ?? 'none'
-  const columns = mode === 'none' ? [] : columnsForMode(mode)
+  const mode = data?.mode ?? EOwnerContactMode.NONE
+  const columns = mode === EOwnerContactMode.NONE ? [] : columnsForMode(mode)
 
   const { mutate } = useMutation(
     trpc.bailleur.updateContactStatus.mutationOptions({
+      onMutate: async ({ id, status }) => {
+        await queryClient.cancelQueries({ queryKey: boardQueryKey })
+        const previous = queryClient.getQueryData(boardQueryKey)
+        queryClient.setQueryData(boardQueryKey, (board) =>
+          board ? { ...board, items: board.items.map((item) => (item.id === id ? { ...item, status } : item)) } : board,
+        )
+        return { previous }
+      },
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: trpc.bailleur.listResidencesWithContactCounts.queryKey() })
       },
-      onError: () => {
-        createToast({ priority: 'error', message: 'Le changement de statut a échoué.' })
-        queryClient.invalidateQueries({ queryKey: trpc.bailleur.listContactsByResidence.queryKey({ slug }) })
+      onError: (_error, _variables, context) => {
+        // Restauration immédiate de l'instantané précédent, sans aller-retour serveur.
+        if (context?.previous) queryClient.setQueryData(boardQueryKey, context.previous)
+        createToast({ priority: 'error', message: t('statusChangeError') })
       },
     }),
   )
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
 
-  const activeItem = useMemo(() => items.find((i) => i.id === activeId) ?? null, [items, activeId])
+  const activeItem = items.find((item) => item.id === activeId) ?? null
 
-  const resolveTargetStatus = (overId: string): ContactStatus | null => {
-    if (columns.includes(overId as ContactStatus)) return overId as ContactStatus
-    return (items.find((i) => i.id === overId)?.status as ContactStatus) ?? null
+  const resolveTargetStatus = (overId: string): EContactStatus | null => {
+    if (columns.includes(overId as EContactStatus)) return overId as EContactStatus
+    return (items.find((i) => i.id === overId)?.status as EContactStatus) ?? null
   }
 
   const onDragEnd = (event: DragEndEvent) => {
@@ -60,7 +73,6 @@ export const ContactsBoard = ({ slug }: Props) => {
     const target = resolveTargetStatus(String(over.id))
     if (!item || !target || item.status === target) return
 
-    setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, status: target } : i)))
     mutate({ id: item.id, status: target, source: item.source })
   }
 
@@ -72,15 +84,11 @@ export const ContactsBoard = ({ slug }: Props) => {
         onDragEnd={onDragEnd}
         onDragCancel={() => setActiveId(null)}
       >
-        <div className={styles.board} style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` }}>
+        <div className="fr-grid-row fr-grid-row--gutters">
           {columns.map((status, index) => (
-            <ContactColumn
-              key={status}
-              status={status}
-              slug={slug}
-              isEntry={index === 0}
-              items={items.filter((i) => i.status === status)}
-            />
+            <div key={status} className="fr-col-12 fr-col-md">
+              <ContactColumn status={status} slug={slug} isEntry={index === 0} items={items.filter((i) => i.status === status)} />
+            </div>
           ))}
         </div>
 
