@@ -1,7 +1,7 @@
 .container {
   border-bottom: 1px solid var(--border-default-grey);
   display: grid;
-  grid-template-columns: repeat(4, 1fr) auto;
+  grid-template-columns: 1fr auto auto auto auto;
   row-gap: 2rem;
   column-gap: 1rem;
   margin-bottom: 2rem;
