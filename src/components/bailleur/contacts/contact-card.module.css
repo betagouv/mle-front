@@ -1,17 +1,18 @@
+/* Liseré bas coloré par statut (couleur posée en inline style) + affordance de drag. */
 .card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 1rem;
-  background: var(--background-default-grey);
-  border: 1px solid var(--border-default-grey);
-  border-bottom: 4px solid var(--border-default-grey);
-  cursor: grab;
+  position: relative;
+  border-bottom-width: 0.25rem;
+  cursor: pointer;
   touch-action: none;
 }
 
+.card[aria-pressed="true"],
 .card:active {
   cursor: grabbing;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 18, 0.16);
 }
 
 .overlay {
@@ -19,39 +20,28 @@
   cursor: grabbing;
 }
 
-.name {
-  font-size: 1.125rem;
-  font-weight: 700;
-  margin-top: 0.25rem;
-}
-
 .nameActive {
   color: var(--text-active-blue-france);
 }
 
-.nameMuted {
-  color: var(--text-default-grey);
-}
-
-.boursier {
-  font-size: 0.875rem;
-  color: var(--text-mention-grey);
-}
-
-.footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 0.5rem;
-}
-
-.dfLogo {
-  font-size: 0.875rem;
-  color: var(--text-default-grey);
-}
-
-.arrow {
+.cardLink {
   --icon-size: 1rem;
+  --hover: transparent;
+  --active: transparent;
 
-  margin-left: auto;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-color: transparent;
+}
+
+.cardLink:hover,
+.cardLink:active {
+  background-color: transparent;
+}
+
+.cardLink::before {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
 }

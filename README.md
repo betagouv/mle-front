@@ -508,6 +508,7 @@ Les migrations Drizzle sont appliquées au déploiement via le hook `postdeploy`
 | `0 4 1 * *` | `sync rents` | 1er du mois à 4h |
 | `10 4 1 * *` | `sync students` | 1er du mois à 4h10 |
 | `0 3 * * *` | `sync stats` | Tous les jours à 3h |
+| `30 3 * * *` | `purge-contact-requests` | Tous les jours à 3h30 |
 
 Pour vérifier les crons actifs : `scalingo --app <app> cron-tasks`
 Pour voir les logs d'exécution : `scalingo --app <app> logs --filter cron`

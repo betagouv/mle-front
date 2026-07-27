@@ -2,10 +2,12 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { notFound } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { ContactDetailAbout } from '~/components/bailleur/contacts/contact-detail-about'
 import { ContactDetailActions } from '~/components/bailleur/contacts/contact-detail-actions'
 import { ContactDetailDossierFacile } from '~/components/bailleur/contacts/contact-detail-dossier-facile'
 import { ContactDetailLayout } from '~/components/bailleur/contacts/contact-detail-layout'
+import { EContactSource } from '~/enums/contact-source'
 import { useTRPC } from '~/server/trpc/client'
 
 interface CandidatureDetailProps {
@@ -13,15 +15,15 @@ interface CandidatureDetailProps {
   slug: string
 }
 
-/** Fiche d'une candidature DossierFacile (mode `dossier_facile`). */
 export const CandidatureDetail = ({ id, slug }: CandidatureDetailProps) => {
+  const t = useTranslations('bailleur.contacts')
   const trpc = useTRPC()
   const { data: candidature, isLoading } = useQuery(trpc.bailleur.getCandidature.queryOptions({ id }))
 
   if (isLoading) {
     return (
       <div className="fr-container fr-pb-12w">
-        <p>Chargement...</p>
+        <p>{t('loading')}</p>
       </div>
     )
   }
@@ -30,34 +32,13 @@ export const CandidatureDetail = ({ id, slug }: CandidatureDetailProps) => {
 
   return (
     <ContactDetailLayout
-      studentName={candidature.studentName}
-      status={candidature.status}
+      contact={candidature}
       slug={slug}
-      source="dossier_facile"
-      actions={
-        <ContactDetailActions
-          id={candidature.id}
-          source="dossier_facile"
-          status={candidature.status}
-          dfTenantId={candidature.dfTenantId}
-          reviewedAt={candidature.reviewedAt}
-        />
-      }
+      actions={<ContactDetailActions contact={candidature} source={EContactSource.DOSSIER_FACILE} dfTenantId={candidature.dfTenantId} />}
     >
-      <ContactDetailAbout
-        email={candidature.studentEmail}
-        phone={candidature.studentPhone}
-        birthdate={candidature.studentBirthdate}
-        scholarshipStatus={candidature.scholarshipStatus}
-      />
+      <ContactDetailAbout contact={candidature} />
 
-      <ContactDetailDossierFacile
-        status={candidature.status}
-        dfTenantId={candidature.dfTenantId}
-        hasTenantUrl={candidature.hasTenantUrl}
-        hasPdfUrl={candidature.hasPdfUrl}
-        documents={candidature.documents}
-      />
+      <ContactDetailDossierFacile candidature={candidature} />
     </ContactDetailLayout>
   )
 }

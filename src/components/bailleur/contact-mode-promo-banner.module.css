@@ -1,10 +1,6 @@
-.bannerContainer {
-  display: flex;
-  border-bottom: 1px solid #e3e3fd;
-}
-
-.bannerText {
-  margin: 0;
+.banner {
+  background-color: var(--background-alt-blue-france);
+  color: var(--text-default-info);
 }
 
 .bannerTitle::before {
@@ -14,10 +10,4 @@
 /* .fr-link force --text-action-high-blue-france : on reprend la couleur du bandeau. */
 .bannerLink {
   color: inherit !important;
-}
-
-.bannerContent {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }

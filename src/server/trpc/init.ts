@@ -1,11 +1,16 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { type BailleurPermission, hasPermission } from '~/server/bailleur/permissions'
+import { getClientIp } from '~/server/contacts/rate-limit'
 import { getServerSession } from '~/services/better-auth'
 
-export const createTRPCContext = async () => {
+/**
+ * `opts` est fourni par `fetchRequestHandler` (route HTTP) mais pas par les appels serveur
+ * (prefetch RSC, callers de test) : `clientIp` vaut alors `null`.
+ */
+export const createTRPCContext = async (opts?: { req?: Request }) => {
   const session = await getServerSession()
-  return { session }
+  return { session, clientIp: getClientIp(opts?.req) }
 }
 
 const t = initTRPC.context<Awaited<ReturnType<typeof createTRPCContext>>>().create({

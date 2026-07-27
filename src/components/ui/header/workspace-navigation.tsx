@@ -4,11 +4,11 @@ import MainNavigation, { MainNavigationProps } from '@codegouvfr/react-dsfr/Main
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { FC } from 'react'
-import type { OwnerContactMode } from '~/enums/owner-contact-mode'
+import type { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { buildHref } from '~/utils/preserve-query-params'
 import styles from './navigation.module.css'
 
-export const WorkspaceHeaderNavigation: FC<{ contactMode: OwnerContactMode; canManageUsers?: boolean; isAdmin?: boolean }> = ({
+export const WorkspaceHeaderNavigation: FC<{ contactMode: EOwnerContactMode; canManageUsers?: boolean; isAdmin?: boolean }> = ({
   contactMode,
   canManageUsers = false,
   isAdmin = false,

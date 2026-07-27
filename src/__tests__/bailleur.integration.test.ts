@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { accommodations } from '../server/db/schema/accommodations'
 import { activityLog } from '../server/db/schema/activity-log'
 import { owners } from '../server/db/schema/owners'
@@ -749,7 +750,9 @@ describe('bailleur.setContactMode', () => {
     await createOwner({ name: 'Owner NoPerm', slug: 'owner-no-perm', userId: 'test-gestionnaire-id' })
 
     const noPermCaller = gestionnaireCallerFactory()
-    await expect(noPermCaller.bailleur.setContactMode({ mode: 'contacts' })).rejects.toThrow('Permission denied: manage_applications')
+    await expect(noPermCaller.bailleur.setContactMode({ mode: EOwnerContactMode.CONTACTS })).rejects.toThrow(
+      'Permission denied: manage_applications',
+    )
   })
 
   it('accepts a gestionnaire holding manage_applications', async () => {
@@ -757,7 +760,7 @@ describe('bailleur.setContactMode', () => {
     const owner = await createOwner({ name: 'Owner Perm', slug: 'owner-perm', userId: 'test-gestionnaire-id' })
 
     const permCaller = gestionnaireCallerFactory({ permissions: ['manage_applications'] })
-    const result = await permCaller.bailleur.setContactMode({ mode: 'contacts' })
+    const result = await permCaller.bailleur.setContactMode({ mode: EOwnerContactMode.CONTACTS })
     expect(result.contactMode).toBe('contacts')
 
     const db = getTestDb()
@@ -768,7 +771,7 @@ describe('bailleur.setContactMode', () => {
   it('accepts an owner administrator', async () => {
     await createOwner({ name: 'Owner Admin Mode', slug: 'owner-admin-mode', userId: 'test-owner-id' })
 
-    const result = await ownerCaller.bailleur.setContactMode({ mode: 'contacts' })
+    const result = await ownerCaller.bailleur.setContactMode({ mode: EOwnerContactMode.CONTACTS })
     expect(result.contactMode).toBe('contacts')
   })
 
@@ -776,7 +779,7 @@ describe('bailleur.setContactMode', () => {
     vi.stubEnv('NEXT_PUBLIC_APP_ENV', 'development')
     await createOwner({ name: 'Owner DF Dev', slug: 'owner-df-dev', userId: 'test-owner-id' })
 
-    const result = await ownerCaller.bailleur.setContactMode({ mode: 'dossier_facile' })
+    const result = await ownerCaller.bailleur.setContactMode({ mode: EOwnerContactMode.DOSSIER_FACILE })
     expect(result.contactMode).toBe('dossier_facile')
   })
 
@@ -784,10 +787,12 @@ describe('bailleur.setContactMode', () => {
     vi.stubEnv('NEXT_PUBLIC_APP_ENV', 'production')
     const owner = await createOwner({ name: 'Owner DF Prod', slug: 'owner-df-prod', userId: 'test-owner-id' })
 
-    await expect(ownerCaller.bailleur.setContactMode({ mode: 'dossier_facile' })).rejects.toThrow('DossierFacile is not available yet')
+    await expect(ownerCaller.bailleur.setContactMode({ mode: EOwnerContactMode.DOSSIER_FACILE })).rejects.toThrow(
+      'DossierFacile is not available yet',
+    )
 
     // Les autres modes restent activables.
-    await ownerCaller.bailleur.setContactMode({ mode: 'contacts' })
+    await ownerCaller.bailleur.setContactMode({ mode: EOwnerContactMode.CONTACTS })
     const db = getTestDb()
     const updated = await db.query.owners.findFirst({ where: eq(owners.id, owner.id) })
     expect(updated!.contactMode).toBe('contacts')
