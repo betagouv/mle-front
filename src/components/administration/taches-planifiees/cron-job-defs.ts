@@ -30,6 +30,11 @@ const CRON_JOB_DEF_MAP: Record<CronJobType, Omit<CronJobDef, 'type'>> = {
     description: 'Hausses de disponibilité → jobs d’alerte',
     schedule: 'Tous les jours à 9h00 et 17h00',
   },
+  'purge-contacts': {
+    label: 'Purge RGPD candidatures',
+    description: 'Demandes non confirmées supprimées, expirées anonymisées',
+    schedule: 'Tous les jours à 3h30',
+  },
 }
 
 export const CRON_JOB_DEFS: CronJobDef[] = CRON_JOB_TYPES.map((type) => ({ type, ...CRON_JOB_DEF_MAP[type] }))

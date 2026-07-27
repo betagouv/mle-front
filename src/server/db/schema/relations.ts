@@ -45,7 +45,7 @@ export const housingAidSimulationsRelations = relations(housingAidSimulations, (
 
 export const contactRequestsRelations = relations(contactRequests, ({ one }) => ({
   user: one(user, { fields: [contactRequests.userId], references: [user.id] }),
-  accommodation: one(accommodations, { fields: [contactRequests.accommodationSlug], references: [accommodations.slug] }),
+  accommodation: one(accommodations, { fields: [contactRequests.accommodationId], references: [accommodations.id] }),
 }))
 
 export const dossierFacileTenantsRelations = relations(dossierFacileTenants, ({ one, many }) => ({

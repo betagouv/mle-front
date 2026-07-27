@@ -22,6 +22,7 @@ import { SaveAccommodationFavoriteButton } from '~/components/favorites/save-acc
 import { OwnerDetails } from '~/components/find-student-accomodation/owner-details/owner-details'
 import { JsonLd } from '~/components/seo/json-ld'
 import { getAvailableApartmentTypes } from '~/enums/apartment-type'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { EResidenceType, RESIDENCE_TYPE_LABELS } from '~/enums/residence-type'
 import { getCanonicalUrl } from '~/utils/canonical'
 import { formatCityWithA } from '~/utils/french-contraction'
@@ -197,7 +198,7 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
               isAuthenticated={!!user}
               accommodationSlug={slug}
               availableApartmentTypes={getAvailableApartmentTypes(accommodation.typologies)}
-              contactMode={owner?.contactMode ?? 'none'}
+              contactMode={owner?.contactMode ?? EOwnerContactMode.NONE}
             />
             <NearbyAccommodations nearbyAccommodations={nearbyAccommodations} accommodation={accommodation} />
           </div>

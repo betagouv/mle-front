@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { FC } from 'react'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { hasPermission } from '~/server/bailleur/permissions'
 import { getServerSession } from '~/services/better-auth'
 import { WorkspaceHeaderClient } from './workspace-header-client'
@@ -31,7 +32,7 @@ export const WorkspaceHeaderComponent: FC = async () => {
       adminOwners={adminOwners}
       defaultOwnerId={defaultOwnerId}
       showSwitcher={showSwitcher}
-      contactMode={auth.user.owner?.contactMode ?? 'none'}
+      contactMode={auth.user.owner?.contactMode ?? EOwnerContactMode.NONE}
       canManageUsers={canManageUsers}
       isAdmin={isAdmin}
     />

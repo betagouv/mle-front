@@ -1,6 +1,6 @@
 'use client'
 
-import { colors, fr } from '@codegouvfr/react-dsfr'
+import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import { usePathname } from 'next/navigation'
@@ -32,13 +32,7 @@ export const Banner = () => {
 
   if (!isVisible || pathname.includes('landing')) return null
   return (
-    <div
-      className={clsx(styles.bannerContainer, fr.cx('fr-py-1w'))}
-      style={{
-        backgroundColor: colors.decisions.background.alt.blueFrance.default,
-        color: colors.decisions.text.default.info.default,
-      }}
-    >
+    <div className={clsx(styles.bannerContainer, fr.cx('fr-py-1w'))}>
       <div className={clsx(fr.cx('fr-container'), styles.bannerContent)}>
         <p className={styles.bannerText}>
           <span className={fr.cx('fr-text--bold', 'ri-sparkling-line')}>{t('title')}</span>

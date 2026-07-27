@@ -7,6 +7,7 @@ import { APARTMENT_TYPES } from '~/enums/apartment-type'
 import { DF_TENANT_STATUSES_BLOCKING_APPLICATION, type DFTenantStatus } from '~/enums/dossier-facile-tenant-status'
 import { db } from '~/server/db'
 import { accommodations, accommodationTypologies, dossierFacileApplications, dossierFacileTenants } from '~/server/db/schema'
+import { ensureFavorite } from '~/server/favorites/ensure-favorite'
 import { buildDossierFacileAuthorizationUrl, validateDossierFacileConfig } from '~/server/services/dossier-facile/sync'
 import { getJwtSecret } from '~/server/utils/jwt-secret'
 import { createTRPCRouter, userProcedure } from '../init'
@@ -115,6 +116,9 @@ export const dossierFacileRouter = createTRPCRouter({
         })
         .onConflictDoNothing()
         .returning()
+
+      // Candidater vaut suivi : la résidence rejoint les favoris, où la candidature est restituée.
+      await ensureFavorite(ctx.session.user.id, accommodation.id)
 
       return application ?? null
     }),

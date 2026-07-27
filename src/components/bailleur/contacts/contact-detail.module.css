@@ -1,47 +1,30 @@
-.panel {
-  background: var(--background-default-grey);
-  border: 1px solid var(--border-default-grey);
-  padding: 1.5rem;
+.detailGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(18rem, 1fr);
+  gap: 1rem;
 }
 
-/* Carte d'action : liseré haut bleu + contenu centré. */
-.actions {
-  border-top: 4px solid var(--border-plain-blue-france);
-  text-align: center;
+.actionsPanel {
+  border-top: 5px solid var(--border-plain-blue-france);
 }
 
 .actionsIcon {
   --icon-size: 2rem;
 
-  display: block;
   margin: 0 auto 1rem;
-  color: var(--text-title-blue-france);
-}
-
-.actionsIconError {
-  color: var(--text-default-error);
-}
-
-.actionsIconSuccess {
-  color: var(--text-default-success);
-}
-
-.documents {
-  display: flex;
-  flex-direction: column;
 }
 
 .document {
   border-bottom: 1px solid var(--border-default-grey);
   padding: 0.75rem 0;
-  text-align: left;
 }
 
 .document:last-child {
   border-bottom: none;
 }
 
-.dfLogo {
-  font-size: 1.125rem;
-  color: var(--text-default-grey);
+@media (max-width: 48em) {
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
 }

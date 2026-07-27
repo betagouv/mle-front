@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
 import { SignUpForm } from '~/components/sign-up/sign-up-form'
 import background from '~/images/background-credentials.webp'
+import { getClaimedContactRequest } from '~/server/contacts/claimed-request'
 import styles from '../auth.module.css'
 
 export const generateMetadata = async (): Promise<Metadata> => {
@@ -13,8 +14,12 @@ export const generateMetadata = async (): Promise<Metadata> => {
   return { title: tSignUp('title'), description: tMeta('signUp.description') }
 }
 
-export default async function SignUpPage() {
+export default async function SignUpPage({ searchParams }: { searchParams: Promise<{ claim?: string }> }) {
   const t = await getTranslations('signUp')
+  // `claim` est remis au visiteur après une demande de contact anonyme : on lui réaffiche ses
+  // coordonnées déjà saisies. Le rattachement de la demande au compte, lui, se fera à la
+  // vérification de l'e-mail (voir `link-guest-requests.ts`).
+  const claimed = await getClaimedContactRequest((await searchParams).claim)
   return (
     <>
       <div className={styles.imageContainer}>
@@ -32,7 +37,7 @@ export default async function SignUpPage() {
         </Button>
         <h1>{t('title')}</h1>
         <p>{t('requiredFieldsNotice')}</p>
-        <SignUpForm />
+        <SignUpForm prefill={claimed} />
       </div>
     </>
   )

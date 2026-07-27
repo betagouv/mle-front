@@ -23,6 +23,7 @@ import { sendAdminResetPasswordEmail, sendOwnerWelcomeEmail } from '~/server/ser
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '~/server/utils/slug'
 import { adminProcedure, createTRPCRouter } from '../init'
+import { adminCandidaturesRouter } from './admin-candidatures'
 import { consumersRouter } from './admin-consumers'
 
 const PAGE_SIZE = 20
@@ -1084,8 +1085,9 @@ const importsRouter = createTRPCRouter({
     return db.select().from(importJobs).where(inArray(importJobs.type, IMPORT_JOB_TYPES)).orderBy(desc(importJobs.createdAt)).limit(50)
   }),
 
+  // Pas de garde `FEATURES.csvImport` ici : ce détail sert aussi les tâches planifiées, qui ne
+  // dépendent pas du flag d'import CSV.
   getById: adminProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
-    if (!FEATURES.csvImport) throw new TRPCError({ code: 'NOT_FOUND' })
     const [job] = await db.select().from(importJobs).where(eq(importJobs.id, input.id)).limit(1)
     if (!job) throw new TRPCError({ code: 'NOT_FOUND' })
     return job
@@ -1218,4 +1220,5 @@ export const adminRouter = createTRPCRouter({
   imports: importsRouter,
   feedback: feedbackRouter,
   consumers: consumersRouter,
+  candidatures: adminCandidaturesRouter,
 })
