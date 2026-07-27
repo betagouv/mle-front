@@ -5,12 +5,12 @@ import Button from '@codegouvfr/react-dsfr/Button'
 import { PasswordInput } from '@codegouvfr/react-dsfr/blocks/PasswordInput'
 import { Input } from '@codegouvfr/react-dsfr/Input'
 import { zodResolver } from '@hookform/resolvers/zod'
-import clsx from 'clsx'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { FC } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { tss } from 'tss-react'
+import { usePasswordRuleMessages } from '~/hooks/use-password-rule-messages'
 import { useStudentRegistration } from '~/hooks/use-student-registration'
 import { ZSignUpForm } from '~/schemas/sign-up/sign-up'
 
@@ -35,16 +35,12 @@ export const SignUpForm: FC = () => {
 
   const { errors } = formState
   const { lastname, firstname, email, password } = errors || {}
+  const passwordRules = usePasswordRuleMessages(!!password)
   return (
     <FormProvider {...loginForm}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Input
-          label={
-            <>
-              {t('labels.lastname')}
-              &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-            </>
-          }
+          label={t('labels.lastname')}
           state={lastname ? 'error' : undefined}
           stateRelatedMessage={lastname?.message}
           nativeInputProps={{
@@ -52,12 +48,7 @@ export const SignUpForm: FC = () => {
           }}
         />
         <Input
-          label={
-            <>
-              {t('labels.firstname')}
-              &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-            </>
-          }
+          label={t('labels.firstname')}
           state={firstname ? 'error' : undefined}
           stateRelatedMessage={firstname?.message}
           nativeInputProps={{
@@ -65,12 +56,7 @@ export const SignUpForm: FC = () => {
           }}
         />
         <Input
-          label={
-            <>
-              {t('labels.email')}
-              &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-            </>
-          }
+          label={t('labels.email')}
           state={email ? 'error' : undefined}
           stateRelatedMessage={email?.message}
           nativeInputProps={{
@@ -79,15 +65,9 @@ export const SignUpForm: FC = () => {
         />
 
         <PasswordInput
-          hintText={t('labels.passwordHintText')}
-          label={
-            <>
-              {t('labels.password')}
-              &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>
-            </>
-          }
-          messagesHint=""
-          messages={password ? [{ severity: 'error', message: password.message ?? '' }] : []}
+          label={t('labels.password')}
+          messagesHint={passwordRules.messagesHint}
+          messages={passwordRules.messages}
           nativeInputProps={{
             ...register('password'),
           }}
@@ -118,11 +98,9 @@ const useStyles = tss.create({
     flexDirection: 'column',
     gap: '1rem',
   },
-  required: {
-    color: 'red',
-  },
   ctasContainer: {
     display: 'flex',
+    marginTop: '1.5rem',
     '@media (min-width: 768px)': {
       justifyContent: 'space-between',
       alignItems: 'center',

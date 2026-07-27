@@ -1,16 +1,15 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import Alert from '@codegouvfr/react-dsfr/Alert'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { PasswordInput } from '@codegouvfr/react-dsfr/blocks/PasswordInput'
 import { zodResolver } from '@hookform/resolvers/zod'
-import clsx from 'clsx'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { FC } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { tss } from 'tss-react'
+import { usePasswordRuleMessages } from '~/hooks/use-password-rule-messages'
 import { useResetPassword } from '~/hooks/use-reset-password'
 import { trackEvent } from '~/lib/tracking'
 import { ZResetPasswordForm } from '~/schemas/reset-password/reset-password'
@@ -53,32 +52,22 @@ export const ResetPasswordForm: FC = () => {
 
   const { errors } = resetPasswordForm.formState
   const { password, confirmPassword } = errors || {}
+  const passwordRules = usePasswordRuleMessages(!!password)
   return (
     <FormProvider {...resetPasswordForm}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={classes.formContainer}>
           <div className={classes.inputContainer}>
             <PasswordInput
-              hintText={t('labels.newPasswordDescription')}
-              label={
-                <>
-                  {t('labels.newPassword')}
-                  &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-                </>
-              }
-              messagesHint=""
-              messages={password ? [{ severity: 'error', message: password.message ?? '' }] : []}
+              label={t('labels.newPassword')}
+              messagesHint={passwordRules.messagesHint}
+              messages={passwordRules.messages}
               nativeInputProps={{
                 ...register('password'),
               }}
             />
             <PasswordInput
-              label={
-                <>
-                  {t('labels.confirmPassword')}
-                  &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-                </>
-              }
+              label={t('labels.confirmPassword')}
               messagesHint=""
               messages={confirmPassword ? [{ severity: 'error', message: confirmPassword.message ?? '' }] : []}
               nativeInputProps={{
@@ -108,8 +97,5 @@ const useStyles = tss.create({
     display: 'flex',
     flexDirection: 'column',
     gap: '2rem',
-  },
-  required: {
-    color: 'red',
   },
 })

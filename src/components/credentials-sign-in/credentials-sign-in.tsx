@@ -7,7 +7,6 @@ import { PasswordInput } from '@codegouvfr/react-dsfr/blocks/PasswordInput'
 import { Input } from '@codegouvfr/react-dsfr/Input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -128,12 +127,7 @@ export const CredentialsSignInForm: FC = () => {
           )}
           <div className={classes.inputContainer}>
             <Input
-              label={
-                <>
-                  {t('labels.email')}
-                  &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-                </>
-              }
+              label={t('labels.email')}
               state={formState.errors.email ? 'error' : undefined}
               stateRelatedMessage={formState.errors.email?.message}
               nativeInputProps={{
@@ -141,12 +135,7 @@ export const CredentialsSignInForm: FC = () => {
               }}
             />
             <PasswordInput
-              label={
-                <>
-                  {t('labels.password')}
-                  &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-                </>
-              }
+              label={t('labels.password')}
               messagesHint=""
               messages={formState.errors.password ? [{ severity: 'error', message: formState.errors.password.message ?? '' }] : []}
               nativeInputProps={{
@@ -178,9 +167,6 @@ const useStyles = tss.create({
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
-  },
-  required: {
-    color: 'red',
   },
   alertContent: {
     display: 'flex',
