@@ -150,6 +150,38 @@ describe('ramsese service — getEtablissementsSuperieurByCodePostal', () => {
     expect(etab?.denomination).toBe('Université de Montpellier')
   })
 
+  it('exclut les établissements non ouverts (ETAT ≠ 1)', async () => {
+    const UAI_DETAIL_FERME = {
+      IDENTIFICATION: {
+        NUMERO_UAI: '0340003C',
+        ETAT: '3', // fermé
+        NATURES: [{ CODE: '520' }],
+        APPELLATIONS_OFFICIELLES: [{ VALEUR: 'Ancienne école supérieure' }],
+      },
+      LOCALISATION: { CODE_POSTAL: '34090', LOCALITE_ACHEMINEMENT: 'MONTPELLIER' },
+    }
+
+    fetchMock
+      .mockResolvedValueOnce(jsonResponse([{ code: '34172', nom: 'Montpellier' }]))
+      .mockResolvedValueOnce(jsonResponse([]))
+      .mockResolvedValueOnce(jsonResponse({ UAIS: ['0341089Z', '0340003C'] }))
+      .mockResolvedValueOnce(jsonResponse({ ...UAI_DETAIL_SUP, IDENTIFICATION: { ...UAI_DETAIL_SUP.IDENTIFICATION, ETAT: '1' } }))
+      .mockResolvedValueOnce(jsonResponse(UAI_DETAIL_FERME))
+
+    const { getEtablissementsSuperieurByCodePostal } = await import('./ramsese')
+    const result = await getEtablissementsSuperieurByCodePostal('34090')
+
+    expect(result.map((e) => e.numeroUai)).toEqual(['0341089Z'])
+  })
+
+  it('considère un ETAT absent comme ouvert (champ optionnel côté API)', async () => {
+    const { _internal } = await import('./ramsese')
+    expect(_internal.isOpenUai({ IDENTIFICATION: { NUMERO_UAI: '0341089Z' } })).toBe(true)
+    expect(_internal.isOpenUai({ IDENTIFICATION: { NUMERO_UAI: '0341089Z', ETAT: '1' } })).toBe(true)
+    expect(_internal.isOpenUai({ IDENTIFICATION: { NUMERO_UAI: '0341089Z', ETAT: '2' } })).toBe(false) // à ouvrir
+    expect(_internal.isOpenUai({ IDENTIFICATION: { NUMERO_UAI: '0341089Z', ETAT: '3' } })).toBe(false) // fermé
+  })
+
   it('exclut les natures fermées (DATE_FIN renseignée)', async () => {
     const { _internal } = await import('./ramsese')
     const etab = _internal.toEtablissement({

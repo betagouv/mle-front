@@ -17,9 +17,19 @@ import { env } from '~/server/env'
  * les natures sur le préfixe « 5 » à l'étape 3 (source de vérité complète, pas de
  * liste de codes à maintenir). Un jeu de natures explicite peut être fourni pour
  * pré-filtrer côté API et réduire le nombre d'appels détail.
+ *
+ * Même logique pour l'ouverture : l'endpoint filtres n'expose pas de critère
+ * « établissement ouvert », l'état n'est disponible qu'au détail (`IDENTIFICATION.ETAT`),
+ * donc l'exclusion des fermés se fait aussi à l'étape 3.
  */
 
 const SUPERIEUR_NATURE_PREFIX = '5'
+/**
+ * Nomenclature RAMSESE « état de l'UAI » : 1 = ouvert, 2 = à ouvrir, 3 = fermé.
+ * Un établissement fermé ou pas encore ouvert n'a rien à faire dans le bloc
+ * « à proximité ».
+ */
+const ETAT_OUVERT = '1'
 /**
  * Libellés « bouche-trou » saisis dans RAMSESE quand le nom réel n'est pas connu.
  * Comparés sur une forme normalisée (sans accents, casse et ponctuation ignorées).
@@ -66,6 +76,16 @@ function normalizeDenomination(value: string): string {
 function isPlaceholderDenomination(value: string | null): boolean {
   if (!value) return true
   return PLACEHOLDER_DENOMINATIONS.has(normalizeDenomination(value))
+}
+
+/**
+ * `true` si l'UAI est ouvert. Un `ETAT` absent est considéré ouvert : le champ est
+ * optionnel côté API, mieux vaut afficher un établissement d'état inconnu que vider
+ * le bloc si RAMSESE cesse de le servir.
+ */
+function isOpenUai(uai: TUaiWs): boolean {
+  const etat = uai.IDENTIFICATION?.ETAT
+  return !etat || etat === ETAT_OUVERT
 }
 
 /** Codes actifs (sans DATE_FIN) d'une liste de codes historisés. */
@@ -221,7 +241,7 @@ export async function getEtablissementsSuperieurByCodePostal(
     naturesFilter ? codes.some((c) => naturesFilter.has(c)) : codes.some((c) => c.startsWith(SUPERIEUR_NATURE_PREFIX))
 
   return details
-    .map((uai) => (uai ? toEtablissement(uai) : null))
+    .map((uai) => (uai && isOpenUai(uai) ? toEtablissement(uai) : null))
     .filter((e): e is TEtablissementSuperieur => e !== null && isSuperieur(e.natureCodes) && !isPlaceholderDenomination(e.denomination))
 }
 
@@ -233,4 +253,5 @@ export const _internal = {
   toEtablissement,
   mapWithConcurrency,
   isPlaceholderDenomination,
+  isOpenUai,
 }
