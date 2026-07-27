@@ -10,11 +10,7 @@ export default async function ForgotPasswordPage() {
   return (
     <div className={clsx(styles.container, fr.cx('fr-container'))}>
       <h1>{t('title')}</h1>
-      <p>
-        {t('subTitlePart1')}
-        &nbsp;<span className={clsx(fr.cx('fr-text--bold'), styles.required)}>*</span>
-        &nbsp;{t('subTitlePart2')}
-      </p>
+      <p>{t('requiredFieldsNotice')}</p>
       <ForgotPasswordForm />
       <hr className={fr.cx('fr-mt-3w')} />
       <Button priority="secondary" iconPosition="left" iconId="ri-arrow-left-line" linkProps={{ href: '/se-connecter' }}>

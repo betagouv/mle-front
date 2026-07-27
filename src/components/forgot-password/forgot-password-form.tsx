@@ -1,11 +1,9 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import Alert from '@codegouvfr/react-dsfr/Alert'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { Input } from '@codegouvfr/react-dsfr/Input'
 import { zodResolver } from '@hookform/resolvers/zod'
-import clsx from 'clsx'
 import { useTranslations } from 'next-intl'
 import { FC, ReactNode } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
@@ -45,12 +43,7 @@ export const ForgotPasswordForm: FC = () => {
         <div className={classes.formContainer}>
           <div className={classes.inputContainer}>
             <Input
-              label={
-                <>
-                  {t('labels.email')}
-                  &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-                </>
-              }
+              label={t('labels.email')}
               nativeInputProps={{
                 ...register('email'),
               }}
@@ -79,8 +72,5 @@ const useStyles = tss.create({
     display: 'flex',
     flexDirection: 'column',
     gap: '2rem',
-  },
-  required: {
-    color: 'red',
   },
 })
