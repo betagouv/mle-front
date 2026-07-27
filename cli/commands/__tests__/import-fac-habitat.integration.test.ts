@@ -84,7 +84,7 @@ describe('import-fac-habitat integration', () => {
   it('creates accommodation and external source from JSON file', async () => {
     const db = getTestDb()
 
-    await createOwner({ name: 'FAC HABITAT', slug: 'fac-habitat' })
+    await createOwner({ name: 'Fac-Habitat', slug: 'fac-habitat' })
 
     const filePath = writeTmpJson([makeResidence()])
     mockGeocoder()
@@ -128,7 +128,7 @@ describe('import-fac-habitat integration', () => {
   it('updates existing accommodation on re-import', async () => {
     const db = getTestDb()
 
-    await createOwner({ name: 'FAC HABITAT', slug: 'fac-habitat-2' })
+    await createOwner({ name: 'Fac-Habitat', slug: 'fac-habitat-2' })
 
     const filePath1 = writeTmpJson([makeResidence({ id: 42, name: 'Résidence Lune' })])
     mockGeocoder()
@@ -161,7 +161,7 @@ describe('import-fac-habitat integration', () => {
 
     expect(result.created).toBe(1)
 
-    const ownerRows = await db.select().from(owners).where(eq(owners.name, 'FAC HABITAT'))
+    const ownerRows = await db.select().from(owners).where(eq(owners.name, 'Fac-Habitat'))
     expect(ownerRows).toHaveLength(1)
     expect(ownerRows[0].slug).toBe('fac-habitat')
   })
@@ -169,7 +169,7 @@ describe('import-fac-habitat integration', () => {
   it('handles typology grouping correctly', async () => {
     const db = getTestDb()
 
-    await createOwner({ name: 'FAC HABITAT', slug: 'fac-habitat-typo' })
+    await createOwner({ name: 'Fac-Habitat', slug: 'fac-habitat-typo' })
 
     const residence = makeResidence({
       id: 100,
@@ -219,7 +219,7 @@ describe('import-fac-habitat integration', () => {
   it('dry-run does not modify the database', async () => {
     const db = getTestDb()
 
-    await createOwner({ name: 'FAC HABITAT', slug: 'fac-habitat-dry' })
+    await createOwner({ name: 'Fac-Habitat', slug: 'fac-habitat-dry' })
 
     const filePath = writeTmpJson([makeResidence({ id: 200 }), makeResidence({ id: 201 })])
     mockGeocoder()
@@ -245,7 +245,7 @@ describe('import-fac-habitat integration', () => {
   it('handles multiple residences with mixed create/update', async () => {
     const db = getTestDb()
 
-    const owner = await createOwner({ name: 'FAC HABITAT', slug: 'fac-habitat-mix' })
+    const owner = await createOwner({ name: 'Fac-Habitat', slug: 'fac-habitat-mix' })
 
     const existing = await createAccommodation({
       name: 'Résidence Existante',
@@ -275,7 +275,7 @@ describe('import-fac-habitat integration', () => {
   })
 
   it('records errors without stopping the import', async () => {
-    await createOwner({ name: 'FAC HABITAT', slug: 'fac-habitat-err' })
+    await createOwner({ name: 'Fac-Habitat', slug: 'fac-habitat-err' })
 
     const filePath = writeTmpJson([makeResidence({ id: 601 }), makeResidence({ id: 602 })])
 
@@ -298,7 +298,7 @@ describe('import-fac-habitat integration', () => {
   it('Available fields: null when all sources absent, sum (incl. 0) when any present', async () => {
     const db = getTestDb()
 
-    await createOwner({ name: 'FAC HABITAT', slug: 'fac-habitat-available' })
+    await createOwner({ name: 'Fac-Habitat', slug: 'fac-habitat-available' })
 
     const residence = makeResidence({
       id: 9001,
@@ -332,7 +332,7 @@ describe('import-fac-habitat integration', () => {
   it('slug must not change on re-import with same name', async () => {
     const db = getTestDb()
 
-    await createOwner({ name: 'FAC HABITAT', slug: 'fac-habitat-slug' })
+    await createOwner({ name: 'Fac-Habitat', slug: 'fac-habitat-slug' })
 
     const residence = makeResidence({ id: 7001, name: 'Résidence Stabilité' })
 
