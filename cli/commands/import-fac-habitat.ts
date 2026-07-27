@@ -15,7 +15,7 @@ import { getOrCreateOwner } from '../utils/get-or-create-owner'
 import { pushResidenceEntry } from './import-utils'
 
 const SOURCE = 'fac-habitat'
-const OWNER_NAME = 'FAC HABITAT'
+const OWNER_NAME = 'Fac-Habitat'
 const DEFAULT_REMOTE_PATH = '/export/monlogementetudiant.json'
 
 interface FacHabitatResidence {
