@@ -1,0 +1,34 @@
+.filter {
+  margin: 0;
+}
+
+.filter :global(.fr-fieldset__legend) {
+  padding: 0;
+  margin: 0;
+  font-weight: normal;
+}
+
+.filter :global(.fr-fieldset__content) {
+  margin: 0;
+  gap: 0.5rem;
+}
+
+/* Desktop : les deux radios sur une seule ligne. */
+@media (min-width: 768px) {
+  .filter :global(.fr-fieldset__content) {
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+}
+
+/* Mobile : radios empilés en colonne. */
+@media (max-width: 767px) {
+  .filter :global(.fr-fieldset__content) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.filter :global(.fr-fieldset__element) {
+  margin: 0;
+}
