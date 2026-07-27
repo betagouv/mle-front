@@ -1,3 +1,4 @@
+import { Alert } from '@codegouvfr/react-dsfr/Alert'
 import Button, { ButtonProps } from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import { JSX } from 'react'
@@ -5,13 +6,6 @@ import { toast } from 'react-hot-toast'
 import styles from './toaster.module.css'
 
 export type ToastPriority = 'info' | 'warning' | 'error' | 'success'
-
-const icons: { [key in ToastPriority]: string } = {
-  info: 'fr-icon-info-fill',
-  warning: 'fr-icon-warning-fill',
-  error: 'fr-icon-error-fill',
-  success: 'fr-icon-checkbox-circle-fill',
-}
 
 export const createToast = ({
   priority,
@@ -24,19 +18,27 @@ export const createToast = ({
   action?: ButtonProps
   duration?: number
 }) => {
-  toast(
-    action ? (
-      <div className={clsx(styles.toastContent, 'fr-no-print')}>
-        <span>{message}</span>
-        <Button className={clsx('fr-ml-1w', styles.action)} priority="tertiary no outline" size="small" {...action} />
+  toast.custom(
+    (t) => (
+      <div className={clsx(styles.toast, 'fr-no-print')}>
+        <Alert
+          small
+          closable
+          severity={priority}
+          onClose={() => toast.dismiss(t.id)}
+          description={
+            action ? (
+              <span className={styles.toastContent}>
+                {message}
+                <Button className={clsx('fr-ml-1w', styles.action)} priority="tertiary no outline" size="small" {...action} />
+              </span>
+            ) : (
+              (message ?? '')
+            )
+          }
+        />
       </div>
-    ) : (
-      <span className={clsx(styles.toastContent, 'fr-no-print')}>{message}</span>
     ),
-    {
-      duration,
-      className: clsx(styles.toast, styles[priority]),
-      icon: <span className={clsx(styles.icon, icons[priority])} />,
-    },
+    { duration },
   )
 }
