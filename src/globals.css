@@ -34,7 +34,7 @@ span[class^="fr-"]::before {
 }
 
 .primaryBackgroundColor {
-  background-color: #5858ad;
+  background-color: #313178;
 }
 
 .breadcrumbInverted .fr-breadcrumb__link[aria-current]:not([aria-current="false"]) {
