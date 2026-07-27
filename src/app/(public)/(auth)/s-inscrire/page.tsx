@@ -31,11 +31,7 @@ export default async function SignUpPage() {
           {t('backToLogin')}
         </Button>
         <h1>{t('title')}</h1>
-        <p>
-          {t('subTitlePart1')}
-          &nbsp;<span className={clsx(fr.cx('fr-text--bold'), styles.required)}>*</span>
-          &nbsp;{t('subTitlePart2')}
-        </p>
+        <p>{t('requiredFieldsNotice')}</p>
         <SignUpForm />
       </div>
     </>
