@@ -2,12 +2,13 @@
 
 import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
+import { PasswordInput } from '@codegouvfr/react-dsfr/blocks/PasswordInput'
 import { Input } from '@codegouvfr/react-dsfr/Input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
-import { FC, useState } from 'react'
+import { FC } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { tss } from 'tss-react'
 import { useStudentRegistration } from '~/hooks/use-student-registration'
@@ -15,7 +16,6 @@ import { ZSignUpForm } from '~/schemas/sign-up/sign-up'
 
 export const SignUpForm: FC = () => {
   const t = useTranslations('signUp')
-  const [showPassword, setShowPassword] = useState(false)
   const { mutateAsync, isLoading } = useStudentRegistration()
 
   const { classes } = useStyles()
@@ -78,16 +78,7 @@ export const SignUpForm: FC = () => {
           }}
         />
 
-        <Input
-          addon={
-            <Button
-              iconId="ri-eye-line"
-              priority="tertiary"
-              type="button"
-              title="Afficher le mot de passe"
-              nativeButtonProps={{ onClick: () => setShowPassword(!showPassword) }}
-            />
-          }
+        <PasswordInput
           hintText={t('labels.passwordHintText')}
           label={
             <>
@@ -95,11 +86,10 @@ export const SignUpForm: FC = () => {
               &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>
             </>
           }
-          state={password ? 'error' : undefined}
-          stateRelatedMessage={password?.message}
+          messagesHint=""
+          messages={password ? [{ severity: 'error', message: password.message ?? '' }] : []}
           nativeInputProps={{
             ...register('password'),
-            type: showPassword ? 'text' : 'password',
           }}
         />
         <div className={classes.ctasContainer}>
