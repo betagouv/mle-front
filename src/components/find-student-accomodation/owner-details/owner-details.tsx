@@ -45,7 +45,7 @@ export const OwnerDetails = async ({
   contactMode,
   updatedAt,
 }: OwnerDetailsProps) => {
-  const [t, locale] = await Promise.all([getTranslations('accomodation'), getLocale()])
+  const [t, tA11y, locale] = await Promise.all([getTranslations('accomodation'), getTranslations('accessibility'), getLocale()])
   const ownerUrl = externalUrl || owner?.url
   const isDossierFacile = contactMode === EOwnerContactMode.DOSSIER_FACILE
   const badgeAvailability = (
@@ -68,7 +68,13 @@ export const OwnerDetails = async ({
         <span>{t('sidebar.proposedBy')}</span>
         {owner?.imageBase64 ? (
           owner.landingUrl ? (
-            <Link className="fr-link fr-link--no-underline" href={owner.landingUrl} target="_blank" rel="noreferrer">
+            <Link
+              className="fr-link fr-link--no-underline"
+              href={owner.landingUrl}
+              target="_blank"
+              rel="noreferrer"
+              title={tA11y('linkNewWindow', { label: owner.name })}
+            >
               <Image className={styles.image} src={owner.imageBase64} alt={owner.name} width={201} height={90} quality={100} />
             </Link>
           ) : (

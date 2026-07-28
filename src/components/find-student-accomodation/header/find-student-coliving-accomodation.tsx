@@ -1,10 +1,10 @@
 'use client'
 
-import { ToggleSwitch } from '@codegouvfr/react-dsfr/ToggleSwitch'
 import { useTranslations } from 'next-intl'
 import { parseAsBoolean, parseAsInteger, useQueryStates } from 'nuqs'
 import { FC } from 'react'
 import { tss } from 'tss-react'
+import { ToggleSwitch } from '~/components/ui/toggle-switch'
 import { trackEvent } from '~/lib/tracking'
 
 type FindStudentColivingAccomodationSwitchProps = {
@@ -29,6 +29,7 @@ export const FindStudentColivingAccomodationSwitch: FC<FindStudentColivingAccomo
     <ToggleSwitch
       classes={{ label: classes.label }}
       inputTitle="coliving"
+      description={t('header.sharedDescription')}
       showCheckedHint={false}
       label={t('header.shared')}
       labelPosition="right"

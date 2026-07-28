@@ -1,6 +1,5 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { PasswordInput } from '@codegouvfr/react-dsfr/blocks/PasswordInput'
 import { Input } from '@codegouvfr/react-dsfr/Input'
@@ -90,7 +89,7 @@ export const SignUpForm: FC<Props> = ({ prefill }) => {
             {isLoading ? 'Inscription en cours...' : t('labels.cta')}
           </Button>
           <div>
-            <Link className={fr.cx('fr-link')} href="/politique-de-confidentialite">
+            <Link className="fr-link" href="/politique-de-confidentialite">
               {t('labels.privacyPolicy')}
             </Link>
           </div>

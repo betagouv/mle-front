@@ -4,13 +4,14 @@ import { getLatestWordpressPosts } from '~/server/services/wordpress-posts'
 
 export const StudentInformations = async () => {
   const t = await getTranslations('student.informations')
+  const tA11y = await getTranslations('accessibility')
   const posts = await getLatestWordpressPosts({ limit: 4 })
 
   if (posts.length === 0) return null
 
   return (
     <div className="fr-flex fr-direction-column fr-flex-gap-4v fr-pt-4w fr-px-6w fr-pb-6w">
-      <span className="fr-h4">{t('title')}</span>
+      <h2 className="fr-h4">{t('title')}</h2>
       <div className="fr-grid-row fr-grid-row--gutters">
         {posts.map((post) => {
           const commonCardProps = {
@@ -28,6 +29,7 @@ export const StudentInformations = async () => {
               href: post.link,
               target: '_blank' as const,
               rel: 'noopener noreferrer',
+              title: tA11y('linkNewWindow', { label: post.title }),
             },
             size: 'medium' as const,
             title: post.title,

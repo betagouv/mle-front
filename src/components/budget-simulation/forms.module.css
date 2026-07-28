@@ -25,3 +25,11 @@
 .select {
   max-width: 300px;
 }
+
+/* Le regroupement des lignes en <fieldset> est sémantique : il ne doit rien changer au rendu. */
+.rowFieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}

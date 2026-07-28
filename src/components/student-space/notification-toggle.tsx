@@ -29,15 +29,17 @@ export const NotificationToggle = ({ email, initialChecked, preference, translat
     <div className="fr-flex fr-direction-column fr-flex-gap-0.5v fr-mt-8v">
       <ToggleSwitch
         label={t('notificationToggle')}
+        helperText={
+          <>
+            {t('notificationEmailPrefix')} <strong>{email}</strong>
+          </>
+        }
         inputTitle={inputTitle}
         checked={checked}
         onChange={handleChange}
         showCheckedHint={false}
         labelPosition="left"
       />
-      <span className="fr-text--sm fr-text-mention--grey">
-        {t('notificationEmailPrefix')} <strong>{email}</strong>
-      </span>
     </div>
   )
 }

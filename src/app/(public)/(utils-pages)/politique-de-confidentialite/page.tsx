@@ -1,8 +1,8 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import { Breadcrumb } from '@codegouvfr/react-dsfr/Breadcrumb'
 import { Table } from '@codegouvfr/react-dsfr/Table'
 import { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
+import { NewWindowHint } from '~/components/ui/new-window'
 import styles from '../pages.module.css'
 
 export const generateMetadata = async (): Promise<Metadata> => {
@@ -13,7 +13,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
 export default async function PolitiqueDeConfidentialite() {
   const breadcrumbT = await getTranslations('breadcrumbs')
   return (
-    <div className={fr.cx('fr-container')}>
+    <div className="fr-container">
       <Breadcrumb
         currentPageLabel={breadcrumbT('privacyPolicy')}
         homeLinkProps={{ href: '/' }}
@@ -23,10 +23,10 @@ export default async function PolitiqueDeConfidentialite() {
       <div className={styles.borderBottom}>
         <h1>Politique de confidentialité</h1>
         <p>
-          Mis à jour le <span className={fr.cx('fr-text--bold')}>30/06/25</span>
+          Mis à jour le <span className="fr-text--bold">30/06/25</span>
         </p>
       </div>
-      <div className={fr.cx('fr-py-3w')}>
+      <div className="fr-py-3w">
         <div className={styles.content}>
           <p>
             La plateforme <strong>« MonLogementEtudiant »</strong> s'engage au respect des dispositions en vigueur relatives à la protection
@@ -38,20 +38,20 @@ export default async function PolitiqueDeConfidentialite() {
             (DGESIP), représentée par Monsieur Olivier Ginez.
           </p>
 
-          <h2 className={fr.cx('fr-mt-6w', 'fr-mb-2w')}>Pourquoi nous traitons les données ?</h2>
+          <h2 className="fr-mt-6w fr-mb-2w">Pourquoi nous traitons les données ?</h2>
           <p>
             La plateforme recueille différentes informations pour accomplir sa mission. Celle-ci se résume à faciliter l'accès au logement
             des étudiants. Elle effectue des traitements de données à caractère personnel pour :
           </p>
-          <ul className={fr.cx('fr-ml-6w')}>
+          <ul className="fr-ml-6w">
             <li>Envoyer des courriels aux personnes concernées qui souhaitent suivre les actualités ;</li>
             <li>Effectuer des simulations ;</li>
             <li>Permettre aux personnes concernées de contacter la Plateforme.</li>
           </ul>
 
-          <h2 className={fr.cx('fr-mt-6w', 'fr-mb-2w')}>Quelles données traitons nous ?</h2>
+          <h2 className="fr-mt-6w fr-mb-2w">Quelles données traitons nous ?</h2>
           <p>Les données à caractère personnel collectées par la plateforme sont :</p>
-          <ul className={fr.cx('fr-ml-6w')}>
+          <ul className="fr-ml-6w">
             <li>
               <strong>Les données de localisation :</strong> Elles sont collectées afin de proposer des services personnalisés relativement
               aux lieux de recherche ;
@@ -66,9 +66,9 @@ export default async function PolitiqueDeConfidentialite() {
             </li>
           </ul>
 
-          <h2 className={fr.cx('fr-mt-6w', 'fr-mb-2w')}>Sur quelle base traitons-nous vos données ?</h2>
+          <h2 className="fr-mt-6w fr-mb-2w">Sur quelle base traitons-nous vos données ?</h2>
           <p>Les traitements sont justifiés car :</p>
-          <ul className={fr.cx('fr-ml-6w')}>
+          <ul className="fr-ml-6w">
             <li>
               Pour les simulations : l'exécution de la mission d'intérêt public (faciliter l'accès au logement des étudiants) relève de
               l'exercice d'une autorité publique
@@ -79,12 +79,12 @@ export default async function PolitiqueDeConfidentialite() {
             </li>
           </ul>
 
-          <h2 className={fr.cx('fr-mt-6w', 'fr-mb-2w')}>Quels sont vos droits ?</h2>
+          <h2 className="fr-mt-6w fr-mb-2w">Quels sont vos droits ?</h2>
           <p>
             Conformément aux dispositions du RGPD et de la loi informatique et libertés, les utilisateurs de la plateforme&nbsp;
             <strong>MonLogementEtudiant</strong> disposent des droits suivants :
           </p>
-          <ul className={fr.cx('fr-ml-6w')}>
+          <ul className="fr-ml-6w">
             <li>Droit à l'information ;</li>
             <li>Droit d'accès ;</li>
             <li>Droit d'effacement ;</li>
@@ -95,7 +95,7 @@ export default async function PolitiqueDeConfidentialite() {
             ou légaux. Concernant les newsletters, un lien de désinscription accompagne les courriels. En cas d'insatisfaction, en réponse à
             l'un de ces droits, ou en cas de contestation sur l'usage des données, vous avez la possibilité d'adresser les demandes au :
           </p>
-          <ul className={fr.cx('fr-ml-6w', 'fr-mb-2w')}>
+          <ul className="fr-ml-6w fr-mb-2w">
             <li>
               DPO :&nbsp;
               <a href="mailto:dpo@monlogementetudiant.beta.gouv.fr" className="fr-link">
@@ -104,8 +104,9 @@ export default async function PolitiqueDeConfidentialite() {
             </li>
             <li>
               À la CNIL :&nbsp;
-              <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer" className={fr.cx('fr-link')}>
+              <a href="https://www.cnil.fr/fr/plaintes" target="_blank" rel="noopener noreferrer" className="fr-link">
                 https://www.cnil.fr/fr/plaintes
+                <NewWindowHint />
               </a>
             </li>
           </ul>
@@ -115,13 +116,14 @@ export default async function PolitiqueDeConfidentialite() {
               href="https://www.cnil.fr/fr/modele/courrier/exercer-son-droit-dacces"
               target="_blank"
               rel="noopener noreferrer"
-              className={fr.cx('fr-link')}
+              className="fr-link"
             >
               https://www.cnil.fr/fr/modele/courrier/exercer-son-droit-dacces
+              <NewWindowHint />
             </a>
           </p>
 
-          <h2 className={fr.cx('fr-mt-6w', 'fr-mb-2w')}>Combien de temps conservons-nous les données ?</h2>
+          <h2 className="fr-mt-6w fr-mb-2w">Combien de temps conservons-nous les données ?</h2>
           <Table
             noCaption
             fixed
@@ -131,7 +133,7 @@ export default async function PolitiqueDeConfidentialite() {
               [
                 <>
                   Données relatives au contact
-                  <ul className={fr.cx('fr-ml-2w', 'fr-mb-0')}>
+                  <ul className="fr-ml-2w fr-mb-0">
                     <li>courriel</li>
                     <li>Newsletter</li>
                   </ul>
@@ -148,10 +150,10 @@ export default async function PolitiqueDeConfidentialite() {
                 '13 mois',
               ],
             ]}
-            className={fr.cx('fr-mb-4w')}
+            className="fr-mb-4w"
           />
 
-          <h2 className={fr.cx('fr-mt-6w', 'fr-mb-2w')}>Quels sont nos sous-traitants ?</h2>
+          <h2 className="fr-mt-6w fr-mb-2w">Quels sont nos sous-traitants ?</h2>
           <p>
             Les membres de l'équipe de la Plateforme <strong>"MonLogementEtudiant"</strong> ont accès aux données. Hormis ceux-ci, les
             personnes suivantes auront accès aux données :
@@ -169,33 +171,30 @@ export default async function PolitiqueDeConfidentialite() {
                   href="https://scalingo.com/fr/contrat-gestion-traitements-donnees-personnelles"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={fr.cx('fr-link')}
+                  className="fr-link"
                 >
                   https://scalingo.com/fr/contrat-gestion-traitements-donnees-personnelles
+                  <NewWindowHint />
                 </a>,
               ],
               [
                 'Brevo',
                 'France',
                 'Emailing',
-                <a
-                  href="https://www.brevo.com/fr/legal/privacypolicy/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={fr.cx('fr-link')}
-                >
+                <a href="https://www.brevo.com/fr/legal/privacypolicy/" target="_blank" rel="noopener noreferrer" className="fr-link">
                   https://www.brevo.com/fr/legal/privacypolicy/
+                  <NewWindowHint />
                 </a>,
               ],
             ]}
-            className={fr.cx('fr-mb-4w')}
+            className="fr-mb-4w"
           />
           <p>
             Ces accès sont strictement encadrés et juridiquement justifiés. Les données leur sont communiquées au regard de leurs rôles de
             sous-traitants.
           </p>
 
-          <h2 className={fr.cx('fr-mt-6w', 'fr-mb-2w')}>Quelles mesures de sécurité mettons-nous en place ?</h2>
+          <h2 className="fr-mt-6w fr-mb-2w">Quelles mesures de sécurité mettons-nous en place ?</h2>
           <p>
             Diverses mesures de sécurité sont prises afin de garantir la sécurité et la confidentialité des données. En plus des techniques
             de contrôle, la plateforme <strong>« MonLogementEtudiant »</strong> utilise le protocole « HyperText Transfer Protocol Secure »,
@@ -203,7 +202,7 @@ export default async function PolitiqueDeConfidentialite() {
             protocole garantit la confidentialité et l'intégrité des données envoyées par l'utilisateur. Les mesures de sécurité définies
             sont les suivantes :
           </p>
-          <ul className={fr.cx('fr-ml-6w', 'fr-mb-2w')}>
+          <ul className="fr-ml-6w fr-mb-2w">
             <li>Stockage des données en base de données ;</li>
             <li>Cloisonnement des données ;</li>
             <li>Mesures de traçabilité ;</li>
@@ -213,7 +212,7 @@ export default async function PolitiqueDeConfidentialite() {
             <li>Mesures restrictives limitant l'accès physique aux données à caractère personnel.</li>
           </ul>
 
-          <h2 className={fr.cx('fr-mt-6w', 'fr-mb-2w')}>Cookies</h2>
+          <h2 className="fr-mt-6w fr-mb-2w">Cookies</h2>
           <p>
             Un cookie est un fichier déposé sur le terminal lors de la visite d'un site. Il a pour but de collecter des informations
             relatives à votre navigation et de vous adresser des services adaptés à votre terminal (ordinateur, mobile ou tablette). En

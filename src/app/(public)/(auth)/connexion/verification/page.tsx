@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import clsx from 'clsx'
 import { Metadata } from 'next'
 import Image from 'next/image'
@@ -57,10 +56,10 @@ export default async function VerificationBufferPage({ searchParams }: Verificat
       <div className={authStyles.imageContainer}>
         <Image className={authStyles.image} src={background} alt="" priority quality={100} />
       </div>
-      <div className={clsx(authStyles.container, fr.cx('fr-container'))}>
+      <div className={clsx(authStyles.container, 'fr-container')}>
         <h1>{t('title')}</h1>
         <p>{t('description')}</p>
-        <p className={fr.cx('fr-text--sm')}>
+        <p className="fr-text--sm">
           {t('fallbackText')}
           <br />
           <a href={safeUrl}>{t('fallbackLink')}</a>

@@ -34,13 +34,7 @@ export const FacilitateSection = async () => {
         </h2>
         <div className="fr-flex fr-direction-column fr-direction-md-row fr-align-items-center fr-flex-gap-8v">
           <div className={styles.faciliteSectionContentLeft}>
-            <Image
-              className={styles.facilitateIllustration}
-              src="/images/facilities.svg"
-              alt={tHome('hero.illustrationAlt')}
-              width={610}
-              height={587}
-            />
+            <Image className={styles.facilitateIllustration} src="/images/facilities.svg" alt="" width={610} height={587} />
           </div>
           <div className="fr-flex fr-direction-column fr-flex-gap-6v">
             <ul className={clsx('fr-flex fr-direction-column fr-flex-gap-4v', styles.facilitateList)}>
@@ -48,7 +42,7 @@ export const FacilitateSection = async () => {
                 <li key={item.titleKey} className={styles.facilitateItem}>
                   <div className={styles.facilitateItemBefore}>
                     <div>
-                      <i className={clsx(item.icon, styles.facilitateIcon)} aria-hidden="true" />
+                      <span className={clsx(item.icon, styles.facilitateIcon)} aria-hidden="true" />
                     </div>
                     {item.showLine && <div className={styles.facilitateItemLine} />}
                   </div>
@@ -64,13 +58,7 @@ export const FacilitateSection = async () => {
               {tHome('facilitate.button')}
             </Button>
           </div>
-          <Image
-            className={styles.facilitateIllustrationMobile}
-            src="/images/facilities.svg"
-            alt={tHome('hero.illustrationAlt')}
-            width={352}
-            height={215}
-          />
+          <Image className={styles.facilitateIllustrationMobile} src="/images/facilities.svg" alt="" width={352} height={215} />
         </div>
       </div>
     </section>

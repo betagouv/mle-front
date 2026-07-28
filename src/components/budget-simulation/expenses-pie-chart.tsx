@@ -48,9 +48,29 @@ export function ExpensesPieChart() {
   return (
     <div className={clsx(styles.border, 'fr-mt-4w fr-mb-2w')}>
       <div className="fr-py-2w fr-px-4w">
-        <span className="fr-text-inverted--grey fr-h6 fr-mb-0">{t('summary.expensesBreakdown')}</span>
+        <h3 className="fr-text-inverted--grey fr-h6 fr-mb-0">{t('summary.expensesBreakdown')}</h3>
       </div>
-      <div className="fr-flex fr-direction-column fr-justify-content-center fr-align-items-center">
+      <table className="fr-sr-only">
+        <caption>{t('summary.expensesBreakdown')}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{t('expenses.categoryLabel')}</th>
+            <th scope="col">{t('expenses.amountLabel')}</th>
+            <th scope="col">{t('summary.chartShareHeader')}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {activeExpenses.map((expense) => (
+            <tr key={expense.type}>
+              <th scope="row">{expense.name}</th>
+              <td>{expense.value} €</td>
+              <td>{((expense.value / totalExpenses) * 100).toFixed(1)} %</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div className="fr-flex fr-direction-column fr-justify-content-center fr-align-items-center" aria-hidden="true">
         <div style={{ height: '200px', width: '100%' }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>

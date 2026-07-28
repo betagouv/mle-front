@@ -1,6 +1,5 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import Badge from '@codegouvfr/react-dsfr/Badge'
 import Button from '@codegouvfr/react-dsfr/Button'
 import Card, { CardProps } from '@codegouvfr/react-dsfr/Card'
@@ -37,7 +36,7 @@ export const NearbyAccommodations = ({
     background: true,
     border: true,
     badge: currentFeature.priceMin ? <Badge severity="new" noIcon>{`${currentFeature.priceMin}€`}</Badge> : undefined,
-    desc: <>{nbTotalApartments && <span className={fr.cx('ri-community-line')}>{`${nbTotalApartments} logements`}</span>}</>,
+    desc: <>{nbTotalApartments && <span className="ri-community-line">{`${nbTotalApartments} logements`}</span>}</>,
     enlargeLink: true,
     horizontal: true,
     ...(hasImage

@@ -2,6 +2,7 @@
 
 import Button from '@codegouvfr/react-dsfr/Button'
 import DOMPurify from 'dompurify'
+import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import styles from './logement.module.css'
 
@@ -30,7 +31,19 @@ function detectVirtualTourType(input: string): VirtualTourType | null {
   return null
 }
 
+/**
+ * Le code d'intégration est saisi par le gestionnaire : rien ne garantit qu'il porte un titre
+ * de cadre. Sans titre, l'iframe est annoncée « cadre sans nom » (RGAA 2.1) — on impose donc
+ * un titre de repli à toute iframe qui n'en a pas.
+ */
+function ensureIframeTitle(html: string, fallbackTitle: string): string {
+  return html.replace(/<iframe\b([^>]*)>/gi, (match, attributes: string) =>
+    /\btitle\s*=\s*"[^"]*[^\s"][^"]*"/i.test(attributes) ? match : `<iframe${attributes} title="${fallbackTitle}">`,
+  )
+}
+
 const IframeEmbed = ({ html }: { html: string }) => {
+  const t = useTranslations('accomodation')
   const sanitized = DOMPurify.sanitize(html, {
     ALLOWED_TAGS: ['iframe'],
     ALLOWED_ATTR: ['src', 'width', 'height', 'title', 'frameborder', 'allow', 'allowfullscreen', 'referrerpolicy'],
@@ -39,7 +52,7 @@ const IframeEmbed = ({ html }: { html: string }) => {
 
   if (!sanitized) return null
 
-  const responsive = sanitized
+  const responsive = ensureIframeTitle(sanitized, t('virtualTour.frameTitle'))
     .replace(/width="[^"]*"/g, '')
     .replace(/height="[^"]*"/g, 'style="position:absolute;top:0;left:0;width:100%;height:100%"')
 
@@ -52,6 +65,8 @@ const IframeEmbed = ({ html }: { html: string }) => {
 }
 
 const VideoPlayer = ({ src }: { src: string }) => {
+  const t = useTranslations('accomodation')
+  const tA11y = useTranslations('accessibility')
   const [videoError, setVideoError] = useState(false)
 
   if (videoError) {
@@ -64,9 +79,10 @@ const VideoPlayer = ({ src }: { src: string }) => {
           href: src,
           target: '_blank',
           rel: 'noopener noreferrer',
+          title: tA11y('linkNewWindow', { label: t('virtualTour.openLink') }),
         }}
       >
-        Accéder à la visite virtuelle
+        {t('virtualTour.openLink')}
       </Button>
     )
   }
@@ -86,6 +102,8 @@ const VideoPlayer = ({ src }: { src: string }) => {
 }
 
 const TourEmbed = ({ url }: { url: string }) => {
+  const t = useTranslations('accomodation')
+  const tA11y = useTranslations('accessibility')
   const [iframeError, setIframeError] = useState(false)
 
   return (
@@ -94,7 +112,7 @@ const TourEmbed = ({ url }: { url: string }) => {
         <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden' }}>
           <iframe
             src={url}
-            title="Visite virtuelle"
+            title={t('virtualTour.frameTitle')}
             allow="fullscreen"
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 0 }}
             onError={() => setIframeError(true)}
@@ -110,9 +128,10 @@ const TourEmbed = ({ url }: { url: string }) => {
             href: url,
             target: '_blank',
             rel: 'noopener noreferrer',
+            title: tA11y('linkNewWindow', { label: t('virtualTour.openLink') }),
           }}
         >
-          Accéder à la visite virtuelle
+          {t('virtualTour.openLink')}
         </Button>
       )}
     </>
@@ -120,6 +139,8 @@ const TourEmbed = ({ url }: { url: string }) => {
 }
 
 export const AccommodationVirtualTour = ({ url }: { url: string | null }) => {
+  const t = useTranslations('accomodation')
+
   if (!url) return null
 
   const type = detectVirtualTourType(url)
@@ -127,7 +148,7 @@ export const AccommodationVirtualTour = ({ url }: { url: string | null }) => {
 
   return (
     <div className={styles.section}>
-      <h4>Visite virtuelle</h4>
+      <h3 className="fr-h4">{t('virtualTour.title')}</h3>
       {type === 'iframe' && <IframeEmbed html={url} />}
       {type === 'video' && <VideoPlayer src={url.trim()} />}
       {type === 'link' && <TourEmbed url={toEmbedUrl(url.trim())} />}

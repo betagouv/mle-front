@@ -95,13 +95,19 @@ export const HelpSimulatorStep1: FC = () => {
         stateRelatedMessage={errors.age?.message}
         nativeInputProps={{
           ...register('age', { valueAsNumber: true }),
+          'aria-required': true,
           type: 'number',
           min: 16,
           max: 99,
         }}
       />
 
-      <fieldset className={styles.fieldset}>
+      <fieldset
+        className={styles.fieldset}
+        aria-required="true"
+        aria-describedby={errors.status ? 'status-error' : undefined}
+        aria-invalid={errors.status ? true : undefined}
+      >
         <legend className={styles.legend}>
           <RequiredLabel>Quel est votre statut ? (plusieurs choix possibles)</RequiredLabel>
         </legend>
@@ -128,7 +134,7 @@ export const HelpSimulatorStep1: FC = () => {
           })}
         </div>
         {errors.status && (
-          <p className="fr-error-text fr-mt-1w" id="status-error">
+          <p className="fr-error-text fr-mt-1w" id="status-error" role="alert">
             {errors.status.message as string}
           </p>
         )}
@@ -185,15 +191,15 @@ export const HelpSimulatorStep1: FC = () => {
           options={[
             {
               label: 'Oui',
-              nativeInputProps: { ...register('isProfessionalLicence'), value: 'yes' },
+              nativeInputProps: { ...register('isProfessionalLicence'), value: 'yes', 'aria-required': true },
             },
             {
               label: 'Non',
-              nativeInputProps: { ...register('isProfessionalLicence'), value: 'no' },
+              nativeInputProps: { ...register('isProfessionalLicence'), value: 'no', 'aria-required': true },
             },
             {
               label: 'Je ne sais pas',
-              nativeInputProps: { ...register('isProfessionalLicence'), value: 'unknown' },
+              nativeInputProps: { ...register('isProfessionalLicence'), value: 'unknown', 'aria-required': true },
             },
           ]}
         />
@@ -219,15 +225,15 @@ export const HelpSimulatorStep1: FC = () => {
           options={[
             {
               label: currentYear === 'terminale' ? "Oui, je change de région ou d'académie" : 'Oui, je change de région',
-              nativeInputProps: { ...register('changingRegion'), value: 'yes' },
+              nativeInputProps: { ...register('changingRegion'), value: 'yes', 'aria-required': true },
             },
             {
               label: 'Non',
-              nativeInputProps: { ...register('changingRegion'), value: 'no' },
+              nativeInputProps: { ...register('changingRegion'), value: 'no', 'aria-required': true },
             },
             {
               label: 'Je ne sais pas',
-              nativeInputProps: { ...register('changingRegion'), value: 'unknown' },
+              nativeInputProps: { ...register('changingRegion'), value: 'unknown', 'aria-required': true },
             },
           ]}
         />
@@ -242,7 +248,7 @@ export const HelpSimulatorStep1: FC = () => {
           className="fr-mb-0"
           options={scholarshipOptions.map(({ label, value }) => ({
             label,
-            nativeInputProps: { ...register('scholarship'), value },
+            nativeInputProps: { ...register('scholarship'), value, 'aria-required': true },
           }))}
         />
       )}

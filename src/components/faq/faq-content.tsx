@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { NewWindowHint } from '~/components/ui/new-window'
 import { TFaqQuestionsAnswers } from '~/schemas/faq/faq-questions-answers'
 
 export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
@@ -86,6 +87,7 @@ export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
           limitative est définie par décret. Vous pouvez trouver ces informations sur
           <Link target="_blank" href="https://www.service-public.fr/particuliers/vosdroits/F947" className="fr-link">
             &nbsp;https://www.service-public.fr/particuliers/vosdroits/F947
+            <NewWindowHint />
           </Link>
         </p>
       </>
@@ -162,10 +164,12 @@ export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
             className="fr-link"
           >
             https://www.caf.fr/allocataires/aides-et-demarches/droits-et-prestations/logement/les-aides-personnelles-au-logement
+            <NewWindowHint />
           </Link>
           &nbsp;et&nbsp;
           <Link target="_blank" href="https://www.service-public.fr/particuliers/vosdroits/N20360" className="fr-link">
             https://www.service-public.fr/particuliers/vosdroits/N20360
+            <NewWindowHint />
           </Link>
         </p>
         <p>D'autres aides peuvent exister (aides locales).</p>
@@ -192,6 +196,7 @@ export const FAQ_CONTENTS: TFaqQuestionsAnswers[] = [
               <span className="fr-text--bold">La grantie Visale</span>&nbsp;(gratuite et publique)&nbsp;
               <Link target="_blank" href="https://www.visale.fr/" className="fr-link">
                 https://www.visale.fr/
+                <NewWindowHint />
               </Link>
             </p>
           </li>

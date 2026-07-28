@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
 import styles from './prepare-budget-content-card.module.css'
@@ -14,10 +13,10 @@ export default async function PrepareBudgetContentHeader() {
     { title: t('list.item6') },
   ]
   return (
-    <div className={clsx(fr.cx('fr-py-2w'), styles.border)}>
+    <div className={clsx('fr-py-2w', styles.border)}>
       <div>
-        <h3 className={fr.cx('fr-mb-2v')}>{t('title')}</h3>
-        <p className={fr.cx('fr-mb-2v')}>{t('description')}</p>
+        <h3 className="fr-mb-2v">{t('title')}</h3>
+        <p className="fr-mb-2v">{t('description')}</p>
         <ul className={styles.headerList}>
           {items.map((item, index) => (
             <li key={index}>

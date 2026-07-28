@@ -3,9 +3,12 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import Input from '@codegouvfr/react-dsfr/Input'
 import clsx from 'clsx'
+import { useTranslations } from 'next-intl'
 import { FC, useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { tss } from 'tss-react'
+import { LiveRegion } from '~/components/ui/live-region'
+import { useCombobox } from '~/hooks/use-combobox'
 import { useTerritories } from '~/hooks/use-territories'
 import { TCreateAlertRequest } from '~/schemas/alerts/create-alert'
 import { TAcademyOrDepartment, TCity } from '~/schemas/territories'
@@ -16,6 +19,7 @@ interface StudentAlertLocationProps {
 }
 
 export const StudentAlertLocation: FC<StudentAlertLocationProps> = ({ error, initialLocation }) => {
+  const t = useTranslations('student.alerts')
   const { classes } = useStyles()
   const { data, isError, searchQuery, setSearchQuery } = useTerritories()
   const [selectedLocation, setSelectedLocation] = useState(initialLocation || '')
@@ -48,43 +52,69 @@ export const StudentAlertLocation: FC<StudentAlertLocationProps> = ({ error, ini
     setValue(field, item.id)
   }
 
-  const hasResults = data && ((data.cities?.length ?? 0) > 0 || (data.departments?.length ?? 0) > 0 || (data.academies?.length ?? 0) > 0)
+  // Les trois listes (villes, départements, académies) sont aplaties en une seule séquence :
+  // le motif combobox exige un ordre unique de parcours au clavier (RGAA 7.3).
+  const suggestions: TLocationSuggestion[] = [
+    ...(data?.cities ?? []).map((item: TCity) => ({
+      field: 'cityId' as const,
+      item,
+      icon: 'ri-map-pin-2-fill',
+      label: `${item.name} (${item.departmentCode})`,
+    })),
+    ...(data?.departments ?? []).map((item: TAcademyOrDepartment) => ({
+      field: 'departmentId' as const,
+      item,
+      icon: 'ri-road-map-line',
+      label: item.name,
+    })),
+    ...(data?.academies ?? []).map((item: TAcademyOrDepartment) => ({
+      field: 'academyId' as const,
+      item,
+      icon: 'ri-government-line',
+      label: item.name,
+    })),
+  ]
+
+  const isOpen = suggestions.length > 0 && showResults && !!searchQuery && !selectedLocation
+  const { inputProps, listboxProps, getOptionProps, activeIndex, announcement } = useCombobox<TLocationSuggestion>({
+    id: 'alerte-localisation',
+    items: suggestions,
+    isOpen,
+    onSelect: (suggestion) => handleClick(suggestion.field, suggestion.item),
+    onClose: () => setShowResults(false),
+  })
 
   return (
     <div className={classes.container}>
       <Input
         classes={{ root: classes.input }}
-        label="Ville, département ou académie"
+        label={t('locationLabel')}
+        hintText={t('locationHint')}
         iconId="ri-map-pin-line"
         nativeInputProps={{
           onFocus: handleOnFocus,
           onChange: handleInputChange,
           value: searchQuery,
-          placeholder: 'Rechercher une ville, un département ou une académie',
+          autoComplete: 'address-level2',
+          ...inputProps,
         }}
         state={error || isError ? 'error' : 'default'}
         stateRelatedMessage={error}
       />
 
-      {hasResults && showResults && !!searchQuery && !selectedLocation && (
+      <LiveRegion message={announcement} />
+
+      {isOpen && (
         <div className={classes.resultsContainer}>
-          <ul className={classes.list}>
-            {data.cities?.map((item: TCity) => (
-              <li className={classes.item} key={`city-${item.id}`} onClick={() => handleClick('cityId', item)}>
-                <span className={clsx(classes.icon, 'ri-map-pin-2-fill')} />
-                {item.name} ({item.departmentCode})
-              </li>
-            ))}
-            {data.departments?.map((item: TAcademyOrDepartment) => (
-              <li className={classes.item} key={`dept-${item.id}`} onClick={() => handleClick('departmentId', item)}>
-                <span className={clsx(classes.icon, 'ri-road-map-line')} />
-                {item.name}
-              </li>
-            ))}
-            {data.academies?.map((item: TAcademyOrDepartment) => (
-              <li className={classes.item} key={`academy-${item.id}`} onClick={() => handleClick('academyId', item)}>
-                <span className={clsx(classes.icon, 'ri-government-line')} />
-                {item.name}
+          <ul className={classes.list} {...listboxProps}>
+            {suggestions.map((suggestion, index) => (
+              <li
+                className={clsx(classes.item, index === activeIndex && classes.itemActive)}
+                key={`${suggestion.field}-${suggestion.item.id}`}
+                {...getOptionProps(index)}
+              >
+                <span className={clsx(classes.icon, suggestion.icon)} aria-hidden="true" />
+                {suggestion.label}
               </li>
             ))}
           </ul>
@@ -92,6 +122,13 @@ export const StudentAlertLocation: FC<StudentAlertLocationProps> = ({ error, ini
       )}
     </div>
   )
+}
+
+type TLocationSuggestion = {
+  field: 'cityId' | 'academyId' | 'departmentId'
+  item: TCity | TAcademyOrDepartment
+  icon: string
+  label: string
 }
 
 const useStyles = tss.create({
@@ -125,6 +162,9 @@ const useStyles = tss.create({
     display: 'flex',
     alignItems: 'center',
     gap: '8px',
+  },
+  itemActive: {
+    backgroundColor: '#f0f0f0',
   },
   list: {
     backgroundColor: 'white',

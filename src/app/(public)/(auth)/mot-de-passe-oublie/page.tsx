@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
@@ -8,11 +7,11 @@ import styles from '../auth.module.css'
 export default async function ForgotPasswordPage() {
   const t = await getTranslations('forgotPassword')
   return (
-    <div className={clsx(styles.container, fr.cx('fr-container'))}>
+    <div className={clsx(styles.container, 'fr-container')}>
       <h1>{t('title')}</h1>
       <p>{t('requiredFieldsNotice')}</p>
       <ForgotPasswordForm />
-      <hr className={fr.cx('fr-mt-3w')} />
+      <hr className="fr-mt-3w" />
       <Button priority="secondary" iconPosition="left" iconId="ri-arrow-left-line" linkProps={{ href: '/se-connecter' }}>
         {t('backToLogin')}
       </Button>

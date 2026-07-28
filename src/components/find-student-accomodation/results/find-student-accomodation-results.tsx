@@ -92,17 +92,23 @@ export const FindStudentAccomodationResultsContent: FC<FindStudentAccomodationRe
       <div className="fr-hidden-sm">{card}</div>
       <div className={classes.container}>
         <div className={classes.accomodationsContainer}>
-          <div className={classes.accommodationGrid}>
+          <div className={classes.accommodationGrid} aria-busy={isFetching}>
             {(accommodations?.results || []).map((accommodation) => (
               <AccomodationCard key={accommodation.id} accomodation={accommodation} user={user} />
             ))}
-            {!accommodations?.results?.length && isFetching && Array.from({ length: 24 }).map((_, index) => <CardSkeleton key={index} />)}
+            {!accommodations?.results?.length && isFetching && (
+              <div aria-hidden="true" className={classes.accommodationGrid}>
+                {Array.from({ length: 24 }).map((_, index) => (
+                  <CardSkeleton key={index} />
+                ))}
+              </div>
+            )}
           </div>
 
           {!isFetching && accommodations?.count === 0 && (
-            <div className={fr.cx('fr-col-md-11')}>
-              <h3>{t('noResult')}</h3>
-              <p className={fr.cx('fr-mb-0')}>{t('description')}</p>
+            <div className="fr-col-md-11">
+              <h2 className="fr-h3">{t('noResult')}</h2>
+              <p className="fr-mb-0">{t('description')}</p>
               <p>{t('description2')}</p>
             </div>
           )}
@@ -153,7 +159,7 @@ export const FindStudentAccomodationResultsContent: FC<FindStudentAccomodationRe
           )}
         </div>
 
-        {queryStates.vue === 'carte' && <div className={clsx(fr.cx('fr-hidden', 'fr-unhidden-sm'), classes.mapContainer)}>{card}</div>}
+        {queryStates.vue === 'carte' && <div className={clsx('fr-hidden', 'fr-unhidden-sm', classes.mapContainer)}>{card}</div>}
       </div>
     </>
   )
