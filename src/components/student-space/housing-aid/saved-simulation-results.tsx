@@ -7,6 +7,7 @@ import { type HelpSimulatorFormData } from '~/components/helps-simulator/help-si
 import { calculateAllAids } from '~/components/helps-simulator/results/aid-calculator'
 import { AidsLocalisationInfo } from '~/components/helps-simulator/results/aids-localisation-info'
 import { AidsResults, type AidsResultsView } from '~/components/helps-simulator/results/aids-results-view'
+import styles from './saved-simulation-results.module.css'
 
 interface SavedSimulationResultsProps {
   inputs: HelpSimulatorFormData | null
@@ -19,7 +20,7 @@ export const SavedSimulationResults = ({ inputs }: SavedSimulationResultsProps) 
   if (!inputs) {
     return (
       <div className="fr-flex fr-direction-column fr-align-items-center fr-flex-gap-3v fr-py-6w">
-        <span className="ri-money-euro-circle-line fr-display--sm" aria-hidden="true" />
+        <span className={`fr-icon-money-euro-circle-line ${styles.icon}`} aria-hidden="true" />
         <p className="fr-text--lg fr-mb-0 fr-text--center">{t('emptyState')}</p>
         <Button linkProps={{ href: '/simuler-mes-aides-au-logement' }} iconId="ri-arrow-right-line" iconPosition="right">
           {t('emptyCta')}
