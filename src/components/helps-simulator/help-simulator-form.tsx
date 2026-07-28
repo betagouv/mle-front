@@ -2,7 +2,7 @@
 
 import Button from '@codegouvfr/react-dsfr/Button'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { FC, useEffect } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import {
   type HelpSimulatorFormData,
@@ -17,9 +17,17 @@ import { HelpSimulatorStep2 } from '~/components/helps-simulator/steps/help-simu
 import { HelpSimulatorStep3 } from '~/components/helps-simulator/steps/help-simulator-step-3'
 import { useHelpSimulatorData } from '~/components/helps-simulator/use-help-simulator-data'
 import { useHelpSimulatorStep } from '~/components/helps-simulator/use-help-simulator-step'
+import { LiveRegion } from '~/components/ui/live-region'
+import { RequiredFieldsNotice } from '~/components/ui/required-mark'
 import { trackEvent } from '~/lib/tracking'
 
 const TOTAL_FORM_STEPS = 3
+
+const STEP_TITLES: Record<number, string> = {
+  1: 'Votre situation',
+  2: 'Votre recherche de logement',
+  3: 'Vos ressources et votre loyer',
+}
 
 const stepSchemas = {
   1: step1Schema,
@@ -40,6 +48,25 @@ interface HelpSimulatorFormProps {
 export const HelpSimulatorForm: FC<HelpSimulatorFormProps> = ({ onScrollToTop }) => {
   const [currentStep, setCurrentStep] = useHelpSimulatorStep()
   const { urlState, setUrlState, clearUrlState } = useHelpSimulatorData()
+  const [errorSummary, setErrorSummary] = useState<string[]>([])
+  const errorSummaryRef = useRef<HTMLDivElement>(null)
+  const stepHeadingRef = useRef<HTMLHeadingElement>(null)
+  const previousStep = useRef(currentStep)
+
+  // Le passage d'une étape à l'autre remplace tout le contenu du formulaire sans rien annoncer
+  // ni déplacer le focus : on le pose sur le titre de la nouvelle étape (RGAA 7.5, 12.x).
+  useEffect(() => {
+    if (previousStep.current === currentStep) return
+    previousStep.current = currentStep
+    setErrorSummary([])
+    stepHeadingRef.current?.focus()
+  }, [currentStep])
+
+  // Le résumé n'existe dans le DOM qu'après le rendu : le focus ne peut donc pas être posé
+  // depuis le gestionnaire de soumission.
+  useEffect(() => {
+    if (errorSummary.length > 0) errorSummaryRef.current?.focus()
+  }, [errorSummary])
 
   const form = useForm<HelpSimulatorFormData>({
     resolver: zodResolver(helpSimulatorSchema),
@@ -126,6 +153,9 @@ export const HelpSimulatorForm: FC<HelpSimulatorFormProps> = ({ onScrollToTop })
           const fieldName = error.path[0] as keyof HelpSimulatorFormData
           form.setError(fieldName, { message: error.message })
         }
+        // Sans ce résumé, un lecteur d'écran ne restituait rien après un clic sur « Continuer » :
+        // les messages posés par setError ne sont ni annoncés ni atteints par le focus (RGAA 7.5, 11.10).
+        setErrorSummary(issues.map((issue) => issue.message))
         return
       }
     }
@@ -209,6 +239,35 @@ export const HelpSimulatorForm: FC<HelpSimulatorFormProps> = ({ onScrollToTop })
     <div>
       <FormProvider {...form}>
         <form>
+          <h2 className="fr-h5" ref={stepHeadingRef} tabIndex={-1}>
+            {STEP_TITLES[currentStep] ?? ''}
+            <span className="fr-sr-only">
+              {' '}
+              — étape {currentStep} sur {TOTAL_FORM_STEPS}
+            </span>
+          </h2>
+          <LiveRegion message={`Étape ${currentStep} sur ${TOTAL_FORM_STEPS} : ${STEP_TITLES[currentStep] ?? ''}`} />
+          <RequiredFieldsNotice />
+          {errorSummary.length > 0 && (
+            <div
+              ref={errorSummaryRef}
+              tabIndex={-1}
+              role="alert"
+              className="fr-alert fr-alert--error fr-mb-3w"
+              aria-labelledby="simulateur-erreurs-titre"
+            >
+              <h3 className="fr-alert__title" id="simulateur-erreurs-titre">
+                {errorSummary.length === 1
+                  ? 'Une information est manquante ou invalide'
+                  : `${errorSummary.length} informations sont manquantes ou invalides`}
+              </h3>
+              <ul>
+                {errorSummary.map((message) => (
+                  <li key={message}>{message}</li>
+                ))}
+              </ul>
+            </div>
+          )}
           <div className="fr-flex fr-direction-column fr-flex-gap-4v">{renderStep()}</div>
           <div className="fr-flex fr-align-items-center fr-pt-3w fr-mt-3w" style={{ borderTop: '1px solid var(--border-default-grey)' }}>
             {currentStep > 1 && (

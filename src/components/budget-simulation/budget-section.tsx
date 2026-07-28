@@ -17,7 +17,7 @@ export function BudgetSection({ icon, iconColor, title, subtitle, iconSize, chil
       <div className="fr-flex fr-align-items-center fr-flex-gap-4v">
         <span className={clsx(iconSize, icon, 'fr-mb-0', iconColor)} />
         <div className="fr-flex fr-direction-column fr-justify-content-center">
-          <span className="fr-h3 fr-mb-0">{title}</span>
+          <h2 className="fr-h3 fr-mb-0">{title}</h2>
           <span className="fr-text-mention--grey">{subtitle}</span>
         </div>
       </div>

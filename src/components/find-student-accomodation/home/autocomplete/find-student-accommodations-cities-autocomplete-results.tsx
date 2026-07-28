@@ -1,22 +1,33 @@
 'use client'
 
-import { FC } from 'react'
+import clsx from 'clsx'
+import { FC, HTMLAttributes, LiHTMLAttributes } from 'react'
 import { tss } from 'tss-react'
 import { TCity } from '~/schemas/territories'
 
 interface AutocompleteResultsProps {
   data: TCity[]
-  onClickItem: (item: TCity) => void
+  /** Fourni par useCombobox : rôle et identifiant de la liste. */
+  listboxProps: HTMLAttributes<HTMLUListElement>
+  /** Fourni par useCombobox : rôle, identifiant, état sélectionné et activation de chaque option. */
+  getOptionProps: (index: number) => LiHTMLAttributes<HTMLLIElement>
+  /** Option désignée par aria-activedescendant, à mettre en évidence visuellement. */
+  activeIndex: number
 }
 
-export const FindStudentAccommodationCitiesAutocompleteResults: FC<AutocompleteResultsProps> = ({ data, onClickItem }) => {
+export const FindStudentAccommodationCitiesAutocompleteResults: FC<AutocompleteResultsProps> = ({
+  data,
+  listboxProps,
+  getOptionProps,
+  activeIndex,
+}) => {
   const { classes } = useStyles()
 
   return (
     <div className={classes.container}>
-      <ul className={classes.list}>
-        {data.map((item: TCity) => (
-          <li className={classes.item} key={item.id} onClick={() => onClickItem(item)}>
+      <ul className={classes.list} {...listboxProps}>
+        {data.map((item: TCity, index) => (
+          <li key={item.id} className={clsx(classes.item, index === activeIndex && classes.itemActive)} {...getOptionProps(index)}>
             {item.name}
           </li>
         ))}
@@ -43,6 +54,9 @@ const useStyles = tss.create({
     borderTop: '1px solid #e0e0e0',
     cursor: 'pointer',
     padding: '8px',
+  },
+  itemActive: {
+    backgroundColor: '#f0f0f0',
   },
   list: {
     backgroundColor: 'white',

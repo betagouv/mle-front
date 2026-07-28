@@ -28,6 +28,7 @@ export const HelpSimulatorStep2: FC = () => {
         stateRelatedMessage={errors.monthlyIncome?.message}
         nativeInputProps={{
           ...register('monthlyIncome', { valueAsNumber: true }),
+          'aria-required': true,
           type: 'number',
           min: 0,
         }}
@@ -44,6 +45,8 @@ export const HelpSimulatorStep2: FC = () => {
           state={errors.monthlyRent ? 'error' : 'default'}
           stateRelatedMessage={errors.monthlyRent?.message}
           nativeInputProps={{
+            // Le loyer n'est obligatoire que si l'utilisateur déclare le connaître.
+            'aria-required': !rentUnknown,
             value: rentUnknown ? 0 : (monthlyRent ?? 0),
             onChange: (e) => setValue('monthlyRent', Number(e.target.value)),
             disabled: rentUnknown === true,

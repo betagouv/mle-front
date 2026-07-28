@@ -130,7 +130,13 @@ export const ResidencePictures = ({ accommodation }: { accommodation: TAccomodat
                   <div className="fr-flex fr-direction-row fr-flex-wrap fr-flex-gap-4v">
                     {field.value.map((imageUrl, index) => (
                       <div key={index} className="fr-flex fr-direction-column fr-align-items-center">
-                        <AccommodationImage src={imageUrl} width={100} height={100} withModal={false} />
+                        <AccommodationImage
+                          src={imageUrl}
+                          alt={`Photo ${index + 1} sur ${field.value?.length ?? 0} de la résidence`}
+                          width={100}
+                          height={100}
+                          withModal={false}
+                        />
                         <div className="fr-flex fr-align-items-center">
                           <Button
                             priority="tertiary no outline"

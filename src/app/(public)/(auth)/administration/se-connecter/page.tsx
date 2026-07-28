@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
@@ -18,7 +17,7 @@ export default async function AdminLoginPage() {
       <div className={authStyles.imageContainer}>
         <Image className={authStyles.image} src={background} alt="Se connecter" priority quality={100} />
       </div>
-      <div className={clsx(authStyles.container, fr.cx('fr-container'))}>
+      <div className={clsx(authStyles.container, 'fr-container')}>
         <h1>Se connecter à l'Espace Administration</h1>
         <p>{t('requiredFieldsNotice')}</p>
         <MagicLinkSignInForm callbackURL="/administration/tableau-de-bord" type="admin" />

@@ -202,3 +202,8 @@
 .borderBottom {
   border-bottom: 1px solid #dddddd;
 }
+
+/* Vert de validation du DSFR : la couleur n’a pas sa place dans le JSX. */
+.checkIcon {
+  color: var(--text-default-success);
+}

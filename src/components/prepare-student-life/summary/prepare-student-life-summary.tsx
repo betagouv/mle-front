@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import Tabs from '@codegouvfr/react-dsfr/Tabs'
 import Tag from '@codegouvfr/react-dsfr/Tag'
@@ -37,9 +36,9 @@ export default async function PrepareStudentLifeSummary({
   const mensualIncome = Math.round(averageIncome / 12)
 
   return (
-    <div className={clsx(fr.cx('fr-container'), styles.mainContainer)}>
-      <div className={clsx(fr.cx('fr-col-md-12'), styles.container)}>
-        <div className={clsx(fr.cx('fr-col-md-8'), styles.mainContent)}>
+    <div className={clsx('fr-container', styles.mainContainer)}>
+      <div className={clsx('fr-col-md-12', styles.container)}>
+        <div className={clsx('fr-col-md-8', styles.mainContent)}>
           <h1 className={styles.subtitle}>{t('subTitle', { titleFormatted: formatCityWithA(name) })}</h1>
           <p>
             Aliquip reprehenderit laborum consectetur mollit aliqua magna consectetur eiusmod ad. Deserunt proident dolore non et commodo
@@ -49,15 +48,15 @@ export default async function PrepareStudentLifeSummary({
           </p>
           <div className={styles.statsContainer}>
             <div className={styles.statColumn}>
-              <span className={fr.cx('fr-icon-team-line')}>93000 habitants</span>
-              <span className={clsx(fr.cx('fr-text--bold'), styles.statValue)}>{nbStudents} étudiants</span>
+              <span className="fr-icon-team-line">93000 habitants</span>
+              <span className={clsx('fr-text--bold', styles.statValue)}>{nbStudents} étudiants</span>
             </div>
-            <div className={clsx(fr.cx('fr-hidden', 'fr-unhidden-sm'), styles.statDivider)}></div>
+            <div className={clsx('fr-hidden', 'fr-unhidden-sm', styles.statDivider)}></div>
             <div className={styles.statColumn}>
-              <span className={fr.cx('ri-money-euro-circle-line')}>Revenu moyen par habitant</span>
-              <span className={clsx(fr.cx('fr-text--bold'), styles.statValue)}>
+              <span className="ri-money-euro-circle-line">Revenu moyen par habitant</span>
+              <span className={clsx('fr-text--bold', styles.statValue)}>
                 {mensualIncome} €{' '}
-                <span className={fr.cx('fr-text--sm')} style={{ fontWeight: 'normal' }}>
+                <span className="fr-text--sm" style={{ fontWeight: 'normal' }}>
                   / mois
                 </span>
               </span>
@@ -70,7 +69,7 @@ export default async function PrepareStudentLifeSummary({
                 {
                   content: (
                     <div>
-                      <p className={fr.cx('fr-text--bold')}>8 lieux d&apos;enseignement supérieur</p>
+                      <p className="fr-text--bold">8 lieux d&apos;enseignement supérieur</p>
                       <div className={styles.tabsLinkContainer}>
                         {universities.map((university) => (
                           <a className={styles.tabsLink} key={university} href="#">
@@ -101,8 +100,8 @@ export default async function PrepareStudentLifeSummary({
             />
           </div>
         </div>
-        <div className={clsx(fr.cx('fr-col-md-4'), styles.mapContainer)}>
-          <div className={clsx(fr.cx('fr-hidden', 'fr-unhidden-sm'), styles.mapWrapper)}>
+        <div className={clsx('fr-col-md-4', styles.mapContainer)}>
+          <div className={clsx('fr-hidden', 'fr-unhidden-sm', styles.mapWrapper)}>
             <PrepareStudentLifeMap bbox={formattedBbox} />
           </div>
           <div className={styles.nearbyContainer}>

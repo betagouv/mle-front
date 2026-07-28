@@ -27,7 +27,7 @@ export const ResidenceCard: FC<ResidenceCardProps> = ({ accomodation, href }) =>
   const accommodationsTypes = accomodation.nbColivingApartments ? [t('individual'), t('colocation')] : [t('individual')]
   const imageProps =
     imagesUrls && imagesUrls.length > 0
-      ? { imageComponent: <FindStudentAccommodationImageCard image={imagesUrls[0]} name={name} /> }
+      ? { imageComponent: <FindStudentAccommodationImageCard image={imagesUrls[0]} /> }
       : {
           imageComponent: <FindStudentAccommodationPlaceholderImageCard id={accomodation.id} />,
         }

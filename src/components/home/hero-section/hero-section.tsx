@@ -30,13 +30,7 @@ export const HeroSection = async () => {
           <Image src="/images/hero-illustration-left.svg" alt="" fill className={styles.heroIllustrationLeftImg} priority />
         </div>
         <div className={styles.heroIllustrationRight}>
-          <Image
-            src="/images/hero-illustration-right.svg"
-            alt={tHome('hero.illustrationAlt')}
-            fill
-            className={styles.heroIllustrationRightImg}
-            priority
-          />
+          <Image src="/images/hero-illustration-right.svg" alt="" fill className={styles.heroIllustrationRightImg} priority />
         </div>
       </div>
     </section>

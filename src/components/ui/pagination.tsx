@@ -1,6 +1,5 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr/fr'
 import { type RegisteredLinkProps } from '@codegouvfr/react-dsfr/link'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -77,19 +76,19 @@ export const Pagination = memo(function Pagination(props: PaginationProps) {
     <nav
       id={id}
       role="navigation"
-      className={fr.cx('fr-pagination') + (classes.root ? ` ${classes.root}` : '') + (className ? ` ${className}` : '')}
+      className={'fr-pagination' + (classes.root ? ` ${classes.root}` : '') + (className ? ` ${className}` : '')}
       aria-label="Pagination"
       style={style}
     >
-      <ul className={fr.cx('fr-pagination__list') + (classes.list ? ` ${classes.list}` : '')}>
+      <ul className={'fr-pagination__list' + (classes.list ? ` ${classes.list}` : '')}>
         {showFirstLast && (
           <li>
             {isFirstPage ? (
-              <a className={fr.cx('fr-pagination__link', 'fr-pagination__link--first')} aria-disabled role="link">
+              <a className="fr-pagination__link fr-pagination__link--first" aria-disabled role="link">
                 Première page
               </a>
             ) : (
-              <Link className={fr.cx('fr-pagination__link', 'fr-pagination__link--first')} {...getPageLinkProps(1)}>
+              <Link className="fr-pagination__link fr-pagination__link--first" {...getPageLinkProps(1)}>
                 Première page
               </Link>
             )}
@@ -97,16 +96,12 @@ export const Pagination = memo(function Pagination(props: PaginationProps) {
         )}
         <li>
           {isFirstPage ? (
-            <a
-              className={fr.cx('fr-pagination__link', 'fr-pagination__link--prev', 'fr-pagination__link--lg-label')}
-              aria-disabled
-              role="link"
-            >
+            <a className="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label" aria-disabled role="link">
               Page précédente
             </a>
           ) : (
             <Link
-              className={fr.cx('fr-pagination__link', 'fr-pagination__link--prev', 'fr-pagination__link--lg-label')}
+              className="fr-pagination__link fr-pagination__link--prev fr-pagination__link--lg-label"
               {...getPageLinkProps(defaultPage - 1)}
             >
               Page précédente
@@ -123,7 +118,7 @@ export const Pagination = memo(function Pagination(props: PaginationProps) {
               />
             ) : (
               <Link
-                className={fr.cx('fr-pagination__link') + (classes.link ? ` ${classes.link}` : '')}
+                className={'fr-pagination__link' + (classes.link ? ` ${classes.link}` : '')}
                 aria-current={part.active ? true : undefined}
                 title={`Page ${part.number}`}
                 {...getPageLinkProps(part.number)}
@@ -135,16 +130,12 @@ export const Pagination = memo(function Pagination(props: PaginationProps) {
         ))}
         <li>
           {isLastPage ? (
-            <a
-              className={fr.cx('fr-pagination__link', 'fr-pagination__link--next', 'fr-pagination__link--lg-label')}
-              aria-disabled
-              role="link"
-            >
+            <a className="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label" aria-disabled role="link">
               Page suivante
             </a>
           ) : (
             <Link
-              className={fr.cx('fr-pagination__link', 'fr-pagination__link--next', 'fr-pagination__link--lg-label')}
+              className="fr-pagination__link fr-pagination__link--next fr-pagination__link--lg-label"
               {...getPageLinkProps(defaultPage + 1)}
             >
               Page suivante
@@ -154,11 +145,11 @@ export const Pagination = memo(function Pagination(props: PaginationProps) {
         {showFirstLast && (
           <li>
             {isLastPage ? (
-              <a className={fr.cx('fr-pagination__link', 'fr-pagination__link--last')} aria-disabled>
+              <a className="fr-pagination__link fr-pagination__link--last" aria-disabled>
                 Dernière page
               </a>
             ) : (
-              <Link className={fr.cx('fr-pagination__link', 'fr-pagination__link--last')} {...getPageLinkProps(count)}>
+              <Link className="fr-pagination__link fr-pagination__link--last" {...getPageLinkProps(count)}>
                 Dernière page
               </Link>
             )}
@@ -177,7 +168,7 @@ function EllipsisSelect({ from, to, onSelect }: { from: number; to: number; onSe
 
   return (
     <span className={styles.ellipsis}>
-      <span className={fr.cx('fr-pagination__link')} aria-hidden="true">
+      <span className="fr-pagination__link" aria-hidden="true">
         …
       </span>
       <select

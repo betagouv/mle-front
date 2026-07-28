@@ -13,6 +13,7 @@ interface ConsultOfferButtonProps {
 
 export const ConsultOfferButton = ({ href, slug, priority = 'tertiary' }: ConsultOfferButtonProps) => {
   const t = useTranslations('accomodation')
+  const tA11y = useTranslations('accessibility')
   const trpcClient = useTRPCClient()
 
   const handleClick = () => {
@@ -30,6 +31,7 @@ export const ConsultOfferButton = ({ href, slug, priority = 'tertiary' }: Consul
           target: '_blank',
           rel: 'noopener noreferrer',
           onClick: handleClick,
+          title: tA11y('linkNewWindow', { label: t('sidebar.buttons.consult') }),
         }}
         priority={priority}
         size="medium"

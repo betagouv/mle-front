@@ -3,6 +3,7 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import clsx from 'clsx'
 import { MouseEvent, ReactNode } from 'react'
+import styles from './tooltip-hover-only.module.css'
 
 interface TooltipHoverOnlyProps {
   id: string
@@ -18,9 +19,11 @@ export const TooltipHoverOnly = ({ id, title, children, className, style }: Tool
   return (
     <>
       {typeof children === 'undefined' ? (
-        <i
-          className={fr.cx('fr-icon--sm', 'fr-icon-question-line')}
+        <button
+          type="button"
+          className={clsx('fr-icon--sm', 'fr-icon-question-line', styles.tooltipTrigger)}
           style={{ color: fr.colors.decisions.text.actionHigh.blueFrance.default }}
+          aria-label={title}
           aria-describedby={id}
           id={`tooltip-owner-${id}`}
           data-fr-js-tooltip-referent="true"
@@ -31,7 +34,7 @@ export const TooltipHoverOnly = ({ id, title, children, className, style }: Tool
           {children}
         </span>
       )}
-      <span className={clsx(fr.cx('fr-tooltip', 'fr-placement'), className)} id={id} style={style} role="tooltip" data-fr-js-tooltip="true">
+      <span className={clsx('fr-tooltip', 'fr-placement', className)} id={id} style={style} role="tooltip" data-fr-js-tooltip="true">
         {title}
       </span>
     </>

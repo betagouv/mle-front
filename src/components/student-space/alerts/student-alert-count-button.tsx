@@ -1,11 +1,16 @@
+'use client'
+
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
+import { useTranslations } from 'next-intl'
 import { expandBbox } from '~/components/map/map-utils'
 import { TAlert } from '~/schemas/alerts/get-alerts'
 import { sPluriel } from '~/utils/sPluriel'
 import styles from './student-alert-count-button.module.css'
 
 export const StudentAlertCountButton = ({ alert }: { alert: TAlert }) => {
+  const t = useTranslations('student.alerts')
+  const tA11y = useTranslations('accessibility')
   const getHref = () => {
     const searchParams = new URLSearchParams()
 
@@ -46,8 +51,17 @@ export const StudentAlertCountButton = ({ alert }: { alert: TAlert }) => {
   }
 
   return (
-    <Button priority="secondary" linkProps={{ href: getHref(), target: '_blank' }}>
-      {alert.count} résidence{sPluriel(alert.count)}
+    <Button
+      priority="secondary"
+      linkProps={{
+        href: getHref(),
+        target: '_blank',
+        'aria-label': tA11y('linkNewWindow', {
+          label: t('countButtonLabel', { count: alert.count, pluralize: sPluriel(alert.count) }),
+        }),
+      }}
+    >
+      {t('countLabel', { count: alert.count, pluralize: sPluriel(alert.count) })}
       <span className={clsx(styles.icon, 'fr-ml-1w ri-arrow-right-line')} />
     </Button>
   )

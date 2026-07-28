@@ -4,7 +4,7 @@ import { Input } from '@codegouvfr/react-dsfr/Input'
 import { RadioButtons } from '@codegouvfr/react-dsfr/RadioButtons'
 import { useTranslations } from 'next-intl'
 import { useFormContext } from 'react-hook-form'
-import { RequiredLabel } from '~/components/ui/required-mark'
+import { RequiredFieldsNotice, RequiredLabel } from '~/components/ui/required-mark'
 
 export const StudentProfileFields = () => {
   const t = useTranslations('student.profile')
@@ -19,18 +19,19 @@ export const StudentProfileFields = () => {
 
   return (
     <>
+      <RequiredFieldsNotice />
       <Input
         label={<RequiredLabel>{t('phone')}</RequiredLabel>}
         state={phoneError ? 'error' : 'default'}
         stateRelatedMessage={phoneError}
-        nativeInputProps={{ ...register('phone'), type: 'tel', autoComplete: 'tel' }}
+        nativeInputProps={{ ...register('phone'), type: 'tel', autoComplete: 'tel', 'aria-required': true }}
       />
       <Input
         label={<RequiredLabel>{t('birthdate')}</RequiredLabel>}
         hintText={t('birthdateHint')}
         state={birthdateError ? 'error' : 'default'}
         stateRelatedMessage={birthdateError}
-        nativeInputProps={{ ...register('birthdate'), type: 'date' }}
+        nativeInputProps={{ ...register('birthdate'), type: 'date', autoComplete: 'bday', 'aria-required': true }}
       />
       <RadioButtons
         legend={<RequiredLabel>{t('scholarship')}</RequiredLabel>}
@@ -38,9 +39,9 @@ export const StudentProfileFields = () => {
         stateRelatedMessage={scholarshipStatusError}
         orientation="horizontal"
         options={[
-          { label: t('yes'), nativeInputProps: { ...register('scholarshipStatus'), value: 'yes' } },
-          { label: t('no'), nativeInputProps: { ...register('scholarshipStatus'), value: 'no' } },
-          { label: t('unknown'), nativeInputProps: { ...register('scholarshipStatus'), value: 'unknown' } },
+          { label: t('yes'), nativeInputProps: { ...register('scholarshipStatus'), value: 'yes', 'aria-required': true } },
+          { label: t('no'), nativeInputProps: { ...register('scholarshipStatus'), value: 'no', 'aria-required': true } },
+          { label: t('unknown'), nativeInputProps: { ...register('scholarshipStatus'), value: 'unknown', 'aria-required': true } },
         ]}
       />
     </>

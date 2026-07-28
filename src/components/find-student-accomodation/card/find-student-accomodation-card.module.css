@@ -26,3 +26,10 @@
 .endDetail {
   margin-top: auto;
 }
+
+/* Le lien étiré recouvre la carte d'un pseudo-élément : les commandes de cette zone
+   (bouton favori, tag de ville) doivent repasser au-dessus pour rester cliquables. */
+.start {
+  position: relative;
+  z-index: 1;
+}

@@ -1,12 +1,11 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import Image from 'next/image'
 import { useState } from 'react'
 import { tss } from 'tss-react'
-import { accommodationPicturesModal } from './accommodation-images'
+import { accommodationPicturesModal, photoAlt } from './accommodation-images'
 
 export const AccommodationImagesModal = ({ children, images, title }: { children: React.ReactNode; images: string[]; title: string }) => {
   const { classes } = useStyles()
@@ -17,12 +16,20 @@ export const AccommodationImagesModal = ({ children, images, title }: { children
       <accommodationPicturesModal.Component title={title} size="large">
         <div className={classes.container}>
           <div style={{ position: 'relative', width: '100%', height: '50vh' }}>
-            <Image src={images[currentImage]} alt="Accommodation" fill style={{ objectFit: 'contain' }} />
+            <Image
+              src={images[currentImage]}
+              alt={photoAlt(currentImage + 1, images.length, title)}
+              fill
+              style={{ objectFit: 'contain' }}
+            />
           </div>
+          <p role="status" aria-live="polite" className="fr-sr-only">
+            Photo {currentImage + 1} sur {images.length}
+          </p>
         </div>
         {images.length > 1 && (
           <div className={classes.buttonsContainer}>
-            <div className={clsx(classes.buttons, fr.cx('fr-mt-4w'))}>
+            <div className={clsx(classes.buttons, 'fr-mt-4w')}>
               <Button
                 iconId="ri-arrow-left-line"
                 priority="secondary"

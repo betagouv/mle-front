@@ -33,7 +33,7 @@ export const AccommodationNearbyEtablissements = ({ etablissements }: Accommodat
 
   return (
     <div className={styles.section}>
-      <h4 className="fr-mb-3w">{t('nearbyEtablissements.title')}</h4>
+      <h3 className="fr-mb-3w fr-h4">{t('nearbyEtablissements.title')}</h3>
       <ul className={styles.etablissementList}>
         {visible.map((etab) => (
           <li key={etab.numeroUai} className={styles.etablissementRow}>

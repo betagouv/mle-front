@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { TooltipHoverOnly } from '~/components/tooltip-hover-only'
+import { NewWindowHint } from '~/components/ui/new-window'
 import { EResidenceType } from '~/enums/residence-type'
 import { ETargetAudience } from '~/enums/target-audience'
 import { TAccomodationDetails } from '~/schemas/accommodations/accommodations'
@@ -51,9 +52,9 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
     return (
       <div className={styles.section}>
         {accommodation.nbTotalApartments ? (
-          <h4>{t('availableAccommodationsCount', { count: accommodation.nbTotalApartments })}</h4>
+          <h3 className="fr-h4">{t('availableAccommodationsCount', { count: accommodation.nbTotalApartments })}</h3>
         ) : (
-          <h4>{t('availableAccommodations')}</h4>
+          <h3 className="fr-h4">{t('availableAccommodations')}</h3>
         )}{' '}
         <Alert
           severity="warning"
@@ -69,9 +70,9 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
     <div className={styles.section}>
       <div className={styles.sectionContent}>
         {accommodation.nbTotalApartments ? (
-          <h4 className="fr-mb-0">{t('availableAccommodationsCount', { count: accommodation.nbTotalApartments })}</h4>
+          <h3 className="fr-mb-0 fr-h4">{t('availableAccommodationsCount', { count: accommodation.nbTotalApartments })}</h3>
         ) : (
-          <h4 className="fr-mb-0">{t('availableAccommodations')}</h4>
+          <h3 className="fr-mb-0 fr-h4">{t('availableAccommodations')}</h3>
         )}
 
         <div className={styles.accommodationsContainer}>
@@ -139,6 +140,7 @@ export const AccommodationResidence = async ({ accommodation }: AccommodationRes
                   target="_blank"
                 >
                   {t('socialHousingRequiredLink')}
+                  <NewWindowHint />
                 </Link>
               </div>
             )}

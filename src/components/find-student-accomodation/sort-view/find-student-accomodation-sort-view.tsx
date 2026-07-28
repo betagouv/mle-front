@@ -1,6 +1,5 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import { SegmentedControl } from '@codegouvfr/react-dsfr/SegmentedControl'
 import { useTranslations } from 'next-intl'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
@@ -35,19 +34,15 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
       : `${t('accommodations')}${sPluriel(accommodations?.count ?? 0)}`
   return (
     <div className={classes.headerContainer}>
-      {accommodations && accommodations.count > 0 && (
-        <h2 className="h4">
-          {accommodations.count} {title}
-        </h2>
-      )}
+      <div role="status" aria-live="polite">
+        {accommodations && accommodations.count > 0 && (
+          <h2 className="h4">
+            {accommodations.count} {title}
+          </h2>
+        )}
+      </div>
       <div className={classes.container}>
-        {/* Implement it as soon as we have differents sorting strategies */}
-        {/* <Select label="" nativeSelectProps={{}}>
-          <option disabled hidden defaultValue={t('sortByPrice')} selected>
-            {t('sortByPrice')}
-          </option>
-        </Select> */}
-        <div className={fr.cx('fr-hidden', 'fr-unhidden-md')}>
+        <div className="fr-hidden fr-unhidden-md">
           <SegmentedControl
             hideLegend
             legend={t('view')}
@@ -98,6 +93,7 @@ const useStyles = tss.withParams<{ hasResults?: boolean }>().create(({ hasResult
   headerContainer: {
     display: 'flex',
     justifyContent: hasResults ? 'space-between' : 'flex-end',
+    alignItems: 'start',
   },
   title: {
     animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',

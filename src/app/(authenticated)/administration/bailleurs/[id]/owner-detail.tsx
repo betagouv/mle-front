@@ -521,7 +521,7 @@ function StatsTab({ stats }: { stats: StatsData | null }) {
   const maxValue = Math.max(...TYPE_LABELS.map((t) => stats[t.key]), 1)
 
   return (
-    <div className={clsx(styles.card)} style={{ padding: '1.5rem' }}>
+    <div className={styles.card} style={{ padding: '1.5rem' }}>
       <h3 className="fr-h6 fr-mb-3w">Répartition par type</h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         {TYPE_LABELS.filter((t) => stats[t.key] > 0).map((t) => (

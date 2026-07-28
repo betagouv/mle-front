@@ -1,11 +1,17 @@
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { StudentFavorites } from '~/components/student-space/favorites/student-favorites'
 import { NotificationToggle } from '~/components/student-space/notification-toggle'
 import { getNotificationPreferences } from '~/server/student/get-notification-preferences'
 import { getServerSession } from '~/services/better-auth'
 import styles from '../mon-espace.module.css'
+
+export const generateMetadata = async () => {
+  const t = await getTranslations('breadcrumbs.student')
+  return { title: t('favorites.title') }
+}
 
 export default async function StudentFavoritesPage() {
   const auth = await getServerSession()

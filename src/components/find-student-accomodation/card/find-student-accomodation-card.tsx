@@ -4,11 +4,10 @@ import { Badge } from '@codegouvfr/react-dsfr/Badge'
 import { Card } from '@codegouvfr/react-dsfr/Card'
 import { Tag } from '@codegouvfr/react-dsfr/Tag'
 import clsx from 'clsx'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { parseAsString, useQueryState } from 'nuqs'
 import { FC } from 'react'
-import { FAVORITE_BUTTON_TITLES, SaveAccommodationFavoriteButton } from '~/components/favorites/save-accommodation-favorite-button'
+import { SaveAccommodationFavoriteButton } from '~/components/favorites/save-accommodation-favorite-button'
 import {
   FindStudentAccommodationImageCard,
   FindStudentAccommodationPlaceholderImageCard,
@@ -39,9 +38,9 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
   targetBlank = false,
   user,
 }) => {
-  const router = useRouter()
   const [selectedAccommodation] = useQueryState('id', parseAsString)
   const t = useTranslations('findAccomodation.card')
+  const tA11y = useTranslations('accessibility')
   const { city, imagesUrls, name, nbTotalApartments, postalCode, priceMin, acceptWaitingList } = accomodation
   const nbAvailable = calculateAvailability(accomodation.typologies)
   const nbIndividualApartments = (accomodation.nbTotalApartments || 0) - (accomodation.nbColivingApartments || 0)
@@ -51,7 +50,7 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
   ]
   const imageProps =
     imagesUrls && imagesUrls.length > 0
-      ? { imageComponent: <FindStudentAccommodationImageCard image={imagesUrls[0]} name={name} /> }
+      ? { imageComponent: <FindStudentAccommodationImageCard image={imagesUrls[0]} /> }
       : {
           imageComponent: <FindStudentAccommodationPlaceholderImageCard id={accomodation.id} />,
         }
@@ -69,19 +68,6 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
 
   const redirectUri = href ?? getAccommodationPath(city, accomodation.slug)
 
-  const handleCardClick = (event: React.MouseEvent) => {
-    const target = event.target as HTMLElement
-    if (target.closest(`button[title="${FAVORITE_BUTTON_TITLES.ADD}"], button[title="${FAVORITE_BUTTON_TITLES.REMOVE}"]`)) {
-      return
-    }
-    trackEvent({ category: 'Logement', action: 'clic carte logement', name: accomodation.slug })
-    if (targetBlank) {
-      window.open(redirectUri, '_blank', 'noopener,noreferrer')
-    } else {
-      router.push(redirectUri)
-    }
-  }
-
   return (
     <Card
       {...badgeProps}
@@ -89,12 +75,18 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
       classes={{
         root: clsx(className, selectedAccommodation === accomodation.id.toString() && styles.active, styles.hover),
         header: styles.header,
+        start: styles.start,
         endDetail: clsx('fr-justify-content-end', styles.endDetail),
       }}
       id={`accomodation-${accomodation.id}`}
       background
       border
-      nativeDivProps={{ onClick: handleCardClick }}
+      enlargeLink
+      linkProps={{
+        href: redirectUri,
+        onClick: () => trackEvent({ category: 'Logement', action: 'clic carte logement', name: accomodation.slug }),
+        ...(targetBlank ? { target: '_blank', rel: 'noopener noreferrer', title: tA11y('linkNewWindow', { label: name }) } : {}),
+      }}
       desc={
         <>
           {accommodationsTypes.length > 0 && (
@@ -133,7 +125,6 @@ export const AccomodationCard: FC<AccomodationCardProps> = ({
           {showFavorite && <SaveAccommodationFavoriteButton slug={accomodation.slug} user={user} />}
         </div>
       }
-      endDetail={<span className={clsx('ri-arrow-right-line fr-text-title--blue-france', styles.arrow)} />}
       size="small"
       title={<span className="fr-text-title--blue-france fr-mb-0">{name}</span>}
       titleAs="h2"

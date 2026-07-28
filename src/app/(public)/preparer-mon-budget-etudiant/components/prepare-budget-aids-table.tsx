@@ -1,7 +1,7 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import { Table } from '@codegouvfr/react-dsfr/Table'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
+import { NewWindowHint } from '~/components/ui/new-window'
 
 export default async function PrepareBudgetAidsTable() {
   const links = {
@@ -17,8 +17,9 @@ export default async function PrepareBudgetAidsTable() {
     t(`${row}.column1`),
     t(`${row}.column2`),
     row !== 'row6' ? (
-      <Link href={links[row as keyof typeof links]} className={fr.cx('fr-link')} target="_blank">
+      <Link href={links[row as keyof typeof links]} className="fr-link" target="_blank" rel="noopener noreferrer">
         {t(`${row}.column3`)}
+        <NewWindowHint />
       </Link>
     ) : (
       t(`${row}.column3`)
@@ -27,6 +28,7 @@ export default async function PrepareBudgetAidsTable() {
 
   return (
     <Table
+      caption={t('caption')}
       noCaption
       data={data}
       fixed
