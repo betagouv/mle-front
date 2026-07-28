@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import { Breadcrumb } from '@codegouvfr/react-dsfr/Breadcrumb'
 import { Table } from '@codegouvfr/react-dsfr/Table'
 import clsx from 'clsx'
@@ -14,20 +13,20 @@ export const generateMetadata = async (): Promise<Metadata> => {
 export default async function BudgetPage() {
   const [t, breadcrumbT] = await Promise.all([getTranslations('budget'), getTranslations('breadcrumbs')])
   return (
-    <div className={fr.cx('fr-container')}>
+    <div className="fr-container">
       <Breadcrumb
         currentPageLabel={breadcrumbT('budget')}
         homeLinkProps={{ href: '/' }}
         segments={[]}
         classes={{ root: 'fr-mt-0 fr-mb-2w fr-pt-4w' }}
       />
-      <div className={fr.cx('fr-container')}>
+      <div className="fr-container">
         <h1>{t('title')}</h1>
         <p>
-          {t('lastUpdate')} <span className={fr.cx('fr-text--bold')}>22/06/26</span>
+          {t('lastUpdate')} <span className="fr-text--bold">22/06/26</span>
         </p>
-        <div className={clsx(fr.cx('fr-p-4w'), styles.mainContainer)}>
-          <p className={clsx(fr.cx('fr-text--bold'), styles.description)}>{t('description')}</p>
+        <div className={clsx('fr-p-4w', styles.mainContainer)}>
+          <p className={clsx('fr-text--bold', styles.description)}>{t('description')}</p>
           <p>{t('description2')}</p>
           <hr />
           <h2>{t('repartition')}</h2>

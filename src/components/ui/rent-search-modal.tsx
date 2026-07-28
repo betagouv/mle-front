@@ -9,6 +9,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { tss } from 'tss-react'
 import { useDebounce } from 'use-debounce'
+import { NewWindowHint } from '~/components/ui/new-window'
 import { useRentSearch } from '~/hooks/use-rent-search'
 import { trackEvent } from '~/lib/tracking'
 import { TRentSearchResult } from '~/schemas/territories'
@@ -73,7 +74,7 @@ export const RentSearchModal = ({ onApply, onCancel }: RentSearchModalProps) => 
         size="large"
       >
         <div className={classes.container}>
-          <div className={fr.cx('fr-mb-4w')}>
+          <div className="fr-mb-4w">
             <Input
               label="Rechercher une ville"
               hintText="Commencez la saisie, puis choisissez la ville recherchée"
@@ -83,7 +84,7 @@ export const RentSearchModal = ({ onApply, onCancel }: RentSearchModalProps) => 
           </div>
 
           {error && (
-            <div className={fr.cx('fr-alert', 'fr-alert--error', 'fr-mb-2w')}>
+            <div className="fr-alert fr-alert--error fr-mb-2w">
               <p>Erreur lors de la recherche des données de loyer</p>
             </div>
           )}
@@ -91,11 +92,11 @@ export const RentSearchModal = ({ onApply, onCancel }: RentSearchModalProps) => 
           {debouncedQuery.length >= 2 && searchQuery !== selectedCity?.city && (
             <div className={classes.resultsContainer}>
               {isLoading ? (
-                <div className={fr.cx('fr-p-2w')}>
+                <div className="fr-p-2w">
                   <p>Recherche en cours...</p>
                 </div>
               ) : data?.cities.length === 0 ? (
-                <div className={fr.cx('fr-p-2w')}>
+                <div className="fr-p-2w">
                   <p>Aucune ville trouvée pour "{debouncedQuery}"</p>
                 </div>
               ) : (
@@ -131,6 +132,7 @@ export const RentSearchModal = ({ onApply, onCancel }: RentSearchModalProps) => 
                   >
                     Estimations de l’Agence Nationale pour l’Information sur le Logement (ANIL), à partir des données de SeLoger et de
                     Leboncoin
+                    <NewWindowHint />
                   </Link>
                 </span>
               </div>

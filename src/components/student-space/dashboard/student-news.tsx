@@ -9,7 +9,7 @@ export const StudentNews = async () => {
   const t = await getTranslations()
   return (
     <div className="fr-flex fr-direction-column fr-flex-gap-4v fr-pt-4w fr-px-6w fr-pb-6w">
-      <span className="fr-h4">{t('student.news.title')}</span>
+      <h2 className="fr-h4">{t('student.news.title')}</h2>
 
       <div className={styles.testimonialContainer}>
         <div

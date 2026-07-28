@@ -1,8 +1,8 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import Badge from '@codegouvfr/react-dsfr/Badge'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { getTranslations } from 'next-intl/server'
 import { PrepareStudentLifeAccommodationResidence } from '~/components/prepare-student-life/stats/prepare-student-life-accommodation-residence'
 import compteur from '~/images/compteur.png'
 import logoCrous from '~/images/logo-crous.svg'
@@ -13,7 +13,7 @@ type PrepareStudentLifeStatsProps = TCity & {
   location: string
 }
 
-export default function PrepareStudentLifeStats({
+export default async function PrepareStudentLifeStats({
   averageRent,
   location,
   nbTotalApartments,
@@ -27,7 +27,11 @@ export default function PrepareStudentLifeStats({
   nbT6,
   nbT7More,
 }: PrepareStudentLifeStatsProps) {
-  const locationAids = ['Aides nationales', 'Aides régionales', 'Aides départementales', 'Aides de la ville']
+  const t = await getTranslations('prepareStudentLife.stats')
+  // Mise en forme partagée par toutes les phrases riches du bloc.
+  const bold = (chunks: React.ReactNode) => <span className="fr-text--bold">{chunks}</span>
+  const br = () => <br />
+  const locationAids = [t('aids.national'), t('aids.regional'), t('aids.departmental'), t('aids.city')]
 
   // City-level counts → minimal typologies object (only presence drives the tiles).
   const mkTypology = (n: number | null) =>
@@ -47,50 +51,46 @@ export default function PrepareStudentLifeStats({
 
   return (
     <div className={styles.mainContainer}>
-      <div className={fr.cx('fr-container', 'fr-pt-2w', 'fr-pb-6w', 'fr-col-md-12')}>
+      <div className="fr-container fr-pt-2w fr-pb-6w fr-col-md-12">
         <div className={styles.cardsContainer}>
           <div className={styles.cardContainer}>
-            <div className={fr.cx('fr-col-md-4')}>
+            <div className="fr-col-md-4">
               <div className={styles.card}>
-                <h2 className="h4">
-                  {nbTotalApartments} logements étudiants <br /> sur la ville de {location}
-                </h2>
-                <p style={{ margin: 0 }}>soit 7% des logements de la ville</p>
+                <h2 className="h4">{t.rich('housingCount', { count: nbTotalApartments, location, br })}</h2>
+                <p style={{ margin: 0 }}>{t('housingShare')}</p>
                 <div className={styles.divider}></div>
-                <p>3 bailleurs sociaux à {location}</p>
+                <p>{t('socialLandlords', { location })}</p>
                 <div className={styles.logosContainer}>
-                  <Image src={logoCrous.src} alt="Crous" width={40} height={40} />
-                  <Image src={logoCrous.src} alt="Crous" width={40} height={40} />
-                  <Image src={logoCrous.src} alt="Crous" width={40} height={40} />
+                  <Image src={logoCrous.src} alt={t('crousAlt')} width={40} height={40} />
+                  <Image src={logoCrous.src} alt={t('crousAlt')} width={40} height={40} />
+                  <Image src={logoCrous.src} alt={t('crousAlt')} width={40} height={40} />
                 </div>
               </div>
             </div>
-            <div className={fr.cx('fr-col-md-8')} style={{ textAlign: 'center' }}>
+            <div className="fr-col-md-8" style={{ textAlign: 'center' }}>
               <div className={clsx(styles.card, styles.marginLeft)}>
                 <div className={styles.counterContainer}>
                   <div>
-                    <h2 className="h4">Facilité à trouver un logement</h2>
-                    <Image src={compteur.src} alt="compteur" quality={100} width={142} height={72} />
-                    <h3 className="h4">Facile</h3>
-                    <p>
-                      <span className={fr.cx('fr-text--bold')}>3 semaines</span> en moyenne pour trouver un logement étudiant à {location}
-                    </p>
+                    <h2 className="h4">{t('easeTitle')}</h2>
+                    <Image src={compteur.src} alt={t('gaugeAlt')} quality={100} width={142} height={72} />
+                    <h3 className="h4">{t('easeLevel')}</h3>
+                    <p>{t.rich('easeDetail', { location, b: bold })}</p>
                   </div>
                   <div>
-                    <h2 className="h4">Budget des locataires</h2>
-                    <Image src={compteur.src} alt="compteur" quality={100} width={142} height={72} />
-                    <h3 className="h4">Équilibré</h3>
-                    <p>Le budget des étudiants locataires à Créteil est équilibré.</p>
+                    <h2 className="h4">{t('tenantsBudgetTitle')}</h2>
+                    <Image src={compteur.src} alt={t('gaugeAlt')} quality={100} width={142} height={72} />
+                    <h3 className="h4">{t('tenantsBudgetLevel')}</h3>
+                    <p>{t('tenantsBudgetDetail', { location })}</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
           <div className={styles.cardContainer}>
-            <div className={fr.cx('fr-col-md-8')}>
+            <div className="fr-col-md-8">
               <PrepareStudentLifeAccommodationResidence location={location} typologies={typologies} />
             </div>
-            <div className={fr.cx('fr-col-md-4')}>
+            <div className="fr-col-md-4">
               <div className={clsx(styles.card, styles.helpersMainContainer, styles.marginLeft)}>
                 <div className={styles.helpersContainer}>
                   <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -153,65 +153,59 @@ export default function PrepareStudentLifeStats({
                     />
                   </svg>
                   <div>
-                    <h4 style={{ margin: 0 }}>17 aides disponibles pour les étudiants résidant à {location}</h4>
+                    <h4 style={{ margin: 0 }}>{t('aidsTitle', { location })}</h4>
                   </div>
                   <div className={styles.helpersItems}>
                     {locationAids.map((aid) => (
                       <div key={aid}>
-                        <i style={{ color: '#17753C' }} className={fr.cx('ri-check-line')}></i>
+                        <span className={clsx('ri-check-line', styles.checkIcon)} aria-hidden="true" />
                         {aid}
                       </div>
                     ))}
                   </div>
-                  <Button iconId="ri-money-euro-circle-line">Simuler mes aides</Button>
+                  <Button iconId="ri-money-euro-circle-line">{t('simulateAidsCta')}</Button>
                 </div>
               </div>
             </div>
           </div>
-          <div className={clsx(fr.cx('fr-container'), styles.costContainer)}>
+          <div className={clsx('fr-container', styles.costContainer)}>
             <div className={styles.costHeaderContainer}>
               <div className={styles.costHeaderTitleContainer}>
-                <h3>
-                  Le coût de la vie <br />
-                  étudiante à {location}
-                </h3>
-                <p>
-                  Une estimation générale des principaux postes de dépense pour un étudiant à Créteil. Les coûts peuvent varier en fonction
-                  du style de vie, des aides perçues et des choix personnels.
-                </p>
+                <h3>{t.rich('costTitle', { location, br })}</h3>
+                <p>{t('costIntro', { location })}</p>
               </div>
               <div className={styles.budgetsMainContainer}>
                 <div className={styles.budgetsContainer}>
                   <div>
                     <h4 className="h5" style={{ marginBottom: '0.5rem' }}>
-                      Budget minimal
+                      {t('minimalBudgetTitle')}
                     </h4>
-                    <p style={{ marginBottom: '0.5rem' }}>Résidence Crous, repas RU, et peu de sorties.</p>
+                    <p style={{ marginBottom: '0.5rem' }}>{t('minimalBudgetDescription')}</p>
                     {/* biome-ignore lint/complexity/noExtraBooleanCast: price min can be undefined */}
                     {!!priceMin ? (
                       <Badge noIcon severity="new">
-                        Entre {priceMin} et {priceMin * 1.5} €
+                        {t('budgetRange', { min: priceMin, max: priceMin * 1.5 })}
                       </Badge>
                     ) : (
                       <Badge noIcon severity="new">
-                        Non connu
+                        {t('unknownBudget')}
                       </Badge>
                     )}
                   </div>
-                  <div className={fr.cx('fr-hidden', 'fr-unhidden-sm')} style={{ backgroundColor: '#DDDDDD', width: '1px' }} />
+                  <div className="fr-hidden fr-unhidden-sm" style={{ backgroundColor: '#DDDDDD', width: '1px' }} />
                   <div>
                     <h4 className="h5" style={{ marginBottom: '0.5rem' }}>
-                      Budget confortable
+                      {t('comfortableBudgetTitle')}
                     </h4>
-                    <p style={{ marginBottom: '0.5rem' }}>Logement privé et activités diverses.</p>
+                    <p style={{ marginBottom: '0.5rem' }}>{t('comfortableBudgetDescription')}</p>
                     {/* biome-ignore lint/complexity/noExtraBooleanCast: price min can be undefined */}
                     {!!priceMin ? (
                       <Badge noIcon severity="new">
-                        Entre {priceMin * 2} et {priceMin * 3} €
+                        {t('budgetRange', { min: priceMin * 2, max: priceMin * 3 })}
                       </Badge>
                     ) : (
                       <Badge noIcon severity="new">
-                        Non connu
+                        {t('unknownBudget')}
                       </Badge>
                     )}
                   </div>
@@ -221,78 +215,53 @@ export default function PrepareStudentLifeStats({
             <div className={styles.costGridContainer}>
               <div className={clsx(styles.costGridItem, styles.borderRight, styles.borderBottom)}>
                 <div className={styles.summaryCardTitle}>
-                  <span className={fr.cx('ri-community-line')} />
+                  <span className="ri-community-line" />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <span className={fr.cx('fr-text--bold')}>Logement</span>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Prix moyen du m²</span> : {Math.round(averageRent)} €.
-                  </div>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Loyer moyen pour un logement de 20m²</span> : {Math.round(averageRent * 20)} €
-                    par mois.
-                  </div>
+                  <span className="fr-text--bold">{t('cost.housingTitle')}</span>
+                  <div>{t.rich('cost.pricePerSquareMeter', { price: Math.round(averageRent), b: bold })}</div>
+                  <div>{t.rich('cost.rentFor20', { price: Math.round(averageRent * 20), b: bold })}</div>
                 </div>
               </div>
               <div className={clsx(styles.costGridItem, styles.borderBottom)}>
                 <div className={styles.summaryCardTitle}>
-                  <span className={fr.cx('ri-train-line')} />
+                  <span className="ri-train-line" />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <span className={fr.cx('fr-text--bold')}>Transport</span>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Navigo Imagine&apos;R</span> (carte pour étudiants) : environ 38 € par mois
-                    (APL déduite).
-                  </div>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Frais occasionnels</span> (covoiturage, taxis, etc.) : 10-30 € par mois.
-                  </div>
+                  <span className="fr-text--bold">{t('cost.transportTitle')}</span>
+                  <div>{t.rich('cost.transportPass', { b: bold })}</div>
+                  <div>{t.rich('cost.transportOccasional', { b: bold })}</div>
                 </div>
               </div>
               <div className={clsx(styles.costGridItem, styles.borderRight, styles.borderBottom)}>
                 <div className={styles.summaryCardTitle}>
-                  <span className={fr.cx('ri-restaurant-line')} />
+                  <span className="ri-restaurant-line" />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <span className={fr.cx('fr-text--bold')}>Alimentation</span>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Courses alimentaires</span> : 150-200 € par mois (APL déduite).
-                  </div>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Repas universitaires (Crous)</span> : environ 3.30 € par repas (si pris au RU).
-                  </div>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Repas à 1€ pour les étudiants boursiers et précaires.</span>
-                  </div>
+                  <span className="fr-text--bold">{t('cost.foodTitle')}</span>
+                  <div>{t.rich('cost.foodGroceries', { b: bold })}</div>
+                  <div>{t.rich('cost.foodUniversity', { b: bold })}</div>
+                  <div>{t.rich('cost.foodOneEuro', { b: bold })}</div>
                 </div>
               </div>
               <div className={clsx(styles.costGridItem, styles.borderBottom)}>
                 <div className={styles.summaryCardTitle}>
-                  <span className={fr.cx('ri-pencil-ruler-line')} />
+                  <span className="ri-pencil-ruler-line" />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <span className={fr.cx('fr-text--bold')}>Frais universitaires</span>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Frais d&apos;inscription annuels</span> : <br />
-                    Licence : 170 € / Master: 243 €.
-                  </div>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Mutuelle santé</span> : 10-40 € par mois (selon les besoins et le statut).
-                  </div>
+                  <span className="fr-text--bold">{t('cost.universityTitle')}</span>
+                  <div>{t.rich('cost.universityTuition', { b: bold, br })}</div>
+                  <div>{t.rich('cost.universityHealth', { b: bold })}</div>
                 </div>
               </div>
               <div className={clsx(styles.costGridItem, styles.borderRight, styles.borderBottom)}>
                 <div className={styles.summaryCardTitle}>
-                  <span className={fr.cx('ri-clapperboard-line')} />
+                  <span className="ri-clapperboard-line" />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <span className={fr.cx('fr-text--bold')}>Loisirs et sorties</span>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Sorties</span> (cinéma, bars, restaurants) : 50-100 € par mois.
-                  </div>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Activités sportives ou culturelles</span> : 20-50 € par mois.
-                  </div>
+                  <span className="fr-text--bold">{t('cost.leisureTitle')}</span>
+                  <div>{t.rich('cost.leisureOutings', { b: bold })}</div>
+                  <div>{t.rich('cost.leisureActivities', { b: bold })}</div>
                 </div>
               </div>
               <div
@@ -303,19 +272,13 @@ export default function PrepareStudentLifeStats({
                 }}
               >
                 <div className={styles.summaryCardTitle}>
-                  <span className={fr.cx('ri-wifi-line')} />
+                  <span className="ri-wifi-line" />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <span className={fr.cx('fr-text--bold')}>Autres dépenses</span>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Internet et téléphone</span> : 20-40 € par mois.
-                  </div>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Fournitures scolaires</span> : 20-30 € par mois.
-                  </div>
-                  <div>
-                    <span className={fr.cx('fr-text--bold')}>Assurance habitation</span> : 10-20 € par mois.
-                  </div>
+                  <span className="fr-text--bold">{t('cost.otherTitle')}</span>
+                  <div>{t.rich('cost.otherInternet', { b: bold })}</div>
+                  <div>{t.rich('cost.otherSupplies', { b: bold })}</div>
+                  <div>{t.rich('cost.otherInsurance', { b: bold })}</div>
                 </div>
               </div>
             </div>

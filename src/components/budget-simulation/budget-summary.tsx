@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef } from 'react'
 import { ExpensesPieChart } from '~/components/budget-simulation/expenses-pie-chart'
+import { LiveRegion } from '~/components/ui/live-region'
 import { trackEvent } from '~/lib/tracking'
 import { getMonthlyEquivalent, useBudgetSimulator } from './budget-simulator-context'
 import styles from './budget-summary.module.css'
@@ -52,7 +53,15 @@ export function BudgetSummary() {
 
   return (
     <div className="fr-flex fr-direction-column fr-pt-4w fr-pb-6w fr-px-5w">
-      <span className="fr-text-inverted--grey fr-h3 fr-mb-0">{t('title')}</span>
+      <LiveRegion
+        debounceMs={1200}
+        message={t('announcement', {
+          incomes: formatAmount(totalIncomes),
+          expenses: formatAmount(totalExpenses),
+          balance: formatAmount(remainingBalance),
+        })}
+      />
+      <h2 className="fr-text-inverted--grey fr-h3 fr-mb-0">{t('title')}</h2>
       <span className={styles.summarySubtitle}>{t('subtitle')}</span>
       <div className={clsx(styles.border, 'fr-flex fr-direction-column fr-direction-md-row fr-mt-4w fr-mb-2w')}>
         <div className={clsx(styles.totalsContainer, 'fr-flex fr-direction-column fr-justify-content-center fr-py-2w fr-px-4w')}>
@@ -64,7 +73,7 @@ export function BudgetSummary() {
           <div className="fr-flex fr-direction-column fr-justify-content-space-between">
             <span className="fr-text--sm fr-text-inverted--grey fr-text--bold fr-mb-0">{t('totalExpenses')}</span>
             <span className={clsx(styles.totalExpenses, 'fr-h3 fr-mb-0')}>{formatAmount(totalExpenses)}</span>
-            <span className="fr-text--xs fr-text-mention--grey fr-mb-0">
+            <span className={clsx(styles.annualTotal, 'fr-text--xs fr-mb-0')}>
               {t('annualTotal', { amount: formatAmount(totalExpenses * 12) })}
             </span>
           </div>
@@ -92,7 +101,7 @@ export function BudgetSummary() {
       <ExpensesPieChart />
       {yearlyExpensesTotal > 0 && (
         <div className={clsx(styles.border, 'fr-flex fr-direction-column fr-mt-4w fr-mb-2w fr-py-2w fr-px-4w')}>
-          <span className="fr-text-inverted--grey fr-h6 fr-mb-2w">{t('schoolYearBudgetTitle')}</span>
+          <h3 className="fr-text-inverted--grey fr-h6 fr-mb-2w">{t('schoolYearBudgetTitle')}</h3>
           <p className="fr-text--sm fr-text-inverted--grey fr-mb-0">
             {t('schoolYearBudgetDescription', {
               firstMonth: formatAmount(firstMonthTotal),
@@ -102,7 +111,7 @@ export function BudgetSummary() {
         </div>
       )}
       <div className={clsx(styles.border, 'fr-flex fr-flex-gap-4v fr-direction-column fr-mt-4w fr-mb-2w fr-py-2w fr-px-4w')}>
-        <span className="fr-text-inverted--grey fr-h4 fr-mb-0">{t('hintsTitle')}</span>
+        <h3 className="fr-text-inverted--grey fr-h4 fr-mb-0">{t('hintsTitle')}</h3>
         <Button iconId="fr-icon-money-euro-circle-line" linkProps={{ href: '/preparer-mon-budget-etudiant', target: '_self' }}>
           {t('hintsCta')}
         </Button>

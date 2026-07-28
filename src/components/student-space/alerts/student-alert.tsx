@@ -1,10 +1,11 @@
 'use client'
 
 import Tag from '@codegouvfr/react-dsfr/Tag'
-import ToggleSwitch from '@codegouvfr/react-dsfr/ToggleSwitch'
+import { useTranslations } from 'next-intl'
 import { DeleteStudentAlert } from '~/components/student-space/alerts/delete-student-alert'
 import { StudentAlertCountButton } from '~/components/student-space/alerts/student-alert-count-button'
 import { UpdateStudentAlert } from '~/components/student-space/alerts/update-student-alert'
+import { ToggleSwitch } from '~/components/ui/toggle-switch'
 import { useUpdateAlert } from '~/hooks/use-update-alert'
 import { TAlert } from '~/schemas/alerts/get-alerts'
 
@@ -12,6 +13,7 @@ type StudentAlertProps = {
   alert: TAlert
 }
 export const StudentAlert = ({ alert }: StudentAlertProps) => {
+  const t = useTranslations('student.alerts')
   const { mutateAsync: updateAlert } = useUpdateAlert()
 
   const handleToggleNotifications = async (checked: boolean) => {
@@ -22,7 +24,7 @@ export const StudentAlert = ({ alert }: StudentAlertProps) => {
     <div className="fr-border fr-background-default--grey fr-width-full fr-p-5w">
       <div className="fr-flex fr-direction-column fr-flex-gap-4v">
         <div className="fr-flex fr-justify-content-space-between">
-          <span className="fr-h4 fr-text-title--blue-france fr-mb-0">{alert.name}</span>
+          <h2 className="fr-h4 fr-text-title--blue-france fr-mb-0">{alert.name}</h2>
           <div className="fr-flex fr-flex-gap-2v">
             <UpdateStudentAlert alert={alert} />
             <DeleteStudentAlert alertId={alert.id} />
@@ -38,8 +40,9 @@ export const StudentAlert = ({ alert }: StudentAlertProps) => {
       <div className="fr-mt-4w fr-flex fr-justify-content-space-between">
         <div className="fr-col-6">
           <ToggleSwitch
-            label="Recevoir des alertes mail"
+            label={t('notificationsLabel')}
             inputTitle={`receive-notifications-${alert.id}`}
+            description={t('notificationsDescription', { name: alert.name })}
             checked={alert.receiveNotifications}
             onChange={handleToggleNotifications}
             showCheckedHint={false}

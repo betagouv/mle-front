@@ -1,4 +1,16 @@
 {
+  "accessibility": {
+    "skipLinks": {
+      "content": "Contenu",
+      "navigation": "Menu",
+      "footer": "Pied de page"
+    },
+    "newWindow": "nouvelle fenêtre",
+    "linkNewWindow": "{label} (nouvelle fenêtre)",
+    "required": "(obligatoire)",
+    "requiredFieldsNotice": "Les champs suivis d’un astérisque (*) sont obligatoires.",
+    "suggestionsAvailable": "{count} suggestion{pluralize} disponible{pluralize}"
+  },
   "passwordInput": {
     "hint": "Votre mot de passe doit contenir :",
     "rule12": "12 caractères minimum",
@@ -40,6 +52,9 @@
       },
       "alerts": {
         "title": "Alertes logements"
+      },
+      "personalInformations": {
+        "title": "Informations personnelles"
       }
     }
   },
@@ -64,7 +79,7 @@
       "description": "Trouvez votre logement étudiant dans la résidence {name} {cityFormatted}"
     },
     "prepareBudget": {
-      "title": "Calculer son budget étudiant",
+      "title": "Préparer son budget étudiant : conseils pratiques",
       "description": "Gérez vos finances facilement et visualisez votre budget mensuel en temps réel"
     },
     "simulateAids": {
@@ -84,6 +99,7 @@
     "student": {
       "workspace": {
         "title": "Espace étudiant - Gestion de votre espace",
+        "shortTitle": "Espace étudiant",
         "description": "Votre espace étudiant"
       }
     },
@@ -157,6 +173,15 @@
     "linkList": {
       "departmentsCategoryName": "Départements",
       "citiesCategoryName": "Villes étudiantes"
+    },
+    "cityLink": "Logements étudiants {city}",
+    "legalNotice": "Mentions légales",
+    "brand": "Mon Logement Étudiant",
+    "bottom": {
+      "privacy": "Politique de confidentialité",
+      "budget": "Budget Mon Logement Étudiant",
+      "budgetCalculator": "Calculatrice de budget étudiant",
+      "terms": "Conditions générales d'utilisation"
     }
   },
   "languages": {
@@ -185,7 +210,9 @@
       "candidates": "Candidatures",
       "contacts": "Contacts",
       "users": "Utilisateurs"
-    }
+    },
+    "mainMenuLabel": "Menu principal",
+    "close": "Fermer"
   },
   "accomodation": {
     "availability": {
@@ -320,6 +347,11 @@
       "t5": "T5 : Séjour + 4 chambres séparées + cuisine (ouverte/fermée) + plusieurs salles de bain possibles.",
       "t6": "T6 : Séjour + 5 chambres séparées + cuisine (ouverte/fermée) + généralement 2 salles de bain minimum.",
       "t7": "T7 : Séjour + 6 chambres séparées + cuisine (ouverte/fermée) + 2 à 3 salles de bain."
+    },
+    "virtualTour": {
+      "title": "Visite virtuelle",
+      "frameTitle": "Visite virtuelle de la résidence",
+      "openLink": "Accéder à la visite virtuelle"
     }
   },
   "findAccomodation": {
@@ -336,6 +368,8 @@
       "cta": "Foire aux questions"
     },
     "autocomplete": {
+      "suggestionsLabel": "Suggestions de recherche",
+      "suggestionsCount": "{count, plural, one {# suggestion disponible} other {# suggestions disponibles}}",
       "categories": {
         "academies": "Académies",
         "cities": "Villes",
@@ -364,7 +398,9 @@
       "priceAll": "Tous",
       "removeFilter": "Retirer le filtre {filter}",
       "crous": "Crous",
-      "others": "Autres résidences"
+      "others": "Autres résidences",
+      "availabilityDescription": "N'afficher que les résidences ayant au moins un logement disponible",
+      "sharedDescription": "N'afficher que les résidences proposant de la colocation"
     },
     "filters": {
       "accommodations": "résidence",
@@ -406,7 +442,65 @@
     "subTitle": "Être étudiant {titleFormatted}",
     "nearbyCities": "Villes à proximité {titleFormattedDe}",
     "noResultTitle": "Aucun logement étudiant répertorié pour le moment",
-    "noResultDescription": "Il n'y a pas de logements pour les villes de ce département. Nous vous invitons à réessayer plus tard, de nouvelles résidences sont ajoutées régulièrement."
+    "noResultDescription": "Il n'y a pas de logements pour les villes de ce département. Nous vous invitons à réessayer plus tard, de nouvelles résidences sont ajoutées régulièrement.",
+    "residence": {
+      "title": "Prix moyen des loyers étudiants à {location}",
+      "studio": "STUDIO ({types})",
+      "apartments": "Appartements ({types})",
+      "deposit": "Prévoir un dépôt de garantie ainsi que le versement d'un premier loyer",
+      "rentCap": "Un <b>plafonnement des loyers est en vigueur à {location}</b> afin de limiter les abus"
+    },
+    "stats": {
+      "housingCount": "{count} logements étudiants <br></br> sur la ville de {location}",
+      "housingShare": "soit 7% des logements de la ville",
+      "socialLandlords": "3 bailleurs sociaux à {location}",
+      "crousAlt": "Crous",
+      "gaugeAlt": "Jauge",
+      "easeTitle": "Facilité à trouver un logement",
+      "easeLevel": "Facile",
+      "easeDetail": "<b>3 semaines</b> en moyenne pour trouver un logement étudiant à {location}",
+      "tenantsBudgetTitle": "Budget des locataires",
+      "tenantsBudgetLevel": "Équilibré",
+      "tenantsBudgetDetail": "Le budget des étudiants locataires à {location} est équilibré.",
+      "aidsTitle": "17 aides disponibles pour les étudiants résidant à {location}",
+      "aids": {
+        "national": "Aides nationales",
+        "regional": "Aides régionales",
+        "departmental": "Aides départementales",
+        "city": "Aides de la ville"
+      },
+      "simulateAidsCta": "Simuler mes aides",
+      "costTitle": "Le coût de la vie <br></br> étudiante à {location}",
+      "costIntro": "Une estimation générale des principaux postes de dépense pour un étudiant à {location}. Les coûts peuvent varier en fonction du style de vie, des aides perçues et des choix personnels.",
+      "minimalBudgetTitle": "Budget minimal",
+      "minimalBudgetDescription": "Résidence Crous, repas RU, et peu de sorties.",
+      "comfortableBudgetTitle": "Budget confortable",
+      "comfortableBudgetDescription": "Logement privé et activités diverses.",
+      "budgetRange": "Entre {min} et {max} €",
+      "unknownBudget": "Non connu",
+      "cost": {
+        "housingTitle": "Logement",
+        "pricePerSquareMeter": "<b>Prix moyen du m²</b> : {price} €.",
+        "rentFor20": "<b>Loyer moyen pour un logement de 20m²</b> : {price} € par mois.",
+        "transportTitle": "Transport",
+        "transportPass": "<b>Navigo Imagine'R</b> (carte pour étudiants) : environ 38 € par mois (APL déduite).",
+        "transportOccasional": "<b>Frais occasionnels</b> (covoiturage, taxis, etc.) : 10-30 € par mois.",
+        "foodTitle": "Alimentation",
+        "foodGroceries": "<b>Courses alimentaires</b> : 150-200 € par mois (APL déduite).",
+        "foodUniversity": "<b>Repas universitaires (Crous)</b> : environ 3.30 € par repas (si pris au RU).",
+        "foodOneEuro": "<b>Repas à 1€ pour les étudiants boursiers et précaires.</b>",
+        "universityTitle": "Frais universitaires",
+        "universityTuition": "<b>Frais d'inscription annuels</b> : <br></br>Licence : 170 € / Master : 243 €.",
+        "universityHealth": "<b>Mutuelle santé</b> : 10-40 € par mois (selon les besoins et le statut).",
+        "leisureTitle": "Loisirs et sorties",
+        "leisureOutings": "<b>Sorties</b> (cinéma, bars, restaurants) : 50-100 € par mois.",
+        "leisureActivities": "<b>Activités sportives ou culturelles</b> : 20-50 € par mois.",
+        "otherTitle": "Autres dépenses",
+        "otherInternet": "<b>Internet et téléphone</b> : 20-40 € par mois.",
+        "otherSupplies": "<b>Fournitures scolaires</b> : 20-30 € par mois.",
+        "otherInsurance": "<b>Assurance habitation</b> : 10-20 € par mois."
+      }
+    }
   },
   "prepareBudget": {
     "title": "Préparer mon budget étudiant",
@@ -497,6 +591,7 @@
         "title": "5. Les aides à ne pas oublier",
         "description": "Voici quelques dispositifs valables sur tout le territoire :",
         "table": {
+          "caption": "Aides au logement et à la vie étudiante selon la situation",
           "header": {
             "column1": "Aides",
             "column2": "Description",
@@ -667,8 +762,7 @@
     "hero": {
       "title": "Trouvez votre prochain",
       "titleHighlight": "logement social étudiant",
-      "counter": "Plus de <strong>60 000 logements</strong> déjà référencés",
-      "illustrationAlt": "Étudiant travaillant sur son ordinateur"
+      "counter": "Plus de <strong>60 000 logements</strong> déjà référencés"
     },
     "cta": "Rechercher un logement",
     "title": "Plus de 1300 résidences étudiantes",
@@ -707,8 +801,7 @@
     },
     "cities": {
       "title": "Explorez les villes étudiantes",
-      "moreButton": "Plus de villes",
-      "illustrationAlt": "Étudiante sur canapé avec laptop"
+      "moreButton": "Plus de villes"
     },
     "facilitate": {
       "title": "Tout pour faciliter ma",
@@ -753,7 +846,8 @@
       "title": "Gestionnaires, rejoignez la plateforme nationale du",
       "titleHighlight": "logement social étudiant",
       "description": "Nous centralisons l'ensemble de l'offre de résidences à vocation sociale pour fluidifier le parcours d'accès au logement des étudiants et futurs étudiants",
-      "button": "En savoir plus"
+      "button": "En savoir plus",
+      "buttonLabel": "En savoir plus sur les bailleurs sociaux partenaires"
     },
     "institutionalPartners": {
       "label": "Parmi les partenaires de <bold>Mon Logement Étudiant</bold>"
@@ -922,6 +1016,7 @@
       }
     },
     "income": {
+      "incomeRowLegend": "Ligne de revenu : {source}",
       "sourceLabel": "Source de revenus",
       "frequencyLabel": "Fréquence",
       "amountLabel": "Montant",
@@ -944,6 +1039,7 @@
       }
     },
     "expenses": {
+      "expenseRowLegend": "Ligne de dépense : {category}",
       "categoryLabel": "Catégorie",
       "frequencyLabel": "Fréquence",
       "amountLabel": "Montant",
@@ -977,6 +1073,8 @@
       }
     },
     "summary": {
+      "chartShareHeader": "Part du budget",
+      "announcement": "Revenus mensuels : {incomes}. Dépenses mensuelles : {expenses}. Reste à vivre : {balance}.",
       "title": "Résumé du budget",
       "subtitle": "Résultats de votre simulation en équivalent mensuel",
       "totalIncome": "Revenus totaux mensualisés",
@@ -1036,7 +1134,8 @@
       "menuTitle": "Mon espace"
     },
     "welcome": {
-      "subtitle": "Bienvenue dans votre espace personnel"
+      "subtitle": "Bienvenue dans votre espace personnel",
+      "greeting": "Ravi de vous revoir {firstname}"
     },
     "summary": {
       "title": "En résumé",
@@ -1073,7 +1172,41 @@
     },
     "todo": {
       "title": "Ma liste de priorités",
-      "description": "Complétez votre liste de priorités pour mettre toutes les chances de votre côté"
+      "description": "Complétez votre liste de priorités pour mettre toutes les chances de votre côté",
+      "sectionTodo": "À faire",
+      "sectionDone": "Terminé",
+      "markDone": "Marquer comme terminé",
+      "markTodo": "Remettre à faire",
+      "items": {
+        "simulateHousingAid": {
+          "label": "Simuler mes aides au logement",
+          "description": "Tout pour estimer vos droits",
+          "cta": "Accéder au simulateur",
+          "ctaLabel": "Accéder au simulateur d’aides au logement",
+          "duration": "5 minutes"
+        },
+        "anticipateStudentBudget": {
+          "label": "Anticiper mon budget étudiant",
+          "description": "Pour les villes où je pourrais m’installer",
+          "cta": "Guide pratique",
+          "ctaLabel": "Guide pratique pour anticiper mon budget étudiant",
+          "duration": "5 minutes"
+        },
+        "submitApplications": {
+          "label": "Déposer un dossier dans au moins 3 résidences étudiantes",
+          "description": "Mettez toutes les chances de votre côté",
+          "cta": "Explorer les logements",
+          "ctaLabel": "Explorer les logements pour déposer un dossier",
+          "duration": ""
+        },
+        "createHousingAlert": {
+          "label": "Créer sa première alerte logement",
+          "description": "Les nouvelles offres de logements disponibles en temps réel",
+          "cta": "Mes alertes",
+          "ctaLabel": "Accéder à mes alertes logement",
+          "duration": "1 minute"
+        }
+      }
     },
     "housingAid": {
       "title": "Mes aides au logement",
@@ -1119,12 +1252,30 @@
       "notifications": {
         "title": "Paramètres des notifications",
         "similarAlert": "Je souhaite augmenter la distance (+10 km) et le budget (+25 %) autour de mes villes de recherche.",
-        "favoriteAlert": "Je souhaite des alertes de disponibilité dans mes résidences favorites"
+        "favoriteAlert": "Je souhaite des alertes de disponibilité dans mes résidences favorites",
+        "similarAlertDescription": "Recevoir un courriel lorsque des logements similaires à vos favoris sont disponibles",
+        "favoriteAlertDescription": "Recevoir un courriel lorsqu’un de vos favoris redevient disponible"
       }
     },
     "alerts": {
       "notificationToggle": "Je souhaite augmenter la distance (+10 km) et le budget (+25 %) autour de mes villes de recherche.",
-      "notificationEmailPrefix": "Vous recevez les notifications sur votre adresse e-mail"
+      "notificationEmailPrefix": "Vous recevez les notifications sur votre adresse e-mail",
+      "nameLabel": "Nom de l'alerte",
+      "maxPriceLabel": "Budget maximum",
+      "colivingLabel": "En colocation",
+      "colivingDescription": "N'être alerté que pour les résidences proposant de la colocation",
+      "accessibleLabel": "Adapté PMR",
+      "accessibleDescription": "N'être alerté que pour les résidences adaptées aux personnes à mobilité réduite",
+      "locationLabel": "Ville, département ou académie",
+      "locationHint": "Saisissez le nom d'une ville, d'un département ou d'une académie",
+      "notificationsLabel": "Recevoir des alertes mail",
+      "notificationsDescription": "Recevoir un courriel lorsque de nouveaux logements correspondent à l’alerte « {name} »",
+      "countLabel": "{count} résidence{pluralize}",
+      "countButtonLabel": "Voir les {count} résidence{pluralize} de cette alerte",
+      "edit": "Éditer",
+      "save": "Enregistrer",
+      "saving": "Enregistrement...",
+      "cancel": "Annuler"
     },
     "favorites": {
       "notificationToggle": "Je souhaite des alertes de disponibilité dans mes résidences favorites",
@@ -1545,5 +1696,14 @@
       "submit": "Enregistrer",
       "submitting": "Enregistrement..."
     }
+  },
+  "map": {
+    "zoomIn": "Zoom avant",
+    "zoomInLabel": "Zoom avant sur la carte",
+    "zoomOut": "Zoom arrière",
+    "zoomOutLabel": "Zoom arrière sur la carte",
+    "resultsLabel": "Carte des résidences correspondant à votre recherche. La liste des résultats, affichée à côté de la carte, en donne l'équivalent textuel.",
+    "accommodationLabel": "Carte de localisation de la résidence. L'adresse complète figure en texte au-dessus de la carte.",
+    "markerLabel": "Emplacement de la résidence sur la carte"
   }
 }

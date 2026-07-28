@@ -4,6 +4,11 @@ import { SavedSimulationResults } from '~/components/student-space/housing-aid/s
 import { getHousingAidSimulation } from '~/server/student/get-housing-aid-simulation'
 import styles from '../mon-espace.module.css'
 
+export const generateMetadata = async () => {
+  const t = await getTranslations('breadcrumbs.student')
+  return { title: t('housingAid.title') }
+}
+
 export default async function HousingAidPage() {
   const t = await getTranslations('student.housingAid')
   const inputs = await getHousingAidSimulation()

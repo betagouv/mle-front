@@ -4,6 +4,7 @@ import { StudentSpaceNavigation } from '~/components/student-space/navigation/st
 import { PendingSimulationSaver } from '~/components/student-space/pending-simulation-saver'
 import { StudentProfileGate } from '~/components/student-space/profile/student-profile-gate'
 import { StudentBreadcrumb } from '~/components/student-space/student-breadcrumb'
+import { CommonSkipLinks, MAIN_CONTENT_ID } from '~/components/ui/common-skip-links'
 import { CommonFooter } from '~/components/ui/footer/footer'
 import { CommonHeader } from '~/components/ui/header/common-header'
 import { getServerSession } from '~/services/better-auth'
@@ -12,7 +13,10 @@ export const generateMetadata = async () => {
   const t = await getTranslations('metadata')
   return {
     description: t('student.workspace.description'),
-    title: t('student.workspace.title'),
+    title: {
+      template: `%s - ${t('student.workspace.shortTitle')}`,
+      default: t('student.workspace.title'),
+    },
     robots: {
       index: false,
       follow: false,
@@ -35,8 +39,9 @@ export default async function WorkspaceLayout({
     <>
       <PendingSimulationSaver />
       <StudentProfileGate user={auth.user} />
+      <CommonSkipLinks withNavigation={false} />
       <CommonHeader withNavigation={false} />
-      <main className="primaryBackgroundColor">
+      <main id={MAIN_CONTENT_ID} tabIndex={-1} className="primaryBackgroundColor">
         <div className="fr-container fr-pb-12w">
           <StudentBreadcrumb />
           <div className="fr-col-md-12 fr-flex fr-direction-column fr-direction-md-row fr-background-default--grey">

@@ -1,4 +1,4 @@
-import { fr } from '@codegouvfr/react-dsfr'
+import clsx from 'clsx'
 import Image from 'next/image'
 import { getTranslations } from 'next-intl/server'
 import PrepareBudgetAidsTable from '~/app/(public)/preparer-mon-budget-etudiant/components/prepare-budget-aids-table'
@@ -41,16 +41,14 @@ export default async function PrepareBudgetContent() {
     },
   ]
   return (
-    <div className={fr.cx('fr-col-md-8', 'fr-px-4w', 'fr-py-5w')}>
-      <h2 className="fr-h6" style={{ color: fr.colors.decisions.text.mention.grey.default, fontWeight: '400 !important' }}>
-        {t('subtitle')}
-      </h2>
+    <div className="fr-col-md-8 fr-px-4w fr-py-5w">
+      <p className={clsx('fr-h6', styles.contentSubtitle)}>{t('subtitle')}</p>
       <h2 className="fr-h1">
         {t('mainTitlePart1')}
         <br />
         <span>{t('mainTitlePart2')}</span>
       </h2>
-      <Image src={imageHero} alt="Prepare mon budget étudiant - Image de fond" priority quality={100} className={styles.imageHero} />
+      <Image src={imageHero} alt="" priority quality={100} className={styles.imageHero} />
       <PrepareBudgetContentHeader />
       {cards.map((card, index) => (
         <PrepareBudgetContentCard key={card.translationKey} {...card} withBorder={index !== cards.length - 1}>

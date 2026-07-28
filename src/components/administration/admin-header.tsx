@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import { Header } from '@codegouvfr/react-dsfr/Header'
 import { getTranslations } from 'next-intl/server'
 import { FC } from 'react'
@@ -30,7 +29,7 @@ export const AdminHeaderComponent: FC = async () => {
             <span className="fr-ml-1w fr-badge fr-badge--error fr-badge--no-icon fr-text--uppercase">Administration</span>
           </>
         }
-        className={fr.cx('fr-header')}
+        className="fr-header"
       />
     </div>
   )

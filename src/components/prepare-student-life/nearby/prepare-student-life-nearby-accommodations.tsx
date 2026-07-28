@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import Link from 'next/link'
@@ -22,7 +21,7 @@ export default async function PrepareStudentLifeNearbyAccommodations({ bbox, nam
   const accommodationsList = accommodations.results.slice(0, 6)
   return (
     <div className="primaryBackgroundColor">
-      <div className={clsx(fr.cx('fr-container'), styles.accommodationGridContainer, 'fr-pt-6w')}>
+      <div className={clsx('fr-container', styles.accommodationGridContainer, 'fr-pt-6w')}>
         <h1 className={clsx('h1', styles.whiteTitle)}>Parmi les logements étudiants à {name}</h1>
         <div className={styles.accommodationGrid}>
           {accommodationsList.map((accommodation) => (

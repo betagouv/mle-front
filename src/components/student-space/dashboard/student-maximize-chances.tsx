@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { useLocalStorage } from 'usehooks-ts'
-import { ALL_TODOS } from '~/components/student-space/todo/student-todo-list'
+import { ALL_TODO_IDS } from '~/components/student-space/todo/student-todo-list'
 import styles from './student-maximize-chances.module.css'
 
 export const StudentMaximizeChances = () => {
@@ -17,7 +17,7 @@ export const StudentMaximizeChances = () => {
     setIsHydrated(true)
   }, [])
 
-  const isTodoListComplete = isHydrated && completedTodos.length === ALL_TODOS.length
+  const isTodoListComplete = isHydrated && completedTodos.length === ALL_TODO_IDS.length
 
   const items = [
     {
@@ -33,7 +33,7 @@ export const StudentMaximizeChances = () => {
 
   return (
     <div className="fr-flex fr-direction-column fr-flex-gap-4v fr-pt-4w fr-px-6w fr-pb-6w">
-      <span className="fr-h4">{t('title')}</span>
+      <h2 className="fr-h4">{t('title')}</h2>
       <div className="fr-background-default--grey">
         <div className="fr-flex fr-direction-column fr-justify-content-space-between fr-px-4w">
           {items.map((item, index) => (

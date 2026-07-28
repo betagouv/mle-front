@@ -7,6 +7,8 @@ import { useQueryState } from 'nuqs'
 import { FC } from 'react'
 import { tss } from 'tss-react'
 import { FindStudentAccommodationCitiesAutocompleteResults } from '~/components/find-student-accomodation/home/autocomplete/find-student-accommodations-cities-autocomplete-results'
+import { LiveRegion } from '~/components/ui/live-region'
+import { useCombobox } from '~/hooks/use-combobox'
 import { useSearchCities } from '~/hooks/use-search-cities'
 import { trackEvent } from '~/lib/tracking'
 import { TCity } from '~/schemas/territories'
@@ -37,18 +39,41 @@ export const FindStudentAccommodationCitiesAutocompleteInput: FC = () => {
     setSearchQueryState(item.slug)
   }
 
+  const suggestions = data ?? []
+  const isOpen = suggestions.length > 0 && !!searchQuery && !searchQueryState
+  const { inputProps, listboxProps, getOptionProps, activeIndex, announcement } = useCombobox<TCity>({
+    id: 'recherche-ville',
+    items: suggestions,
+    isOpen,
+    onSelect: handleOnClickItem,
+    onClose: () => setSearchQueryState(searchQuery),
+  })
+
   return (
     <div className={classes.container}>
       <Input
         classes={{ root: classes.input }}
         label={t('city')}
         iconId="ri-search-line"
-        nativeInputProps={{ onFocus: handleOnFocus, onChange: handleInputChange, value: searchQuery }}
+        nativeInputProps={{
+          onFocus: handleOnFocus,
+          onChange: handleInputChange,
+          value: searchQuery,
+          autoComplete: 'address-level2',
+          ...inputProps,
+        }}
         state={isError ? 'error' : 'default'}
       />
 
-      {data && !!searchQuery && !searchQueryState && (
-        <FindStudentAccommodationCitiesAutocompleteResults data={data} onClickItem={handleOnClickItem} />
+      <LiveRegion message={announcement} />
+
+      {isOpen && (
+        <FindStudentAccommodationCitiesAutocompleteResults
+          data={suggestions}
+          listboxProps={listboxProps}
+          getOptionProps={getOptionProps}
+          activeIndex={activeIndex}
+        />
       )}
     </div>
   )

@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import Accordion from '@codegouvfr/react-dsfr/Accordion'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { clsx } from 'clsx'
@@ -35,9 +34,9 @@ export default async function SimulateAccommodationAids() {
       <WrapperSimulator />
 
       <div className={clsx('primaryBackgroundColor', styles.faqSection)}>
-        <div className={fr.cx('fr-container')}>
+        <div className="fr-container">
           <div className={clsx('fr-col-md-12', styles.faqContainer)}>
-            <div className={clsx(fr.cx('fr-col-md-4'), styles.faqTitleContainer)}>
+            <div className={clsx('fr-col-md-4', styles.faqTitleContainer)}>
               <h2 className={styles.faqTitle}>
                 Parmi les questions fréquentes sur les <br />
                 aides aux logements étudiants
@@ -48,8 +47,8 @@ export default async function SimulateAccommodationAids() {
                 </Button>
               </div>
             </div>
-            <div className={fr.cx('fr-col-md-8')}>
-              <div className={clsx(fr.cx('fr-accordions-group'), styles.faqContent)}>
+            <div className="fr-col-md-8">
+              <div className={clsx('fr-accordions-group', styles.faqContent)}>
                 {questionsAnswers.map((qa, index) => (
                   <Accordion key={index} label={qa.title_fr}>
                     <div dangerouslySetInnerHTML={{ __html: qa.content_fr }} />

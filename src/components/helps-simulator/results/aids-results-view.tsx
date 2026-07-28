@@ -36,7 +36,9 @@ export const AidsResults: FC<AidsResultsViewProps> = ({ results, view, onViewCha
       </div>
 
       <div className="fr-pt-3w">
-        <h3 className="fr-h5 fr-mb-3w">{view === 'eligible' ? eligibleLabel : ineligibleLabel}</h3>
+        {/* <h2> : sur la page « Mes aides au logement », ce titre suit directement le <h1> (RGAA 9.1).
+            Les cartes d'aide qu'il introduit restent en <h3>. */}
+        <h2 className="fr-h5 fr-mb-3w">{view === 'eligible' ? eligibleLabel : ineligibleLabel}</h2>
         {view === 'eligible' && (
           <div className="fr-flex fr-direction-column">
             <span className="fr-text--bold">{t('disclaimerTitle')}</span>

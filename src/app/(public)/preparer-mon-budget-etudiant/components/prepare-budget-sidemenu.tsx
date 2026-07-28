@@ -90,7 +90,7 @@ export const PrepareBudgetSidemenu = () => {
   return (
     <div className={clsx('fr-col-md-4', classes.sideMenuContainer)}>
       <SideMenu
-        className={clsx(fr.cx('fr-px-4w', 'fr-py-5w'), classes.sideMenu)}
+        className={clsx('fr-px-4w', 'fr-py-5w', classes.sideMenu)}
         align="left"
         classes={{
           inner: classes.innerMenu,

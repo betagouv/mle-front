@@ -45,3 +45,10 @@ next-env.d.ts
 # Generated favicons (copied from DSFR)
 public/favicon.svg
 public/favicon.ico
+
+.audit-rgaa-cache/
+docs/audit-rgaa/
+
+# Audit RGAA : outillage local, non versionné
+cli/commands/audit-rgaa/
+cli/local/

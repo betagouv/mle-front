@@ -7,6 +7,7 @@ import styles from './news.module.css'
 
 export const NewsSection = async () => {
   const tHome = await getTranslations('home')
+  const tA11y = await getTranslations('accessibility')
   const posts = await getLatestWordpressPosts({ limit: 3 })
 
   return (
@@ -37,6 +38,7 @@ export const NewsSection = async () => {
               href: post.link,
               target: '_blank' as const,
               rel: 'noopener noreferrer',
+              title: tA11y('linkNewWindow', { label: post.title }),
             },
             size: 'medium' as const,
             title: post.title,
@@ -46,7 +48,7 @@ export const NewsSection = async () => {
           return (
             <div key={post.id} className={clsx('fr-col-12 fr-col-md-4', styles.newsCardColumn)}>
               {post.imageUrl ? (
-                <Card {...commonCardProps} imageUrl={post.imageUrl} imageAlt={post.imageAlt} />
+                <Card {...commonCardProps} imageUrl={post.imageUrl} imageAlt={post.imageAlt || ''} />
               ) : (
                 <Card {...commonCardProps} />
               )}
@@ -57,7 +59,10 @@ export const NewsSection = async () => {
       <div className="fr-flex fr-justify-content-center fr-mt-4w">
         <Button
           priority="secondary"
-          linkProps={{ href: 'https://info.monlogementetudiant.beta.gouv.fr/category/conseils-pratiques/' }}
+          linkProps={{
+            href: 'https://info.monlogementetudiant.beta.gouv.fr/category/conseils-pratiques/',
+            title: tA11y('linkNewWindow', { label: tHome('news.moreButton') }),
+          }}
           iconPosition="right"
           iconId="ri-arrow-right-line"
         >

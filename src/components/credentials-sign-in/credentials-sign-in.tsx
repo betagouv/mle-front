@@ -1,6 +1,5 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import Alert from '@codegouvfr/react-dsfr/Alert'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { PasswordInput } from '@codegouvfr/react-dsfr/blocks/PasswordInput'
@@ -145,7 +144,7 @@ export const CredentialsSignInForm: FC = () => {
             />
           </div>
           <div>
-            <Link className={fr.cx('fr-link')} href="/mot-de-passe-oublie">
+            <Link className="fr-link" href="/mot-de-passe-oublie">
               {t('labels.forgotPassword')}
             </Link>
           </div>

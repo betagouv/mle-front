@@ -5,7 +5,7 @@ import SideMenu from '@codegouvfr/react-dsfr/SideMenu'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useLocalStorage } from 'usehooks-ts'
-import { ALL_TODOS } from '~/components/student-space/todo/student-todo-list'
+import { ALL_TODO_IDS } from '~/components/student-space/todo/student-todo-list'
 import styles from './student-space-navigation.module.css'
 
 const NAV_ITEMS = [
@@ -27,7 +27,7 @@ export const StudentSpaceNavigation = () => {
   const items = NAV_ITEMS.map(({ href, labelKey }) => ({
     isActive: pathname === href || pathname.startsWith(`${href}/`),
     linkProps: { href },
-    text: labelKey === 'todoList' ? t('todoList', { done: completedTodos.length, total: ALL_TODOS.length }) : t(labelKey),
+    text: labelKey === 'todoList' ? t('todoList', { done: completedTodos.length, total: ALL_TODO_IDS.length }) : t(labelKey),
   }))
 
   return (
@@ -37,7 +37,7 @@ export const StudentSpaceNavigation = () => {
           {t('backToHome')}
         </Button>
       </div>
-      <SideMenu align="left" burgerMenuButtonText={t('menuTitle')} items={items} classes={{ inner: styles.menuInner }} />
+      <SideMenu align="left" burgerMenuButtonText={t('menuTitle')} items={items} classes={{ root: 'fr-p-3w', inner: styles.menuInner }} />
     </>
   )
 }

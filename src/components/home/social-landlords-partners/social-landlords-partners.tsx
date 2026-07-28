@@ -52,7 +52,15 @@ export const SocialLandlordsPartnersSection = async () => {
             <p className="fr-mb-0">{t('landing.hero.contact.role')}</p>
           </div>
         </div>
-        <Button priority="tertiary" className={styles.partnersButton} linkProps={{ href: '/landing', target: '_blank' }}>
+        <Button
+          priority="tertiary"
+          className={styles.partnersButton}
+          linkProps={{
+            href: '/landing',
+            target: '_blank',
+            'aria-label': t('accessibility.linkNewWindow', { label: tHome('partners.buttonLabel') }),
+          }}
+        >
           {tHome('partners.button')}
         </Button>
       </div>

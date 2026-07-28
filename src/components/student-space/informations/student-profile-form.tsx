@@ -9,7 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
 import { createToast } from '~/components/ui/createToast'
-import { RequiredLabel } from '~/components/ui/required-mark'
+import { RequiredFieldsNotice, RequiredLabel } from '~/components/ui/required-mark'
 import { useUpdateStudentProfile } from '~/hooks/use-update-student-profile'
 import { SCHOLARSHIP_TYPES, type TUpdateStudentProfileForm, ZUpdateStudentProfileForm } from '~/schemas/student/update-profile'
 import { authClient } from '~/services/better-auth-client'
@@ -78,13 +78,14 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="fr-flex fr-direction-column fr-flex-gap-4v">
+      <RequiredFieldsNotice />
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-12 fr-col-md-6">
           <Input
             label={<RequiredLabel>{t('lastname')}</RequiredLabel>}
             state={errors.lastname ? 'error' : undefined}
             stateRelatedMessage={errors.lastname?.message}
-            nativeInputProps={{ ...register('lastname') }}
+            nativeInputProps={{ ...register('lastname'), autoComplete: 'family-name', 'aria-required': true }}
           />
         </div>
         <div className="fr-col-12 fr-col-md-6">
@@ -92,15 +93,11 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
             label={<RequiredLabel>{t('firstname')}</RequiredLabel>}
             state={errors.firstname ? 'error' : undefined}
             stateRelatedMessage={errors.firstname?.message}
-            nativeInputProps={{ ...register('firstname') }}
+            nativeInputProps={{ ...register('firstname'), autoComplete: 'given-name', 'aria-required': true }}
           />
         </div>
         <div className="fr-col-12 fr-col-md-6">
-          <Input
-            label={<RequiredLabel>{t('email')}</RequiredLabel>}
-            disabled
-            nativeInputProps={{ value: initialValues.email, readOnly: true }}
-          />
+          <Input label={t('email')} disabled nativeInputProps={{ value: initialValues.email, readOnly: true, autoComplete: 'email' }} />
         </div>
         <div className="fr-col-12 fr-col-md-6">
           <Input
@@ -114,6 +111,7 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
                 },
               }),
               type: 'tel',
+              autoComplete: 'tel-national',
               placeholder: t('phonePlaceholder'),
               maxLength: 10,
             }}
@@ -125,7 +123,7 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
             hintText={t('birthdateHint')}
             state={errors.birthdate ? 'error' : undefined}
             stateRelatedMessage={errors.birthdate?.message}
-            nativeInputProps={{ ...register('birthdate'), type: 'date' }}
+            nativeInputProps={{ ...register('birthdate'), type: 'date', autoComplete: 'bday' }}
           />
         </div>
       </div>
