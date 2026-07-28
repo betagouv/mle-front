@@ -1,6 +1,5 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import { useRouter } from 'next/navigation'
 import { FC } from 'react'
 
@@ -22,7 +21,7 @@ export const LanguageLink: FC<LanguageLinkProps> = ({ activeLocale, fullNameByLa
 
   return (
     <a
-      className={fr.cx('fr-translate__language', 'fr-nav__link')}
+      className="fr-translate__language fr-nav__link"
       href=""
       aria-current={activeLocale === locale ? 'true' : undefined}
       onClick={() => handleLocale(locale)}

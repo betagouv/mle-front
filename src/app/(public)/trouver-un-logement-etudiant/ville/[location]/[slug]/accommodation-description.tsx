@@ -9,7 +9,7 @@ export default async function AccommodationDescription({ title, description }: {
 
   return (
     <div className={styles.section}>
-      <h4>{t('descriptionTitle', { title })}</h4>
+      <h3 className="fr-h4">{t('descriptionTitle', { title })}</h3>
       <div dangerouslySetInnerHTML={{ __html: sanitizeHTML(description) }} />
     </div>
   )

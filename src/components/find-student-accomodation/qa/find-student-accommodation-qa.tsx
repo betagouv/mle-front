@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
@@ -11,7 +10,7 @@ export default async function FindStudentAccommodationQA() {
 
   return (
     <div className={clsx(styles.mainQaFaqContainer, 'primaryBackgroundColor')}>
-      <div className={fr.cx('fr-container')}>
+      <div className="fr-container">
         <div className={styles.faqQaContainer}>
           <div className={styles.faqTitleCtaContainer}>
             <h2 className={clsx(styles.whiteColor, styles.titleMargin)}>{t('faq.title')}</h2>

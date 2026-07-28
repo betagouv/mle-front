@@ -1,9 +1,9 @@
 'use client'
 
-import { ToggleSwitch } from '@codegouvfr/react-dsfr/ToggleSwitch'
 import { useTranslations } from 'next-intl'
 import { parseAsBoolean, parseAsInteger, useQueryStates } from 'nuqs'
 import { FC } from 'react'
+import { ToggleSwitch } from '~/components/ui/toggle-switch'
 import { trackEvent } from '~/lib/tracking'
 import styles from './find-student-accommodation-availability-switch.module.css'
 
@@ -31,6 +31,7 @@ export const FindStudentAccommodationAvailabilitySwitch: FC<FindStudentAccommoda
         className="fr-mb-2v"
         classes={{ label: styles.label }}
         inputTitle="availability"
+        description={t('header.availabilityDescription')}
         showCheckedHint={false}
         label={t('header.availability')}
         labelPosition="right"

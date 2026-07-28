@@ -1,11 +1,13 @@
 'use client'
 
 import { FrCxArg, fr } from '@codegouvfr/react-dsfr'
+import clsx from 'clsx'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { FC } from 'react'
 import { tss } from 'tss-react'
+import { LiveRegion } from '~/components/ui/live-region'
 import { TTerritories, TTerritory } from '~/schemas/territories'
 import { useTRPCClient } from '~/server/trpc/client'
 
@@ -50,8 +52,14 @@ export const FindStudentAccomodationAutocompleteResults: FC<FindStudentAccomodat
     return null
   }
 
+  const suggestionsCount = categories.reduce(
+    (total, category) => total + ((data[category as keyof TTerritories] as TTerritory[])?.length ?? 0),
+    0,
+  )
+
   return (
-    <div className={classes.container}>
+    <div className={classes.container} role="region" aria-label={t('autocomplete.suggestionsLabel')}>
+      <LiveRegion message={suggestionsCount > 0 ? t('autocomplete.suggestionsCount', { count: suggestionsCount }) : ''} />
       <ul className={classes.list}>
         {categories.map((category) => {
           const categoryKey = category as keyof TTerritories
@@ -60,10 +68,8 @@ export const FindStudentAccomodationAutocompleteResults: FC<FindStudentAccomodat
           const { icon, label } = getCategoryLabelAndIcon(categoryKey)
 
           return (
-            <div className={classes.category} key={category}>
-              <li className={classes.categoryItem}>
-                <span className={fr.cx(icon)}>{label}</span>
-              </li>
+            <li className={classes.category} key={category}>
+              <span className={clsx(icon, classes.categoryItem)}>{label}</span>
               <ul className={classes.list}>
                 {items.map((item: TTerritory) => {
                   const searchParams = new URLSearchParams()
@@ -80,23 +86,24 @@ export const FindStudentAccomodationAutocompleteResults: FC<FindStudentAccomodat
                   }
                   const slug = 'slug' in item ? item.slug : item.name
                   return (
-                    <Link
-                      key={item.id}
-                      href={{
-                        pathname: `/trouver-un-logement-etudiant/${getCategoryKeySingular(categoryKey)}/${slug}`,
-                        search: searchParams.toString(),
-                      }}
-                      onClick={() => trackTerritorySelection(categoryKey, item)}
-                    >
-                      <li className={classes.item} key={item.id} tabIndex={0}>
+                    <li className={classes.item} key={item.id}>
+                      <Link
+                        className={classes.itemLink}
+                        role="option"
+                        href={{
+                          pathname: `/trouver-un-logement-etudiant/${getCategoryKeySingular(categoryKey)}/${slug}`,
+                          search: searchParams.toString(),
+                        }}
+                        onClick={() => trackTerritorySelection(categoryKey, item)}
+                      >
                         {item.name}
                         {'departmentCode' in item && item.departmentCode ? <>&nbsp;({item.departmentCode})</> : null}
-                      </li>
-                    </Link>
+                      </Link>
+                    </li>
                   )
                 })}
               </ul>
-            </div>
+            </li>
           )
         })}
       </ul>
@@ -133,7 +140,14 @@ const useStyles = tss.create({
     borderBottom: '1px solid #e0e0e0',
     borderTop: '1px solid #e0e0e0',
     cursor: 'pointer',
+  },
+  itemLink: {
+    backgroundImage: 'none',
+    color: 'inherit',
+    display: 'block',
     padding: '8px',
+    textDecoration: 'none',
+    width: '100%',
   },
   list: {
     backgroundColor: 'white',

@@ -6,6 +6,11 @@ import { StudentProfileForm } from '~/components/student-space/informations/stud
 import { getStudentProfile } from '~/server/student/get-profile'
 import styles from '../mon-espace.module.css'
 
+export const generateMetadata = async () => {
+  const t = await getTranslations('breadcrumbs.student')
+  return { title: t('personalInformations.title') }
+}
+
 export default async function StudentPersonalInformationsPage() {
   const t = await getTranslations('student.personalInformations')
   const profile = await getStudentProfile()

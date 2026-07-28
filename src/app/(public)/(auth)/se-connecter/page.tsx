@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import Alert from '@codegouvfr/react-dsfr/Alert'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
@@ -26,10 +25,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
       <div className={authStyles.imageContainer}>
         <Image className={authStyles.image} src={background} alt="Se connecter" priority quality={100} />
       </div>
-      <div className={clsx(authStyles.container, fr.cx('fr-container'))}>
+      <div className={clsx(authStyles.container, 'fr-container')}>
         <h1>{t('studentTitle')}</h1>
         <p>{t('requiredFieldsNotice')}</p>
-        {activated && <Alert severity="success" small description={t('activated')} className={fr.cx('fr-mb-3w')} />}
+        {activated && <Alert severity="success" small description={t('activated')} className="fr-mb-3w" />}
         <CredentialsSignInForm />
         <div className={authStyles.dividerContainer}>
           <span className={authStyles.divider}>{t('labels.or')}</span>

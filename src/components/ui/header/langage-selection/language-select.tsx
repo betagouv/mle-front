@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import { HeaderQuickAccessItem } from '@codegouvfr/react-dsfr/Header'
 import { cookies } from 'next/headers'
 import { useTranslations } from 'next-intl'
@@ -26,7 +25,7 @@ export const LanguageSelect: FC = async () => {
         buttonProps: {
           'aria-controls': 'language-select-menu',
           'aria-expanded': false,
-          className: fr.cx('fr-btn--tertiary', 'fr-translate', 'fr-nav'),
+          className: 'fr-btn--tertiary fr-translate fr-nav',
           title: t('title'),
         },
         iconId: 'fr-icon-translate-2',
@@ -34,10 +33,10 @@ export const LanguageSelect: FC = async () => {
           <>
             <div>
               <span className="short-label">{lang.toUpperCase()}</span>
-              <span className={fr.cx('fr-hidden-lg')}> -{fullNameByLang[lang as AvailableLocales]}</span>{' '}
+              <span className="fr-hidden-lg"> -{fullNameByLang[lang as AvailableLocales]}</span>{' '}
             </div>
-            <div className={fr.cx('fr-collapse', 'fr-menu')} id="language-select-menu">
-              <ul className={fr.cx('fr-menu__list')}>
+            <div className="fr-collapse fr-menu" id="language-select-menu">
+              <ul className="fr-menu__list">
                 {availablesLocales.map((lang_i) => (
                   <li key={lang_i}>
                     <LanguageLink activeLocale={lang} locale={lang_i} fullNameByLang={fullNameByLang[lang_i as AvailableLocales]} />

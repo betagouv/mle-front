@@ -9,7 +9,7 @@ export const StudentSummary = async () => {
   const [favorites, alerts] = await Promise.all([getFavorites(), getAlerts()])
   return (
     <div className="fr-flex fr-direction-column fr-flex-gap-4v fr-pt-4w fr-px-6w fr-pb-6w">
-      <span className="fr-h4">{t('title')}</span>
+      <h2 className="fr-h4">{t('title')}</h2>
       <div className="fr-flex fr-direction-column fr-direction-md-row fr-flex-gap-4v fr-justify-content-space-between">
         <div className="fr-width-full">
           <Tile

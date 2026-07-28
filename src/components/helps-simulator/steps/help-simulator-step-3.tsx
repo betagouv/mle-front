@@ -3,11 +3,14 @@
 import { fr } from '@codegouvfr/react-dsfr'
 import { Input } from '@codegouvfr/react-dsfr/Input'
 import { RadioButtons } from '@codegouvfr/react-dsfr/RadioButtons'
+import clsx from 'clsx'
 import { FC, useEffect, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { tss } from 'tss-react'
 import { type HelpSimulatorFormData } from '~/components/helps-simulator/help-simulator-schema'
+import { LiveRegion } from '~/components/ui/live-region'
 import { RequiredLabel } from '~/components/ui/required-mark'
+import { useCombobox } from '~/hooks/use-combobox'
 import { useSearchCities } from '~/hooks/use-search-cities'
 import { TCity } from '~/schemas/territories'
 
@@ -41,6 +44,16 @@ export const HelpSimulatorStep3: FC = () => {
     setShowResults(false)
   }
 
+  const suggestions = data ?? []
+  const isOpen = suggestions.length > 0 && showResults
+  const { inputProps, listboxProps, getOptionProps, activeIndex, announcement } = useCombobox<TCity>({
+    id: 'simulateur-ville',
+    items: suggestions,
+    isOpen,
+    onSelect: handleCitySelect,
+    onClose: () => setShowResults(false),
+  })
+
   return (
     <>
       <div className={classes.autocompleteContainer}>
@@ -52,14 +65,21 @@ export const HelpSimulatorStep3: FC = () => {
             ...register('city'),
             onChange: handleCityInputChange,
             value: searchQuery,
-            autoComplete: 'off',
+            autoComplete: 'address-level2',
+            required: true,
+            ...inputProps,
           }}
         />
-        {data && data.length > 0 && showResults && (
+        <LiveRegion message={announcement} />
+        {isOpen && (
           <div className={classes.resultsContainer}>
-            <ul className={classes.resultsList}>
-              {data.map((city: TCity) => (
-                <li key={city.id} className={classes.resultItem} onClick={() => handleCitySelect(city)}>
+            <ul className={classes.resultsList} {...listboxProps}>
+              {suggestions.map((city: TCity, index: number) => (
+                <li
+                  key={city.id}
+                  className={clsx(classes.resultItem, index === activeIndex && classes.resultItemActive)}
+                  {...getOptionProps(index)}
+                >
                   {city.name} {city.departmentCode ? `(${city.departmentCode})` : ''}
                 </li>
               ))}
@@ -79,6 +99,7 @@ export const HelpSimulatorStep3: FC = () => {
             nativeInputProps: {
               ...register('hasGuarantor'),
               value: 'yes',
+              'aria-required': true,
             },
           },
           {
@@ -86,6 +107,7 @@ export const HelpSimulatorStep3: FC = () => {
             nativeInputProps: {
               ...register('hasGuarantor'),
               value: 'no',
+              'aria-required': true,
             },
           },
           {
@@ -93,6 +115,7 @@ export const HelpSimulatorStep3: FC = () => {
             nativeInputProps: {
               ...register('hasGuarantor'),
               value: 'unknown',
+              'aria-required': true,
             },
           },
         ]}
@@ -132,5 +155,8 @@ const useStyles = tss.create({
     borderBottom: '1px solid #e0e0e0',
     cursor: 'pointer',
     padding: '8px',
+  },
+  resultItemActive: {
+    backgroundColor: '#f0f0f0',
   },
 })

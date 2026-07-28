@@ -15,13 +15,7 @@ export const CitiesSection = async () => {
       <div className={styles.citiesSection}>
         <div className="fr-flex fr-direction-column fr-direction-md-row">
           <div className={styles.citiesIllustration}>
-            <Image
-              width={612}
-              height={376}
-              src="/images/sofa-student.svg"
-              alt={tHome('cities.illustrationAlt')}
-              className={styles.citiesImage}
-            />
+            <Image width={612} height={376} src="/images/sofa-student.svg" alt="" className={styles.citiesImage} />
           </div>
           <div className={clsx('fr-flex fr-direction-column fr-flex-gap-6v', styles.citiesContent)}>
             <h2 className={clsx('fr-text--center fr-h2 fr-mb-0', styles.citiesTitle)}>{tHome('cities.title')}</h2>

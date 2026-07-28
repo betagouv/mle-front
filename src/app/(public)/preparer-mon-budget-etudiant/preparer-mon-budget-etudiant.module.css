@@ -21,3 +21,8 @@
   height: 400px;
   object-fit: cover;
 }
+
+p.contentSubtitle {
+  color: var(--text-mention-grey);
+  font-weight: 400;
+}

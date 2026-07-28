@@ -44,7 +44,8 @@ export function IncomeForm() {
   return (
     <div className="fr-flex fr-direction-column fr-flex-gap-4v">
       {state.activeIncomeTypes.map((type) => (
-        <div key={type} className={clsx('fr-flex fr-align-items-end fr-flex-gap-4v', styles.formRow)}>
+        <fieldset key={type} className={clsx('fr-flex fr-align-items-end fr-flex-gap-4v', styles.formRow, styles.rowFieldset)}>
+          <legend className="fr-sr-only">{t('incomeRowLegend', { source: t(`types.${type}`) })}</legend>
           <div className={clsx('fr-flex-basis-0 fr-flex-grow-1', styles.sourceSelect)}>
             <Select
               label={t('sourceLabel')}
@@ -96,14 +97,14 @@ export function IncomeForm() {
             {state.activeIncomeTypes.length > 1 && (
               <Button
                 priority="tertiary"
-                title={t('removeIncomeTitle')}
+                title={`${t('removeIncomeTitle')} : ${t(`types.${type}`)}`}
                 iconId="ri-delete-bin-line"
                 size="small"
                 onClick={() => handleRemoveIncomeType(type)}
               />
             )}
           </div>
-        </div>
+        </fieldset>
       ))}
       {canAddMore && (
         <Button iconId="ri-add-line" priority="secondary" size="small" onClick={handleAddIncomeType}>

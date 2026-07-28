@@ -19,7 +19,7 @@ const AccommodationMaximizeChance = async () => {
         <SelfTraining fontSize="large" width="62px" height="62px" className="fr-artwork--blue-ecume" />
       </div>
       <div className={classes.cardContent}>
-        <h4 className="fr-mb-1w fr-h5">{t('maximiseChancesTitle')}</h4>
+        <h3 className="fr-mb-1w fr-h5">{t('maximiseChancesTitle')}</h3>
         <p className="fr-mb-1w">{t('maximiseChancesDescription')}</p>
       </div>
     </div>
@@ -50,7 +50,7 @@ export const AccommodationAvailability = async ({ nbAvailable, acceptWaitingList
               <Error fontSize="large" width="62px" height="62px" />
             </div>
             <div className={classes.cardContent}>
-              <h4 className="fr-mb-1w fr-h5">{t('noAvailabilityTitle')}</h4>
+              <h3 className="fr-mb-1w fr-h5">{t('noAvailabilityTitle')}</h3>
               <p className="fr-mb-1w">{t('noAvailabilityDescription')}</p>
             </div>
           </div>

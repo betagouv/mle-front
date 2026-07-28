@@ -15,7 +15,8 @@ import z from 'zod'
 import { CompleteProfileModal, completeProfileModal } from '~/components/student-space/profile/complete-profile-modal'
 import { createToast } from '~/components/ui/createToast'
 import { ModalPortal } from '~/components/ui/modal-portal'
-import { RequiredLabel } from '~/components/ui/required-mark'
+import { NewWindowHint } from '~/components/ui/new-window'
+import { RequiredFieldsNotice, RequiredLabel } from '~/components/ui/required-mark'
 import type { ApartmentType } from '~/enums/apartment-type'
 import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { trackEvent } from '~/lib/tracking'
@@ -105,17 +106,21 @@ const LockableInput = ({
   label,
   name,
   type,
+  autoComplete,
+  required,
   lockedValue,
   form,
 }: {
   label: ReactNode
   name: TContactRequestField
   type: 'text' | 'email' | 'tel'
+  autoComplete: string
+  required?: boolean
   lockedValue: string
   form: UseFormReturn<TContactRequestForm>
 }) => {
   if (lockedValue) {
-    return <Input label={label} disabled nativeInputProps={{ type, value: lockedValue, readOnly: true }} />
+    return <Input label={label} disabled nativeInputProps={{ type, autoComplete, value: lockedValue, readOnly: true }} />
   }
 
   const error = form.formState.errors[name]?.message
@@ -125,7 +130,7 @@ const LockableInput = ({
       label={label}
       state={error ? 'error' : 'default'}
       stateRelatedMessage={error}
-      nativeInputProps={{ type, ...form.register(name) }}
+      nativeInputProps={{ type, ...form.register(name), autoComplete, 'aria-required': required }}
     />
   )
 }
@@ -182,20 +187,23 @@ const ContactRequestModal = ({ accommodationSlug }: { accommodationSlug: string 
 
   return (
     <ModalPortal>
-      <modal.Component title={null} size="large">
+      <modal.Component title={t('title')} size="large">
         {step === 'form' ? (
           <form onSubmit={handleSubmit}>
             <div className={styles.title}>
               <span className="ri-mail-send-line" aria-hidden="true" />
-              <h1 className="fr-h2 fr-mb-0">{t('title')}</h1>
+              <h2 className="fr-h2 fr-mb-0">{t('title')}</h2>
             </div>
             <p className="fr-text--lead">{t('description')}</p>
             {hasKnownFields && <p className="fr-text--sm fr-mb-0">{t('prefilledFromAccount')}</p>}
+            <RequiredFieldsNotice />
             <div className={styles.formGrid}>
               <LockableInput
                 label={<RequiredLabel>{t('firstname')}</RequiredLabel>}
                 name="firstname"
                 type="text"
+                autoComplete="given-name"
+                required
                 lockedValue={known.firstname}
                 form={form}
               />
@@ -203,6 +211,8 @@ const ContactRequestModal = ({ accommodationSlug }: { accommodationSlug: string 
                 label={<RequiredLabel>{t('lastname')}</RequiredLabel>}
                 name="lastname"
                 type="text"
+                autoComplete="family-name"
+                required
                 lockedValue={known.lastname}
                 form={form}
               />
@@ -210,10 +220,12 @@ const ContactRequestModal = ({ accommodationSlug }: { accommodationSlug: string 
                 label={<RequiredLabel>{t('email')}</RequiredLabel>}
                 name="email"
                 type="email"
+                autoComplete="email"
+                required
                 lockedValue={known.email}
                 form={form}
               />
-              <LockableInput label={t('phone')} name="phone" type="tel" lockedValue={known.phone} form={form} />
+              <LockableInput label={t('phone')} name="phone" type="tel" autoComplete="tel-national" lockedValue={known.phone} form={form} />
             </div>
             <Checkbox
               state={form.formState.errors.consent ? 'error' : 'default'}
@@ -225,6 +237,7 @@ const ContactRequestModal = ({ accommodationSlug }: { accommodationSlug: string 
                       {t('consentStart')}{' '}
                       <Link href="/politique-de-confidentialite" target="_blank">
                         {t('privacyPolicy')}
+                        <NewWindowHint />
                       </Link>{' '}
                       {t('consentEnd')}
                     </>
@@ -246,7 +259,7 @@ const ContactRequestModal = ({ accommodationSlug }: { accommodationSlug: string 
           <div>
             <div className={styles.title}>
               <span className="ri-check-line" aria-hidden="true" />
-              <h1 className="fr-h2 fr-mb-0">{t('successTitle')}</h1>
+              <h2 className="fr-h2 fr-mb-0">{t('successTitle')}</h2>
             </div>
             <p className="fr-text--lead">{isAuthenticated ? t('successDescriptionAuthenticated') : t('successDescriptionGuest')}</p>
             <div className={styles.footer}>
@@ -277,6 +290,7 @@ const DossierFacileApplyButton = ({
   availableApartmentTypes: ApartmentType[]
 }) => {
   const t = useTranslations('accomodation')
+  const tA11y = useTranslations('accessibility')
   const trpc = useTRPC()
   const trpcClient = useTRPCClient()
   const candidatureModal = useCandidatureModal(accommodationSlug)
@@ -340,7 +354,12 @@ const DossierFacileApplyButton = ({
         <Button
           priority="primary"
           className="fr-width-full fr-flex fr-justify-content-center"
-          linkProps={{ href: tenantUrl, target: '_blank', rel: 'noopener noreferrer' }}
+          linkProps={{
+            href: tenantUrl,
+            target: '_blank',
+            rel: 'noopener noreferrer',
+            title: tA11y('linkNewWindow', { label: 'DossierFacile' }),
+          }}
         >
           {t('sidebar.buttons.dossierFacileIncomplete')}
         </Button>
@@ -354,7 +373,12 @@ const DossierFacileApplyButton = ({
         <Button
           priority="primary"
           className="fr-width-full fr-flex fr-justify-content-center"
-          linkProps={{ href: tenantUrl, target: '_blank', rel: 'noopener noreferrer' }}
+          linkProps={{
+            href: tenantUrl,
+            target: '_blank',
+            rel: 'noopener noreferrer',
+            title: tA11y('linkNewWindow', { label: 'DossierFacile' }),
+          }}
         >
           {t('sidebar.buttons.dossierFacileDenied')}
         </Button>

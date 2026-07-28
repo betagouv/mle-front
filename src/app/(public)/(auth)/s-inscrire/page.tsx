@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import { Metadata } from 'next'
@@ -25,7 +24,7 @@ export default async function SignUpPage({ searchParams }: { searchParams: Promi
       <div className={styles.imageContainer}>
         <Image className={styles.image} src={background} alt="S'inscrire" priority quality={100} />
       </div>
-      <div className={clsx(styles.container, fr.cx('fr-container'))}>
+      <div className={clsx(styles.container, 'fr-container')}>
         <Button
           priority="tertiary no outline"
           iconPosition="left"

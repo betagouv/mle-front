@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import clsx from 'clsx'
 import { getTranslations } from 'next-intl/server'
 import PrepareBudgetChart from '~/app/(public)/preparer-mon-budget-etudiant/components/prepare-budget-chart'
@@ -22,14 +21,14 @@ export default async function PrepareBudgetContentCard({
   const t = await getTranslations(translationKey)
   const items = itemsKeys.map((key) => ({ label: t(key) }))
   return (
-    <div id={id} className={clsx(fr.cx('fr-py-4w'), withBorder && styles.border)}>
+    <div id={id} className={clsx('fr-py-4w', withBorder && styles.border)}>
       <div className={styles.container}>
-        <h3 className={fr.cx('fr-mb-0')}>{t('title')}</h3>
-        <p className={fr.cx('fr-mb-0')} dangerouslySetInnerHTML={{ __html: t.raw('description') }} />
+        <h3 className="fr-mb-0">{t('title')}</h3>
+        <p className="fr-mb-0" dangerouslySetInnerHTML={{ __html: t.raw('description') }} />
         <div className={styles.content}>
           <div className={styles.contentContainer}>
             <div>
-              {t.has('list.title') && <h4 className={clsx(fr.cx('fr-mb-0'), 'fr-h7')}>{t('list.title')}</h4>}
+              {t.has('list.title') && <h4 className="fr-mb-0 fr-h7">{t('list.title')}</h4>}
               <div>
                 {items.length > 0 && (
                   <ul className={styles.list}>
@@ -38,7 +37,7 @@ export default async function PrepareBudgetContentCard({
                     ))}
                   </ul>
                 )}
-                {t.has('descriptionSubList') && <p className={fr.cx('fr-mb-0')}>{t('descriptionSubList')}</p>}
+                {t.has('descriptionSubList') && <p className="fr-mb-0">{t('descriptionSubList')}</p>}
               </div>
             </div>
             {children}

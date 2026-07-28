@@ -3,12 +3,8 @@
 import Button, { type ButtonProps } from '@codegouvfr/react-dsfr/Button'
 import { createModal } from '@codegouvfr/react-dsfr/Modal'
 import clsx from 'clsx'
-import React, { type KeyboardEvent, type MouseEvent as ReactMouseEvent, type ReactNode, type RefObject, useEffect, useRef } from 'react'
+import React, { type KeyboardEvent, type MouseEvent as ReactMouseEvent, type ReactNode, type RefObject, useId, useRef } from 'react'
 import { useOnClickOutside } from 'usehooks-ts'
-
-const hasKey = (
-  event: React.KeyboardEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>,
-): event is React.KeyboardEvent<HTMLDivElement> => Object.hasOwn(event, 'key')
 
 export const Dropdown = ({
   id,
@@ -37,13 +33,25 @@ export const Dropdown = ({
   displayDropdownArrow?: boolean
   'data-testid'?: string
 }) => {
-  const formattedId = id.replace('-', '_')
+  // Le composant Header du DSFR rend deux fois quickAccessItems (barre d'outils et menu
+  // mobile) : un identifiant fixe se retrouverait donc en double dans la page, ce qui invalide
+  // le document et rend aria-controls ambigu (RGAA 8.2). useId le rend unique par instance.
+  const instanceId = useId().replace(/[^\w-]/g, '')
+  const formattedId = `${id.replace('-', '_')}_${instanceId}`
   const [isOpen, setIsOpen] = React.useState(false)
 
+  // La variante mobile (modale) et la variante desktop (panneau) coexistent dans le DOM :
+  // elles doivent porter des identifiants distincts, sinon aria-controls devient ambigu.
   const modal = createModal({
-    id: formattedId,
+    id: `${formattedId}_modal`,
     isOpenedByDefault: false,
   })
+
+  // Le titre de la modale est son nom accessible, et le DSFR le rend dans un <h1>. Sans lui,
+  // ce <h1> reste vide : les lecteurs d'écran annoncent un titre muet, et le plan de la page
+  // gagne un titre de niveau 1 concurrent du vrai (RGAA 9.1). À défaut de titre explicite,
+  // l'intitulé du bouton déclencheur fait office — c'est ce que la modale ouvre.
+  const modalTitle = title ?? (typeof control === 'string' ? control : undefined)
 
   const buttonRef = useRef<HTMLButtonElement>(null)
   const collapseRef = useRef<HTMLDivElement>(null)
@@ -52,28 +60,22 @@ export const Dropdown = ({
     setIsOpen((previous) => !previous)
   }, [])
 
-  const onClickOrEnterInsideDropdown = (event: KeyboardEvent<HTMLDivElement> | ReactMouseEvent<HTMLDivElement>) => {
-    if (hasKey(event) && (event.key === 'Tab' || event.key === 'Shift')) return
-
-    if (hasKey(event) && (event.key === 'Enter' || event.key === ' ')) {
-      event.preventDefault()
-
-      const target = event.target as HTMLElement
-      if (
-        target instanceof HTMLAnchorElement ||
-        target instanceof HTMLButtonElement ||
-        target.getAttribute('role') === 'button' ||
-        target.closest('a, button, [role="button"]')
-      ) {
-        const clickableElement = target.closest('a, button, [role="button"]') || target
-        ;(clickableElement as HTMLElement).click()
-        setIsOpen(false)
-      }
-    }
-
-    if (!hasKey(event) && event.target instanceof HTMLAnchorElement) {
+  /**
+   * Le panneau ne contient que des liens et des boutons : leur activation au clavier est
+   * native. L'ancienne implémentation simulait un `.click()` sur Entrée/Espace, ce qui
+   * doublait l'activation. Il ne reste qu'à refermer le panneau après une navigation.
+   */
+  const closeAfterActivation = (event: ReactMouseEvent<HTMLDivElement>) => {
+    if (event.target instanceof HTMLElement && event.target.closest('a, button')) {
       setIsOpen(false)
     }
+  }
+
+  const closeOnEscape = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Escape') return
+    event.stopPropagation()
+    setIsOpen(false)
+    buttonRef.current?.focus()
   }
 
   useOnClickOutside(collapseRef as RefObject<HTMLElement>, (event) => {
@@ -83,12 +85,6 @@ export const Dropdown = ({
 
     setIsOpen(false)
   })
-
-  useEffect(() => {
-    if (buttonRef.current) {
-      buttonRef.current.setAttribute('aria-expanded', `${isOpen}`)
-    }
-  }, [isOpen])
 
   return (
     <>
@@ -104,13 +100,13 @@ export const Dropdown = ({
         >
           {control}
         </Button>
-        <modal.Component title={title}>
-          <div role="navigation" className="fr-dropdown__modal" style={{ [alignRight ? 'right' : 'left']: 0 }} id={formattedId}>
+        <modal.Component title={modalTitle}>
+          <div className="fr-dropdown__modal" style={{ [alignRight ? 'right' : 'left']: 0 }}>
             {children}
           </div>
         </modal.Component>
       </div>
-      <div className="fr-dropdown fr-hidden fr-unhidden-md">
+      <div className="fr-dropdown fr-hidden fr-unhidden-md" onKeyDown={closeOnEscape}>
         <Button
           className={clsx(displayDropdownArrow ? 'fr-dropdown__btn' : '', dropdownControlClassName)}
           priority={priority}
@@ -118,7 +114,9 @@ export const Dropdown = ({
           type="button"
           size={size}
           aria-expanded={isOpen}
-          aria-controls={formattedId}
+          // Le panneau n'existe qu'ouvert : référencer son identifiant en permanence
+          // ferait pointer aria-controls dans le vide.
+          aria-controls={isOpen ? formattedId : undefined}
           ref={buttonRef}
           data-testid={dataTestId}
           onClick={handleButtonClick}
@@ -127,13 +125,11 @@ export const Dropdown = ({
         </Button>
         {isOpen && (
           <div
-            role="navigation"
             className="fr-collapse fr-dropdown__pane fr-mr-1v"
             style={{ [alignRight ? 'right' : 'left']: 0 }}
             id={formattedId}
             ref={collapseRef}
-            onClick={onClickOrEnterInsideDropdown}
-            onKeyDown={onClickOrEnterInsideDropdown}
+            onClick={closeAfterActivation}
           >
             {children}
           </div>

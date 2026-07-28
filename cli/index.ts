@@ -1,3 +1,5 @@
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import { program } from 'commander'
 import { backfillAlertJobsCommand } from './commands/backfill-alert-jobs'
 import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
@@ -210,5 +212,26 @@ program
   .option('--json <fichier>', 'Écrire la liste complète des établissements (non tronquée) dans ce fichier .json')
   .option('--dump', 'Afficher le payload JSON complet du 1er UAI')
   .action((opts) => verifyRamsese(opts))
+
+/**
+ * Commandes locales, non versionnées (`cli/local/` est dans .gitignore).
+ *
+ * Chaque fichier du dossier exporte par défaut une fonction qui reçoit `program` et y
+ * enregistre ses commandes. Le dossier peut être absent : le CLI reste alors utilisable en
+ * l'état, sans import cassé ni commande fantôme.
+ */
+function registerLocalCommands(): void {
+  const localDir = path.join(__dirname, 'local')
+  if (!fs.existsSync(localDir)) return
+
+  for (const file of fs.readdirSync(localDir).sort()) {
+    if (!/\.(ts|js)$/.test(file) || file.endsWith('.d.ts')) continue
+    const module = require(path.join(localDir, file))
+    const register = module.default ?? module.register
+    if (typeof register === 'function') register(program)
+  }
+}
+
+registerLocalCommands()
 
 program.parse()

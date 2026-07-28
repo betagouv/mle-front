@@ -1,11 +1,11 @@
 'use client'
 
-import { ToggleSwitch } from '@codegouvfr/react-dsfr/ToggleSwitch'
 import { Tooltip } from '@codegouvfr/react-dsfr/Tooltip'
 import { useTranslations } from 'next-intl'
 import { parseAsBoolean, parseAsInteger, useQueryStates } from 'nuqs'
 import { FC } from 'react'
 import { tss } from 'tss-react'
+import { ToggleSwitch } from '~/components/ui/toggle-switch'
 import { trackEvent } from '~/lib/tracking'
 
 type FindStudentAccessibleAccomodationSwitchProps = {
@@ -30,11 +30,13 @@ export const FindStudentAccessibleAccomodationSwitch: FC<FindStudentAccessibleAc
     <ToggleSwitch
       classes={{ label: classes.label }}
       inputTitle="accessibility"
+      description={t('header.tooltip.accessible')}
       showCheckedHint={false}
       label={
         <span className={classes.labelContent}>
           {t('header.accessbility')}
-          <Tooltip kind="hover" title={t('header.tooltip.accessible')} />
+
+          <Tooltip kind="click" title={t('header.tooltip.accessible')} />
         </span>
       }
       labelPosition="right"

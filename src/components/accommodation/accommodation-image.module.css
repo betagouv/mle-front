@@ -1,0 +1,11 @@
+/* Le bouton ne doit rien changer visuellement : il n'existe que pour rendre la vignette
+   activable au clavier. Le focus reste visible (aucun outline supprimé). */
+.trigger {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}

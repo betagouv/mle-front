@@ -1,2 +1,19 @@
 .megaMenuCategory {
 }
+
+/**
+ * Colonnes de villes sans titre : elles prolongent la colonne titrée et doivent s'aligner
+ * sur elle. La liste ouvre alors sa colonne, à la place du titre, et doit en réserver la
+ * hauteur — 48 px mesurés au rendu (interlignage 24 px + 2 × 12 px de remplissage).
+ *
+ * Cette valeur est solidaire de l'habillage de l'intitulé de catégorie : toute classe qui en
+ * change la taille de texte oblige à la reprendre.
+ *
+ * Les colonnes ne se juxtaposent qu'à partir du point de rupture lg : empilées, elles n'ont
+ * rien à aligner et la réserve créerait un blanc.
+ */
+@media (min-width: 62em) {
+  .megaMenu :global(.fr-mega-menu__list):first-child {
+    margin-top: 3rem;
+  }
+}

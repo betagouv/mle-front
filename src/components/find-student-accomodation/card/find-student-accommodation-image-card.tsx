@@ -17,7 +17,7 @@ export const FindStudentAccommodationPlaceholderImageCard = ({ id = 0 }: { id?: 
     <Image
       style={{ objectFit: 'cover', width: '100%', height: '100%' }}
       src={randomImage}
-      alt="Image placeholder d'une résidence"
+      alt=""
       width={vue === 'carte' ? 332 : 390}
       height={193}
       priority
@@ -26,13 +26,13 @@ export const FindStudentAccommodationPlaceholderImageCard = ({ id = 0 }: { id?: 
   )
 }
 
-export const FindStudentAccommodationImageCard = ({ image, name }: { image: string; name: string }) => {
+export const FindStudentAccommodationImageCard = ({ image }: { image: string }) => {
   const [vue] = useQueryState('vue', parseAsString)
   return (
     <Image
       style={{ objectFit: 'cover', width: '100%', height: '100%' }}
       src={image}
-      alt={name}
+      alt=""
       width={vue === 'carte' ? 344 : 390}
       height={193}
       priority

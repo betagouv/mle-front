@@ -4,11 +4,12 @@ import Button from '@codegouvfr/react-dsfr/Button'
 import Input from '@codegouvfr/react-dsfr/Input'
 import { createModal } from '@codegouvfr/react-dsfr/Modal'
 import Range from '@codegouvfr/react-dsfr/Range'
-import ToggleSwitch from '@codegouvfr/react-dsfr/ToggleSwitch'
 import { zodResolver } from '@hookform/resolvers/zod'
 import clsx from 'clsx'
+import { useTranslations } from 'next-intl'
 import { FormProvider, useForm } from 'react-hook-form'
 import { StudentAlertLocation } from '~/components/student-space/alerts/student-alert-location'
+import { ToggleSwitch } from '~/components/ui/toggle-switch'
 import { useCreateAlert } from '~/hooks/use-create-alert'
 import { trackEvent } from '~/lib/tracking'
 import { type TCreateAlertRequest, ZCreateAlertRequest } from '~/schemas/alerts/create-alert'
@@ -20,6 +21,7 @@ export const createStudentAlertModal = createModal({
 })
 
 export const CreateStudentAlert = () => {
+  const t = useTranslations('student.alerts')
   const { mutateAsync: createAlert, isLoading } = useCreateAlert()
 
   const form = useForm<TCreateAlertRequest>({
@@ -68,7 +70,7 @@ export const CreateStudentAlert = () => {
               Configurez votre alerte personnalisée et soyez notifié dès qu'un logement correspondant à vos critères est disponible.
             </span>
             <Input
-              label="Nom de l'alerte"
+              label={t('nameLabel')}
               iconId="ri-notification-line"
               state={form.formState.errors.name ? 'error' : 'default'}
               stateRelatedMessage={form.formState.errors.name?.message}
@@ -79,7 +81,7 @@ export const CreateStudentAlert = () => {
             <StudentAlertLocation error={form.formState.errors.cityId?.message || form.formState.errors.departmentId?.message} />
 
             <Range
-              label="Budget maximum"
+              label={t('maxPriceLabel')}
               max={1000}
               min={150}
               hideMinMax
@@ -94,8 +96,9 @@ export const CreateStudentAlert = () => {
               <ToggleSwitch
                 classes={{ label: 'fr-width-full' }}
                 inputTitle="colocation"
+                description={t('colivingDescription')}
                 showCheckedHint={false}
-                label="En colocation"
+                label={t('colivingLabel')}
                 labelPosition="right"
                 checked={form.watch('hasColiving')}
                 onChange={(checked) => form.setValue('hasColiving', checked)}
@@ -103,8 +106,9 @@ export const CreateStudentAlert = () => {
               <ToggleSwitch
                 classes={{ label: 'fr-width-full' }}
                 inputTitle="accessibility"
+                description={t('accessibleDescription')}
                 showCheckedHint={false}
-                label="Adapté PMR"
+                label={t('accessibleLabel')}
                 labelPosition="right"
                 checked={form.watch('isAccessible')}
                 onChange={(checked) => form.setValue('isAccessible', checked)}
@@ -112,10 +116,10 @@ export const CreateStudentAlert = () => {
             </div>
             <div className="fr-flex fr-justify-content-end fr-flex-gap-2v">
               <Button priority="secondary" type="button" onClick={handleCancel}>
-                Annuler
+                {t('cancel')}
               </Button>
               <Button priority="primary" type="submit" disabled={isLoading}>
-                {isLoading ? 'Enregistrement...' : 'Enregistrer'}
+                {isLoading ? t('saving') : t('save')}
               </Button>
             </div>
           </form>

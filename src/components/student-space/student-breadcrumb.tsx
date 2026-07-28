@@ -10,6 +10,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   'aides-au-logement': 'breadcrumbs.student.housingAid.title',
   favoris: 'breadcrumbs.student.favorites.title',
   alertes: 'breadcrumbs.student.alerts.title',
+  'informations-personnelles': 'breadcrumbs.student.personalInformations.title',
 }
 
 export const StudentBreadcrumb = () => {

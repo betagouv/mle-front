@@ -1,6 +1,5 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useState } from 'react'
@@ -44,7 +43,7 @@ export const OwnerDetailsActions = ({ title, location }: { title: string; locati
 
   return (
     <div className={classes.sidebarShare}>
-      <p className={fr.cx('fr-m-0')}>{t('sidebar.share')}</p>
+      <p className="fr-m-0">{t('sidebar.share')}</p>
       <div className={classes.buttonGroup}>
         <Button size="small" iconId="ri-links-line" priority="tertiary" title={t('sidebar.buttons.link')} onClick={handleCopyLink} />
         <Button
