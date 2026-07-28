@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useLocalStorage } from 'usehooks-ts'
 import { ALL_TODOS } from '~/components/student-space/todo/student-todo-list'
+import styles from './student-space-navigation.module.css'
 
 const NAV_ITEMS = [
   { href: '/mon-espace/tableau-de-bord', labelKey: 'dashboard' },
@@ -36,7 +37,7 @@ export const StudentSpaceNavigation = () => {
           {t('backToHome')}
         </Button>
       </div>
-      <SideMenu align="left" burgerMenuButtonText={t('menuTitle')} items={items} />
+      <SideMenu align="left" burgerMenuButtonText={t('menuTitle')} items={items} classes={{ inner: styles.menuInner }} />
     </>
   )
 }
