@@ -123,6 +123,32 @@ export async function sendAlertCreationConfirmationEmail(
   }
 }
 
+export async function sendAlertExpiryReminderEmail(email: string, params: { alertName: string; alertsUrl: string }): Promise<void> {
+  if (env.NEXT_PUBLIC_APP_ENV !== 'production') {
+    console.info(`[${env.NEXT_PUBLIC_APP_ENV}] relance de péremption non envoyée à ${email}`)
+    return
+  }
+
+  await sendTemplateEmail({
+    to: email,
+    templateId: env.BREVO_TEMPLATE_ALERT_EXPIRY_REMINDER,
+    params: { alertName: params.alertName, alertsUrl: params.alertsUrl },
+  })
+}
+
+export async function sendAlertDeactivationEmail(email: string, params: { alertName: string; alertsUrl: string }): Promise<void> {
+  if (env.NEXT_PUBLIC_APP_ENV !== 'production') {
+    console.info(`[${env.NEXT_PUBLIC_APP_ENV}] désactivation d'alerte non envoyée à ${email}`)
+    return
+  }
+
+  await sendTemplateEmail({
+    to: email,
+    templateId: env.BREVO_TEMPLATE_ALERT_DEACTIVATION,
+    params: { alertName: params.alertName, alertsUrl: params.alertsUrl },
+  })
+}
+
 export async function sendStudentAlertEmail(
   email: string,
   params: { firstName: string; alertName?: string; accommodations: { nom: string; url: string }[] },

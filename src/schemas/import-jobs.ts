@@ -10,12 +10,13 @@ export const ZImportJobType = z.enum([
   'sync-students',
   'sync-stats',
   'alert-detection',
+  'alert-expiration',
   'purge-contacts',
 ])
 export type TImportJobType = z.infer<typeof ZImportJobType>
 
 // Crons qui ne touchent pas aux résidences : ni import, ni synchro de données.
-const MAINTENANCE_JOB_TYPES: string[] = ['alert-detection', 'purge-contacts']
+const MAINTENANCE_JOB_TYPES: string[] = ['alert-detection', 'alert-expiration', 'purge-contacts']
 
 // Tout ce qui ne contient pas "sync" et n'est pas un job de maintenance est un import.
 export function isImportJob(type: string): boolean {
