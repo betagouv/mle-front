@@ -9,6 +9,7 @@ import { cities } from '~/server/db/schema/cities'
 import { favoriteAccommodations } from '~/server/db/schema/favorite-accommodations'
 import { studentAlerts } from '~/server/db/schema/student-alerts'
 import { trackingEvents } from '~/server/db/schema/tracking-events'
+import { DAY_MS } from '~/utils/time'
 import { createTRPCRouter, ownerProcedure } from '../init'
 
 const periodInput = z.object({
@@ -33,14 +34,14 @@ function periodToDays(period: Period): number {
 function getDateRange(period: Period): { from: Date; to: Date; days: number } {
   const days = periodToDays(period)
   const to = new Date()
-  const from = new Date(to.getTime() - days * 24 * 60 * 60 * 1000)
+  const from = new Date(to.getTime() - days * DAY_MS)
   return { from, to, days }
 }
 
 function getPreviousDateRange(period: Period): { from: Date; to: Date } {
   const days = periodToDays(period)
-  const to = new Date(Date.now() - days * 24 * 60 * 60 * 1000)
-  const from = new Date(to.getTime() - days * 24 * 60 * 60 * 1000)
+  const to = new Date(Date.now() - days * DAY_MS)
+  const from = new Date(to.getTime() - days * DAY_MS)
   return { from, to }
 }
 
@@ -285,7 +286,7 @@ export const ownerStatisticsRouter = createTRPCRouter({
     >()
 
     for (let i = 0; i <= days; i += 1) {
-      const d = new Date(from.getTime() + i * 24 * 60 * 60 * 1000)
+      const d = new Date(from.getTime() + i * DAY_MS)
       const key = d.toISOString().slice(0, 10)
       series.set(key, { date: key, nbSearches: 0, nbAlerts: 0, nbFavorites: 0, nbViews: 0, nbConsultOffer: 0 })
     }

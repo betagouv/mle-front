@@ -30,6 +30,11 @@ const CRON_JOB_DEF_MAP: Record<CronJobType, Omit<CronJobDef, 'type'>> = {
     description: 'Hausses de disponibilité → jobs d’alerte',
     schedule: 'Tous les jours à 9h00 et 17h00',
   },
+  'alert-expiration': {
+    label: 'Péremption alertes',
+    description: 'Relance à 3 mois (template 46) puis désactivation après 7 jours (template 48)',
+    schedule: 'Tous les jours à 6h00',
+  },
   'purge-contacts': {
     label: 'Purge RGPD candidatures',
     description: 'Demandes non confirmées supprimées, expirées anonymisées',
