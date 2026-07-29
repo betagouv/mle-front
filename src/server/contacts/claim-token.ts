@@ -1,5 +1,6 @@
 import { createHmac, timingSafeEqual } from 'node:crypto'
 import { env } from '~/server/env'
+import { DAY_MS } from '~/utils/time'
 
 /**
  * Jetons signés remis au visiteur après une demande de contact anonyme.
@@ -16,8 +17,8 @@ import { env } from '~/server/env'
 export type TClaimTokenPurpose = 'claim' | 'confirm'
 
 const TOKEN_TTL_MS: Record<TClaimTokenPurpose, number> = {
-  claim: 7 * 24 * 60 * 60 * 1000,
-  confirm: 7 * 24 * 60 * 60 * 1000,
+  claim: 7 * DAY_MS,
+  confirm: 7 * DAY_MS,
 }
 
 const sign = (payload: string) => createHmac('sha256', env.AUTH_SECRET).update(payload).digest('base64url')

@@ -1,12 +1,14 @@
+import { DAY_MS } from '~/utils/time'
+
 export function formatRelativeTime(date: Date | string): string {
   const now = new Date()
   const targetDate = typeof date === 'string' ? new Date(date) : date
   const diffInMs = now.getTime() - targetDate.getTime()
   const diffInMinutes = Math.floor(diffInMs / (1000 * 60))
   const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60))
-  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24))
-  const diffInMonths = Math.floor(diffInMs / (1000 * 60 * 60 * 24 * 30))
-  const diffInYears = Math.floor(diffInMs / (1000 * 60 * 60 * 24 * 365))
+  const diffInDays = Math.floor(diffInMs / DAY_MS)
+  const diffInMonths = Math.floor(diffInMs / (DAY_MS * 30))
+  const diffInYears = Math.floor(diffInMs / (DAY_MS * 365))
 
   if (diffInMinutes < 1) {
     return "il y a moins d'une minute"

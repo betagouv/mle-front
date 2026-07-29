@@ -20,6 +20,9 @@ export const studentAlerts = pgTable(
     maxPrice: integer('max_price').notNull(),
     receiveNotifications: boolean('receive_notifications').notNull().default(false),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+    renewedAt: timestamp('renewed_at', { withTimezone: true }).notNull().defaultNow(),
+    expiryReminderSentAt: timestamp('expiry_reminder_sent_at', { withTimezone: true }),
+    expiredAt: timestamp('expired_at', { withTimezone: true }),
   },
   (t) => [index('student_alert_user_id_idx').on(t.userId)],
 )

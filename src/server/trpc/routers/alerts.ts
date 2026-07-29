@@ -10,9 +10,11 @@ import { cities } from '~/server/db/schema/cities'
 import { departments } from '~/server/db/schema/departments'
 import { studentAlerts } from '~/server/db/schema/student-alerts'
 import { enqueueJobsForNewAlert } from '~/server/services/alert-detector'
+import { ALERT_EXPIRY_REMINDER_DAYS, ALERT_LIFETIME_DAYS } from '~/server/services/alert-expiration'
 import { type AlertMatchInput, buildAlertMatchConditions } from '~/server/services/alert-matching'
 import { sendAlertCreationConfirmationEmail } from '~/server/services/brevo'
 import { bboxSelect } from '~/server/trpc/utils/spatial-helpers'
+import { DAY_MS } from '~/utils/time'
 import { createTRPCRouter, userProcedure } from '../init'
 
 function countQuery(alert: AlertMatchInput) {
@@ -103,6 +105,9 @@ function formatAlert(
     isAccessible: boolean
     maxPrice: number
     receiveNotifications: boolean
+    renewedAt: Date
+    expiryReminderSentAt: Date | null
+    expiredAt: Date | null
   },
   count: number,
   maps: Awaited<ReturnType<typeof fetchTerritoryMaps>>,
@@ -122,6 +127,10 @@ function formatAlert(
   const acad = alert.academyId ? maps.academyMap.get(alert.academyId) : null
   const academy = acad ? { id: acad.id, name: acad.name, bbox: acad.bbox } : null
 
+  const expiresAt = alert.expiryReminderSentAt
+    ? new Date(alert.expiryReminderSentAt.getTime() + ALERT_EXPIRY_REMINDER_DAYS * DAY_MS)
+    : new Date(alert.renewedAt.getTime() + ALERT_LIFETIME_DAYS * DAY_MS)
+
   return {
     id: alert.id,
     count,
@@ -133,6 +142,8 @@ function formatAlert(
     isAccessible: alert.isAccessible,
     maxPrice: alert.maxPrice,
     receiveNotifications: alert.receiveNotifications,
+    expiresAt: expiresAt.toISOString(),
+    expired: alert.expiredAt != null,
   }
 }
 
@@ -162,6 +173,9 @@ export const alertsRouter = createTRPCRouter({
         isAccessible: studentAlerts.isAccessible,
         maxPrice: studentAlerts.maxPrice,
         receiveNotifications: studentAlerts.receiveNotifications,
+        renewedAt: studentAlerts.renewedAt,
+        expiryReminderSentAt: studentAlerts.expiryReminderSentAt,
+        expiredAt: studentAlerts.expiredAt,
       })
       .from(studentAlerts)
       .where(eq(studentAlerts.userId, userId))
@@ -224,11 +238,36 @@ export const alertsRouter = createTRPCRouter({
 
     const updateData = buildUpdateData(fields)
 
+    const criteriaEdited = Object.keys(updateData).some((key) => key !== 'receiveNotifications')
+    const reactivated = updateData.receiveNotifications === true
+
+    if (criteriaEdited || reactivated) {
+      updateData.renewedAt = new Date()
+      updateData.expiryReminderSentAt = null
+      updateData.expiredAt = null
+    }
+
     const [row] = await db
       .update(studentAlerts)
       .set(updateData)
       .where(and(eq(studentAlerts.id, id), eq(studentAlerts.userId, userId)))
       .returning()
+
+    if (!row) return row
+
+    if (criteriaEdited) {
+      const [[cityRow], [academyRow]] = await Promise.all([
+        row.cityId ? db.select({ name: cities.name }).from(cities).where(eq(cities.id, row.cityId)) : [],
+        row.academyId ? db.select({ name: academies.name }).from(academies).where(eq(academies.id, row.academyId)) : [],
+      ])
+
+      await sendAlertCreationConfirmationEmail(ctx.session.user.email, {
+        alertName: row.name,
+        city: cityRow?.name,
+        academy: academyRow?.name,
+        maxBudget: row.maxPrice,
+      })
+    }
 
     try {
       await enqueueJobsForNewAlert(row.id)

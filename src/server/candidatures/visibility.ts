@@ -3,8 +3,7 @@ import { CONTACT_RETENTION_DAYS } from '~/enums/contact-status'
 import { DF_TENANT_STATUS_VERIFIED } from '~/enums/dossier-facile-tenant-status'
 import { db } from '~/server/db'
 import { contactRequests, dossierFacileApplications, dossierFacileTenants } from '~/server/db/schema'
-
-const DAY_MS = 24 * 60 * 60 * 1000
+import { DAY_MS } from '~/utils/time'
 
 /** Début de la fenêtre de rétention : les candidatures antérieures ne sont plus restituées. */
 export const contactRetentionCutoff = () => new Date(Date.now() - CONTACT_RETENTION_DAYS * DAY_MS)

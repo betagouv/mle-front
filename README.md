@@ -103,6 +103,7 @@ cli/
     backfill-alert-jobs.ts  # Vague initiale : jobs pour le stock dispo × alertes existantes
     detect-alert-jobs.ts    # Détecte les hausses de dispo et crée les jobs (réconciliation)
     send-alert-jobs.ts      # Draine la file de jobs et envoie les emails d'alerte
+    expire-alerts.ts        # Relance à 3 mois puis désactive les alertes sans réaction
 ```
 
 ---
@@ -379,6 +380,24 @@ Draine la file des jobs `pending`, regroupe par étudiant (un mail listant ses r
 
 > **Garde-fou anti-spam** : `sendStudentAlertEmail` n'envoie réellement qu'en `NEXT_PUBLIC_APP_ENV === 'production'`. En dev/staging, les jobs sont traités mais aucun mail ne part.
 
+#### `expire-alerts` — Péremption des alertes
+
+```bash
+pnpm cli expire-alerts --dry-run --verbose
+pnpm cli expire-alerts
+```
+
+Cycle de vie d'une alerte, piloté par la date de référence `renewed_at` (initialisée à la création, réinitialisée à chaque **édition de critères** dans l'espace étudiant — qui renvoie aussi le template 43 de confirmation) :
+
+1. **Relance** — à `renewed_at + 90 jours`, une alerte encore active reçoit le **template 46** et son `expiry_reminder_sent_at` est horodaté (anti-doublon).
+2. **Désactivation** — 7 jours après la relance sans réaction, elle reçoit le **template 48**, son `receive_notifications` repasse à `false` et `expired_at` est horodaté.
+
+À jouer en cron **quotidien** (`0 6 * * *`). Suivi dans `import_job` (type `alert-expiration`, visible dans l'admin « Tâches planifiées »).
+
+> **Garde-fou anti-spam** : double verrou. La commande `return` hors production (comme `send-alert-jobs`), et `sendAlertExpiryReminderEmail` / `sendAlertDeactivationEmail` refusent aussi d'envoyer hors `NEXT_PUBLIC_APP_ENV === 'production'`. En dev/staging : aucune relance, aucune désactivation, aucun mail.
+
+Variables d'env requises : `DATABASE_URL`, `BREVO_API_KEY`, `BREVO_TEMPLATE_ALERT_EXPIRY_REMINDER`, `BREVO_TEMPLATE_ALERT_DEACTIVATION`.
+
 ---
 
 ### Commandes d'import
@@ -568,6 +587,7 @@ Les migrations Drizzle sont appliquées au déploiement via le hook `postdeploy`
 | `10 4 1 * *` | `sync students` | 1er du mois à 4h10 |
 | `0 3 * * *` | `sync stats` | Tous les jours à 3h |
 | `30 3 * * *` | `purge-contact-requests` | Tous les jours à 3h30 |
+| `0 6 * * *` | `expire-alerts` | Tous les jours à 6h |
 
 Pour vérifier les crons actifs : `scalingo --app <app> cron-tasks`
 Pour voir les logs d'exécution : `scalingo --app <app> logs --filter cron`
