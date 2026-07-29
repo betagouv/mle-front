@@ -4,6 +4,7 @@ import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
 import { backfillBrevoOwners } from './commands/backfill-brevo-owners'
 import { compareCrous } from './commands/compare-crous'
 import { detectAlertJobsCommand } from './commands/detect-alert-jobs'
+import { expireAlertsCommand } from './commands/expire-alerts'
 import { healthcheck, healthcheckCities } from './commands/healthcheck'
 import { importBackup } from './commands/import-backup'
 import { importCrousRents } from './commands/import-crous-rents'
@@ -168,6 +169,13 @@ program
   .option('--dry-run', 'Simuler sans envoyer ni modifier la BDD')
   .option('--verbose', 'Afficher le détail par utilisateur')
   .action((opts) => sendAlertJobs(opts))
+
+program
+  .command('expire-alerts')
+  .description('Relance les alertes de plus de 3 mois (template 46) puis désactive celles sans réaction après 7 jours (template 48)')
+  .option('--dry-run', 'Simuler sans envoyer ni modifier la BDD')
+  .option('--verbose', 'Afficher le détail des alertes relancées/désactivées')
+  .action((opts) => expireAlertsCommand(opts))
 
 program
   .command('purge-contact-requests')

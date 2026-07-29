@@ -3,8 +3,7 @@ import { UNCONFIRMED_CONTACT_RETENTION_DAYS } from '~/enums/contact-status'
 import { contactRetentionCutoff } from '~/server/candidatures/visibility'
 import { db } from '~/server/db'
 import { contactRequests, dossierFacileApplications, dossierFacileDocuments, dossierFacileTenants } from '~/server/db/schema'
-
-const DAY_MS = 24 * 60 * 60 * 1000
+import { DAY_MS } from '~/utils/time'
 
 export interface PurgeContactRequestsResult {
   /** Demandes visiteur jamais confirmées, supprimées. */
