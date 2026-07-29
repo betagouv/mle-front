@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { DAY_MS } from '~/utils/time'
 import { createAcademy, createAlert, createCity, createDepartment, createUser } from './fixtures/factories'
 import './helpers/setup-integration'
 import { authenticatedCaller, authenticatedCaller2, caller } from './helpers/test-caller'
@@ -152,6 +153,58 @@ describe('alerts.update', () => {
     })
 
     expect(result).toBeUndefined()
+  })
+
+  it('resets the expiry window on a criteria edit', async () => {
+    const renewedAt = new Date(Date.now() - 50 * DAY_MS)
+    const alert = await createAlert({
+      userId: 'test-user-id',
+      name: 'Original',
+      maxPrice: 500,
+      receiveNotifications: true,
+      renewedAt,
+      expiryReminderSentAt: new Date(Date.now() - DAY_MS),
+    })
+
+    const result = await authenticatedCaller.alerts.update({ id: alert.id, name: 'Updated' })
+
+    expect(result.renewedAt.getTime()).toBeGreaterThan(renewedAt.getTime())
+    expect(result.expiryReminderSentAt).toBeNull()
+    expect(result.expiredAt).toBeNull()
+  })
+
+  it('does not reset the window when only toggling notifications off', async () => {
+    const renewedAt = new Date(Date.now() - 50 * DAY_MS)
+    const alert = await createAlert({
+      userId: 'test-user-id',
+      name: 'Original',
+      maxPrice: 500,
+      receiveNotifications: true,
+      renewedAt,
+    })
+
+    const result = await authenticatedCaller.alerts.update({ id: alert.id, receiveNotifications: false })
+
+    expect(result.renewedAt.getTime()).toBe(renewedAt.getTime())
+  })
+
+  it('resets the window when reactivating notifications', async () => {
+    const renewedAt = new Date(Date.now() - 100 * DAY_MS)
+    const alert = await createAlert({
+      userId: 'test-user-id',
+      name: 'Original',
+      maxPrice: 500,
+      receiveNotifications: false,
+      renewedAt,
+      expiryReminderSentAt: new Date(Date.now() - 8 * DAY_MS),
+      expiredAt: new Date(Date.now() - DAY_MS),
+    })
+
+    const result = await authenticatedCaller.alerts.update({ id: alert.id, receiveNotifications: true })
+
+    expect(result.renewedAt.getTime()).toBeGreaterThan(renewedAt.getTime())
+    expect(result.expiryReminderSentAt).toBeNull()
+    expect(result.expiredAt).toBeNull()
   })
 })
 

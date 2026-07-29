@@ -36,6 +36,8 @@ const ZAlert = z.object({
   isAccessible: z.boolean(),
   maxPrice: z.number(),
   receiveNotifications: z.boolean(),
+  expiresAt: z.string(),
+  expired: z.boolean(),
 })
 
 export const ZGetAlertsResponse = z.object({
