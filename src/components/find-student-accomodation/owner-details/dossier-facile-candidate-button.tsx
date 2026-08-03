@@ -8,8 +8,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import type { ReactNode } from 'react'
 import { useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { type UseFormReturn, useForm } from 'react-hook-form'
 import z from 'zod'
 import { CompleteProfileModal, completeProfileModal } from '~/components/student-space/profile/complete-profile-modal'
 import { createToast } from '~/components/ui/createToast'
@@ -93,6 +94,42 @@ const ZContactRequestForm = z.object({
 
 type TContactRequestForm = z.infer<typeof ZContactRequestForm>
 
+type TContactRequestField = 'firstname' | 'lastname' | 'email' | 'phone'
+
+/**
+ * Une information déjà connue du compte n'est pas redemandée : elle s'affiche verrouillée.
+ * Le champ verrouillé n'est pas enregistré auprès de react-hook-form — sa valeur vient de `values`,
+ * donc elle part quand même dans la soumission.
+ */
+const LockableInput = ({
+  label,
+  name,
+  type,
+  lockedValue,
+  form,
+}: {
+  label: ReactNode
+  name: TContactRequestField
+  type: 'text' | 'email' | 'tel'
+  lockedValue: string
+  form: UseFormReturn<TContactRequestForm>
+}) => {
+  if (lockedValue) {
+    return <Input label={label} disabled nativeInputProps={{ type, value: lockedValue, readOnly: true }} />
+  }
+
+  const error = form.formState.errors[name]?.message
+
+  return (
+    <Input
+      label={label}
+      state={error ? 'error' : 'default'}
+      stateRelatedMessage={error}
+      nativeInputProps={{ type, ...form.register(name) }}
+    />
+  )
+}
+
 const ContactRequestModal = ({ accommodationSlug }: { accommodationSlug: string }) => {
   const t = useTranslations('accomodation.sidebar.contactRequestModal')
   const buttonT = useTranslations('accomodation.sidebar.buttons')
@@ -104,15 +141,19 @@ const ContactRequestModal = ({ accommodationSlug }: { accommodationSlug: string 
   const [step, setStep] = useState<'form' | 'success'>('form')
   const [claimToken, setClaimToken] = useState<string | null>(null)
 
+  // Seul un étudiant connecté a des coordonnées à réutiliser ; un gestionnaire de passage saisit tout.
+  const account = isAuthenticated ? session?.user : undefined
+  const known = {
+    firstname: account?.firstname || '',
+    lastname: account?.lastname || '',
+    email: account?.email || '',
+    phone: account?.phone || '',
+  }
+  const hasKnownFields = Object.values(known).some(Boolean)
+
   const form = useForm<TContactRequestForm>({
     resolver: zodResolver(ZContactRequestForm),
-    values: {
-      firstname: session?.user.firstname ?? '',
-      lastname: session?.user.lastname ?? '',
-      email: session?.user.email ?? '',
-      phone: session?.user.phone ?? '',
-      consent: false,
-    },
+    values: { ...known, consent: false },
     resetOptions: { keepDirtyValues: true },
   })
 
@@ -149,31 +190,30 @@ const ContactRequestModal = ({ accommodationSlug }: { accommodationSlug: string 
               <h1 className="fr-h2 fr-mb-0">{t('title')}</h1>
             </div>
             <p className="fr-text--lead">{t('description')}</p>
+            {hasKnownFields && <p className="fr-text--sm fr-mb-0">{t('prefilledFromAccount')}</p>}
             <div className={styles.formGrid}>
-              <Input
+              <LockableInput
                 label={<RequiredLabel>{t('firstname')}</RequiredLabel>}
-                state={form.formState.errors.firstname ? 'error' : 'default'}
-                stateRelatedMessage={form.formState.errors.firstname?.message}
-                nativeInputProps={form.register('firstname')}
+                name="firstname"
+                type="text"
+                lockedValue={known.firstname}
+                form={form}
               />
-              <Input
+              <LockableInput
                 label={<RequiredLabel>{t('lastname')}</RequiredLabel>}
-                state={form.formState.errors.lastname ? 'error' : 'default'}
-                stateRelatedMessage={form.formState.errors.lastname?.message}
-                nativeInputProps={form.register('lastname')}
+                name="lastname"
+                type="text"
+                lockedValue={known.lastname}
+                form={form}
               />
-              <Input
+              <LockableInput
                 label={<RequiredLabel>{t('email')}</RequiredLabel>}
-                state={form.formState.errors.email ? 'error' : 'default'}
-                stateRelatedMessage={form.formState.errors.email?.message}
-                nativeInputProps={{ type: 'email', ...form.register('email') }}
+                name="email"
+                type="email"
+                lockedValue={known.email}
+                form={form}
               />
-              <Input
-                label={t('phone')}
-                state={form.formState.errors.phone ? 'error' : 'default'}
-                stateRelatedMessage={form.formState.errors.phone?.message}
-                nativeInputProps={{ type: 'tel', ...form.register('phone') }}
-              />
+              <LockableInput label={t('phone')} name="phone" type="tel" lockedValue={known.phone} form={form} />
             </div>
             <Checkbox
               state={form.formState.errors.consent ? 'error' : 'default'}
