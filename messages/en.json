@@ -251,6 +251,7 @@
       "contactRequestModal": {
         "title": "Être recontacté",
         "description": "Vous avez la possibilité de partager vos coordonnées au gestionnaire pour être éventuellement recontacté selon les disponibilités de la résidence.",
+        "prefilledFromAccount": "Les informations de votre compte sont pré-remplies. Pour les modifier, rendez-vous dans vos informations personnelles.",
         "firstname": "Prénom",
         "lastname": "Nom",
         "email": "E-mail",
