@@ -1,6 +1,5 @@
 import { closeDb } from '~/server/db'
 import { backfillAlertJobs } from '~/server/services/alert-detector'
-import { captureCliException } from '../sentry'
 
 interface BackfillAlertJobsOptions {
   dryRun?: boolean
@@ -21,7 +20,6 @@ export async function backfillAlertJobsCommand(options: BackfillAlertJobsOptions
     console.log(`\n  ✅ ${alertsProcessed} alerte(s) actives traitées, ${jobsCreated} job(s) enfilés`)
   } catch (error) {
     console.error(`\n❌ Backfill échoué : ${error instanceof Error ? error.message : String(error)}`)
-    await captureCliException(error)
     throw error
   } finally {
     await closeDb()

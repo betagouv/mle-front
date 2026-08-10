@@ -3,7 +3,6 @@ import { closeDb, db } from '~/server/db'
 import { importJobs } from '~/server/db/schema'
 import { env } from '~/server/env'
 import { expireStaleAlerts, sendExpiryReminders } from '~/server/services/alert-expiration'
-import { captureCliException } from '../sentry'
 
 interface ExpireAlertsOptions {
   dryRun?: boolean
@@ -55,7 +54,6 @@ export async function expireAlertsCommand(options: ExpireAlertsOptions): Promise
         .set({ status: 'error', endedAt: new Date(), updatedAt: new Date(), summary: { errors: [msg] } })
         .where(eq(importJobs.id, jobId))
     }
-    await captureCliException(error)
     throw error
   } finally {
     await closeDb()

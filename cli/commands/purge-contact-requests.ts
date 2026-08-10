@@ -3,7 +3,6 @@ import { CONTACT_RETENTION_DAYS, UNCONFIRMED_CONTACT_RETENTION_DAYS } from '~/en
 import { purgeContactRequests as runPurge } from '~/server/contacts/purge'
 import { closeDb, db } from '~/server/db'
 import { importJobs } from '~/server/db/schema'
-import { captureCliException } from '../sentry'
 
 interface PurgeContactRequestsOptions {
   dryRun?: boolean
@@ -51,7 +50,6 @@ export async function purgeContactRequests(options: PurgeContactRequestsOptions)
         .set({ status: 'error', endedAt: new Date(), updatedAt: new Date(), summary: { errors: [msg] } })
         .where(eq(importJobs.id, jobId))
     }
-    await captureCliException(error)
     throw error
   } finally {
     await closeDb()
