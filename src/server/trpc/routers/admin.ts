@@ -414,9 +414,22 @@ const ownersRouter = createTRPCRouter({
       throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('ownerNotFound') })
     }
 
+    // Requête séparée plutôt qu'une relation : `owner` a déjà une relation `users` vers `user`
+    // (via user.owner_id), en ajouter une seconde obligerait à nommer les deux.
+    let updatedByName: string | null = null
+    if (result.updatedBy) {
+      const [author] = await db
+        .select({ email: user.email, name: user.name, firstname: user.firstname, lastname: user.lastname })
+        .from(user)
+        .where(eq(user.id, result.updatedBy))
+        .limit(1)
+      if (author) updatedByName = `${author.firstname} ${author.lastname}`.trim() || author.name || author.email
+    }
+
     const { image, ...rest } = result
     return {
       ...rest,
+      updatedByName,
       imageBase64: image ? `data:image/jpeg;base64,${Buffer.from(image).toString('base64')}` : null,
     }
   }),
@@ -456,15 +469,16 @@ const ownersRouter = createTRPCRouter({
         contactMode: ZOwnerContactMode.optional(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { id, ...fields } = input
-      const updateData: Record<string, unknown> = {}
+      const updateData: Record<string, unknown> = { updatedBy: ctx.session.user.id }
 
       if (fields.name !== undefined) updateData.name = fields.name
       if (fields.url !== undefined) updateData.url = fields.url
       if (fields.landingUrl !== undefined) updateData.landingUrl = fields.landingUrl
       if (fields.contactMode !== undefined) updateData.contactMode = fields.contactMode
 
+      // `updatedAt` est tamponné automatiquement par le `$onUpdate` de la colonne.
       const [updated] = await db.update(owners).set(updateData).where(eq(owners.id, id)).returning()
       if (!updated) {
         throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('ownerNotFound') })
@@ -481,14 +495,18 @@ const ownersRouter = createTRPCRouter({
         image: z.string().nullable(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       let imageBuffer: Buffer | null = null
       if (input.image) {
         const base64Data = input.image.replace(/^data:image\/\w+;base64,/, '')
         imageBuffer = Buffer.from(base64Data, 'base64')
       }
 
-      const [updated] = await db.update(owners).set({ image: imageBuffer }).where(eq(owners.id, input.id)).returning()
+      const [updated] = await db
+        .update(owners)
+        .set({ image: imageBuffer, updatedBy: ctx.session.user.id })
+        .where(eq(owners.id, input.id))
+        .returning()
 
       if (!updated) {
         throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('ownerNotFound') })
@@ -704,6 +722,10 @@ const statsRouter = createTRPCRouter({
             avecDispo: sql<number>`count(*) filter (where ${isAvailable} and not ${isCrous})`.mapWith(Number),
             sansDispo: sql<number>`count(*) filter (where not ${isAvailable} and not ${isUnknown} and not ${isCrous})`.mapWith(Number),
             nonRenseignee: sql<number>`count(*) filter (where ${isUnknown} and not ${isCrous})`.mapWith(Number),
+            // Nombre de logements (et non de résidences) disponibles chez les bailleurs hors-CROUS.
+            logementsDisponibles: sql<number>`coalesce(sum(${nbAvailableApartmentsSum}) filter (where not ${isCrous}), 0)::int`.mapWith(
+              Number,
+            ),
           })
           .from(accommodations),
       ])
@@ -743,6 +765,7 @@ const statsRouter = createTRPCRouter({
         avecDispo: availabilityBreakdown[0]?.avecDispo ?? 0,
         sansDispo: availabilityBreakdown[0]?.sansDispo ?? 0,
         nonRenseignee: availabilityBreakdown[0]?.nonRenseignee ?? 0,
+        logementsDisponibles: availabilityBreakdown[0]?.logementsDisponibles ?? 0,
       },
     }
   }),

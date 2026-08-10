@@ -6,6 +6,7 @@ import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
 import { backfillBrevoOwners } from './commands/backfill-brevo-owners'
 import { backfillGeocoding } from './commands/backfill-geocoding'
 import { compareCrous } from './commands/compare-crous'
+import { cronSelftest } from './commands/cron-selftest'
 import { detectAlertJobsCommand } from './commands/detect-alert-jobs'
 import { expireAlertsCommand } from './commands/expire-alerts'
 import { healthcheck, healthcheckCities } from './commands/healthcheck'
@@ -21,7 +22,9 @@ import { sendAlertJobs } from './commands/send-alert-jobs'
 import { auditStorage } from './commands/storage/auditStorage'
 import { uploadImages } from './commands/upload-images'
 import { verifyRamsese } from './commands/verify-ramsese'
+import { CRON_COMMANDS, jobNameFromArgv, notifyCronFailure } from './cron-failure'
 import { runImport, runSync } from './factory'
+import { captureCliException } from './sentry'
 
 program.name('mle').description('MLE CLI tools')
 
@@ -213,6 +216,11 @@ program
   .option('--dump', 'Afficher le payload JSON complet du 1er UAI')
   .action((opts) => verifyRamsese(opts))
 
+program
+  .command('cron-selftest')
+  .description("Lève une erreur volontaire pour valider la chaîne d'alerte des crons (mail + Sentry)")
+  .action(cronSelftest)
+
 /**
  * Commandes locales, non versionnées (`cli/local/` est dans .gitignore).
  *
@@ -232,6 +240,27 @@ function registerLocalCommands(): void {
   }
 }
 
+// Doit rester avant le parsing, sinon les commandes locales ne sont pas encore déclarées.
 registerLocalCommands()
 
-program.parse()
+// Filet unique pour toutes les commandes : si un job planifié échoue, on remonte l'erreur
+// dans Sentry et par mail avant de sortir en échec. Les commandes lancées à la main ne
+// notifient pas — leur erreur est déjà sous les yeux de qui les a lancées.
+async function main() {
+  const startedAt = new Date()
+  try {
+    await program.parseAsync()
+  } catch (error) {
+    const job = jobNameFromArgv(process.argv)
+    console.error(error)
+
+    if (CRON_COMMANDS.has(job)) {
+      await captureCliException(error)
+      await notifyCronFailure({ job, error, startedAt })
+    }
+
+    process.exitCode = 1
+  }
+}
+
+void main()

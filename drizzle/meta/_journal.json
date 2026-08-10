@@ -372,6 +372,20 @@
       "when": 1785315205667,
       "tag": "0052_student_alert_expiration",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1786374768600,
+      "tag": "0053_owner_update_tracking",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1786375356022,
+      "tag": "0054_owner_updated_at_default_null",
+      "breakpoints": true
     }
   ]
 }

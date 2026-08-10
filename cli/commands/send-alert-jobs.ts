@@ -1,6 +1,7 @@
 import { closeDb } from '~/server/db'
 import { env } from '~/server/env'
-import { sendPendingAlertJobs } from '~/server/services/alert-sender'
+import { MAX_ATTEMPTS, sendPendingAlertJobs } from '~/server/services/alert-sender'
+import { CronPartialFailure } from '../cron-failure'
 
 interface SendAlertJobsOptions {
   dryRun?: boolean
@@ -30,8 +31,13 @@ export async function sendAlertJobs(options: SendAlertJobsOptions): Promise<void
     console.log(`\n  Replanifiés : ${result.requeued}`)
     console.log(`  Envoyés : ${result.sent}`)
     console.log(`  Échoués : ${result.failed}`)
+    console.log(`  Définitivement perdus : ${result.exhausted}`)
 
-    if (result.failed > 0) process.exitCode = 1
+    // Les échecs sous le plafond seront retentés au prochain passage (toutes les 30 min) : les
+    // signaler créerait du bruit pour rien. Seuls les jobs à bout de tentatives sont une perte.
+    if (result.exhausted > 0) {
+      throw new CronPartialFailure(`${result.exhausted} alerte(s) définitivement non envoyée(s) après ${MAX_ATTEMPTS} tentatives`)
+    }
   } finally {
     await closeDb()
   }

@@ -338,9 +338,13 @@ function KeyFigures({ data, isLoading }: { data: ReturnType<typeof useAdminStats
   ]
 
   const dispoLines = [
-    { label: 'Avec dispo', value: data?.disponibilite.avecDispo ?? 0 },
-    { label: '0 logement dispo', value: data?.disponibilite.sansDispo ?? 0 },
-    { label: 'Non renseignée', value: data?.disponibilite.nonRenseignee ?? 0 },
+    {
+      label: 'Résidences avec dispo',
+      value: data?.disponibilite.avecDispo ?? 0,
+      sub: `${fmt(data?.disponibilite.logementsDisponibles ?? 0)} logements disponibles`,
+    },
+    { label: 'Sans logement disponible', value: data?.disponibilite.sansDispo ?? 0, sub: null },
+    { label: 'Non renseignée', value: data?.disponibilite.nonRenseignee ?? 0, sub: null },
   ]
 
   return (
@@ -384,6 +388,7 @@ function KeyFigures({ data, isLoading }: { data: ReturnType<typeof useAdminStats
               <div key={line.label} className={styles.kpiItem}>
                 <div className={styles.kpiValue}>{isLoading ? '-' : fmt(line.value)}</div>
                 <div className={styles.kpiLabel}>{line.label}</div>
+                {line.sub && <div className={styles.kpiSubValue}>{isLoading ? '' : line.sub}</div>}
               </div>
             ))}
           </div>

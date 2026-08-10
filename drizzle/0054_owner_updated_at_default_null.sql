@@ -1,0 +1,1 @@
+ALTER TABLE "owner" ALTER COLUMN "updated_at" SET DEFAULT null;

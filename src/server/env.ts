@@ -14,6 +14,22 @@ const envSchema = z.object({
   AUTH_SECRET: z.string().min(1),
   DATABASE_URL: z.string().min(1),
 
+  // Alerting des crons : destinataires du mail envoyé quand un job planifié échoue.
+  // Liste séparée par des virgules. Vide (ou absente) = aucun envoi, on se contente d'un
+  // log — c'est l'interrupteur de la fonctionnalité, il n'y a pas de garde sur l'APP_ENV.
+  CRON_FAILURE_EMAILS: z
+    .string()
+    .optional()
+    .transform((v) =>
+      v
+        ? v
+            .split(',')
+            .map((email) => email.trim())
+            .filter(Boolean)
+        : [],
+    )
+    .pipe(z.array(z.email({ message: 'CRON_FAILURE_EMAILS doit contenir des adresses email séparées par des virgules' }))),
+
   // Brevo (email)
   BREVO_API_KEY: z.string().min(1, 'BREVO_API_KEY is required'),
   BREVO_API_URL: z.url().default('https://api.brevo.com/v3/smtp/email'),
