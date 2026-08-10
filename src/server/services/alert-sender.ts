@@ -16,6 +16,12 @@ export type AlertSenderResult = {
   sent: number
   failed: number
   requeued: number
+  /**
+   * Jobs qui viennent d'atteindre `MAX_ATTEMPTS` pendant ce run : ils ne seront plus
+   * replanifiés, l'email étudiant est définitivement perdu. C'est le seul compteur qui
+   * justifie d'alerter — un `failed` sous le plafond sera retenté au run suivant.
+   */
+  exhausted: number
 }
 
 // Un envoi = une alerte ou un groupe de favoris par utilisateur.
@@ -80,7 +86,7 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
     .leftJoin(cities, eq(accommodationAddresses.cityId, cities.id))
     .where(selection)
 
-  if (pendingJobs.length === 0) return { sent: 0, failed: 0, requeued }
+  if (pendingJobs.length === 0) return { sent: 0, failed: 0, requeued, exhausted: 0 }
 
   // Clé de regroupement :
   // - alerte → 'alert:<studentAlertId>' (un email par alerte)
@@ -111,6 +117,7 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
 
   let sent = 0
   let failed = 0
+  let exhausted = 0
 
   for (const batch of byBatch.values()) {
     if (options.dryRun) {
@@ -136,14 +143,19 @@ export async function sendPendingAlertJobs(options: { dryRun?: boolean; verbose?
       await new Promise((resolve) => setTimeout(resolve, BREVO_DELAY_MS))
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue'
-      await db
+      // `returning` renvoie le compteur après incrément : on repère ainsi les jobs qui
+      // franchissent le plafond sur ce run précis (un job ne peut le franchir qu'une fois,
+      // puisqu'au-delà il n'est plus replanifié — donc pas de ré-alerte à chaque passage).
+      const updated = await db
         .update(alertJobs)
         .set({ status: 'failed', error: errorMessage, attempts: sql`${alertJobs.attempts} + 1` })
         .where(inArray(alertJobs.id, batch.jobIds))
+        .returning({ attempts: alertJobs.attempts })
+      exhausted += updated.filter((job) => job.attempts >= MAX_ATTEMPTS).length
       console.error(`  ✗ ${batch.email} — ${errorMessage}`)
       failed++
     }
   }
 
-  return { sent, failed, requeued }
+  return { sent, failed, requeued, exhausted }
 }

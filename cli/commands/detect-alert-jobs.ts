@@ -2,7 +2,6 @@ import { eq } from 'drizzle-orm'
 import { closeDb, db } from '~/server/db'
 import { importJobs } from '~/server/db/schema'
 import { detectAlertJobs } from '~/server/services/alert-detector'
-import { captureCliException } from '../sentry'
 
 interface DetectAlertJobsOptions {
   dryRun?: boolean
@@ -56,7 +55,6 @@ export async function detectAlertJobsCommand(options: DetectAlertJobsOptions): P
         .set({ status: 'error', endedAt: new Date(), updatedAt: new Date(), summary: { errors: [msg] } })
         .where(eq(importJobs.id, jobId))
     }
-    await captureCliException(error)
     throw error
   } finally {
     await closeDb()

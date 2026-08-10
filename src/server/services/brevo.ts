@@ -1,5 +1,7 @@
 import { env } from '~/server/env'
 
+const SENDER_EMAIL = 'no-reply@monlogementetudiant.beta.gouv.fr'
+
 const brevoHeaders = {
   'api-key': env.BREVO_API_KEY,
   'Content-Type': 'application/json',
@@ -21,7 +23,7 @@ export async function sendTemplateEmail({ to, templateId, params }: TemplateEmai
     body: JSON.stringify({
       to: [{ email: to }],
       templateId,
-      replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      replyTo: { email: SENDER_EMAIL },
       ...(params && { params }),
     }),
   })
@@ -29,6 +31,39 @@ export async function sendTemplateEmail({ to, templateId, params }: TemplateEmai
   if (!response.ok) {
     const error = await response.text()
     throw new Error(`Brevo email failed: ${response.status} ${error}`)
+  }
+}
+
+interface RawEmailParams {
+  to: string[]
+  subject: string
+  textContent: string
+  /** Coupe l'appel au-delà du délai : un Brevo bloqué ne doit pas faire traîner un conteneur cron. */
+  timeoutMs?: number
+}
+
+/**
+ * Envoi en texte libre (sans template Brevo), réservé aux mails internes d'exploitation dont
+ * le contenu est trop variable pour un template (message d'erreur, stack). Contrairement aux
+ * envois par template, l'expéditeur doit être fourni explicitement.
+ */
+export async function sendRawEmail({ to, subject, textContent, timeoutMs = 10_000 }: RawEmailParams): Promise<void> {
+  const response = await fetch(env.BREVO_API_URL, {
+    method: 'POST',
+    headers: brevoHeaders,
+    signal: AbortSignal.timeout(timeoutMs),
+    body: JSON.stringify({
+      sender: { email: SENDER_EMAIL, name: 'MLE Crons' },
+      to: to.map((email) => ({ email })),
+      replyTo: { email: SENDER_EMAIL },
+      subject,
+      textContent,
+    }),
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    throw new Error(`Brevo raw email failed: ${response.status} ${error}`)
   }
 }
 
@@ -166,7 +201,7 @@ export async function sendStudentAlertEmail(
     body: JSON.stringify({
       to: [{ email }],
       templateId: env.BREVO_TEMPLATE_STUDENT_ALERT,
-      replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      replyTo: { email: SENDER_EMAIL },
       params,
     }),
   })

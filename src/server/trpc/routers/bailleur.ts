@@ -774,7 +774,7 @@ export const bailleurRouter = createTRPCRouter({
       const owner = await getOwnerForUser(ctx.session.user.id, input.ownerId)
       if (!owner) throw new TRPCError({ code: 'NOT_FOUND', message: 'Owner not found' })
 
-      await db.update(owners).set({ contactMode: input.mode }).where(eq(owners.id, owner.id))
+      await db.update(owners).set({ contactMode: input.mode, updatedBy: ctx.session.user.id }).where(eq(owners.id, owner.id))
       return { contactMode: input.mode }
     }),
 

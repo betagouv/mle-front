@@ -533,7 +533,49 @@ Les migrations Drizzle sont appliquées au déploiement via le hook `postdeploy`
 | `0 6 * * *` | `expire-alerts` | Tous les jours à 6h |
 
 Pour vérifier les crons actifs : `scalingo --app <app> cron-tasks`
-Pour voir les logs d'exécution : `scalingo --app <app> logs --filter cron`
+Pour voir les logs d'exécution : `scalingo --app <app> logs` (les crons tournent dans des conteneurs `one-off-*`, pas `cron-*`)
+
+#### Alerte mail en cas d'échec
+
+Quand un job planifié échoue, un mail part vers les adresses listées dans `CRON_FAILURE_EMAILS`
+(séparées par des virgules). **La présence de cette variable est l'interrupteur** : si elle est
+vide, l'échec est seulement journalisé. Il n'y a pas de garde sur l'environnement — renseigner
+la variable sur staging suffit à y recevoir les alertes.
+
+Le mail contient le nom du job, l'environnement, l'horodatage, la durée, le conteneur, le
+message d'erreur et une stack tronquée. L'erreur est en parallèle envoyée à Sentry.
+
+Deux natures d'échec déclenchent l'alerte :
+
+- **Crash net** — toute exception non rattrapée qui remonte jusqu'à `cli/index.ts`.
+- **Échec partiel** — le job termine mais des éléments sont passés à la trappe : `result.errors`
+  non vide pour les imports et syncs, alertes étudiantes ayant épuisé leurs `MAX_ATTEMPTS`
+  tentatives pour `send-alert-jobs`. Le job sort alors en code 1 et apparaît en échec sur
+  Scalingo, même si sa ligne `import_job` reste en `done` avec son résumé détaillé.
+
+Il n'y a **pas d'anti-flood** : un échec = un mail. Un job qui casse durablement enverra donc
+autant de mails qu'il a d'exécutions (jusqu'à 48/jour pour `send-alert-jobs`).
+
+Seules les commandes listées dans `CRON_COMMANDS` (`cli/cron-failure.ts`) notifient — un one-off
+lancé à la main affiche déjà son erreur dans le terminal. `cron-failure.test.ts` échoue si une
+commande de `cron.json` manque à cette liste.
+
+**Ce qui n'est pas couvert** — le mail suppose que le process JS vit assez longtemps pour
+l'envoyer :
+
+- conteneur tué de l'extérieur (OOM, timeout) : aucun handler ne s'exécute ;
+- cron jamais déclenché (planification cassée) : rien ne détecte une absence d'exécution ;
+- crash à la validation des variables d'env, qui a lieu à l'import des modules donc avant le
+  `try/catch` — cas de toute façon visible, puisqu'il ferait aussi tomber le site.
+
+Pour valider la chaîne de bout en bout après un déploiement :
+
+```bash
+scalingo -a <app> --region osc-secnum-fr1 run npx tsx cli/index.ts cron-selftest
+```
+
+Cette commande lève une erreur volontaire, ne touche ni la base ni aucune API métier, et n'est
+pas planifiée.
 
 ### Variables d'environnement CLI
 
@@ -542,6 +584,7 @@ Toutes les variables sont dans `.env.dist`. Celles spécifiques au CLI :
 | Variable | Utilisée par |
 |----------|-------------|
 | `DATABASE_URL` | Toutes les commandes |
+| `CRON_FAILURE_EMAILS` | Alerte d'échec de tous les jobs planifiés (liste séparée par des virgules, vide = pas d'envoi) |
 | `SCALINGO_API_TOKEN` | `import-backup` |
 | `SCALINGO_APP` | `import-backup` |
 | `SCALINGO_DB_ADDON_ID` | `import-backup` |
