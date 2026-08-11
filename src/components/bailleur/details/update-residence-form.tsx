@@ -74,8 +74,6 @@ export const UpdateResidenceForm = ({ accommodation }: { accommodation: TAccomod
     },
   })
 
-  console.log(form.formState.errors)
-
   const onSubmit = async (data: TUpdateResidence) => {
     const sanitizedData = {
       ...data,
