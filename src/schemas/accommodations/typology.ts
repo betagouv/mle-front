@@ -20,19 +20,28 @@ export const TYPOLOGY_TYPES = TYPOLOGIES.map((t) => t.type) as unknown as readon
 
 export const getTypologyLabel = (type: string): string => TYPOLOGIES.find((t) => t.type === type)?.label ?? type
 
+// Les colonnes numériques de `accommodation_typology` sont toutes nullables : une typologie
+// peut être incomplète (import CSV partiel, saisie en plusieurs fois). Les bornes ne
+// s'appliquent donc qu'aux valeurs effectivement renseignées, jamais à null/undefined.
 export const ZTypology = z
   .object({
     type: z.enum(TYPOLOGY_TYPES, { error: 'Veuillez sélectionner un type de logement' }),
-    priceMin: z.number({ error: 'Le loyer minimum est requis' }).min(0, 'Le loyer minimum doit être positif'),
-    priceMax: z.number({ error: 'Le loyer maximum est requis' }).min(0, 'Le loyer maximum doit être positif'),
-    superficieMin: z.number({ error: 'La superficie minimum est requise' }).min(1, 'La superficie minimum doit être au moins 1 m²'),
-    superficieMax: z.number({ error: 'La superficie maximum est requise' }).min(1, 'La superficie maximum doit être au moins 1 m²'),
+    priceMin: z.number({ error: 'Le loyer minimum doit être un nombre' }).min(0, 'Le loyer minimum doit être positif').nullish(),
+    priceMax: z.number({ error: 'Le loyer maximum doit être un nombre' }).min(0, 'Le loyer maximum doit être positif').nullish(),
+    superficieMin: z
+      .number({ error: 'La superficie minimum doit être un nombre' })
+      .min(1, 'La superficie minimum doit être au moins 1 m²')
+      .nullish(),
+    superficieMax: z
+      .number({ error: 'La superficie maximum doit être un nombre' })
+      .min(1, 'La superficie maximum doit être au moins 1 m²')
+      .nullish(),
     colocation: z.boolean(),
-    nbTotal: z.number({ error: 'Le nombre total est requis' }).min(1, 'Le nombre total doit être au moins 1'),
-    nbAvailable: z.number({ error: 'Le nombre disponible est requis' }).min(0, 'Le nombre disponible doit être positif'),
+    nbTotal: z.number({ error: 'Le nombre total doit être un nombre' }).min(1, 'Le nombre total doit être au moins 1').nullish(),
+    nbAvailable: z.number({ error: 'Le nombre disponible doit être un nombre' }).min(0, 'Le nombre disponible doit être positif').nullish(),
   })
   .superRefine((data, ctx) => {
-    if (data.priceMin > data.priceMax) {
+    if (data.priceMin != null && data.priceMax != null && data.priceMin > data.priceMax) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Le loyer minimum ne peut pas être supérieur au loyer maximum',
@@ -46,7 +55,7 @@ export const ZTypology = z
         path: ['superficieMin'],
       })
     }
-    if (data.nbAvailable > data.nbTotal) {
+    if (data.nbAvailable != null && data.nbTotal != null && data.nbAvailable > data.nbTotal) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: `Le nombre de logements disponibles ne peut pas être supérieur au nombre total (${data.nbTotal})`,

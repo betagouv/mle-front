@@ -19,10 +19,10 @@ import { ETargetAudience } from '~/enums/target-audience'
 import { useUpdateResidenceDetails } from '~/hooks/use-update-residence-details'
 import { trackEvent } from '~/lib/tracking'
 import { TAccomodationMy } from '~/schemas/accommodations/accommodations'
-import { TYPOLOGIES } from '~/schemas/accommodations/typology'
 import { TUpdateResidence, ZUpdateResidence } from '~/schemas/accommodations/update-residence'
 import { formatRelativeTime } from '~/utils/formatRelativeTime'
 import { sanitizeHTML } from '~/utils/sanitize-html'
+import { typologyFormDefaults } from '~/utils/typology-form-defaults'
 import styles from './update-residence-form.module.css'
 
 export const UpdateResidenceForm = ({ accommodation }: { accommodation: TAccomodationMy }) => {
@@ -31,20 +31,7 @@ export const UpdateResidenceForm = ({ accommodation }: { accommodation: TAccomod
 
   const updateMutation = useUpdateResidenceDetails(accommodation.slug)
 
-  // Build the typologies array (form input model) from the keyed `typologies` object.
-  const typologyDefaults = TYPOLOGIES.filter(({ type }) => !!accommodation.typologies[type]).map(({ type }) => {
-    const v = accommodation.typologies[type]!
-    return {
-      type,
-      priceMin: v.priceMin ?? 0,
-      priceMax: v.priceMax ?? 0,
-      superficieMin: v.superficieMin ?? 0,
-      superficieMax: v.superficieMax ?? 0,
-      nbTotal: v.nbTotal ?? 0,
-      nbAvailable: v.nbAvailable ?? 0,
-      colocation: v.colocation,
-    }
-  })
+  const typologyDefaults = typologyFormDefaults(accommodation.typologies)
 
   const form = useForm<TUpdateResidence>({
     resolver: zodResolver(ZUpdateResidence),
@@ -87,10 +74,12 @@ export const UpdateResidenceForm = ({ accommodation }: { accommodation: TAccomod
     },
   })
 
+  console.log(form.formState.errors)
+
   const onSubmit = async (data: TUpdateResidence) => {
     const sanitizedData = {
       ...data,
-      description: data.description ? sanitizeHTML(data.description) : data.description,
+      description: data.description && sanitizeHTML(data.description),
     }
     await updateMutation.mutateAsync(sanitizedData)
     trackEvent({ category: 'Espace Gestionnaire', action: 'mise a jour residence', name: accommodation.slug })
@@ -98,7 +87,9 @@ export const UpdateResidenceForm = ({ accommodation }: { accommodation: TAccomod
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      {/* noValidate : la validation est assurée par Zod/RHF. La validation native du navigateur
+          court-circuiterait le resolver et remplacerait les messages DSFR par ses propres bulles. */}
+      <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <div className="fr-flex fr-direction-row fr-justify-content-space-between fr-align-items-md-center fr-flex-gap-4v">
           <div className="fr-flex fr-flex-gap-2v fr-align-items-center">
             <h1 className="fr-mb-0">{accommodation.name}</h1>

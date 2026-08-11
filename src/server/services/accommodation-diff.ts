@@ -25,8 +25,8 @@ export type ActivityAction =
   | 'accommodation.published'
   | 'accommodation.unpublished'
   // Émis directement par bailleur.updateAvailability : la disponibilité vit dans la table enfant
-  // accommodation_typologies, elle n'apparaît donc jamais dans le field-diff de bailleur.update et
-  // n'est pas produite par classifyActions ci-dessous.
+  // accommodation_typology, hors du périmètre de computeDiff ci-dessus, et n'est donc pas produite
+  // par classifyActions. Son diff est calculé par computeTypologyDiff (services/typology-diff.ts).
   | 'accommodation.availability_updated'
 
 export function classifyActions(diff: Diff): { action: ActivityAction; diff: Diff }[] {

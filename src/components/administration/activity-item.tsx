@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { ACTION_COLORS, ACTION_LABELS } from '~/utils/activity-actions'
+import { formatDiffFieldLabel, formatDiffValue } from '~/utils/activity-fields'
 import { formatRelativeDate } from '~/utils/date-helpers'
 import styles from './activity-item.module.css'
 
@@ -61,9 +62,9 @@ export function ActivityItem({ item, showOwner = false }: { item: ActivityEntry;
             <tbody>
               {Object.entries(meta.diff).map(([field, { old: oldVal, new: newVal }]) => (
                 <tr key={field}>
-                  <td className={styles.diffField}>{field}</td>
-                  <td className={styles.diffOld}>{oldVal == null ? '—' : String(oldVal)}</td>
-                  <td className={styles.diffNew}>{newVal == null ? '—' : String(newVal)}</td>
+                  <td className={styles.diffField}>{formatDiffFieldLabel(field)}</td>
+                  <td className={styles.diffOld}>{formatDiffValue(oldVal)}</td>
+                  <td className={styles.diffNew}>{formatDiffValue(newVal)}</td>
                 </tr>
               ))}
             </tbody>

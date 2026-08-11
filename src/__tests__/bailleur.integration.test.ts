@@ -523,6 +523,73 @@ describe('activity_log diff accuracy', () => {
     expect(logs[0].action).toBe('accommodation.availability_updated')
   })
 
+  // Les typologies vivent dans une table enfant, hors du périmètre de computeDiff : leur diff est
+  // calculé à part. Sans ça, le journal admin n'affiche plus aucun avant/après sur les
+  // disponibilités, les surfaces, les loyers ni les compteurs.
+  it('records the before/after of an availability change', async () => {
+    const db = getTestDb()
+    const owner = await createOwner({ name: 'Owner Diff Avail', slug: 'owner-diff-avail', userId: 'test-owner-id' })
+    await createAccommodation({ name: 'Diff Avail', slug: 'diff-avail', ownerId: owner.id, geom: parisPoint }, [
+      typologyDraft('t1', { nbTotal: 10, nbAvailable: 5 }),
+      typologyDraft('t3', { nbTotal: 4, nbAvailable: 2 }),
+    ])
+
+    await db.delete(activityLog)
+    await ownerCaller.bailleur.updateAvailability({
+      slug: 'diff-avail',
+      availability: [{ type: 't1', nbAvailable: 8 }],
+    })
+
+    const [log] = await db.select().from(activityLog)
+    const meta = log.metadata as { diff: Record<string, { old: unknown; new: unknown }> }
+    expect(meta.diff).toEqual({ 'typologies.t1.nbAvailable': { old: 5, new: 8 } })
+  })
+
+  it('records the before/after of surfaces, rents and counts', async () => {
+    const db = getTestDb()
+    const owner = await createOwner({ name: 'Owner Diff Typo', slug: 'owner-diff-typo', userId: 'test-owner-id' })
+    await createAccommodation({ name: 'Diff Typo', slug: 'diff-typo', ownerId: owner.id, geom: parisPoint }, [
+      typologyDraft('t1', { nbTotal: 10, nbAvailable: 5, priceMin: 400, priceMax: 600, superficieMin: 15, superficieMax: 25 }),
+    ])
+
+    await db.delete(activityLog)
+    await ownerCaller.bailleur.update({
+      slug: 'diff-typo',
+      typologies: [
+        { type: 't1', nbTotal: 12, nbAvailable: 5, priceMin: 400, priceMax: 650, superficieMin: 18, superficieMax: 25, colocation: false },
+      ],
+    })
+
+    const [log] = await db.select().from(activityLog)
+    expect(log.action).toBe('accommodation.updated')
+    const meta = log.metadata as { diff: Record<string, { old: unknown; new: unknown }> }
+    expect(meta.diff).toEqual({
+      'typologies.t1.nbTotal': { old: 10, new: 12 },
+      'typologies.t1.priceMax': { old: 600, new: 650 },
+      'typologies.t1.superficieMin': { old: 15, new: 18 },
+    })
+  })
+
+  it('records an added and a removed typology', async () => {
+    const db = getTestDb()
+    const owner = await createOwner({ name: 'Owner Diff Add', slug: 'owner-diff-add', userId: 'test-owner-id' })
+    await createAccommodation({ name: 'Diff Add', slug: 'diff-add', ownerId: owner.id, geom: parisPoint }, [
+      typologyDraft('t1', { nbTotal: 10, nbAvailable: 5 }),
+    ])
+
+    await db.delete(activityLog)
+    await ownerCaller.bailleur.update({
+      slug: 'diff-add',
+      typologies: [{ type: 't2', nbTotal: 3, nbAvailable: 1, colocation: false }],
+    })
+
+    const [log] = await db.select().from(activityLog)
+    const meta = log.metadata as { diff: Record<string, { old: unknown; new: unknown }> }
+    expect(meta.diff['typologies.t1.present']).toEqual({ old: true, new: false })
+    expect(meta.diff['typologies.t2.present']).toEqual({ old: false, new: true })
+    expect(meta.diff['typologies.t2.nbTotal']).toEqual({ old: null, new: 3 })
+  })
+
   it('classifies published change as accommodation.published', async () => {
     const db = getTestDb()
     const owner = await createOwner({ name: 'Owner Pub', slug: 'owner-pub', userId: 'test-owner-id' })
