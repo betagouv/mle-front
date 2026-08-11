@@ -218,6 +218,10 @@ program
  * l'état, sans import cassé ni commande fantôme.
  */
 function registerLocalCommands(): void {
+  if (process.env.SCALINGO_APP || process.env.NEXT_PUBLIC_APP_ENV === 'staging' || process.env.NEXT_PUBLIC_APP_ENV === 'production') {
+    return
+  }
+
   const localDir = path.join(__dirname, 'local')
   if (!fs.existsSync(localDir)) return
 
