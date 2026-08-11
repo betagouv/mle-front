@@ -46,13 +46,13 @@ export const CreateResidenceAccommodationList = () => {
   const handleAddTypology = () => {
     append({
       type: '' as TCreateResidence['typologies'][number]['type'],
-      priceMin: undefined as unknown as number,
-      priceMax: undefined as unknown as number,
-      superficieMin: undefined as unknown as number,
-      superficieMax: undefined as unknown as number,
+      priceMin: undefined,
+      priceMax: undefined,
+      superficieMin: undefined,
+      superficieMax: undefined,
       colocation: false,
-      nbTotal: undefined as unknown as number,
-      nbAvailable: undefined as unknown as number,
+      nbTotal: undefined,
+      nbAvailable: undefined,
     })
     setSelectedTabId(`tab-${fields.length}`)
   }
@@ -114,16 +114,21 @@ export const CreateResidenceAccommodationList = () => {
 
         <div>
           <Tabs selectedTabId={selectedTabId} onTabChange={handleTabChange} tabs={tabs}>
-            {sortedFieldsWithIndex.map(({ field, originalIndex }) => (
-              <div key={field.id} className={selectedTabId === `tab-${originalIndex}` ? '' : 'fr-hidden'}>
-                <TypologyTabContent
-                  index={originalIndex}
-                  typologyType={watchedTypologies?.[originalIndex]?.type}
-                  usedTypes={usedTypes}
-                  onDelete={() => handleRemoveTypology(originalIndex)}
-                />
-              </div>
-            ))}
+            {/* Seul l'onglet sélectionné est rendu : des inputs masqués mais présents dans le DOM
+                font échouer la validation native du navigateur sur des champs non focusables.
+                Les valeurs et erreurs des autres typologies restent dans l'état RHF. */}
+            {sortedFieldsWithIndex
+              .filter(({ originalIndex }) => selectedTabId === `tab-${originalIndex}`)
+              .map(({ field, originalIndex }) => (
+                <div key={field.id}>
+                  <TypologyTabContent
+                    index={originalIndex}
+                    typologyType={watchedTypologies?.[originalIndex]?.type}
+                    usedTypes={usedTypes}
+                    onDelete={() => handleRemoveTypology(originalIndex)}
+                  />
+                </div>
+              ))}
           </Tabs>
         </div>
       </div>

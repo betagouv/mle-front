@@ -19,11 +19,12 @@ import { user } from '~/server/db/schema/auth'
 import { cities } from '~/server/db/schema/cities'
 import { dossierFacileApplications, dossierFacileDocuments, dossierFacileTenants } from '~/server/db/schema/dossier-facile'
 import { owners } from '~/server/db/schema/owners'
-import { persistTypologies, typologyAggregates } from '~/server/lib/typologies'
+import { persistTypologies, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { classifyActions, computeDiff } from '~/server/services/accommodation-diff'
 import { logActivity } from '~/server/services/activity-logger'
 import { triggerAlertDetection } from '~/server/services/alert-detection-trigger'
 import { sendOwnerWelcomeEmail, syncBrevoDataUpdated } from '~/server/services/brevo'
+import { computeTypologyDiff } from '~/server/services/typology-diff'
 import { generateSlug, geocodeAddress } from '~/server/trpc/utils/accommodation-helpers'
 import { resolveCityId } from '~/server/trpc/utils/resolve-city'
 import { getJwtSecret } from '~/server/utils/jwt-secret'
@@ -272,7 +273,12 @@ export const bailleurRouter = createTRPCRouter({
           .insert(accommodations)
           .values(insertValues)
           .returning({ id: accommodations.id, slug: accommodations.slug, name: accommodations.name })
-        await persistTypologies(tx, row.id, typologies)
+        // Les champs numériques de ZTypology sont optionnels : typologyDraft normalise undefined → null.
+        await persistTypologies(
+          tx,
+          row.id,
+          typologies.map((t) => typologyDraft(t.type, t)),
+        )
         return row
       })
 
@@ -322,6 +328,13 @@ export const bailleurRouter = createTRPCRouter({
 
       // Snapshot current state for diff
       const [snapshot] = await db.select().from(accommodations).where(eq(accommodations.slug, slug)).limit(1)
+
+      // Les typologies vivent dans une table enfant : computeDiff ne les voit pas, il faut donc
+      // photographier les lignes avant écriture pour pouvoir les comparer ensuite.
+      const typologiesBefore =
+        typologies === undefined
+          ? []
+          : await db.select().from(accommodationTypologies).where(eq(accommodationTypologies.accommodationId, accommodationId))
 
       // Input fields are already camelCase = DB column names, so no snake→camel mapping is needed.
       const camelFields: Record<string, unknown> = { ...fields }
@@ -375,7 +388,12 @@ export const bailleurRouter = createTRPCRouter({
       parentSet.updatedAt = new Date()
 
       const updated = await db.transaction(async (tx) => {
-        if (typologies) await persistTypologies(tx, accommodationId, typologies)
+        if (typologies)
+          await persistTypologies(
+            tx,
+            accommodationId,
+            typologies.map((t) => typologyDraft(t.type, t)),
+          )
         const [row] = await tx
           .update(accommodations)
           .set(parentSet)
@@ -385,7 +403,15 @@ export const bailleurRouter = createTRPCRouter({
       })
 
       if (snapshot) {
-        const diff = computeDiff(snapshot as Record<string, unknown>, camelFields, userProvidedKeys)
+        const diff = {
+          ...computeDiff(snapshot as Record<string, unknown>, camelFields, userProvidedKeys),
+          ...(typologies === undefined
+            ? {}
+            : computeTypologyDiff(
+                typologiesBefore,
+                typologies.map((t) => typologyDraft(t.type, t)),
+              )),
+        }
         for (const { action, diff: actionDiff } of classifyActions(diff)) {
           await logActivity({
             userId: ctx.session.user.id,
@@ -478,7 +504,7 @@ export const bailleurRouter = createTRPCRouter({
         entityName: updated.name,
         ownerId: owner?.id,
         ownerName: owner?.name,
-        metadata: { slug: updated.slug },
+        metadata: { slug: updated.slug, diff: computeTypologyDiff(currentRows, newTypologies) },
       })
 
       // Sync Brevo : si toutes les résidences du owner ont au moins une dispo renseignée

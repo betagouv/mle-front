@@ -79,7 +79,9 @@ export const CreateResidenceForm = () => {
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      {/* noValidate : la validation est assurée par Zod/RHF. La validation native du navigateur
+          court-circuiterait le resolver et remplacerait les messages DSFR par ses propres bulles. */}
+      <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
         <div className="fr-flex fr-direction-row fr-justify-content-space-between fr-align-items-center">
           <h1>Nouvelle résidence</h1>
           <CreateResidencePublication />

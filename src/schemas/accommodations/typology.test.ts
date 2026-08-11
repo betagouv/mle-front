@@ -38,6 +38,18 @@ describe('ZTypology', () => {
     expect(ZTypology.safeParse({ ...valid, priceMin: 0, priceMax: 0, nbAvailable: 0 }).success).toBe(true)
   })
 
+  it('accepts null or undefined numeric fields (colonnes nullables en base)', () => {
+    expect(ZTypology.safeParse({ type: 't1', colocation: false }).success).toBe(true)
+    expect(ZTypology.safeParse({ ...valid, superficieMin: null, superficieMax: null, nbTotal: null }).success).toBe(true)
+    expect(ZTypology.safeParse({ ...valid, superficieMin: undefined, nbTotal: undefined }).success).toBe(true)
+  })
+
+  it('skips the cross-field comparisons when one side is missing', () => {
+    expect(ZTypology.safeParse({ ...valid, priceMin: 700, priceMax: null }).success).toBe(true)
+    expect(ZTypology.safeParse({ ...valid, superficieMin: 30, superficieMax: undefined }).success).toBe(true)
+    expect(ZTypology.safeParse({ ...valid, nbTotal: null, nbAvailable: 10 }).success).toBe(true)
+  })
+
   it('rejects an unknown typology type', () => {
     expect(ZTypology.safeParse({ ...valid, type: 't9' }).success).toBe(false)
   })
