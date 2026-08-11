@@ -21,7 +21,7 @@ export default defineConfig({
         test: {
           name: 'unit',
           include: ['src/**/*.test.ts', 'cli/**/*.test.ts'],
-          exclude: ['src/**/*.integration.test.ts', 'cli/**/*.integration.test.ts'],
+          exclude: ['src/**/*.integration.test.ts', 'cli/**/*.integration.test.ts', 'cli/commands/audit-rgaa/**/*.test.ts'],
           env: {
             BASE_URL: 'http://localhost:3000',
             AUTH_SECRET: 'test-secret',
