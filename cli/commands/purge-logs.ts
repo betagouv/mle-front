@@ -26,22 +26,32 @@ export interface PurgeLogsOptions {
 const DEFAULT_RETENTION_MONTHS = 6
 
 /**
- * `tracking_event` alimente les statistiques bailleurs, qui remontent jusqu'à 180 jours
- * (période `90d` + période précédente, cf. `owner-statistics.ts`). Six mois ne laisseraient que
- * deux jours de marge au-dessus de cette fenêtre de lecture : on garde 13 mois, ce qui borne la
- * table tout en autorisant une comparaison à N-1.
+ * `tracking_event` alimente le tableau de bord bailleur (`owner-statistics.ts`). Le sélecteur
+ * n'expose que `7d` / `30d` / `90d` : **90 jours sont affichés**, mais une requête remonte à
+ * 180 — `countConsultOffer` sur la période précédente, qui alimente le badge d'évolution des
+ * consultations d'offre en période `90d`.
+ *
+ * Sept mois couvrent donc ces 180 jours avec ~33 jours de marge. Comme la purge est mensuelle,
+ * une ligne vit en pratique entre 7 et 8 mois : le plateau visé est d'environ 8 mois de données.
+ *
+ * Descendre à 3 mois ferait disparaître ce badge (`computeDelta` renvoie `null` sur une période
+ * précédente vide) — l'écran ne casse pas, il ment. Monter au-delà n'achèterait qu'une
+ * comparaison à N-1 qui n'existe dans aucun écran : si le besoin apparaît, c'est un rollup
+ * journalier qu'il faut, pas de la rétention brute.
  */
-const TRACKING_RETENTION_MONTHS = 13
+const TRACKING_RETENTION_MONTHS = 7
 
 /** Taille des lots de suppression : borne la durée des transactions et le volume de WAL. */
 const DELETE_BATCH_SIZE = 10_000
 
 /**
- * Plafond de lignes traitées par table et par run. En régime quotidien une seule journée est
- * concernée ; le plafond ne mord que sur le premier passage, qui rattrape l'historique. Le
- * dépassement est journalisé — jamais tronqué en silence.
+ * Plafond de lignes traitées par table et par run. Le cron étant mensuel, un run de régime
+ * traite un mois d'événements — environ 1,2 M lignes sur `tracking_event` au rythme actuel : le
+ * plafond doit rester nettement au-dessus pour ne pas mordre tous les mois. Il ne sert qu'à
+ * borner le premier passage, qui rattrape l'historique, et son dépassement est journalisé —
+ * jamais tronqué en silence.
  */
-const DEFAULT_MAX_ROWS = 1_000_000
+const DEFAULT_MAX_ROWS = 2_000_000
 
 interface PurgeTarget {
   /** Nom réel de la table en base : sert aussi de préfixe de clé S3. */
