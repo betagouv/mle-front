@@ -131,12 +131,28 @@ pnpm cli purge-logs --retention-months 12       # force la rétention de toutes 
 Supprime les lignes plus vieilles que la rétention (filtre sur `created_at`) dans les tables qui ne
 sont jamais mises à jour et grossissent donc indéfiniment :
 
-| Table | Rétention | Périmètre |
-|-------|-----------|-----------|
-| `tracking_event` | **7 mois** | tous les événements de navigation |
-| `activity_log` | 6 mois | journal d'actions admin/bailleurs |
-| `alert_job` | 6 mois | **jobs terminés uniquement** (`sent`, `failed`) ; les `pending` restent actionnables par le sender |
-| `import_job` | 6 mois | audit trail des imports de résidences |
+| Table | Rétention | Taille | Croissance | Périmètre |
+|-------|-----------|--------|------------|-----------|
+| `tracking_event` | **7 mois** | 805 Mo | ~385 Mo/mois | tous les événements de navigation |
+| `alert_job` | 12 mois | 11 Mo | ~8,8 Mo/mois | **jobs terminés uniquement** (`sent`, `failed`) ; les `pending` restent actionnables par le sender |
+| `activity_log` | 36 mois | 5 Mo | ~0,5 Mo/mois, en décroissance | journal d'actions admin/bailleurs |
+| `import_job` | 24 mois | 1,9 Mo | ~0,2 Mo/mois | audit trail des imports et des crons |
+
+Les rétentions sont volontairement dissymétriques. `tracking_event` pèse 98 % du total et croît
+40 fois plus vite que la somme des trois autres : c'est la seule dont la rétention se paie en
+gigaoctets, donc la seule à purger court. Sur les autres, allonger la rétention coûte quelques
+dizaines de mégaoctets sur plusieurs années — moins cher qu'un écran d'admin qui affiche un trou :
+
+- **`activity_log`** — l'écran « Statistiques gestionnaires » laisse choisir une **plage de dates
+  libre** (deux champs `type="date"`, au-delà des présélections 7/30/90 jours). Purger court ferait
+  silencieusement retourner zéro sur les plages anciennes, pour économiser 5 Mo sur une table qui
+  décroît. La rétention n'est ici qu'un garde-fou.
+- **`import_job`** — l'admin « Tâches planifiées » affiche le dernier run de **chaque type de
+  cron** (`selectDistinctOn`). Certains sont trimestriels (`sync rents`) : une rétention courte
+  pourrait effacer le seul enregistrement d'un job rare et l'afficher comme jamais exécuté.
+- **`alert_job`** — n'est relu par aucun écran ni aucune API. `onConflictDoNothing` du détecteur
+  s'appuie sur les index uniques partiels, qui ne couvrent que `pending` / `failed` : un job `sent`
+  ne bloque aucune réémission. Les 12 mois ne servent qu'au diagnostic a posteriori.
 
 La rétention de `tracking_event` est dictée par le tableau de bord bailleur
 (`owner-statistics.ts`). Le sélecteur n'expose que `7d` / `30d` / `90d`, donc **90 jours sont
