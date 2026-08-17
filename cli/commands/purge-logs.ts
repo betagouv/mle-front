@@ -77,7 +77,6 @@ const IMPORT_JOB_RETENTION_MONTHS = 24
  */
 const TRACKING_RETENTION_MONTHS = 7
 
-/** Taille des lots de suppression : borne la durée des transactions et le volume de WAL. */
 const DELETE_BATCH_SIZE = 10_000
 
 /**
@@ -154,8 +153,12 @@ async function hasRemainingRows(target: PurgeTarget, where: SQL): Promise<boolea
  */
 async function deleteInBatches(target: PurgeTarget, where: SQL, maxId: number): Promise<number> {
   let deleted = 0
+  let batch = 0
 
-  while (true) {
+  // Un lot plein signifie qu'il en reste probablement ; un lot incomplet est forcément le dernier.
+  // La boucle termine toujours : chaque tour supprime les lignes qu'il vient de compter, donc
+  // l'ensemble ciblé décroît strictement jusqu'à épuisement.
+  do {
     const rows = await db.execute(sql`
       with doomed as (
         select ${target.table.id} as id
@@ -169,9 +172,9 @@ async function deleteInBatches(target: PurgeTarget, where: SQL, maxId: number): 
       returning ${target.table.id} as id
     `)
 
-    if (rows.length === 0) break
-    deleted += rows.length
-  }
+    batch = rows.length
+    deleted += batch
+  } while (batch === DELETE_BATCH_SIZE)
 
   return deleted
 }
