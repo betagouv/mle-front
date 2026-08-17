@@ -202,9 +202,15 @@ un `public-read` sur les médias des résidences). Le bucket n'accorde aucun dro
 archive est donc privée par défaut, **rien n'est à configurer côté S3** — un `GET` anonyme sur une
 archive répond 403, là où un média répond 200.
 
-En revanche les archives contiennent des données personnelles (`user_id`, `session_id`,
-`user_name`) et rien ne les fait expirer : sans règle de cycle de vie, la purge ne fait que
-déplacer le problème de rétention hors de la base.
+**Aucune règle de cycle de vie n'est posée sur le préfixe `purges/`, et c'est délibéré** (décision
+d'août 2026, à revoir vers août 2027). Les archives contiennent des données personnelles
+(`user_id`, `session_id`, `user_name`) et rien ne les fait expirer : tant qu'elles s'accumulent, la
+purge n'a pas raccourci la durée de conservation de ces données, elle les a déplacées de PostgreSQL
+vers S3. C'est un compromis assumé le temps de voir tourner la commande, pas un oubli — le volume
+en jeu est d'environ 400 Mo par an, donc rien n'oblige à trancher tout de suite.
+
+Le jour où on la pose (le bucket le supporte : OVH répond `NoSuchLifecycleConfiguration` et non
+`NotImplemented`) :
 
 ```bash
 aws --endpoint-url "$S3_ENDPOINT" s3api put-bucket-lifecycle-configuration \
@@ -217,6 +223,10 @@ aws --endpoint-url "$S3_ENDPOINT" s3api put-bucket-lifecycle-configuration \
     }]
   }'
 ```
+
+Deux limites à connaître : la règle porte sur tout le préfixe `purges/`, donc sur les quatre tables
+avec la même durée (il en faudrait quatre pour moduler) ; et l'expiration se compte depuis la date
+de dépôt, pas depuis la date des événements archivés.
 
 Si le dépôt S3 échoue, **rien n'est supprimé** : mieux vaut une table qui grossit un jour de plus
 que des lignes perdues sans filet.
