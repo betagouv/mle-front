@@ -46,7 +46,7 @@ const DEFAULT_MAX_ROWS = 1_000_000
 interface PurgeTarget {
   /** Nom réel de la table en base : sert aussi de préfixe de clé S3. */
   label: string
-  table: PgTable & { id: PgColumn }
+  table: PgTable & { id: PgColumn; createdAt: PgColumn }
   retentionMonths: number
   /** Condition des lignes à supprimer (plus vieilles que le seuil de rétention). */
   where: (cutoff: Date) => SQL
