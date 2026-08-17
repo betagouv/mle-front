@@ -160,9 +160,11 @@ pnpm cli backfill-geocoding --phase geom --apply --verbose   # écriture des coo
 
 Rattrape deux défauts distincts hérités des imports, chacun sur son propre périmètre.
 
-**Phase `geom`** — uniquement les adresses dont le point tombe hors de la commune de leur `city_id`. La recherche filtrant sur `ST_Within(geom, city.boundary)`, ces résidences sont introuvables sur leur propre ville. Une adresse déjà cohérente n'est jamais déplacée : c'est ce qui ramène les régressions à zéro.
+Les deux phases d'écriture ne travaillent que sur les adresses **déjà incohérentes** — celles dont le point tombe hors de la commune de leur `city_id`. Une adresse saine n'est jamais lue, jamais réécrite.
 
-**Phase `city`** — toutes les adresses. Recale le `city_id` sur la commune du code INSEE validé par la BAN, sans toucher aux coordonnées. Répare les rattachements arbitraires d'avant le correctif (Rezé pour Nantes, Boisemont pour Cergy, Gometz-la-Ville pour Orsay).
+**Phase `city`** — recale le `city_id` sans toucher aux coordonnées, et seulement lorsque la BAN désigne la commune où le point se trouve déjà : deux sources indépendantes qui concordent. Répare les rattachements arbitraires d'avant le correctif (Rezé pour Nantes, Boisemont pour Cergy, Saint-Denis de La Réunion pour la Seine-Saint-Denis).
+
+**Phase `geom`** — corrige le point pour les adresses que `city` n'a pas pu résoudre, signe que ce sont les coordonnées qui sont en cause. Écrit `geom` et `city_id` ensemble, pour ne pas laisser la ville affichée en désaccord avec la position.
 
 **Phase `report`** (défaut) — n'écrit rien, liste les adresses à arbitrer à la main.
 
@@ -176,7 +178,14 @@ Chaque adresse reçoit une décision :
 
 Les `flag` sont pour l'essentiel des adresses dont le numéro de boîte a été rangé dans le code postal à l'import (`2 rue du Général Delestraint CS` + code postal `15250`) : l'information d'origine est perdue, seule une correction manuelle est possible.
 
-> **Ordre d'exécution : `city` avant `geom`.** Tant que le `city_id` est faux, le nom de commune qui en dérive pollue la requête envoyée à la BAN et fausse la validation des candidats.
+> **Ordre d'exécution : `city` avant `geom`.** Tant que le `city_id` est faux, le nom de commune qui en dérive pollue la requête envoyée à la BAN et fausse la validation des candidats. `city` résolvant déjà une partie du lot, `geom` en voit d'autant moins.
+
+Vérifié sur une copie locale d'un backup de production (1571 adresses, 98 incohérentes) : **58 réparées, 0 adresse saine dégradée**, 40 restantes renvoyées en revue manuelle. Requête de contrôle :
+
+```sql
+SELECT count(*) FROM accommodation_address aa JOIN city c ON c.id = aa.city_id
+WHERE aa.geom IS NOT NULL AND c.boundary IS NOT NULL AND NOT ST_Within(aa.geom, c.boundary);
+```
 
 Options :
 

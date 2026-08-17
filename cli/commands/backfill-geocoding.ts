@@ -99,11 +99,19 @@ function writeRollback(path: string, rows: { addressId: number }[]): void {
   )
 }
 
-async function applyGeom(addressId: number, lat: number, lng: number): Promise<void> {
+/**
+ * Écrit le point et son étiquette ensemble : séparer les deux laisserait
+ * l'adresse dans un état où la ville affichée ne correspond pas à la position.
+ */
+async function applyGeom(addressId: number, lat: number, lng: number, inseeCode: string | null): Promise<void> {
   await db.execute(sql`
-    UPDATE accommodation_address
-    SET geom = ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)
-    WHERE id = ${addressId}
+    UPDATE accommodation_address aa
+    SET geom = ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326),
+        city_id = COALESCE(
+          ${inseeCode === null ? null : sql`(SELECT c.id FROM city c WHERE c.insee_codes @> ARRAY[${inseeCode}]::varchar[] LIMIT 1)`},
+          aa.city_id
+        )
+    WHERE aa.id = ${addressId}
   `)
 }
 
@@ -127,10 +135,11 @@ export async function backfillGeocoding(options: BackfillOptions = {}): Promise<
   console.log(`→ Backfill géocodage — phase « ${phase} »${dryRun ? ' (DRY-RUN, aucune écriture)' : ''}`)
 
   try {
-    // La phase `geom` se restreint aux adresses incohérentes ; `city` et
-    // `report` balaient tout, puisqu'un cityId faux n'a rien à voir avec la
-    // position du point.
-    const rows = await fetchAddresses(phase === 'geom', limit)
+    // Les deux phases d'écriture se restreignent aux adresses incohérentes.
+    // Réécrire le cityId d'une adresse dont le point est déjà dans la commune
+    // désaligne le couple geom/cityId : mesuré à 184 adresses saines cassées
+    // sur 186 réétiquetées. Seul `report` balaie tout le parc.
+    const rows = await fetchAddresses(phase !== 'report', limit)
     console.log(`→ ${rows.length} adresse(s) à examiner`)
 
     const decisions: { row: AddressRow; decision: TGeocodeDecision }[] = []
@@ -194,10 +203,13 @@ export async function backfillGeocoding(options: BackfillOptions = {}): Promise<
           continue
         }
         if (verbose) console.log(`  ${row.slug} → ${decision.lat.toFixed(5)},${decision.lng.toFixed(5)} (${decision.confidence})`)
-        if (!dryRun) await applyGeom(row.addressId, decision.lat, decision.lng)
+        if (!dryRun) await applyGeom(row.addressId, decision.lat, decision.lng, decision.inseeCode)
         changed++
       } else {
-        if (!decision.inseeCode) {
+        // On ne réétiquette que si la BAN désigne la commune où le point se
+        // trouve déjà : deux sources indépendantes qui concordent. Sinon c'est
+        // le point qui est en cause, et c'est à la phase geom de le corriger.
+        if (!decision.inseeCode || decision.inseeCode !== row.currentInseeCode) {
           unchanged++
           continue
         }
