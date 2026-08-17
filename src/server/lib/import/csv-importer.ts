@@ -13,7 +13,7 @@ import { generateAccommodationKey, uploadFile } from '~/server/services/s3'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '~/server/utils/slug'
 import { type CsvRow, generateSourceId, normalizeEnum, parseCsvContent, toBool, toDigit } from './csv-parser'
-import { ensureCity, geocodeAddress, reverseGeocode } from './geocoder'
+import { ensureCity, geocodeAddressVerified, geocodeImportRow, reverseGeocode } from './geocoder'
 
 export type ProgressLine = {
   row: number
@@ -350,13 +350,11 @@ export async function executeCsvImport(
           }
         }
         if (resolvedCity && resolvedCity === resolvedCity.toUpperCase() && resolvedCity !== resolvedCity.toLowerCase()) {
-          const fullAddress = `${resolvedAddress}, ${resolvedPostalCode} ${resolvedCity}`
-          const geo = await geocodeAddress(fullAddress)
+          const geo = await geocodeAddressVerified(resolvedAddress, resolvedPostalCode, resolvedCity)
           if (geo?.city) resolvedCity = geo.city
         }
       } else {
-        const fullAddress = `${row.address ?? ''}, ${row.postal_code ?? ''} ${row.city ?? ''}`
-        const geo = await geocodeAddress(fullAddress)
+        const geo = await geocodeImportRow(row.address ?? '', row.postal_code ?? '', row.city ?? '')
         if (geo) {
           geom = sql`ST_SetSRID(ST_MakePoint(${geo.lng}, ${geo.lat}), 4326)`
           resolvedAddress = geo.address || resolvedAddress

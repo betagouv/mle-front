@@ -2,7 +2,7 @@ import { and, eq, sql } from 'drizzle-orm'
 import { EResidenceType } from '~/enums/residence-type'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
-import { ensureCity, geocodeAddress } from '~/server/lib/import/geocoder'
+import { ensureCity, geocodeAddressVerified } from '~/server/lib/import/geocoder'
 import { mergeTypologies, syncTypologies, type TypologyPatch, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { accommodationAddresses, accommodations, externalSources, importBlocklist } from '../../src/server/db/schema'
 import { generateAccommodationKey, uploadFile } from '../../src/server/services/s3'
@@ -175,10 +175,8 @@ const command: ImportCommand = {
           .limit(1)
 
         const normalized = normalizeResidence(residence)
-        const fullAddress = [residence.address, residence.address_complement, `${residence.zip_code} ${residence.city}`]
-          .filter(Boolean)
-          .join(', ')
-        const geo = await geocodeAddress(fullAddress)
+        const street = [residence.address, residence.address_complement].filter(Boolean).join(', ')
+        const geo = await geocodeAddressVerified(street, residence.zip_code, residence.city)
 
         const resolvedPostalCode = geo?.postalCode ?? residence.zip_code
         const resolvedCityName = geo?.city ?? residence.city

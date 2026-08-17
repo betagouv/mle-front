@@ -1,7 +1,7 @@
 import { and, eq, sql } from 'drizzle-orm'
 import type { TypologyType } from '~/schemas/accommodations/typology'
 import { db } from '~/server/db'
-import { ensureCity, geocodeAddress } from '~/server/lib/import/geocoder'
+import { ensureCity, geocodeAddressVerified } from '~/server/lib/import/geocoder'
 import { syncTypologies, type TypologyDraft, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
 import { generateAccommodationKey, uploadFile } from '../../src/server/services/s3'
@@ -182,9 +182,8 @@ const command: ImportCommand = {
         const apiLng = acfAddress?.lng != null ? Number(acfAddress.lng) : null
 
         let geo = null
-        if (acfAddress?.address) {
-          const fullAddress = [acfAddress.address, acfAddress.post_code, acfAddress.city].filter(Boolean).join(', ')
-          geo = await geocodeAddress(fullAddress)
+        if (acfAddress?.address && acfAddress.post_code) {
+          geo = await geocodeAddressVerified(acfAddress.address, acfAddress.post_code, acfAddress.city)
         }
 
         const lat = apiLat && apiLng ? apiLat : geo?.lat

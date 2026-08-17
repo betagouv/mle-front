@@ -1,5 +1,5 @@
 import slugify from 'slugify'
-import { env } from '~/server/env'
+import { resolveAddressLocation } from '~/server/lib/geocoding/resolve'
 
 slugify.extend({
   '&': 'et',
@@ -39,22 +39,13 @@ export function generateSlug(name: string): string {
   return slugify(name, { lower: true })
 }
 
+/**
+ * Géocode une adresse saisie par un bailleur. Renvoie `null` quand aucun
+ * candidat ne peut être rattaché avec certitude à la commune du code postal :
+ * mieux vaut pas de coordonnées qu'un point dans un autre département.
+ */
 export async function geocodeAddress(address: string, city: string, postalCode: string): Promise<{ lon: number; lat: number } | null> {
-  const query = `${address} ${postalCode} ${city}`
-  const baseUrl = env.GEOCODING_API_URL
-  const url = `${baseUrl}?q=${encodeURIComponent(query)}&limit=1`
-
-  try {
-    const response = await fetch(url)
-    if (!response.ok) return null
-
-    const data = await response.json()
-    const feature = data?.features?.[0]
-    if (!feature?.geometry?.coordinates) return null
-
-    const [lon, lat] = feature.geometry.coordinates
-    return { lon, lat }
-  } catch {
-    return null
-  }
+  const decision = await resolveAddressLocation({ address, postalCode, cityName: city })
+  if (decision.action !== 'apply') return null
+  return { lon: decision.lng, lat: decision.lat }
 }
