@@ -29,6 +29,30 @@ export async function uploadFile(input: { key: string; body: Buffer; contentType
   return `${endpoint.replace('://', `://${bucket}.`)}/${input.key}`
 }
 
+/**
+ * Dépose un objet **non public** (pas d'ACL `public-read`, contrairement à `uploadFile` qui
+ * sert les médias des résidences). Réservé aux contenus qui ne doivent être lisibles qu'avec
+ * les identifiants du bucket : archives de purge, exports internes.
+ *
+ * Ne retourne pas d'URL publique : l'objet n'est accessible qu'authentifié.
+ */
+export async function uploadPrivateFile(input: {
+  key: string
+  body: Buffer
+  contentType: string
+  metadata?: Record<string, string>
+}): Promise<void> {
+  await s3.send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: input.key,
+      Body: input.body,
+      ContentType: input.contentType,
+      Metadata: input.metadata,
+    }),
+  )
+}
+
 export function generateAccommodationKey(ext: string): string {
   const uuidHex = randomUUID().replace(/-/g, '')
   return `accommodations${env.S3_SUFFIX_DIR}/${uuidHex}.${ext}`
