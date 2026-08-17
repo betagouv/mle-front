@@ -63,11 +63,16 @@ program.command('migrate').description('Apply Drizzle migrations').action(migrat
 
 program
   .command('purge-logs')
-  .description('Purge les tables de logs (activity_log, alert_job terminés, import_jobs) au-delà de la rétention')
+  .description('Purge les tables append-only au-delà de leur rétention, après archivage NDJSON dans S3')
   .option('--dry-run', 'Compter sans supprimer')
   .option('--verbose', 'Afficher le détail par table')
-  .option('--retention-months <n>', 'Nombre de mois à conserver (défaut : 6)', parseInt)
-  .action((opts) => purgeLogs({ ...opts, retentionMonths: opts.retentionMonths ?? 6 }))
+  .option('--retention-months <n>', 'Forcer la rétention de toutes les tables (défaut : 13 mois pour tracking_event, 6 ailleurs)', parseInt)
+  .option('--max-rows <n>', 'Plafond de lignes par table et par run (défaut : 1000000)', parseInt)
+  .option('--table <name>', 'Ne purger qu’une table (tracking_event, activity_log, alert_job, import_job)')
+  .option('--no-archive', 'Supprimer sans déposer d’archive dans S3')
+  // Commander expose `--no-archive` sous la forme `archive: false` : on le retraduit en
+  // `noArchive` pour que la commande garde une option positive côté API.
+  .action((opts) => purgeLogs({ ...opts, noArchive: opts.archive === false }))
 
 program
   .command('compare-crous <file>')

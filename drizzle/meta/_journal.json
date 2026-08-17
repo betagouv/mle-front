@@ -386,6 +386,13 @@
       "when": 1786375356022,
       "tag": "0054_owner_updated_at_default_null",
       "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1786954115704,
+      "tag": "0055_tracking_event_partial_indexes",
+      "breakpoints": true
     }
   ]
 }
