@@ -81,6 +81,7 @@ cli/
   commands/
     migrate-users.ts     # Migration users Django
     backfill-brevo-contacts.ts # Rattrapage des contacts Brevo (étudiants + gestionnaires)
+    backfill-geocoding.ts # Recalage des geom aberrantes et des city_id mal résolus
     import-backup.ts     # Import backup Scalingo
     import-arpej-ibail.ts # Import résidences ARPEJ (API iBAIL)
     import-crous.ts       # Import résidences CROUS depuis XLSX
@@ -145,6 +146,51 @@ Options :
 Variables d'env requises : `DATABASE_URL`, `BREVO_API_KEY`, `BREVO_CONTACTS_API_URL`
 
 > Conçue pour un one-off Scalingo. Sur Scalingo (vars injectées, pas de fichier `.env`), lancer directement `tsx cli/index.ts backfill-brevo-contacts --verbose` plutôt que `pnpm cli` (qui charge `--env-file=.env`).
+
+#### `backfill-geocoding` — Recaler les adresses mal géocodées
+
+```bash
+pnpm cli backfill-geocoding                                  # rapport : liste ce qui demande une revue manuelle
+pnpm cli backfill-geocoding --phase city --csv /tmp/city.csv # simulation du recalage des city_id
+pnpm cli backfill-geocoding --phase city --apply             # écriture
+pnpm cli backfill-geocoding --phase geom --apply --verbose   # écriture des coordonnées
+```
+
+> ⚠️ Contrairement aux autres commandes, celle-ci est **en dry-run par défaut** : c'est `--apply` qui déclenche l'écriture, pas l'absence de `--dry-run`.
+
+Rattrape deux défauts distincts hérités des imports, chacun sur son propre périmètre.
+
+**Phase `geom`** — uniquement les adresses dont le point tombe hors de la commune de leur `city_id`. La recherche filtrant sur `ST_Within(geom, city.boundary)`, ces résidences sont introuvables sur leur propre ville. Une adresse déjà cohérente n'est jamais déplacée : c'est ce qui ramène les régressions à zéro.
+
+**Phase `city`** — toutes les adresses. Recale le `city_id` sur la commune du code INSEE validé par la BAN, sans toucher aux coordonnées. Répare les rattachements arbitraires d'avant le correctif (Rezé pour Nantes, Boisemont pour Cergy, Gometz-la-Ville pour Orsay).
+
+**Phase `report`** (défaut) — n'écrit rien, liste les adresses à arbitrer à la main.
+
+Chaque adresse reçoit une décision :
+
+| Décision | Sens |
+|----------|------|
+| `apply` | Candidat rattachable à la commune du code postal, ou repli sur son centre |
+| `keep` | Le point en base est déjà plausible, on n'y touche pas |
+| `flag` | Indécidable automatiquement — revue manuelle |
+
+Les `flag` sont pour l'essentiel des adresses dont le numéro de boîte a été rangé dans le code postal à l'import (`2 rue du Général Delestraint CS` + code postal `15250`) : l'information d'origine est perdue, seule une correction manuelle est possible.
+
+> **Ordre d'exécution : `city` avant `geom`.** Tant que le `city_id` est faux, le nom de commune qui en dérive pollue la requête envoyée à la BAN et fausse la validation des candidats.
+
+Options :
+
+| Option | Description |
+|--------|-------------|
+| `--phase <phase>` | `report` (défaut), `geom` ou `city` |
+| `--apply` | Écrit en base (par défaut : simulation) |
+| `--verbose` | Affiche chaque ligne traitée |
+| `--limit <n>` | Limite le nombre d'adresses examinées |
+| `--csv <path>` | Écrit le rapport détaillé (décision, confiance, motif, coordonnées) |
+
+Avec `--apply`, un fichier `rollback-geocoding-<phase>.sql` est écrit : il contient le `SELECT` des valeurs à capturer avant l'opération pour un retour arrière.
+
+Variables d'env requises : `DATABASE_URL`, `GEOCODING_API_URL` (défaut : `https://data.geopf.fr/geocodage/search`)
 
 #### `import-backup` — Importer un backup Scalingo
 
