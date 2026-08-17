@@ -52,7 +52,11 @@ const envSchema = z.object({
   S3_BUCKET: z.string().min(1),
   S3_ACCESS_KEY_ID: z.string().min(1),
   S3_SECRET_ACCESS_KEY: z.string().min(1),
-  S3_SUFFIX_DIR: z.string().default(''),
+
+  // Taille du cache d'images en mémoire de chaque container, en Mo. Lu directement par
+  // cache-handler.mjs, qui tourne hors du graphe de modules de l'app : déclaré ici pour
+  // rester documenté et validé au démarrage, pas pour y être importé.
+  IMAGE_CACHE_MEMORY_MB: z.coerce.number().int().positive().default(128),
 
   // Geocoding
   GEOCODING_API_URL: z.url().default('https://data.geopf.fr/geocodage/search'),

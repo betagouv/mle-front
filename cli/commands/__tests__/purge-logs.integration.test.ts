@@ -17,7 +17,13 @@ const uploadPrivateFile = vi.fn(async (input: CapturedUpload) => {
   uploads.push(input)
 })
 
-vi.mock('~/server/services/s3', () => ({ uploadPrivateFile: (input: CapturedUpload) => uploadPrivateFile(input) }))
+// Mock partiel : seul l'envoi S3 est intercepté. Une factory qui n'énumère que
+// `uploadPrivateFile` remplacerait tout le module, et le moindre export consommé
+// ailleurs — `PURGE_ARCHIVE_PREFIX` dans `archiveKey`, par exemple — lèverait à l'accès.
+vi.mock('~/server/services/s3', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('~/server/services/s3')>()),
+  uploadPrivateFile: (input: CapturedUpload) => uploadPrivateFile(input),
+}))
 
 const { purgeLogs } = await import('../purge-logs')
 
