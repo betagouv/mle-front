@@ -59,6 +59,8 @@ program
   .option('--limit <n>', "Limiter le nombre d'adresses examinées", parseInt)
   .option('--csv <path>', 'Écrire le rapport détaillé dans un CSV')
   .action((opts) => backfillGeocoding({ ...opts, dryRun: !opts.apply }))
+
+program
   .command('backfill-cache-control')
   .description("Pose le Cache-Control immuable sur les médias S3 déposés avant l'ajout de l'en-tête à l'upload")
   .option('--dry-run', 'Lister les objets à corriger sans écrire')
