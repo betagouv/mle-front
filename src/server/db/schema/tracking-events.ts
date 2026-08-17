@@ -43,15 +43,9 @@ export const trackingEvents = pgTable(
     // `city_id` n'est NULL que sur les 14 789 recherches par département : un index partiel
     // n'économiserait rien et coûterait une reconstruction. On le laisse complet.
     index('tracking_event_city_created_idx').on(t.cityId, t.createdAt),
-    index('tracking_event_department_created_idx')
-      .on(t.departmentId, t.createdAt)
-      .where(sql`${t.departmentId} is not null`),
-    index('tracking_event_accommodation_created_idx')
-      .on(t.accommodationId, t.createdAt)
-      .where(sql`${t.accommodationId} is not null`),
-    index('tracking_event_owner_created_idx')
-      .on(t.ownerId, t.createdAt)
-      .where(sql`${t.ownerId} is not null`),
+    index('tracking_event_department_created_idx').on(t.departmentId, t.createdAt).where(sql`${t.departmentId} is not null`),
+    index('tracking_event_accommodation_created_idx').on(t.accommodationId, t.createdAt).where(sql`${t.accommodationId} is not null`),
+    index('tracking_event_owner_created_idx').on(t.ownerId, t.createdAt).where(sql`${t.ownerId} is not null`),
     // Sert la fenêtre de déduplication (24 h) de `tracking-event-logger.ts`. `session_id` est
     // toujours renseigné : rien à gagner en partiel ici.
     index('tracking_event_session_created_idx').on(t.sessionId, t.createdAt),
