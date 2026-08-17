@@ -134,15 +134,19 @@ sont jamais mises à jour et grossissent donc indéfiniment :
 
 | Table | Rétention | Périmètre |
 |-------|-----------|-----------|
-| `tracking_event` | **13 mois** | tous les événements de navigation |
+| `tracking_event` | **7 mois** | tous les événements de navigation |
 | `activity_log` | 6 mois | journal d'actions admin/bailleurs |
 | `alert_job` | 6 mois | **jobs terminés uniquement** (`sent`, `failed`) ; les `pending` restent actionnables par le sender |
 | `import_job` | 6 mois | audit trail des imports de résidences |
 
-La rétention de `tracking_event` est plus longue que les autres parce que les statistiques
-bailleurs remontent jusqu'à **180 jours** (période `90d` + période précédente, cf.
-`owner-statistics.ts`) : six mois ne laisseraient que deux jours de marge. Treize mois bornent la
-table tout en autorisant une comparaison à N-1.
+La rétention de `tracking_event` est dictée par le tableau de bord bailleur
+(`owner-statistics.ts`). Le sélecteur n'expose que `7d` / `30d` / `90d`, donc **90 jours sont
+affichés** — mais une requête remonte à **180 jours** : `countConsultOffer` sur la période
+précédente, qui alimente le badge d'évolution des consultations d'offre en période `90d`. Sept mois
+couvrent cette fenêtre avec ~33 jours de marge.
+
+Attention si quelqu'un rallonge un jour les périodes proposées dans le tableau de bord : la
+rétention doit suivre, sinon les écrans afficheront des chiffres faux sans lever d'erreur.
 
 `stats` et `event_stat` sont volontairement exclues : ce sont déjà des agrégats journaliers, dont
 le volume est négligeable.
@@ -201,13 +205,20 @@ Options :
 | `--dry-run` | Compte les lignes sans rien supprimer ni archiver |
 | `--verbose` | Affiche le filtre, la coupure et la clé d'archive par table |
 | `--retention-months <n>` | Force la rétention de **toutes** les tables |
-| `--max-rows <n>` | Plafond de lignes par table et par run (défaut : 1 000 000) |
+| `--max-rows <n>` | Plafond de lignes par table et par run (défaut : 2 000 000) |
 | `--table <name>` | Ne traite qu'une table |
 | `--no-archive` | Supprime sans déposer d'archive |
 
-Le plafond `--max-rows` ne mord que sur le premier passage, qui rattrape l'historique : la commande
-signale explicitement les tables tronquées et il suffit de la relancer. Idempotente, jouée
-quotidiennement via cron (voir plus bas) et visible dans l'admin « Tâches planifiées ».
+**Cadence : mensuelle**, le 1er de chaque mois, chaînée derrière `sync students` (`cron.json` est à
+la limite des 10 jobs Scalingo, impossible d'ajouter une ligne). Une archive par table et par mois,
+d'environ 30 Mo compressés pour `tracking_event`. C'est la rétention, et non la cadence, qui fixe la
+taille de la table : une purge plus rare la fait grossir, puisque les lignes expirées y attendent
+plus longtemps. Une ligne de `tracking_event` vit donc entre 7 et 8 mois.
+
+Le plafond `--max-rows` est dimensionné au-dessus d'un mois d'événements (~1,2 M lignes) : il ne
+mord que sur le premier passage, qui rattrape l'historique. La commande signale explicitement les
+tables tronquées et il suffit de la relancer. Idempotente, visible dans l'admin
+« Tâches planifiées ».
 
 > **Espace disque.** La suppression de lignes ne rend pas le disque au système : PostgreSQL garde
 > les pages libérées pour ses propres écritures. Après une grosse purge de rattrapage, il faut un
@@ -682,9 +693,9 @@ Les migrations Drizzle sont appliquées au déploiement via le hook `postdeploy`
 | `0 2 * * *` | `import arpej-ibail` | Tous les jours à 2h |
 | `0 1 * * 0` | `sync cities` | Dimanche à 1h |
 | `0 4 1 * *` | `sync rents` | 1er du mois à 4h |
-| `10 4 1 * *` | `sync students` | 1er du mois à 4h10 |
+| `10 4 1 * *` | `sync students` puis `purge-logs` | 1er du mois à 4h10 |
 | `0 3 * * *` | `sync stats` | Tous les jours à 3h |
-| `30 3 * * *` | `purge-contact-requests` puis `purge-logs` | Tous les jours à 3h30 |
+| `30 3 * * *` | `purge-contact-requests` | Tous les jours à 3h30 |
 | `0 6 * * *` | `expire-alerts` | Tous les jours à 6h |
 
 Pour vérifier les crons actifs : `scalingo --app <app> cron-tasks`
