@@ -3,7 +3,11 @@ import { isNotNull } from 'drizzle-orm'
 import { db } from '~/server/db'
 import { accommodations } from '~/server/db/schema/accommodations'
 import { env } from '~/server/env'
+import { IMAGE_CACHE_PREFIX, PURGE_ARCHIVE_PREFIX } from '~/server/services/s3'
 import type { AuditResult, BrokenUrl, UnreferencedFile } from './types'
+
+/** Préfixes gérés par l'application, hors du périmètre des médias de résidences. */
+const MANAGED_PREFIXES = [IMAGE_CACHE_PREFIX, PURGE_ARCHIVE_PREFIX]
 
 export function createS3Client(): S3Client {
   return new S3Client({
@@ -144,8 +148,12 @@ export async function findStorageIssues(options: { fetch?: boolean; verbose?: bo
     brokenUrls.push(...httpBroken)
   }
 
+  // Tout le bucket ne sert pas les résidences : les archives de purge et les dérivées du
+  // cache d'images n'ont, par construction, aucune URL en base. Sans cette exclusion
+  // `audit-storage --write` les prendrait pour des orphelins et les supprimerait — pour
+  // les archives, c'est la seule copie des données purgées.
   const unreferencedFiles: UnreferencedFile[] = s3Objects
-    .filter((o) => !referencedKeys.has(o.key))
+    .filter((o) => !referencedKeys.has(o.key) && !MANAGED_PREFIXES.some((prefix) => o.key.startsWith(prefix)))
     .map((o) => ({ key: o.key, size: o.size, lastModified: o.lastModified }))
 
   const unreferencedFilesTotalBytes = unreferencedFiles.reduce((sum, f) => sum + f.size, 0)

@@ -119,6 +119,50 @@ Lit les tables Django existantes dans la BDD locale (typiquement après un `impo
 
 À utiliser une seule fois après la migration Django → tRPC/Drizzle.
 
+#### `backfill-cache-control` — Rattraper le Cache-Control des médias S3
+
+```bash
+pnpm cli backfill-cache-control --dry-run --verbose   # lister ce qui serait corrigé
+pnpm cli backfill-cache-control                        # rattrapage complet
+pnpm cli backfill-cache-control --prefix purges/       # un autre préfixe
+```
+
+`uploadFile` pose `public, max-age=15552000, immutable` sur les objets déposés (les clés étant
+des UUID, une photo remplacée reçoit une nouvelle clé : le contenu d'une clé ne change jamais).
+Les médias antérieurs n'ont aucun en-tête de cache — les navigateurs revalident, et `next/image`
+plafonne le TTL de ses dérivées à `minimumCacheTTL`, soit 4 h, au lieu de reprendre le `max-age`
+amont.
+
+S3 ne sait pas muter un en-tête en place : la commande recopie chaque objet sur lui-même avec
+`MetadataDirective: REPLACE`. Elle est idempotente et reprenable — un objet déjà à jour est
+ignoré — et sort en code 1 si au moins un objet a échoué, pour que le one-off Scalingo le
+signale.
+
+À lancer une fois par bucket, en one-off :
+
+```bash
+scalingo --app mle-prod --region osc-secnum-fr1 run pnpm cli backfill-cache-control --verbose
+```
+
+##### Cache des images optimisées
+
+`next/image` écrit ses dérivées dans `.next/cache/images`, sur le disque **éphémère** du
+container : avec 4 containers web, une même vignette est réencodée par sharp jusqu'à 4 fois, et
+tout repart à zéro à chaque deploy. `cache-handler.mjs` (racine du repo, branché via
+`cacheHandler` + `images.customCacheHandler` dans `next.config.mjs`) remplace ce cache local par
+un cache à deux étages : un LRU en mémoire par container (`IMAGE_CACHE_MEMORY_MB`, 128 Mo par
+défaut) devant le bucket S3, partagé par les containers et conservé entre les deploys.
+
+Les dérivées vivent sous le préfixe `image-cache<suffixe>/`, sans ACL publique. Comme les
+archives de `purge-logs`, elles ne sont référencées par aucune ligne en base : `audit-storage`
+les exclut explicitement de son balayage des orphelins.
+
+Seules les entrées `IMAGE` sont détournées ; le reste du cache incrémental (fetch cache des
+services WordPress / RAMSESE, pages prérendues) est délégué au `FileSystemCache` de Next. Ce
+dernier est importé par un chemin interne à Next, non couvert par son semver public : **à
+revérifier à chaque montée de version majeure** — le handler échoue au boot plutôt que de
+dégrader le cache en silence.
+
 #### `purge-logs` — Purger les tables append-only
 
 ```bash
@@ -545,7 +589,7 @@ Le comparateur distingue aussi les écarts de nom dus au script SQL de normalisa
 pnpm cli upload-images /chemin/vers/dossier --name aclef
 ```
 
-Upload les images d'un dossier local vers S3, organisé par sous-dossier. Chaque sous-dossier correspond à une résidence (ex: `albert-camus/`, `l-arsenal/`). Les images sont uploadées dans `accommodations{S3_SUFFIX_DIR}/{name}/pictures/{uuid}.{ext}`.
+Upload les images d'un dossier local vers S3, organisé par sous-dossier. Chaque sous-dossier correspond à une résidence (ex: `albert-camus/`, `l-arsenal/`). Les images sont uploadées dans `accommodations/{name}/pictures/{uuid}.{ext}`.
 
 Le résultat affiche les URLs S3 par sous-dossier, séparées par `|` (format compatible avec la colonne `pictures` de l'import CSV).
 

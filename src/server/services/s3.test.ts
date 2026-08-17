@@ -8,7 +8,6 @@ const mockEnv = vi.hoisted(() => ({
   S3_BUCKET: 'test-bucket',
   S3_ACCESS_KEY_ID: 'test-key',
   S3_SECRET_ACCESS_KEY: 'test-secret',
-  S3_SUFFIX_DIR: '',
 }))
 
 vi.mock('~/server/env', () => ({ env: mockEnv }))
@@ -34,7 +33,6 @@ vi.mock('@aws-sdk/client-s3', () => {
 describe('s3 service', () => {
   beforeEach(() => {
     sendMock.mockReset()
-    mockEnv.S3_SUFFIX_DIR = ''
   })
 
   describe('generateAccommodationKey', () => {
@@ -51,14 +49,6 @@ describe('s3 service', () => {
       const key2 = generateAccommodationKey('jpg')
 
       expect(key1).not.toBe(key2)
-    })
-
-    it('includes S3_SUFFIX_DIR when set', async () => {
-      mockEnv.S3_SUFFIX_DIR = '-staging'
-      const { generateAccommodationKey } = await import('./s3')
-      const key = generateAccommodationKey('png')
-
-      expect(key).toMatch(/^accommodations-staging\/[a-f0-9]{32}\.png$/)
     })
 
     it('uses correct extension', async () => {
