@@ -129,6 +129,30 @@ async function applyCityId(addressId: number, inseeCode: string): Promise<boolea
   return result.length > 0
 }
 
+/**
+ * Code INSEE sur lequel recaler le `city_id`, ou `null` s'il ne faut pas y
+ * toucher. La règle est toujours la même : aligner l'étiquette sur la commune
+ * où le point tombe, mais uniquement lorsqu'une source indépendante confirme
+ * que ce point est le bon. Sans cette corroboration, c'est le point qui est en
+ * cause et c'est à la phase `geom` de trancher.
+ */
+function corroboratedInsee(row: AddressRow, decision: TGeocodeDecision): string | null {
+  if (!row.currentInseeCode) return null
+  switch (decision.action) {
+    // La BAN place l'adresse dans la commune où se trouve déjà le point.
+    case 'apply':
+      return decision.inseeCode === row.currentInseeCode ? row.currentInseeCode : null
+    // `cedex-current-in-dept` : code postal CEDEX, mais la BAN trouve l'adresse
+    // dans le département du point. `current-point-in-postcode` : le point est
+    // dans une commune du code postal. Dans les deux cas le point tient, et
+    // c'est le `city_id` — issu d'un repli arbitraire — qui est à corriger.
+    case 'keep':
+      return row.currentInseeCode
+    case 'flag':
+      return null
+  }
+}
+
 export async function backfillGeocoding(options: BackfillOptions = {}): Promise<void> {
   const { dryRun = true, verbose = false, phase = 'report', limit, csv } = options
 
@@ -198,15 +222,15 @@ export async function backfillGeocoding(options: BackfillOptions = {}): Promise<
       return
     }
 
-    if (!dryRun) writeRollback(`rollback-geocoding-${phase}.sql`, applies.map((a) => a.row))
+    const targets = phase === 'geom' ? applies : decisions.filter((d) => corroboratedInsee(d.row, d.decision) !== null)
+    if (!dryRun) writeRollback(`rollback-geocoding-${phase}.sql`, targets.map((t) => t.row))
 
     let changed = 0
     let unchanged = 0
 
-    for (const { row, decision } of applies) {
-      if (decision.action !== 'apply') continue
-
+    for (const { row, decision } of targets) {
       if (phase === 'geom') {
+        if (decision.action !== 'apply') continue
         // Filet de sécurité : ne jamais déplacer un point déjà cohérent.
         if (row.consistent) {
           unchanged++
@@ -216,10 +240,8 @@ export async function backfillGeocoding(options: BackfillOptions = {}): Promise<
         if (!dryRun) await applyGeom(row.addressId, decision.lat, decision.lng, decision.inseeCode)
         changed++
       } else {
-        // On ne réétiquette que si la BAN désigne la commune où le point se
-        // trouve déjà : deux sources indépendantes qui concordent. Sinon c'est
-        // le point qui est en cause, et c'est à la phase geom de le corriger.
-        if (!decision.inseeCode || decision.inseeCode !== row.currentInseeCode) {
+        const insee = corroboratedInsee(row, decision)
+        if (!insee) {
           unchanged++
           continue
         }
@@ -227,16 +249,16 @@ export async function backfillGeocoding(options: BackfillOptions = {}): Promise<
           const [existing] = await db.execute<{ same: boolean }>(sql`
             SELECT (aa.city_id = c.id) AS same
             FROM accommodation_address aa
-            JOIN city c ON c.insee_codes @> ARRAY[${decision.inseeCode}]::varchar[]
+            JOIN city c ON c.insee_codes @> ARRAY[${insee}]::varchar[]
             WHERE aa.id = ${row.addressId}
             LIMIT 1
           `)
           if (existing?.same === false) {
-            if (verbose) console.log(`  ${row.slug} : city_id → INSEE ${decision.inseeCode}`)
+            if (verbose) console.log(`  ${row.slug} : city_id → INSEE ${insee}`)
             changed++
           } else unchanged++
-        } else if (await applyCityId(row.addressId, decision.inseeCode)) {
-          if (verbose) console.log(`  ${row.slug} : city_id → INSEE ${decision.inseeCode}`)
+        } else if (await applyCityId(row.addressId, insee)) {
+          if (verbose) console.log(`  ${row.slug} : city_id → INSEE ${insee}`)
           changed++
         } else unchanged++
       }
