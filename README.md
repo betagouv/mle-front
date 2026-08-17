@@ -173,6 +173,14 @@ psql "$DATABASE_URL" \
   -c "drop table _restore"
 ```
 
+Les identifiants d'origine sont réinjectés tels quels. Sans conséquence dans le cas courant (ils
+sont inférieurs au maximum en base), mais si la table a été vidée entre-temps il faut repositionner
+la séquence : `select setval(pg_get_serial_sequence('tracking_event','id'), max(id)) from
+tracking_event;`
+
+Procédure vérifiée de bout en bout sur une archive réelle de 808 573 lignes (22 Mo compressés,
+20 s de rechargement).
+
 L'objet est déposé **sans ACL** (`uploadPrivateFile`, à ne pas confondre avec `uploadFile` qui pose
 un `public-read` sur les médias des résidences). Le bucket n'accorde aucun droit à `AllUsers` : une
 archive est donc privée par défaut, **rien n'est à configurer côté S3** — un `GET` anonyme sur une
