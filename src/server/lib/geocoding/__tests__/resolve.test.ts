@@ -31,19 +31,23 @@ function feature(opts: { lng: number; lat: number; city: string; postcode: strin
 }
 
 describe('hasOrphanBoxSuffix', () => {
-  it.each(['2 rue du Général Delestraint CS', '5-7 RUE DES RENARDS BP', 'Ile du Saulcy CS', '11, rue du plat d etain  cs'])(
-    'détecte un numéro de boîte tronqué dans « %s »',
-    (address) => {
-      expect(hasOrphanBoxSuffix(address)).toBe(true)
-    },
-  )
+  it.each([
+    '2 rue du Général Delestraint CS',
+    '5-7 RUE DES RENARDS BP',
+    'Ile du Saulcy CS',
+    '11, rue du plat d etain  cs',
+  ])('détecte un numéro de boîte tronqué dans « %s »', (address) => {
+    expect(hasOrphanBoxSuffix(address)).toBe(true)
+  })
 
-  it.each(['3 allée Marguerite Yourcenar', '26, rue Hippolyte Foucque', 'Section Morin BP 473', '1 rue des CS Blancs'])(
-    'ne se déclenche pas sur « %s »',
-    (address) => {
-      expect(hasOrphanBoxSuffix(address)).toBe(false)
-    },
-  )
+  it.each([
+    '3 allée Marguerite Yourcenar',
+    '26, rue Hippolyte Foucque',
+    'Section Morin BP 473',
+    '1 rue des CS Blancs',
+  ])('ne se déclenche pas sur « %s »', (address) => {
+    expect(hasOrphanBoxSuffix(address)).toBe(false)
+  })
 })
 
 describe('stripBoxSuffix', () => {
@@ -53,7 +57,7 @@ describe('stripBoxSuffix', () => {
     expect(stripBoxSuffix('12 rue Pasteur CEDEX 3')).toBe('12 rue Pasteur')
   })
 
-  it("laisse intacte une adresse sans boîte", () => {
+  it('laisse intacte une adresse sans boîte', () => {
     expect(stripBoxSuffix('3 allée Marguerite Yourcenar')).toBe('3 allée Marguerite Yourcenar')
   })
 })

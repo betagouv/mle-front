@@ -56,6 +56,8 @@ export type TGeocodeReason =
   // Attribué par le backfill, pas par cette fonction : la commune que la BAN
   // désigne ne contient pas le point retenu d'après nos propres contours.
   | 'boundary-disagreement'
+  // Idem : l'adresse n'a aucun cityId, ce qui la fait disparaître des listings.
+  | 'missing-city-id'
 
 /**
  * `apply` : coordonnées vérifiées, on peut écrire.

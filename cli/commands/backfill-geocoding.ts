@@ -1,7 +1,7 @@
 import { writeFileSync } from 'node:fs'
 import { sql } from 'drizzle-orm'
 import { closeDb, db } from '~/server/db'
-import { type TGeocodeDecision, resolveAddressLocation } from '~/server/lib/geocoding/resolve'
+import { resolveAddressLocation, type TGeocodeDecision } from '~/server/lib/geocoding/resolve'
 
 type Phase = 'geom' | 'city' | 'report'
 
@@ -200,7 +200,12 @@ export async function backfillGeocoding(options: BackfillOptions = {}): Promise<
         currentInseeCode: row.currentInseeCode,
         currentDepartment: row.currentDepartment,
       })
-      decisions.push({ row, decision: await verifyAgainstBoundaries(decision) })
+      // Une adresse sans cityId disparaît de tous les listings (les requêtes
+      // joignent `city` en INNER JOIN). On ne devine pas la commune à sa place :
+      // le cas doit rester visible pour être corrigé à la main.
+      const verified =
+        row.cityId === null ? ({ action: 'flag', reason: 'missing-city-id' } as const) : await verifyAgainstBoundaries(decision)
+      decisions.push({ row, decision: verified })
       if ((index + 1) % 50 === 0) console.log(`  … ${index + 1}/${rows.length}`)
     }
 
@@ -244,11 +249,25 @@ export async function backfillGeocoding(options: BackfillOptions = {}): Promise<
         )
       }
       console.log(`\n  ${flags.length} adresse(s) à corriger à la main — les autres sont reprises par les phases city puis geom.`)
+
+      // Cas le plus grave : sans cityId, la résidence n'apparaît nulle part.
+      const orphans = flags.filter((f) => f.decision.reason === 'missing-city-id')
+      if (orphans.length > 0) {
+        console.log(`\n  ⚠ ${orphans.length} adresse(s) sans city_id — absentes de tous les listings (INNER JOIN sur city) :`)
+        for (const { row } of orphans) {
+          const where = row.currentInseeCode ? `point en ${row.currentInseeCode}` : 'point hors communes'
+          console.log(`      ${row.slug} (${row.postalCode}) — ${where}`)
+        }
+      }
       return
     }
 
     const targets = phase === 'geom' ? applies : decisions.filter((d) => corroboratedInsee(d.row, d.decision) !== null)
-    if (!dryRun) writeRollback(`rollback-geocoding-${phase}.sql`, targets.map((t) => t.row))
+    if (!dryRun)
+      writeRollback(
+        `rollback-geocoding-${phase}.sql`,
+        targets.map((t) => t.row),
+      )
 
     let changed = 0
     let unchanged = 0
