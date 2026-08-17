@@ -3,7 +3,7 @@ import { existsSync, readdirSync, rmSync, statSync } from 'fs'
 import { mkdir } from 'fs/promises'
 import path from 'path'
 import { env } from '~/server/env'
-import { cleanDatabase, ensureExtensions, restoreBackup } from '../lib/db-utils'
+import { cleanDatabase, ensureExtensions, repairUnaccentIndexes, restoreBackup } from '../lib/db-utils'
 import { ScalingoBackupService } from '../lib/scalingo-backup'
 
 const BACKUP_DIR = '/tmp/jde-backup'
@@ -75,6 +75,11 @@ export async function importBackup(opts: ImportBackupOpts) {
   console.log('→ Restauration du backup...')
   restoreBackup(databaseUrl, dumpFile)
   console.log('✓ Backup restauré avec succès')
+
+  // pg_restore restaure avec search_path vide et ne peut pas construire les
+  // index qui reposent sur immutable_unaccent : on les recrée après coup.
+  console.log('→ Réparation des index de recherche sur les noms de communes...')
+  await repairUnaccentIndexes(databaseUrl)
 
   // Note: Drizzle migrations are NOT applied here.
   // Workflow: import-backup → migrate-users (applies 0000 schema) → drizzle-kit migrate (applies 0001 cleanup)
