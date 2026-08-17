@@ -45,8 +45,9 @@ describe('purge-logs — tracking_event', () => {
   beforeEach(() => {
     uploads.length = 0
     uploadPrivateFile.mockClear()
-    vi.spyOn(console, 'log').mockImplementation(() => {})
-    vi.spyOn(console, 'error').mockImplementation(() => {})
+    // La commande journalise abondamment : on la fait taire pour garder une sortie de test lisible.
+    vi.spyOn(console, 'log').mockImplementation(vi.fn())
+    vi.spyOn(console, 'error').mockImplementation(vi.fn())
   })
 
   it('supprime les lignes au-delà de la rétention et conserve les récentes', async () => {

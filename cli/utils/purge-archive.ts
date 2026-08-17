@@ -1,6 +1,6 @@
-import { createGzip } from 'node:zlib'
 import { once } from 'node:events'
 import { finished } from 'node:stream/promises'
+import { createGzip } from 'node:zlib'
 import type { SQL } from 'drizzle-orm'
 import { sql } from 'drizzle-orm'
 import type { PgColumn, PgTable } from 'drizzle-orm/pg-core'
