@@ -135,11 +135,11 @@ export async function backfillGeocoding(options: BackfillOptions = {}): Promise<
   console.log(`→ Backfill géocodage — phase « ${phase} »${dryRun ? ' (DRY-RUN, aucune écriture)' : ''}`)
 
   try {
-    // Les deux phases d'écriture se restreignent aux adresses incohérentes.
-    // Réécrire le cityId d'une adresse dont le point est déjà dans la commune
-    // désaligne le couple geom/cityId : mesuré à 184 adresses saines cassées
-    // sur 186 réétiquetées. Seul `report` balaie tout le parc.
-    const rows = await fetchAddresses(phase !== 'report', limit)
+    // Toutes les phases se restreignent aux adresses incohérentes — celles dont
+    // le point tombe hors de la commune de leur cityId. Réécrire le cityId
+    // d'une adresse déjà cohérente désaligne le couple geom/cityId : mesuré à
+    // 184 adresses saines cassées sur 186 réétiquetées.
+    const rows = await fetchAddresses(true, limit)
     console.log(`→ ${rows.length} adresse(s) à examiner`)
 
     const decisions: { row: AddressRow; decision: TGeocodeDecision }[] = []
@@ -183,8 +183,18 @@ export async function backfillGeocoding(options: BackfillOptions = {}): Promise<
     }
 
     if (phase === 'report') {
-      console.log('\nÀ revoir manuellement :')
-      for (const { row, decision } of flags) console.log(`  - ${row.slug} (${row.postalCode}) : ${decision.reason}`)
+      // Liste exhaustive des adresses incohérentes, à conserver avant le
+      // backfill pour pouvoir contrôler le résultat à la main ensuite.
+      const label = { apply: 'CORRIGEABLE', keep: 'CONSERVÉE  ', flag: 'MANUELLE   ' } as const
+      const order = { flag: 0, keep: 1, apply: 2 } as const
+      console.log('\nAdresses incohérentes (point hors de la commune de leur city_id) :\n')
+      for (const { row, decision } of [...decisions].sort((a, b) => order[a.decision.action] - order[b.decision.action])) {
+        const where = row.currentInseeCode ? `point en ${row.currentInseeCode}` : 'point hors communes'
+        console.log(
+          `  [${label[decision.action]}] ${row.slug.padEnd(40)} ${row.postalCode}  ${(row.cityName ?? '?').padEnd(24)} ${where.padEnd(22)} ${decision.reason}`,
+        )
+      }
+      console.log(`\n  ${flags.length} adresse(s) à corriger à la main — les autres sont reprises par les phases city puis geom.`)
       return
     }
 
