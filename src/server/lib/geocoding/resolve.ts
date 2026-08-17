@@ -53,6 +53,9 @@ export type TGeocodeReason =
   | 'cedex-current-in-dept'
   | 'no-candidate'
   | 'cedex-no-dept-match'
+  // Attribué par le backfill, pas par cette fonction : la commune que la BAN
+  // désigne ne contient pas le point retenu d'après nos propres contours.
+  | 'boundary-disagreement'
 
 /**
  * `apply` : coordonnées vérifiées, on peut écrire.

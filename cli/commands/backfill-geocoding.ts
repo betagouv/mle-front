@@ -130,6 +130,31 @@ async function applyCityId(addressId: number, inseeCode: string): Promise<boolea
 }
 
 /**
+ * La BAN et nos contours de communes ne s'accordent pas toujours en limite :
+ * « 1326 rue de l'Université 62400 » porte le code INSEE de Béthune alors que
+ * le point tombe dans Verquigneul, sa voisine, selon `city.boundary`. Écrire
+ * un tel couple laisserait l'adresse incohérente, et le rapport la
+ * re-proposerait comme corrigeable à chaque passage sans jamais la résoudre.
+ *
+ * On ne promet donc une correction que si le point retenu tombe réellement
+ * dans la commune que la BAN lui attribue.
+ */
+async function verifyAgainstBoundaries(decision: TGeocodeDecision): Promise<TGeocodeDecision> {
+  if (decision.action !== 'apply' || !decision.inseeCode) return decision
+
+  const [match] = await db.execute<{ inside: boolean }>(sql`
+    SELECT ST_Within(ST_SetSRID(ST_MakePoint(${decision.lng}, ${decision.lat}), 4326), c.boundary) AS inside
+    FROM city c
+    WHERE c.insee_codes @> ARRAY[${decision.inseeCode}]::varchar[]
+    LIMIT 1
+  `)
+  // Commune absente de notre table, ou point hors de son contour : dans les
+  // deux cas on ne peut pas garantir un couple geom/city_id cohérent.
+  if (!match || match.inside !== true) return { action: 'flag', reason: 'boundary-disagreement' }
+  return decision
+}
+
+/**
  * Code INSEE sur lequel recaler le `city_id`, ou `null` s'il ne faut pas y
  * toucher. La règle est toujours la même : aligner l'étiquette sur la commune
  * où le point tombe, mais uniquement lorsqu'une source indépendante confirme
@@ -175,7 +200,7 @@ export async function backfillGeocoding(options: BackfillOptions = {}): Promise<
         currentInseeCode: row.currentInseeCode,
         currentDepartment: row.currentDepartment,
       })
-      decisions.push({ row, decision })
+      decisions.push({ row, decision: await verifyAgainstBoundaries(decision) })
       if ((index + 1) % 50 === 0) console.log(`  … ${index + 1}/${rows.length}`)
     }
 

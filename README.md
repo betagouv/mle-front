@@ -176,7 +176,9 @@ Chaque adresse reçoit une décision :
 | `keep` | Le point en base est déjà plausible, on n'y touche pas |
 | `flag` | Indécidable automatiquement — revue manuelle |
 
-Les `flag` sont pour l'essentiel des adresses dont le numéro de boîte a été rangé dans le code postal à l'import (`2 rue du Général Delestraint CS` + code postal `15250`) : l'information d'origine est perdue, seule une correction manuelle est possible.
+Les `flag` sont pour l'essentiel des adresses dont le numéro de boîte a été rangé dans le code postal à l'import (`2 rue du Général Delestraint CS` + code postal `15250`) : l'information d'origine est perdue, seule une correction manuelle est possible. Le motif `boundary-disagreement` en signale un second type : la commune que la BAN attribue à l'adresse ne contient pas le point retenu d'après `city.boundary` — cas des adresses en limite de deux communes, où les deux sources ne s'accordent pas.
+
+Après un cycle complet, `report` ne doit plus afficher que des `MANUELLE` : tout ce qui est annoncé `CORRIGEABLE` est effectivement corrigé, et relancer les phases ne modifie plus rien.
 
 > **Ordre d'exécution : `city` avant `geom`.** Tant que le `city_id` est faux, le nom de commune qui en dérive pollue la requête envoyée à la BAN et fausse la validation des candidats. `city` résolvant déjà une partie du lot, `geom` en voit d'autant moins.
 
