@@ -5,8 +5,7 @@ import type { SQL } from 'drizzle-orm'
 import { sql } from 'drizzle-orm'
 import type { PgColumn, PgTable } from 'drizzle-orm/pg-core'
 import { db } from '~/server/db'
-import { env } from '~/server/env'
-import { uploadPrivateFile } from '~/server/services/s3'
+import { PURGE_ARCHIVE_PREFIX, uploadPrivateFile } from '~/server/services/s3'
 
 /**
  * Format d'archive : **NDJSON gzippé** (une ligne = un objet JSON = une ligne supprimée).
@@ -64,7 +63,7 @@ function archiveKey(tableName: string, now: Date): string {
   const year = now.getUTCFullYear()
   const month = String(now.getUTCMonth() + 1).padStart(2, '0')
   const stamp = now.toISOString().replace(/[:.]/g, '-')
-  return `purges${env.S3_SUFFIX_DIR}/${tableName}/${year}/${month}/${tableName}-${stamp}.ndjson.gz`
+  return `${PURGE_ARCHIVE_PREFIX}${tableName}/${year}/${month}/${tableName}-${stamp}.ndjson.gz`
 }
 
 function formatBytes(bytes: number): string {

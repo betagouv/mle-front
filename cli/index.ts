@@ -5,6 +5,7 @@ import { backfillAlertJobsCommand } from './commands/backfill-alert-jobs'
 import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
 import { backfillBrevoOwners } from './commands/backfill-brevo-owners'
 import { backfillGeocoding } from './commands/backfill-geocoding'
+import { backfillCacheControl } from './commands/backfill-cache-control'
 import { compareCrous } from './commands/compare-crous'
 import { cronSelftest } from './commands/cron-selftest'
 import { detectAlertJobsCommand } from './commands/detect-alert-jobs'
@@ -58,6 +59,18 @@ program
   .option('--limit <n>', "Limiter le nombre d'adresses examinées", parseInt)
   .option('--csv <path>', 'Écrire le rapport détaillé dans un CSV')
   .action((opts) => backfillGeocoding({ ...opts, dryRun: !opts.apply }))
+  .command('backfill-cache-control')
+  .description("Pose le Cache-Control immuable sur les médias S3 déposés avant l'ajout de l'en-tête à l'upload")
+  .option('--dry-run', 'Lister les objets à corriger sans écrire')
+  .option('--verbose', 'Afficher chaque objet traité')
+  .option('--limit <n>', "Limiter le nombre d'objets", parseInt)
+  .option('--concurrency <n>', 'Nombre de requêtes S3 en parallèle (défaut : 20)', parseInt)
+  .option(
+    '--prefix <prefix>',
+    'Préfixe S3 à traiter, répétable (défaut : tout le bucket, hors image-cache/, purges/ et non-images)',
+    (value: string, previous: string[] | undefined) => [...(previous ?? []), value],
+  )
+  .action((opts) => backfillCacheControl(opts))
 
 program.command('migrate').description('Apply Drizzle migrations').action(migrate)
 
