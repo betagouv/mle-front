@@ -43,7 +43,7 @@ const CRON_JOB_DEF_MAP: Record<CronJobType, Omit<CronJobDef, 'type'>> = {
   'purge-logs': {
     label: 'Purge des logs',
     description: 'Tables append-only au-delà de leur rétention, archivées dans S3',
-    schedule: 'Le 1er de chaque mois, après la sync étudiants',
+    schedule: 'Le 1er de chaque mois à 5h00',
   },
 }
 

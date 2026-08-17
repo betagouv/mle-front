@@ -243,8 +243,7 @@ Options :
 | `--table <name>` | Ne traite qu'une table |
 | `--no-archive` | Supprime sans déposer d'archive |
 
-**Cadence : mensuelle**, le 1er de chaque mois, chaînée derrière `sync students` (`cron.json` est à
-la limite des 10 jobs Scalingo, impossible d'ajouter une ligne). Une archive par table et par mois,
+**Cadence : mensuelle**, le 1er de chaque mois à 5h. Une archive par table et par mois,
 d'environ 30 Mo compressés pour `tracking_event`. C'est la rétention, et non la cadence, qui fixe la
 taille de la table : une purge plus rare la fait grossir, puisque les lignes expirées y attendent
 plus longtemps. Une ligne de `tracking_event` vit donc entre 7 et 8 mois.
@@ -727,7 +726,8 @@ Les migrations Drizzle sont appliquées au déploiement via le hook `postdeploy`
 | `0 2 * * *` | `import arpej-ibail` | Tous les jours à 2h |
 | `0 1 * * 0` | `sync cities` | Dimanche à 1h |
 | `0 4 1 * *` | `sync rents` | 1er du mois à 4h |
-| `10 4 1 * *` | `sync students` puis `purge-logs` | 1er du mois à 4h10 |
+| `10 4 1 * *` | `sync students` | 1er du mois à 4h10 |
+| `0 5 1 * *` | `purge-logs` | 1er du mois à 5h |
 | `0 3 * * *` | `sync stats` | Tous les jours à 3h |
 | `30 3 * * *` | `purge-contact-requests` | Tous les jours à 3h30 |
 | `0 6 * * *` | `expire-alerts` | Tous les jours à 6h |
