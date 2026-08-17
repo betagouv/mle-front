@@ -170,10 +170,26 @@ psql "$DATABASE_URL" \
   -c "drop table _restore"
 ```
 
-L'objet est déposé **sans ACL publique** (`uploadPrivateFile`). Il contient des données
-personnelles (`user_id`, `session_id`, `user_name`) : penser à poser une règle de cycle de vie sur
-le préfixe `purges/` côté bucket pour que les archives expirent, sinon la purge ne fait que
-déplacer le problème de rétention.
+L'objet est déposé **sans ACL** (`uploadPrivateFile`, à ne pas confondre avec `uploadFile` qui pose
+un `public-read` sur les médias des résidences). Le bucket n'accorde aucun droit à `AllUsers` : une
+archive est donc privée par défaut, **rien n'est à configurer côté S3** — un `GET` anonyme sur une
+archive répond 403, là où un média répond 200.
+
+En revanche les archives contiennent des données personnelles (`user_id`, `session_id`,
+`user_name`) et rien ne les fait expirer : sans règle de cycle de vie, la purge ne fait que
+déplacer le problème de rétention hors de la base.
+
+```bash
+aws --endpoint-url "$S3_ENDPOINT" s3api put-bucket-lifecycle-configuration \
+  --bucket "$S3_BUCKET" --lifecycle-configuration '{
+    "Rules": [{
+      "ID": "expire-purges",
+      "Status": "Enabled",
+      "Filter": { "Prefix": "purges/" },
+      "Expiration": { "Days": 365 }
+    }]
+  }'
+```
 
 Si le dépôt S3 échoue, **rien n'est supprimé** : mieux vaut une table qui grossit un jour de plus
 que des lignes perdues sans filet.
