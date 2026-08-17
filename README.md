@@ -119,31 +119,87 @@ Lit les tables Django existantes dans la BDD locale (typiquement après un `impo
 
 À utiliser une seule fois après la migration Django → tRPC/Drizzle.
 
-#### `purge-logs` — Purger les tables de logs (rétention 6 mois)
+#### `purge-logs` — Purger les tables append-only
 
 ```bash
-pnpm cli purge-logs --dry-run --verbose   # simulation, détail par table
-pnpm cli purge-logs                        # purge (rétention 6 mois)
-pnpm cli purge-logs --retention-months 12  # rétention personnalisée
+pnpm cli purge-logs --dry-run --verbose        # simulation, détail par table
+pnpm cli purge-logs                             # purge + archivage S3
+pnpm cli purge-logs --table tracking_event      # une seule table
+pnpm cli purge-logs --retention-months 12       # force la rétention de toutes les tables
 ```
 
-Supprime les lignes plus vieilles que la rétention (défaut **6 mois**, filtre sur `created_at`) dans les tables append-only qui grossissent indéfiniment :
+Supprime les lignes plus vieilles que la rétention (filtre sur `created_at`) dans les tables qui ne
+sont jamais mises à jour et grossissent donc indéfiniment :
 
-- **`activity_log`** — journal d'actions admin/bailleurs.
-- **`alert_job`** — file de jobs d'alerte, **uniquement les jobs terminés** (`status` ∈ `sent`, `failed`) ; les `pending` sont conservés car encore actionnables par le sender.
-- **`import_jobs`** — audit trail des imports de résidences.
+| Table | Rétention | Périmètre |
+|-------|-----------|-----------|
+| `tracking_event` | **13 mois** | tous les événements de navigation |
+| `activity_log` | 6 mois | journal d'actions admin/bailleurs |
+| `alert_job` | 6 mois | **jobs terminés uniquement** (`sent`, `failed`) ; les `pending` restent actionnables par le sender |
+| `import_job` | 6 mois | audit trail des imports de résidences |
 
-`tracking_event`, `stats` et `event_stats` sont volontairement exclus (historique analytics / agrégats de reporting). Idempotente, jouée quotidiennement via cron (voir plus bas).
+La rétention de `tracking_event` est plus longue que les autres parce que les statistiques
+bailleurs remontent jusqu'à **180 jours** (période `90d` + période précédente, cf.
+`owner-statistics.ts`) : six mois ne laisseraient que deux jours de marge. Treize mois bornent la
+table tout en autorisant une comparaison à N-1.
+
+`stats` et `event_stat` sont volontairement exclues : ce sont déjà des agrégats journaliers, dont
+le volume est négligeable.
+
+**Archivage.** Avant chaque suppression, les lignes condamnées sont déposées dans S3 en **NDJSON
+gzippé** (une ligne = un objet JSON), sous
+`purges<suffixe-env>/<table>/<année>/<mois>/<table>-<horodatage>.ndjson.gz`. Ce format est écrit en
+flux (mémoire bornée quel que soit le volume), reste exploitable même tronqué, préserve les `jsonb`
+et les `null`, et se relit sans outillage :
+
+```bash
+# Inspecter une archive
+aws s3 cp s3://<bucket>/purges/tracking_event/2026/08/....ndjson.gz - | zcat | jq .
+
+# Réinjecter une archive en base (procédure vérifiée sur une archive réelle)
+psql "$DATABASE_URL" -c "create table _restore(row jsonb)"
+
+# Le quote/delimiter exotiques sont indispensables : en `copy ... from stdin` texte, PostgreSQL
+# interpréterait les antislashs du JSON et corromprait silencieusement les données.
+zcat archive.ndjson.gz | psql "$DATABASE_URL" \
+  -c "copy _restore(row) from stdin csv quote e'\x01' delimiter e'\x02'"
+
+psql "$DATABASE_URL" \
+  -c "insert into tracking_event select (jsonb_populate_record(null::tracking_event, row)).* from _restore" \
+  -c "drop table _restore"
+```
+
+L'objet est déposé **sans ACL publique** (`uploadPrivateFile`). Il contient des données
+personnelles (`user_id`, `session_id`, `user_name`) : penser à poser une règle de cycle de vie sur
+le préfixe `purges/` côté bucket pour que les archives expirent, sinon la purge ne fait que
+déplacer le problème de rétention.
+
+Si le dépôt S3 échoue, **rien n'est supprimé** : mieux vaut une table qui grossit un jour de plus
+que des lignes perdues sans filet.
 
 Options :
 
 | Option | Description |
 |--------|-------------|
-| `--dry-run` | Compte les lignes sans les supprimer |
-| `--verbose` | Affiche le détail du filtre par table |
-| `--retention-months <n>` | Nombre de mois à conserver (défaut : 6) |
+| `--dry-run` | Compte les lignes sans rien supprimer ni archiver |
+| `--verbose` | Affiche le filtre, la coupure et la clé d'archive par table |
+| `--retention-months <n>` | Force la rétention de **toutes** les tables |
+| `--max-rows <n>` | Plafond de lignes par table et par run (défaut : 1 000 000) |
+| `--table <name>` | Ne traite qu'une table |
+| `--no-archive` | Supprime sans déposer d'archive |
 
-Variable d'env requise : `DATABASE_URL`
+Le plafond `--max-rows` ne mord que sur le premier passage, qui rattrape l'historique : la commande
+signale explicitement les tables tronquées et il suffit de la relancer. Idempotente, jouée
+quotidiennement via cron (voir plus bas) et visible dans l'admin « Tâches planifiées ».
+
+> **Espace disque.** La suppression de lignes ne rend pas le disque au système : PostgreSQL garde
+> les pages libérées pour ses propres écritures. Après une grosse purge de rattrapage, il faut un
+> `VACUUM FULL` (lock exclusif) ou `pg_repack` pour que la base rétrécisse réellement. C'est la
+> limite de l'approche par `DELETE`, et l'argument principal en faveur d'un partitionnement mensuel
+> de `tracking_event` si le volume le justifie un jour : la purge deviendrait un `DROP PARTITION`
+> instantané qui libère le disque immédiatement.
+
+Variables d'env requises : `DATABASE_URL`, `S3_*` (sauf avec `--no-archive`)
 
 #### `backfill-brevo-contacts` — Rattraper les contacts Brevo
 
