@@ -66,7 +66,7 @@ program
   .description('Purge les tables append-only au-delà de leur rétention, après archivage NDJSON dans S3')
   .option('--dry-run', 'Compter sans supprimer')
   .option('--verbose', 'Afficher le détail par table')
-  .option('--retention-months <n>', 'Forcer la rétention de toutes les tables (défaut : 13 mois pour tracking_event, 6 ailleurs)', parseInt)
+  .option('--retention-months <n>', 'Forcer la rétention de toutes les tables (défaut : propre à chaque table, voir purge-logs.ts)', parseInt)
   .option('--max-rows <n>', 'Plafond de lignes par table et par run (défaut : 1000000)', parseInt)
   .option('--table <name>', 'Ne purger qu’une table (tracking_event, activity_log, alert_job, import_job)')
   .option('--no-archive', 'Supprimer sans déposer d’archive dans S3')

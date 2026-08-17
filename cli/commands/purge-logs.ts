@@ -22,8 +22,44 @@ export interface PurgeLogsOptions {
   table?: string
 }
 
-/** Rétention par défaut des tables de logs : 6 mois. */
-const DEFAULT_RETENTION_MONTHS = 6
+/**
+ * Les rétentions sont dimensionnées table par table, sur deux critères : ce que la table coûte,
+ * et ce qui la relit. Mesures d'août 2026 sur une restauration de la prod :
+ *
+ * | table            | taille  | octets/ligne | croissance   |
+ * |------------------|---------|--------------|--------------|
+ * | `tracking_event` | 805 Mo  | 321          | ~385 Mo/mois |
+ * | `alert_job`      | 11 Mo   | 175          | ~8,8 Mo/mois |
+ * | `activity_log`   | 5 Mo    | 1 053        | ~0,5 Mo/mois, **en décroissance** |
+ * | `import_job`     | 1,9 Mo  | 4 148        | ~0,2 Mo/mois |
+ *
+ * `tracking_event` pèse 98 % du total et croît 40 fois plus vite que la somme des trois autres :
+ * c'est la seule dont la rétention se paie en gigaoctets, donc la seule à purger court. Sur les
+ * autres, allonger la rétention coûte quelques dizaines de mégaoctets sur plusieurs années —
+ * moins cher qu'un écran d'admin qui affiche un trou.
+ */
+
+/** Jamais relu : ni écran, ni API. `onConflictDoNothing` du détecteur s'appuie sur les index
+ * uniques partiels, qui ne couvrent que `pending` / `failed` — un job `sent` ne bloque aucune
+ * réémission. Douze mois ne servent donc qu'au diagnostic a posteriori (~105 Mo/an). */
+const ALERT_JOB_RETENTION_MONTHS = 12
+
+/**
+ * L'écran « Statistiques gestionnaires » laisse choisir **une plage de dates libre** (deux champs
+ * `type="date"`, au-delà des présélections 7/30/90 jours) : purger court ferait silencieusement
+ * retourner zéro sur les plages anciennes. La table coûte 5 Mo et **décroît** (2 431 lignes en
+ * avril 2026, 115 en août) : la rétention n'est qu'un garde-fou, elle ne mordra jamais en
+ * pratique.
+ */
+const ACTIVITY_LOG_RETENTION_MONTHS = 36
+
+/**
+ * L'admin « Tâches planifiées » affiche le **dernier run de chaque type de cron**
+ * (`selectDistinctOn`). Certains sont trimestriels (`sync rents`) : une rétention courte
+ * risquerait d'effacer le seul enregistrement d'un job rare et de l'afficher comme jamais
+ * exécuté. À 0,2 Mo/mois, deux ans écartent le cas sans rien coûter.
+ */
+const IMPORT_JOB_RETENTION_MONTHS = 24
 
 /**
  * `tracking_event` alimente le tableau de bord bailleur (`owner-statistics.ts`). Le sélecteur
@@ -75,13 +111,14 @@ export const TARGETS: PurgeTarget[] = [
   {
     label: 'activity_log',
     table: activityLog,
-    retentionMonths: DEFAULT_RETENTION_MONTHS,
+    retentionMonths: ACTIVITY_LOG_RETENTION_MONTHS,
     where: (cutoff) => lt(activityLog.createdAt, cutoff),
+    detail: 'garde-fou : la plage de dates de l’admin est libre, et la table décroît',
   },
   {
     label: 'alert_job',
     table: alertJobs,
-    retentionMonths: DEFAULT_RETENTION_MONTHS,
+    retentionMonths: ALERT_JOB_RETENTION_MONTHS,
     // On ne purge que les jobs terminés : un job `pending` reste actionnable par le sender.
     where: (cutoff) => and(lt(alertJobs.createdAt, cutoff), inArray(alertJobs.status, ['sent', 'failed'])) as SQL,
     detail: "statuts 'sent' et 'failed' uniquement (les 'pending' sont conservés)",
@@ -89,8 +126,9 @@ export const TARGETS: PurgeTarget[] = [
   {
     label: 'import_job',
     table: importJobs,
-    retentionMonths: DEFAULT_RETENTION_MONTHS,
+    retentionMonths: IMPORT_JOB_RETENTION_MONTHS,
     where: (cutoff) => lt(importJobs.createdAt, cutoff),
+    detail: 'l’admin affiche le dernier run de chaque cron, y compris les trimestriels',
   },
 ]
 
