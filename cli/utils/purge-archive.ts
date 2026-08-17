@@ -50,7 +50,7 @@ export interface PurgeArchive {
 }
 
 interface ArchiveParams {
-  table: PgTable & { id: PgColumn }
+  table: PgTable & { id: PgColumn; createdAt: PgColumn }
   tableName: string
   /** Condition des lignes à archiver — la même que celle de la suppression. */
   where: SQL
@@ -119,10 +119,18 @@ async function buildNdjsonGzip({ table, where, maxRows }: ArchiveParams): Promis
  * préfère une table qui grossit un jour de plus à des lignes perdues sans filet.
  */
 export async function archivePurgedRows(params: ArchiveParams): Promise<PurgeArchive | null> {
-  const { tableName, verbose } = params
+  const { table, tableName, where, verbose } = params
 
   const { body, rows, maxId } = await buildNdjsonGzip(params)
   if (rows === 0) return null
+
+  // Plage de données couverte : permet de savoir ce que contient une archive sans la
+  // décompresser, quand il faut retrouver la bonne dans une liste.
+  const [range] = (await db.execute(sql`
+    select min(${table.createdAt})::text as oldest, max(${table.createdAt})::text as newest
+    from ${table}
+    where ${where} and ${table.id} <= ${maxId}
+  `)) as unknown as { oldest: string | null; newest: string | null }[]
 
   const key = archiveKey(tableName, new Date())
 
@@ -135,6 +143,8 @@ export async function archivePurgedRows(params: ArchiveParams): Promise<PurgeArc
       rows: String(rows),
       'max-id': String(maxId),
       'purged-at': new Date().toISOString(),
+      ...(range?.oldest ? { 'data-oldest': range.oldest } : {}),
+      ...(range?.newest ? { 'data-newest': range.newest } : {}),
     },
   })
 

@@ -73,6 +73,9 @@ describe('purge-logs — tracking_event', () => {
     expect(upload.contentType).toBe('application/gzip')
     expect(upload.metadata?.table).toBe('tracking_event')
     expect(upload.metadata?.rows).toBe('2')
+    // La plage couverte permet d'identifier l'archive sans la décompresser.
+    expect(upload.metadata?.['data-oldest']).toMatch(/^\d{4}-\d{2}-\d{2} /)
+    expect(upload.metadata?.['data-newest']).toMatch(/^\d{4}-\d{2}-\d{2} /)
 
     const archived = readArchive(upload)
     expect(archived.map((row) => row.type)).toEqual(['accommodation.viewed', 'search.city'])
