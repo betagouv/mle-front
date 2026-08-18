@@ -129,11 +129,19 @@
 
 .etablissementName {
   font-weight: 500;
+  /* `min-width: 0` lève le plancher min-content du flex item : sans lui, un nom long occupe toute la
+     ligne, il ne reste aucun espace à distribuer et les pointillés disparaissent. Avec, le nom se
+     replie sur plusieurs lignes et laisse toujours sa place au leader. */
+  min-width: 0;
+  overflow-wrap: break-word;
 }
 
 /* Ligne de points reliant le nom à la distance (leader dots) */
 .leader {
-  flex: 1 1 auto;
+  /* grow 1 / shrink 0 / basis 1.5rem : la ligne de points s'étire sur l'espace libre mais ne peut
+     jamais être compressée à zéro — c'est ce qui garantit des pointillés sur *toutes* les lignes,
+     y compris en mobile face à un nom long. */
+  flex: 1 0 1.5rem;
   align-self: center;
   margin-top: 0.25rem;
   border-bottom: 2px dotted var(--border-default-grey);
