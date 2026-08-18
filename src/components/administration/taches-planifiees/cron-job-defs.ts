@@ -45,6 +45,11 @@ const CRON_JOB_DEF_MAP: Record<CronJobType, Omit<CronJobDef, 'type'>> = {
     description: 'Tables append-only au-delà de leur rétention, archivées dans S3',
     schedule: 'Le 1er de chaque mois à 5h00',
   },
+  'backup-db': {
+    label: 'Backup de la base',
+    description: 'Backup Scalingo copié dans S3 — quotidiens gardés 31 jours, le 1er et le 15 indéfiniment',
+    schedule: 'Tous les jours à 5h00',
+  },
 }
 
 export const CRON_JOB_DEFS: CronJobDef[] = CRON_JOB_TYPES.map((type) => ({ type, ...CRON_JOB_DEF_MAP[type] }))

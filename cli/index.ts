@@ -6,6 +6,7 @@ import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
 import { backfillBrevoOwners } from './commands/backfill-brevo-owners'
 import { backfillCacheControl } from './commands/backfill-cache-control'
 import { backfillGeocoding } from './commands/backfill-geocoding'
+import { backupDb } from './commands/backup-db'
 import { compareCrous } from './commands/compare-crous'
 import { cronSelftest } from './commands/cron-selftest'
 import { detectAlertJobsCommand } from './commands/detect-alert-jobs'
@@ -131,6 +132,13 @@ program
   .option('--limit <n>', 'Limiter le nombre de residences du fichier', parseInt)
   .option('--replace', 'Remplacer les compteurs de typologies absents par null')
   .action((file, opts) => importCrousTypologies(file, opts))
+
+program
+  .command('backup-db')
+  .description('Copie le dernier backup Scalingo de la base dans le bucket S3 de sauvegarde (production uniquement)')
+  .option('--dry-run', 'Afficher le backup retenu, la clé calculée et les purges, sans rien écrire')
+  .option('--verbose', 'Détailler les objets conservés et supprimés')
+  .action((opts) => backupDb(opts))
 
 program
   .command('import-backup')
