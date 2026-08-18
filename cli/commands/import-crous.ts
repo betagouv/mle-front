@@ -3,6 +3,7 @@ import * as XLSX from 'xlsx'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, reverseGeocode } from '~/server/lib/import/geocoder'
+import { resolveImportOwner } from '~/server/lib/import/resolve-owner'
 import { syncTypologies, type TypologyDraft, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { sanitizeHTML } from '~/utils/sanitize-html'
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
@@ -22,7 +23,6 @@ import {
   type TypoCategory,
 } from '../lib/crous-helpers'
 import type { ImportCommand, ImportOptions, ImportResult } from '../types'
-import { getOrCreateOwner } from '../utils/get-or-create-owner'
 
 const SOURCE = 'crous'
 const OWNER_NAME = 'CROUS'
@@ -234,8 +234,9 @@ const command: ImportCommand = {
     const items = options.limit ? residences.slice(0, options.limit) : residences
     console.log(`  ${items.length} résidences chargées (${typologiesByResidence.size} résidences avec typologies)`)
 
-    const ownerId = await getOrCreateOwner(OWNER_NAME)
-    if (options.verbose) console.log(`  Owner "${OWNER_NAME}" id=${ownerId}`)
+    const owner = await resolveImportOwner({ id: options.ownerId, slug: options.ownerSlug, name: OWNER_NAME })
+    const ownerId = owner.id
+    if (options.verbose) console.log(`  Owner "${owner.name}" id=${ownerId}`)
 
     const processedEntries: { slug: string; city: string }[] = []
 

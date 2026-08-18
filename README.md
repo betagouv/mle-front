@@ -563,6 +563,14 @@ Options communes :
 - `--dry-run` : simuler sans modifier la BDD
 - `--verbose` : afficher les détails de chaque élément traité
 - `--limit <n>` : limiter le nombre d'éléments importés
+- `--owner-id <id>` : id du bailleur auquel rattacher les résidences (prioritaire sur le slug et le nom)
+- `--owner-slug <slug>` : slug du bailleur (prioritaire sur le nom)
+
+Résolution du bailleur : `--owner-id`, puis `--owner-slug`, puis le nom codé en dur dans la commande.
+Les deux premiers sont des identifiants stables — si aucun bailleur ne correspond, la commande échoue
+sans rien écrire. Le nom, lui, est éditable depuis l'admin : il ne sert que de dernier recours et crée
+le bailleur s'il n'existe pas. Les crons (`cron.json`) passent par `--owner-slug`, le slug étant
+identique d'un environnement à l'autre contrairement à l'id.
 
 #### `import arpej-ibail` — Import résidences ARPEJ via API iBAIL
 
@@ -586,11 +594,13 @@ pnpm cli import csv --file data.csv --source crous --limit 10
 
 Importe des résidences depuis un fichier CSV (délimiteur `;`). Géocode les adresses, télécharge et uploade les images sur S3, puis upsert les accommodations en BDD via la table `external_sources`.
 
-Le CSV doit contenir au minimum : `name`, `owner_name`, `address`, `city`, `postal_code`. Colonnes optionnelles : `pictures` (URLs séparées par `|` ou retour à la ligne), types d'appartements (T1–T7), loyers, équipements (parking, laverie, cuisine…), coordonnées GPS, etc.
+Le CSV doit contenir au minimum : `name`, `owner_name`, `address`, `city`, `postal_code`. Colonnes optionnelles : `owner_id` / `owner_slug` (bailleur, prioritaires sur `owner_name` — lus sur la première ligne, comme `owner_name` et `owner_url`), `pictures` (URLs séparées par `|` ou retour à la ligne), types d'appartements (T1–T7), loyers, équipements (parking, laverie, cuisine…), coordonnées GPS, etc.
 
 Options spécifiques :
 - `--file <path>` (requis) : chemin vers le fichier CSV
 - `--source <name>` (requis) : identifiant de la source externe
+
+`--owner-id` / `--owner-slug` l'emportent sur les colonnes `owner_id` / `owner_slug` du fichier.
 
 Variables d'env requises : `S3_*` (upload images)
 
@@ -736,14 +746,17 @@ Les migrations Drizzle sont appliquées au déploiement via le hook `postdeploy`
 
 | Cron | Commande | Fréquence |
 |------|----------|-----------|
-| `0 2 * * *` | `import arpej-ibail` | Tous les jours à 2h |
+| `0 2 * * *` | `import arpej-ibail --owner-slug arpej` | Tous les jours à 2h |
+| `30 2 * * *` | `import fac-habitat --owner-slug fac-habitat` | Tous les jours à 2h30 |
+| `0 4 * * *` | `import initiall --owner-slug initiall` | Tous les jours à 4h |
 | `0 1 * * 0` | `sync cities` | Dimanche à 1h |
-| `0 4 1 * *` | `sync rents` | 1er du mois à 4h |
+| `0 4 1 */3 *` | `sync rents` | 1er du trimestre à 4h |
 | `10 4 1 * *` | `sync students` | 1er du mois à 4h10 |
 | `0 5 1 * *` | `purge-logs` | 1er du mois à 5h |
 | `0 3 * * *` | `sync stats` | Tous les jours à 3h |
 | `30 3 * * *` | `purge-contact-requests` | Tous les jours à 3h30 |
-| `0 6 * * *` | `expire-alerts` | Tous les jours à 6h |
+| `*/30 * * * *` | `send-alert-jobs` | Toutes les 30 min |
+| `0 8 * * *` | `detect-alert-jobs ; expire-alerts` | Tous les jours à 8h |
 
 Pour vérifier les crons actifs : `scalingo --app <app> cron-tasks`
 Pour voir les logs d'exécution : `scalingo --app <app> logs` (les crons tournent dans des conteneurs `one-off-*`, pas `cron-*`)

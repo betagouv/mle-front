@@ -3,13 +3,13 @@ import { EResidenceType } from '~/enums/residence-type'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, geocodeAddressVerified } from '~/server/lib/import/geocoder'
+import { resolveImportOwner } from '~/server/lib/import/resolve-owner'
 import { mergeTypologies, syncTypologies, type TypologyPatch, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { accommodationAddresses, accommodations, externalSources, importBlocklist } from '../../src/server/db/schema'
 import { generateAccommodationKey, uploadFile } from '../../src/server/services/s3'
 import { generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '../../src/server/utils/slug'
 import type { ImportCommand, ImportOptions, ImportResult } from '../types'
-import { getOrCreateOwner } from '../utils/get-or-create-owner'
 import { pushResidenceEntry } from './import-utils'
 
 const IBAIL_SOURCE = 'arpej'
@@ -140,10 +140,11 @@ const command: ImportCommand = {
   async execute(options: ImportOptions): Promise<ImportResult> {
     const result: ImportResult = { created: 0, updated: 0, skipped: 0, errors: [], residences: [] }
 
-    const ownerId = await getOrCreateOwner(OWNER_NAME, OWNER_URL)
-    result.ownerName = OWNER_NAME
+    const owner = await resolveImportOwner({ id: options.ownerId, slug: options.ownerSlug, name: OWNER_NAME, url: OWNER_URL })
+    const ownerId = owner.id
+    result.ownerName = owner.name
     result.ownerId = ownerId
-    if (options.verbose) console.log(`  🏢 Owner ARPEJ id=${ownerId}`)
+    if (options.verbose) console.log(`  🏢 Owner ${owner.name} id=${ownerId}`)
 
     const residences = await fetchResidences(options)
     console.log(`  ✓ ${residences.length} résidences récupérées`)
