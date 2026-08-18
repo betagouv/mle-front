@@ -1,12 +1,14 @@
 import { z } from 'zod'
 
 const isProd = process.env.NEXT_PUBLIC_APP_ENV === 'production' || process.env.NEXT_PUBLIC_APP_ENV === 'staging'
-// const isProdOnly = process.env.NEXT_PUBLIC_APP_ENV === 'production'
+const isProdOnly = process.env.NEXT_PUBLIC_APP_ENV === 'production'
 
 const optionalUrl = z.preprocess((v) => (v === '' ? undefined : v), z.url().optional())
 const requiredInProdUrl = isProd ? z.url() : optionalUrl
 // const requiredInProdOnlyUrl = isProdOnly ? z.url() : optionalUrl
 const requiredInProd = isProd ? z.string().min(1) : z.string().optional()
+/** Requis en production seulement — staging n'a pas l'équivalent (backups, par exemple). */
+const requiredInProdOnly = isProdOnly ? z.string().min(1) : z.string().optional()
 
 const envSchema = z.object({
   // Core
@@ -57,6 +59,14 @@ const envSchema = z.object({
   S3_BUCKET: z.string().min(1),
   S3_ACCESS_KEY_ID: z.string().min(1),
   S3_SECRET_ACCESS_KEY: z.string().min(1),
+  /**
+   * Bucket dédié aux backups de la base, distinct du bucket applicatif : un dump contient
+   * toute la PII, il n'a rien à faire dans le bucket qui sert les médias en `public-read`.
+   * Mêmes identifiants et même endpoint que `S3_BUCKET` (même compte OVH).
+   *
+   * Production seulement : on ne sauvegarde pas la base de staging.
+   */
+  S3_BACKUP_BUCKET: requiredInProdOnly,
 
   // Taille du cache d'images en mémoire de chaque container, en Mo. Lu directement par
   // cache-handler.mjs, qui tourne hors du graphe de modules de l'app : déclaré ici pour
@@ -96,10 +106,11 @@ const envSchema = z.object({
   MATOMO_TOKEN: requiredInProd,
   MATOMO_ID_SITE: requiredInProd,
 
-  // CLI : Scalingo backup -- Local env only
+  // CLI : API Scalingo — `import-backup` en local, et le cron `backup-db` en production.
+  // Laissées optionnelles : les rendre requises ferait échouer le boot de l'app web, alors
+  // que `ScalingoBackupService` lève déjà une erreur explicite qui déclenche le mail d'échec.
   SCALINGO_API_TOKEN: z.string().optional(),
   SCALINGO_APP: z.string().optional(),
-  SCALINGO_DB_ADDON_ID: z.string().optional(),
   SCALINGO_REGION: z.string().default('osc-secnum-fr1'),
 
   // CLI : FacHabitat SFTP
