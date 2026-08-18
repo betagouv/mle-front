@@ -25,7 +25,6 @@ type Props = {
   onSubmit: (data: BailleurUserFormData) => void
   isPending?: boolean
   submitLabel?: string
-  emailReadOnly?: boolean
   /**
    * Quand `false`, la case `administrator` et les permissions sensibles
    * (manage_users, manage_applications) sont desactivees.
@@ -33,14 +32,7 @@ type Props = {
   canGrantAdministratorRights?: boolean
 }
 
-export const BailleurUserForm = ({
-  defaultValues,
-  onSubmit,
-  isPending,
-  submitLabel,
-  emailReadOnly = false,
-  canGrantAdministratorRights = true,
-}: Props) => {
+export const BailleurUserForm = ({ defaultValues, onSubmit, isPending, submitLabel, canGrantAdministratorRights = true }: Props) => {
   const t = useTranslations('bailleur.users')
 
   const {
@@ -78,7 +70,7 @@ export const BailleurUserForm = ({
     <form onSubmit={handleSubmit(onSubmit)}>
       <Input
         label={t('form.email')}
-        nativeInputProps={{ type: 'email', readOnly: emailReadOnly, ...register('email') }}
+        nativeInputProps={{ type: 'email', ...register('email') }}
         state={errors.email ? 'error' : 'default'}
         stateRelatedMessage={translateError(errors.email?.message)}
       />

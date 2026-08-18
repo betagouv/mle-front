@@ -53,7 +53,7 @@ export function UsersList({ currentUserId, ownerId }: Props) {
       ) : (
         <div className={styles.grid}>
           {items.map((u) => (
-            <UserCard key={u.id} user={u} canDelete={u.id !== currentUserId} />
+            <UserCard key={u.id} user={u} canDelete={u.id !== currentUserId} ownerId={ownerId} />
           ))}
         </div>
       )}

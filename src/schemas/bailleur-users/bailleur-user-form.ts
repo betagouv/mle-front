@@ -11,6 +11,7 @@ export const zCreateBailleurUser = z.object({
 
 export const zUpdateBailleurUser = z.object({
   id: z.string(),
+  email: z.string().email('Email invalide').optional(),
   firstname: z.string().min(1, 'Le prenom est requis').optional(),
   lastname: z.string().min(1, 'Le nom est requis').optional(),
   bailleurRole: z.enum(BAILLEUR_ROLES).optional(),

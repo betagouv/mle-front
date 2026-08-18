@@ -18,10 +18,7 @@ export function EditBailleurUserForm({ id, ownerId, canGrantAdministratorRights 
   if (isLoading) return <p>{t('loading')}</p>
   if (!data) return <p>{t('notFound')}</p>
 
-  const handleSubmit = async (formData: BailleurUserFormData) => {
-    const { email: _email, ...rest } = formData
-    await update.mutateAsync({ id, ownerId, ...rest })
-  }
+  const handleSubmit = async (formData: BailleurUserFormData) => await update.mutateAsync({ id, ownerId, ...formData })
 
   return (
     <BailleurUserForm
@@ -35,7 +32,6 @@ export function EditBailleurUserForm({ id, ownerId, canGrantAdministratorRights 
       onSubmit={handleSubmit}
       isPending={update.isPending}
       submitLabel={t('submitUpdate')}
-      emailReadOnly
       canGrantAdministratorRights={canGrantAdministratorRights}
     />
   )
