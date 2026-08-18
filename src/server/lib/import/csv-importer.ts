@@ -6,8 +6,9 @@ import { TYPOLOGIES } from '~/schemas/accommodations/typology'
 import { ZUpdateResidence } from '~/schemas/accommodations/update-residence'
 import type { TImportJobResidence, TImportJobSummary } from '~/schemas/import-jobs'
 import { db } from '~/server/db'
-import { accommodationAddresses, accommodations, externalSources, owners } from '~/server/db/schema'
+import { accommodationAddresses, accommodations, externalSources } from '~/server/db/schema'
 import { env } from '~/server/env'
+import { resolveImportOwner } from '~/server/lib/import/resolve-owner'
 import { syncTypologies, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { generateAccommodationKey, uploadFile } from '~/server/services/s3'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
@@ -208,18 +209,6 @@ async function processImages(picturesRaw: string): Promise<string[]> {
   return result
 }
 
-async function getOrCreateOwner(name: string, url?: string): Promise<number> {
-  const existing = await db.select({ id: owners.id }).from(owners).where(eq(owners.name, name)).limit(1)
-  if (existing[0]) return existing[0].id
-
-  const slug = generateSlug(name)
-  const [created] = await db
-    .insert(owners)
-    .values({ name, slug, url: url || null })
-    .returning({ id: owners.id })
-  return created.id
-}
-
 // ─── PREVIEW (no DB writes) ────────────────────────────────────────────────
 
 export function previewCsv(content: string, source: string): CsvPreviewResult {
@@ -296,11 +285,14 @@ export async function executeCsvImport(
     return summary
   }
 
-  const ownerName = rows[0].owner_name?.trim()
-  const ownerUrl = rows[0].owner_url?.trim()
-  if (!ownerName) throw new Error('owner_name manquant dans la première ligne')
-
-  const ownerId = await getOrCreateOwner(ownerName, ownerUrl)
+  // Bailleur de la première ligne : `owner_id` puis `owner_slug` (identifiants stables) avant le nom.
+  const owner = await resolveImportOwner({
+    id: toDigit(rows[0].owner_id),
+    slug: rows[0].owner_slug?.trim(),
+    name: rows[0].owner_name?.trim(),
+    url: rows[0].owner_url?.trim(),
+  })
+  const { id: ownerId, name: ownerName } = owner
 
   const result = {
     created: 0,

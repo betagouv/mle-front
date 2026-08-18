@@ -63,6 +63,8 @@ function writeTmpCsv(rows: string[][], headers?: string[]): string {
     'longitude',
     'owner_name',
     'owner_url',
+    'owner_id',
+    'owner_slug',
     'nb_total_apartments',
     'nb_accessible_apartments',
     'nb_coliving_apartments',
@@ -183,6 +185,8 @@ function makeRow(overrides: Record<string, string> = {}): string[] {
     'longitude',
     'owner_name',
     'owner_url',
+    'owner_id',
+    'owner_slug',
     'nb_total_apartments',
     'nb_accessible_apartments',
     'nb_coliving_apartments',
@@ -294,6 +298,56 @@ describe('import-csv integration', () => {
     const ownerRows = await db.select().from(owners).where(eq(owners.name, 'Nouveau Bailleur'))
     expect(ownerRows).toHaveLength(1)
     expect(ownerRows[0].url).toBe('https://nouveau.fr')
+  })
+
+  it('resolves the owner by id, ignoring a stale owner_name', async () => {
+    const db = getTestDb()
+
+    const owner = await createOwner({ name: 'Bailleur Renommé', slug: 'bailleur-renomme' })
+
+    const filePath = writeTmpCsv([makeRow({ owner_id: String(owner.id), owner_name: 'Ancien Nom' })])
+    const result = await command.execute({ file: filePath, source: 'test-owner-id' })
+
+    expect(result.errors).toHaveLength(0)
+    expect(result.ownerId).toBe(owner.id)
+
+    const [created] = await db.select().from(accommodations).where(eq(accommodations.ownerId, owner.id))
+    expect(created).toBeDefined()
+
+    // Le nom obsolète du CSV ne doit pas créer de bailleur.
+    expect(await db.select().from(owners).where(eq(owners.name, 'Ancien Nom'))).toHaveLength(0)
+  })
+
+  it('resolves the owner by slug, ignoring a stale owner_name', async () => {
+    const db = getTestDb()
+
+    const owner = await createOwner({ name: 'Bailleur Slug', slug: 'bailleur-slug' })
+
+    const filePath = writeTmpCsv([makeRow({ owner_slug: 'bailleur-slug', owner_name: 'Ancien Nom' })])
+    const result = await command.execute({ file: filePath, source: 'test-owner-slug' })
+
+    expect(result.errors).toHaveLength(0)
+    expect(result.ownerId).toBe(owner.id)
+    expect(await db.select().from(owners).where(eq(owners.name, 'Ancien Nom'))).toHaveLength(0)
+  })
+
+  it('fails without importing anything when owner_id is unknown', async () => {
+    const db = getTestDb()
+
+    const filePath = writeTmpCsv([makeRow({ name: 'Résidence Fantôme', owner_id: '999999' })])
+
+    await expect(command.execute({ file: filePath, source: 'test-owner-unknown' })).rejects.toThrow('Bailleur introuvable : id=999999')
+
+    expect(await db.select().from(accommodations).where(eq(accommodations.name, 'Résidence Fantôme'))).toHaveLength(0)
+    expect(await db.select().from(externalSources).where(eq(externalSources.source, 'test-owner-unknown'))).toHaveLength(0)
+  })
+
+  it('fails when owner_slug is unknown', async () => {
+    const filePath = writeTmpCsv([makeRow({ owner_slug: 'bailleur-inexistant' })])
+
+    await expect(command.execute({ file: filePath, source: 'test-slug-unknown' })).rejects.toThrow(
+      'Bailleur introuvable : slug=bailleur-inexistant',
+    )
   })
 
   it('reuses existing owner', async () => {
@@ -545,6 +599,8 @@ describe('import-csv integration', () => {
       'longitude',
       'owner_name',
       'owner_url',
+      'owner_id',
+      'owner_slug',
       'nb_total_apartments',
       'nb_accessible_apartments',
       'nb_coliving_apartments',
@@ -676,6 +732,8 @@ describe('import-csv integration', () => {
       'longitude',
       'owner_name',
       'owner_url',
+      'owner_id',
+      'owner_slug',
       'nb_total_apartments',
       'nb_accessible_apartments',
       'nb_coliving_apartments',

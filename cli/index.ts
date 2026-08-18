@@ -148,6 +148,8 @@ program
   .option('--limit <n>', "Limiter le nombre d'éléments", parseInt)
   .option('--file <path>', 'Chemin vers un fichier JSON local')
   .option('--source <name>', 'Identifiant de la source externe')
+  .option('--owner-id <id>', 'Id du bailleur (prioritaire sur le slug et le nom)', parseInt)
+  .option('--owner-slug <slug>', 'Slug du bailleur (prioritaire sur le nom)')
   .action((type, opts) => runImport(type, opts))
 
 // Sync commands (cities, rents, students, stats)
