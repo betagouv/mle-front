@@ -937,6 +937,15 @@ export const bailleurRouter = createTRPCRouter({
         }
 
         const updateData: Record<string, unknown> = { updatedAt: new Date() }
+        if (input.email !== undefined && input.email !== target.email) {
+          const existing = await db.query.user.findFirst({
+            where: and(eq(user.email, input.email), ne(user.id, target.id)),
+          })
+          if (existing) {
+            throw new TRPCError({ code: 'CONFLICT', message: 'Un utilisateur existe deja avec cet email' })
+          }
+          updateData.email = input.email
+        }
         if (input.firstname !== undefined) updateData.firstname = input.firstname
         if (input.lastname !== undefined) updateData.lastname = input.lastname
         if (input.firstname !== undefined || input.lastname !== undefined) {

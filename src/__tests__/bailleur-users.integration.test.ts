@@ -261,6 +261,48 @@ describe('bailleur.users.update', () => {
     expect(updated?.bailleurPermissions).toEqual(['manage_availability', 'manage_applications'])
   })
 
+  it('updates the email of a gestionnaire', async () => {
+    const updated = await ownerCaller.bailleur.users.update({
+      id: 'target-user',
+      email: 'nouvelle-adresse@a.com',
+    })
+
+    expect(updated?.email).toBe('nouvelle-adresse@a.com')
+  })
+
+  it('updates firstname, lastname and email together', async () => {
+    const updated = await ownerCaller.bailleur.users.update({
+      id: 'target-user',
+      firstname: 'Camille',
+      lastname: 'Duboisset',
+      email: 'camille.duboisset@a.com',
+    })
+
+    expect(updated?.email).toBe('camille.duboisset@a.com')
+    expect(updated?.firstname).toBe('Camille')
+    expect(updated?.lastname).toBe('Duboisset')
+    expect(updated?.name).toBe('Camille Duboisset')
+  })
+
+  it('rejects an email already used by another user', async () => {
+    await expect(
+      ownerCaller.bailleur.users.update({
+        id: 'target-user',
+        email: 'owner@test.com',
+      }),
+    ).rejects.toThrow(/existe deja avec cet email/)
+  })
+
+  it('accepts the unchanged email of the edited user', async () => {
+    const updated = await ownerCaller.bailleur.users.update({
+      id: 'target-user',
+      email: 'target@a.com',
+      firstname: 'Target',
+    })
+
+    expect(updated?.email).toBe('target@a.com')
+  })
+
   it('resets permissions to [] when upgrading to administrator', async () => {
     const updated = await ownerCaller.bailleur.users.update({
       id: 'target-user',
@@ -326,6 +368,44 @@ describe('bailleur.users.update', () => {
         bailleurPermissions: ['manage_users'],
       }),
     ).rejects.toThrow(/non trouve|NOT_FOUND/)
+  })
+})
+
+describe("scenario administratrice bailleur : cycle de vie d'un membre d'equipe", () => {
+  it('cree, renomme, change l email puis supprime un membre de son equipe', async () => {
+    const db = getTestDb()
+
+    // 1. Creation
+    const created = await ownerCaller.bailleur.users.create({
+      email: 'membre@afev.org',
+      firstname: 'Prenom',
+      lastname: 'Nom',
+      bailleurRole: 'gestionnaire',
+      bailleurPermissions: ['manage_residences'],
+    })
+    expect(created?.ownerId).toBe(1)
+    expect(created?.role).toBe('owner')
+
+    // 2. Modification du nom, du prenom et de l'email en une passe
+    const updated = await ownerCaller.bailleur.users.update({
+      id: created.id,
+      firstname: 'Nouveau',
+      lastname: 'NomDeFamille',
+      email: 'nouveau.membre@afev.org',
+    })
+    expect(updated?.firstname).toBe('Nouveau')
+    expect(updated?.lastname).toBe('NomDeFamille')
+    expect(updated?.email).toBe('nouveau.membre@afev.org')
+    expect(updated?.name).toBe('Nouveau NomDeFamille')
+
+    // 3. Les modifications sont bien persistees et visibles dans la liste
+    const list = await ownerCaller.bailleur.users.list({})
+    expect(list.items.find((u) => u.id === created.id)?.email).toBe('nouveau.membre@afev.org')
+
+    // 4. Suppression
+    await ownerCaller.bailleur.users.delete({ id: created.id })
+    const gone = await db.query.user.findFirst({ where: eq(user.id, created.id) })
+    expect(gone).toBeUndefined()
   })
 })
 

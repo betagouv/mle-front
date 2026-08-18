@@ -23,9 +23,10 @@ type UserItem = {
 type Props = {
   user: UserItem
   canDelete: boolean
+  ownerId?: number
 }
 
-export const UserCard = ({ user, canDelete }: Props) => {
+export const UserCard = ({ user, canDelete, ownerId }: Props) => {
   const router = useRouter()
   const searchParams = useSearchParams()
   const deleteUser = useDeleteBailleurUser()
@@ -88,7 +89,7 @@ export const UserCard = ({ user, canDelete }: Props) => {
           { children: t('cancel'), doClosesModal: true },
           {
             children: t('delete'),
-            onClick: () => deleteUser.mutate({ id: user.id }),
+            onClick: () => deleteUser.mutate({ id: user.id, ownerId }),
             doClosesModal: true,
           },
         ]}
