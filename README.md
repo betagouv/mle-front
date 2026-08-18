@@ -154,7 +154,7 @@ tout repart à zéro à chaque deploy. `cache-handler.mjs` (racine du repo, bran
 un cache à deux étages : un LRU en mémoire par container (`IMAGE_CACHE_MEMORY_MB`, 128 Mo par
 défaut) devant le bucket S3, partagé par les containers et conservé entre les deploys.
 
-Les dérivées vivent sous le préfixe `image-cache<suffixe>/`, sans ACL publique. Comme les
+Les dérivées vivent sous le préfixe `image-cache/`, sans ACL publique. Comme les
 archives de `purge-logs`, elles ne sont référencées par aucune ligne en base : `audit-storage`
 les exclut explicitement de son balayage des orphelins.
 
