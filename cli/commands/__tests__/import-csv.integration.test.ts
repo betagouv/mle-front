@@ -4,6 +4,7 @@ import path from 'node:path'
 import { and, eq } from 'drizzle-orm'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createAccommodation, createExternalSource, createOwner } from '../../../src/__tests__/fixtures/factories'
+import { createGeocodingStub } from '../../../src/__tests__/helpers/geocoding-stub'
 import { getTestDb } from '../../../src/__tests__/helpers/test-db'
 import { accommodationAddresses, accommodations, externalSources, owners } from '../../../src/server/db/schema'
 import { typologiesByType } from '../../../src/server/lib/typologies'
@@ -16,11 +17,20 @@ async function loadTypologies(accommodationId: number) {
   return typologiesByType(row?.typologies ?? [])
 }
 
+// Le géocodage vérifié interroge geo.api.gouv.fr puis la BAN : le stub répond
+// par URL, `mockFetch` ne sert plus que les téléchargements d'images.
+const geocoding = createGeocodingStub([
+  { postalCode: '75001', city: 'Paris', inseeCode: '75101', address: '10 Rue du Soleil', lat: 48.8566, lng: 2.3522 },
+])
+
 const mockFetch = vi.fn()
-vi.stubGlobal('fetch', mockFetch)
+vi.stubGlobal('fetch', (...args: Parameters<typeof fetch>) =>
+  geocoding.handles(args[0]) ? geocoding.respond(args[0]) : mockFetch(...args),
+)
 
 const mockEnv = vi.hoisted(() => ({
   S3_BUCKET: 'test-bucket' as string,
+  GEOCODING_API_URL: 'https://data.geopf.fr/geocodage/search' as string,
 }))
 
 vi.mock('~/server/env', () => ({ env: mockEnv }))
@@ -218,6 +228,7 @@ function makeRow(overrides: Record<string, string> = {}): string[] {
 
 beforeEach(() => {
   mockFetch.mockReset()
+  geocoding.reset()
   mockEnv.S3_BUCKET = 'test-bucket'
 })
 
@@ -329,30 +340,22 @@ describe('import-csv integration', () => {
   it('falls back to geocoder when lat/lng missing', async () => {
     const db = getTestDb()
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        features: [
-          {
-            geometry: { type: 'Point', coordinates: [2.3522, 48.8566] },
-            properties: {
-              city: 'Paris',
-              name: '10 Rue du Soleil',
-              postcode: '75001',
-            },
-          },
-        ],
-      }),
-    })
-
     const filePath = writeTmpCsv([makeRow({ latitude: '', longitude: '' })])
 
     await command.execute({ file: filePath, source: 'test-geocoder' })
 
-    expect(mockFetch).toHaveBeenCalledTimes(1)
+    // Le candidat BAN est validé contre les communes du code postal avant
+    // d'être retenu : les deux endpoints sont donc appelés une fois chacun.
+    expect(geocoding.communesCalls).toHaveLength(1)
+    expect(geocoding.searchCalls).toHaveLength(1)
+    expect(mockFetch).not.toHaveBeenCalled()
 
     const accs = await db.select().from(accommodations)
     expect(accs).toHaveLength(1)
+
+    const [addr] = await db.select().from(accommodationAddresses).where(eq(accommodationAddresses.accommodationId, accs[0].id))
+    expect(addr.address).toBe('10 Rue du Soleil')
+    expect(addr.postalCode).toBe('75001')
   })
 
   it('dry-run does not modify the database', async () => {

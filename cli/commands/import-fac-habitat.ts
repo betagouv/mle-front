@@ -5,7 +5,7 @@ import { and, eq, sql } from 'drizzle-orm'
 import SftpClient from 'ssh2-sftp-client'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
-import { ensureCity, geocodeAddress } from '~/server/lib/import/geocoder'
+import { ensureCity, geocodeAddressVerified } from '~/server/lib/import/geocoder'
 import { syncTypologies, type TypologyDraft, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
 import { generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
@@ -273,10 +273,9 @@ const command: ImportCommand = {
           .where(and(eq(externalSources.source, SOURCE), eq(externalSources.sourceId, sourceId)))
           .limit(1)
 
-        const fullAddress = `${item.address}, ${item.postal_code} ${item.city}`
-        const geo = await geocodeAddress(fullAddress)
+        const geo = await geocodeAddressVerified(item.address, item.postal_code, item.city)
         if (!geo && options.verbose) {
-          console.warn(`    ⚠ Geocoding returned null for "${fullAddress}"`)
+          console.warn(`    ⚠ Geocoding returned null for "${item.address}, ${item.postal_code} ${item.city}"`)
         }
 
         let resolvedCity = geo?.city ?? item.city

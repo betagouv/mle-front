@@ -1,6 +1,7 @@
 import { and, eq, sql } from 'drizzle-orm'
 import { db } from '~/server/db'
 import { cities, departments } from '~/server/db/schema'
+import { resolveAddressLocation } from '~/server/lib/geocoding/resolve'
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '~/server/utils/slug'
 
@@ -78,6 +79,34 @@ export async function geocodeAddress(fullAddress: string): Promise<GeocodeResult
     }
   }
   return null
+}
+
+/**
+ * Variante vérifiée de `geocodeAddress` : le candidat retenu doit être
+ * rattachable à la commune du code postal. À privilégier partout où l'adresse
+ * est disponible en parties séparées — c'est-à-dire dans tous les imports.
+ *
+ * Renvoie `null` quand rien ne peut être validé, plutôt qu'un point arbitraire.
+ */
+export async function geocodeAddressVerified(address: string, postalCode: string, cityName?: string | null): Promise<GeocodeResult | null> {
+  const decision = await resolveAddressLocation({ address, postalCode, cityName })
+  if (decision.action !== 'apply') return null
+  return {
+    lat: decision.lat,
+    lng: decision.lng,
+    city: decision.city,
+    address: decision.address,
+    postalCode: decision.postalCode,
+  }
+}
+
+/**
+ * Géocode une ligne d'import. Sans code postal il n'y a rien à vérifier : on
+ * retombe alors sur la recherche libre, qui n'est pas pire que l'existant.
+ */
+export async function geocodeImportRow(address: string, postalCode: string, city: string): Promise<GeocodeResult | null> {
+  if (postalCode) return geocodeAddressVerified(address, postalCode, city)
+  return geocodeAddress([address, city].filter(Boolean).join(', '))
 }
 
 export async function reverseGeocode(lat: number, lng: number): Promise<GeocodeResult | null> {
@@ -221,10 +250,15 @@ export async function ensureCity(postalCode: string, cityName: string): Promise<
     .limit(1)
   if (existingByName[0]) return existingByName[0]
 
+  // Un code postal couvre souvent plusieurs communes (91400 = Gometz-la-Ville,
+  // Orsay, Saclay). Sans tri, Postgres en rendait une au hasard : c'est ce qui
+  // a rattaché des résidences d'Orsay à Gometz-la-Ville. La plus peuplée est la
+  // commune principale du code postal dans la quasi-totalité des cas.
   const existing = await db
     .select({ name: cities.name, id: cities.id })
     .from(cities)
     .where(sql`${cities.postalCodes} @> ARRAY[${postalCode}]::varchar[]`)
+    .orderBy(sql`${cities.population} DESC NULLS LAST`, cities.id)
     .limit(1)
   if (existing[0]) return existing[0]
 

@@ -4,7 +4,7 @@ import { and, eq, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
-import { ensureCity, geocodeAddress, reverseGeocode } from '~/server/lib/import/geocoder'
+import { ensureCity, geocodeAddressVerified, geocodeImportRow, reverseGeocode } from '~/server/lib/import/geocoder'
 import { TYPOLOGIES } from '../../src/schemas/accommodations/typology'
 import { ZUpdateResidence } from '../../src/schemas/accommodations/update-residence'
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
@@ -282,16 +282,14 @@ const command: ImportCommand = {
           }
           // Forward geocode to fix ALL-CAPS city name
           if (resolvedCity && resolvedCity === resolvedCity.toUpperCase() && resolvedCity !== resolvedCity.toLowerCase()) {
-            const fullAddress = `${resolvedAddress}, ${resolvedPostalCode} ${resolvedCity}`
-            const geo = await geocodeAddress(fullAddress)
+            const geo = await geocodeAddressVerified(resolvedAddress, resolvedPostalCode, resolvedCity)
             if (geo?.city) {
               resolvedCity = geo.city
               if (options.verbose) console.log(`    Casse corrigée → ${resolvedCity}`)
             }
           }
         } else {
-          const fullAddress = `${row.address ?? ''}, ${row.postal_code ?? ''} ${row.city ?? ''}`
-          const geo = await geocodeAddress(fullAddress)
+          const geo = await geocodeImportRow(row.address ?? '', row.postal_code ?? '', row.city ?? '')
           if (geo) {
             geom = sql`ST_SetSRID(ST_MakePoint(${geo.lng}, ${geo.lat}), 4326)`
             resolvedAddress = geo.address || resolvedAddress

@@ -9,6 +9,7 @@ import {
   createImportBlocklist,
   createOwner,
 } from '../../../src/__tests__/fixtures/factories'
+import { createGeocodingStub } from '../../../src/__tests__/helpers/geocoding-stub'
 import { getTestDb } from '../../../src/__tests__/helpers/test-db'
 import { accommodationAddresses, accommodations, externalSources } from '../../../src/server/db/schema'
 import { typologiesByType, typologyDraft } from '../../../src/server/lib/typologies'
@@ -21,8 +22,24 @@ async function loadTypologies(accommodationId: number) {
   return typologiesByType(row?.typologies ?? [])
 }
 
+// Communes et adresses connues du géocodage pendant ces tests. Le stub répond
+// par URL : l'import interroge geo.api.gouv.fr puis la BAN pour une seule
+// adresse, et met les communes en cache, donc `mockFetch` ne peut pas servir
+// ces réponses dans un ordre fixe.
+const geocoding = createGeocodingStub([
+  { postalCode: '75001', city: 'Paris', inseeCode: '75101', lat: 48.8566, lng: 2.3522 },
+  { postalCode: '75002', city: 'Paris', inseeCode: '75102', lat: 48.86, lng: 2.35 },
+  { postalCode: '75010', city: 'Paris', inseeCode: '75110', lat: 48.876, lng: 2.359 },
+  { postalCode: '75011', city: 'Paris', inseeCode: '75111', lat: 48.86, lng: 2.35 },
+  { postalCode: '75012', city: 'Paris', inseeCode: '75112', lat: 48.84, lng: 2.39 },
+  { postalCode: '91120', city: 'Palaiseau', inseeCode: '91477', lat: 48.714, lng: 2.235 },
+  { postalCode: '59100', city: 'Roubaix', inseeCode: '59512', lat: 50.692, lng: 3.174 },
+])
+
 const mockFetch = vi.fn()
-vi.stubGlobal('fetch', mockFetch)
+vi.stubGlobal('fetch', (...args: Parameters<typeof fetch>) =>
+  geocoding.handles(args[0]) ? geocoding.respond(args[0]) : mockFetch(...args),
+)
 
 vi.mock('../../../src/server/services/s3', () => ({
   uploadFile: vi.fn().mockResolvedValue('https://s3.example.com/test.jpg'),
@@ -33,6 +50,7 @@ const { default: command } = await import('../import-arpej-ibail')
 
 beforeEach(() => {
   mockFetch.mockReset()
+  geocoding.reset()
 })
 
 describe('import-arpej-ibail integration', () => {
@@ -63,23 +81,6 @@ describe('import-arpej-ibail integration', () => {
       headers: new Headers({
         'X-Pagination-Total-Pages': '1',
       }),
-    })
-
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        features: [
-          {
-            geometry: { type: 'Point', coordinates: [2.3522, 48.8566] },
-            properties: { city: 'Paris', name: '10 Rue du Soleil', postcode: '75001' },
-          },
-        ],
-      }),
-    })
-
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => [],
     })
 
     mockFetch.mockResolvedValueOnce({
@@ -143,18 +144,6 @@ describe('import-arpej-ibail integration', () => {
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({
-        features: [
-          {
-            geometry: { type: 'Point', coordinates: [2.235, 48.714] },
-            properties: { city: 'Palaiseau', name: '26 Cours Pierre Vasseur', postcode: '91120' },
-          },
-        ],
-      }),
-    })
-
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
       headers: new Headers({ 'content-type': 'image/jpeg' }),
       arrayBuffer: async () => new ArrayBuffer(100),
     })
@@ -172,6 +161,13 @@ describe('import-arpej-ibail integration', () => {
     expect(typos.t1?.superficieMin).toBe(18)
     expect(typos.t1?.superficieMax).toBe(48)
     expect(created!.imagesUrls).toEqual(['https://s3.example.com/test.jpg'])
+
+    // Le point retenu est celui que la BAN confirme dans une commune du code
+    // postal : sans validation, l'import repartait sans coordonnées.
+    expect(geocoding.searchCalls).toHaveLength(1)
+    const [addr] = await db.select().from(accommodationAddresses).where(eq(accommodationAddresses.accommodationId, created!.id))
+    expect(addr.postalCode).toBe('91120')
+    expect(addr.cityId).not.toBeNull()
     expect(created!.externalUrl).toBe('https://www.arpej.fr/fr/residence/alexandre-manceau-residence-etudiante-palaiseau/')
   })
 
@@ -205,18 +201,6 @@ describe('import-arpej-ibail integration', () => {
         ],
       }),
       headers: new Headers({ 'X-Pagination-Total-Pages': '1' }),
-    })
-
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        features: [
-          {
-            geometry: { type: 'Point', coordinates: [3.174, 50.692] },
-            properties: { city: 'Roubaix', name: '44 rue de la Guinguette', postcode: '59100' },
-          },
-        ],
-      }),
     })
 
     const result = await command.execute({})
@@ -265,18 +249,6 @@ describe('import-arpej-ibail integration', () => {
       }),
       headers: new Headers({ 'X-Pagination-Total-Pages': '1' }),
     })
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        features: [
-          {
-            geometry: { type: 'Point', coordinates: [2.35, 48.86] },
-            properties: { city: 'Paris', name: '11 Rue Existante', postcode: '75011' },
-          },
-        ],
-      }),
-    })
-
     const result = await command.execute({})
 
     expect(result.updated).toBe(1)
@@ -334,18 +306,6 @@ describe('import-arpej-ibail integration', () => {
       }),
       headers: new Headers({ 'X-Pagination-Total-Pages': '1' }),
     })
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        features: [
-          {
-            geometry: { type: 'Point', coordinates: [2.39, 48.84] },
-            properties: { city: 'Paris', name: '12 Rue des Valeurs', postcode: '75012' },
-          },
-        ],
-      }),
-    })
-
     const result = await command.execute({})
 
     expect(result.updated).toBe(1)
@@ -383,18 +343,6 @@ describe('import-arpej-ibail integration', () => {
       headers: new Headers({ 'X-Pagination-Total-Pages': '1' }),
     })
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        features: [
-          {
-            geometry: { type: 'Point', coordinates: [2.35, 48.86] },
-            properties: { city: 'Paris', name: '20 Rue de la Lune', postcode: '75002' },
-          },
-        ],
-      }),
-    })
-
     await command.execute({})
 
     const updated = [
@@ -412,18 +360,6 @@ describe('import-arpej-ibail integration', () => {
       json: async () => ({ residences: updated }),
       headers: new Headers({ 'X-Pagination-Total-Pages': '1' }),
     })
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        features: [
-          {
-            geometry: { type: 'Point', coordinates: [2.35, 48.86] },
-            properties: { city: 'Paris', name: '20 Rue de la Lune', postcode: '75002' },
-          },
-        ],
-      }),
-    })
-
     const result = await command.execute({})
 
     expect(result.updated).toBe(1)
@@ -456,18 +392,6 @@ describe('import-arpej-ibail integration', () => {
       json: async () => ({ residences: [residence] }),
       headers: new Headers({ 'X-Pagination-Total-Pages': '1' }),
     })
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        features: [
-          {
-            geometry: { type: 'Point', coordinates: [2.35, 48.86] },
-            properties: { city: 'Paris', name: '10 Rue Stable', postcode: '75001' },
-          },
-        ],
-      }),
-    })
-
     await command.execute({})
 
     const sources = await db.select().from(externalSources).where(eq(externalSources.sourceId, 'res-slug-001'))
@@ -480,18 +404,6 @@ describe('import-arpej-ibail integration', () => {
       json: async () => ({ residences: [residence] }),
       headers: new Headers({ 'X-Pagination-Total-Pages': '1' }),
     })
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        features: [
-          {
-            geometry: { type: 'Point', coordinates: [2.35, 48.86] },
-            properties: { city: 'Paris', name: '10 Rue Stable', postcode: '75001' },
-          },
-        ],
-      }),
-    })
-
     const result = await command.execute({})
     expect(result.updated).toBe(1)
 

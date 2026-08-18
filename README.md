@@ -81,6 +81,7 @@ cli/
   commands/
     migrate-users.ts     # Migration users Django
     backfill-brevo-contacts.ts # Rattrapage des contacts Brevo (étudiants + gestionnaires)
+    backfill-geocoding.ts # Recalage des geom aberrantes et des city_id mal résolus
     import-backup.ts     # Import backup Scalingo
     import-arpej-ibail.ts # Import résidences ARPEJ (API iBAIL)
     import-crous.ts       # Import résidences CROUS depuis XLSX
@@ -145,6 +146,62 @@ Options :
 Variables d'env requises : `DATABASE_URL`, `BREVO_API_KEY`, `BREVO_CONTACTS_API_URL`
 
 > Conçue pour un one-off Scalingo. Sur Scalingo (vars injectées, pas de fichier `.env`), lancer directement `tsx cli/index.ts backfill-brevo-contacts --verbose` plutôt que `pnpm cli` (qui charge `--env-file=.env`).
+
+#### `backfill-geocoding` — Recaler les adresses mal géocodées
+
+```bash
+pnpm cli backfill-geocoding                                  # rapport : liste ce qui demande une revue manuelle
+pnpm cli backfill-geocoding --phase city --csv /tmp/city.csv # simulation du recalage des city_id
+pnpm cli backfill-geocoding --phase city --apply             # écriture
+pnpm cli backfill-geocoding --phase geom --apply --verbose   # écriture des coordonnées
+```
+
+> ⚠️ Contrairement aux autres commandes, celle-ci est **en dry-run par défaut** : c'est `--apply` qui déclenche l'écriture, pas l'absence de `--dry-run`.
+
+Rattrape deux défauts distincts hérités des imports, chacun sur son propre périmètre.
+
+Les deux phases d'écriture ne travaillent que sur les adresses **déjà incohérentes** — celles dont le point tombe hors de la commune de leur `city_id`. Une adresse saine n'est jamais lue, jamais réécrite.
+
+**Phase `city`** — recale le `city_id` sur la commune où le point se trouve, sans toucher aux coordonnées, et seulement quand une source indépendante confirme ce point : soit la BAN y place l'adresse, soit elle la place dans le même département (cas des codes CEDEX), soit le point est dans une commune du code postal. Répare les rattachements arbitraires d'avant le correctif (Rezé pour Nantes, Faugères pour Montpellier, Saint-Denis de La Réunion pour la Seine-Saint-Denis).
+
+**Phase `geom`** — corrige le point pour les adresses que `city` n'a pas pu résoudre, signe que ce sont les coordonnées qui sont en cause. Écrit `geom` et `city_id` ensemble, pour ne pas laisser la ville affichée en désaccord avec la position.
+
+**Phase `report`** (défaut) — n'écrit rien, liste les adresses à arbitrer à la main.
+
+Chaque adresse reçoit une décision :
+
+| Décision | Sens |
+|----------|------|
+| `apply` | Candidat rattachable à la commune du code postal, ou repli sur son centre |
+| `keep` | Le point en base est déjà plausible, on n'y touche pas |
+| `flag` | Indécidable automatiquement — revue manuelle |
+
+Les `flag` sont pour l'essentiel des adresses dont le numéro de boîte a été rangé dans le code postal à l'import (`2 rue du Général Delestraint CS` + code postal `15250`) : l'information d'origine est perdue, seule une correction manuelle est possible. Le motif `boundary-disagreement` en signale un second type : la commune que la BAN attribue à l'adresse ne contient pas le point retenu d'après `city.boundary` — cas des adresses en limite de deux communes, où les deux sources ne s'accordent pas.
+
+Après un cycle complet, `report` ne doit plus afficher que des `MANUELLE` : tout ce qui est annoncé `CORRIGEABLE` est effectivement corrigé, et relancer les phases ne modifie plus rien.
+
+> **Ordre d'exécution : `city` avant `geom`.** Tant que le `city_id` est faux, le nom de commune qui en dérive pollue la requête envoyée à la BAN et fausse la validation des candidats. `city` résolvant déjà une partie du lot, `geom` en voit d'autant moins.
+
+Vérifié sur une copie locale d'un backup de production (1571 adresses, 98 incohérentes) : **85 réparées, 0 adresse saine dégradée**, 13 restantes renvoyées en revue manuelle. Requête de contrôle :
+
+```sql
+SELECT count(*) FROM accommodation_address aa JOIN city c ON c.id = aa.city_id
+WHERE aa.geom IS NOT NULL AND c.boundary IS NOT NULL AND NOT ST_Within(aa.geom, c.boundary);
+```
+
+Options :
+
+| Option | Description |
+|--------|-------------|
+| `--phase <phase>` | `report` (défaut), `geom` ou `city` |
+| `--apply` | Écrit en base (par défaut : simulation) |
+| `--verbose` | Affiche chaque ligne traitée |
+| `--limit <n>` | Limite le nombre d'adresses examinées |
+| `--csv <path>` | Écrit le rapport détaillé (décision, confiance, motif, coordonnées) |
+
+Avec `--apply`, un fichier `rollback-geocoding-<phase>.sql` est écrit : il contient le `SELECT` des valeurs à capturer avant l'opération pour un retour arrière.
+
+Variables d'env requises : `DATABASE_URL`, `GEOCODING_API_URL` (défaut : `https://data.geopf.fr/geocodage/search`)
 
 #### `import-backup` — Importer un backup Scalingo
 

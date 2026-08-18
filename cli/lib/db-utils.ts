@@ -88,6 +88,39 @@ export async function ensureExtensions(databaseUrl: string): Promise<void> {
   await sql.end()
 }
 
+/**
+ * Répare les deux index que `pg_restore` ne peut pas construire.
+ *
+ * Le dump définit `immutable_unaccent(text)` comme `SELECT unaccent($1)`, sans
+ * qualifier le schéma. `pg_dump` restaure avec `search_path = ''` : au moment
+ * de construire un index sur cette fonction, le planificateur l'inline et ne
+ * résout plus `unaccent`. Les deux index de recherche sur les noms de communes
+ * échouent donc systématiquement, et la base locale tourne sans eux.
+ *
+ * On requalifie la fonction — même sémantique, mais insensible au search_path —
+ * puis on recrée les index manquants.
+ */
+export async function repairUnaccentIndexes(databaseUrl: string): Promise<void> {
+  const sql = postgres(databaseUrl, { prepare: false })
+
+  await sql.unsafe(`
+    CREATE OR REPLACE FUNCTION public.immutable_unaccent(text)
+    RETURNS text LANGUAGE sql IMMUTABLE PARALLEL SAFE
+    AS $$ SELECT public.unaccent($1) $$
+  `)
+
+  const indexes = [
+    `CREATE INDEX IF NOT EXISTS idx_cities_name_trgm
+       ON public.city USING gin (public.immutable_unaccent((name)::text) public.gin_trgm_ops)`,
+    `CREATE INDEX IF NOT EXISTS idx_cities_name_unaccent
+       ON public.city USING btree (lower(public.immutable_unaccent((name)::text)))`,
+  ]
+  for (const statement of indexes) await sql.unsafe(statement)
+
+  console.log('  ✓ Fonction immutable_unaccent requalifiée et index de recherche recréés')
+  await sql.end()
+}
+
 export function restoreBackup(databaseUrl: string, dumpPath: string): void {
   try {
     execSync(`pg_restore --no-owner --no-privileges -d "${databaseUrl}" "${dumpPath}"`, { stdio: 'inherit' })

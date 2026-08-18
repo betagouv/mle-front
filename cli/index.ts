@@ -2,6 +2,7 @@ import { program } from 'commander'
 import { backfillAlertJobsCommand } from './commands/backfill-alert-jobs'
 import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
 import { backfillBrevoOwners } from './commands/backfill-brevo-owners'
+import { backfillGeocoding } from './commands/backfill-geocoding'
 import { compareCrous } from './commands/compare-crous'
 import { detectAlertJobsCommand } from './commands/detect-alert-jobs'
 import { healthcheck, healthcheckCities } from './commands/healthcheck'
@@ -39,6 +40,16 @@ program
   .option('--limit <n>', 'Limiter le nombre de gestionnaires', parseInt)
   .option('--batch-size <n>', 'Nombre de requêtes Brevo en parallèle par lot', parseInt)
   .action((opts) => backfillBrevoOwners(opts))
+
+program
+  .command('backfill-geocoding')
+  .description('Recale les geom aberrantes et les city_id mal résolus des adresses de résidences')
+  .option('--phase <phase>', 'report (défaut) | geom | city', 'report')
+  .option('--apply', 'Écrire en base (par défaut : dry-run)')
+  .option('--verbose', 'Afficher chaque ligne traitée')
+  .option('--limit <n>', "Limiter le nombre d'adresses examinées", parseInt)
+  .option('--csv <path>', 'Écrire le rapport détaillé dans un CSV')
+  .action((opts) => backfillGeocoding({ ...opts, dryRun: !opts.apply }))
 
 program.command('migrate').description('Apply Drizzle migrations').action(migrate)
 
