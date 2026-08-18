@@ -56,11 +56,13 @@ export const AccommodationImages = ({ images, title, withModal = true }: Accommo
   const [mainImage, ...otherImages] = images
   const displayedImages = otherImages.slice(0, 4)
 
+  // `calc(100% / 3)` plutôt que `33.33%` : la grille en face reçoit les deux tiers restants et
+  // les redivise en deux, une valeur arrondie ferait diverger sa colonne de la photo principale.
   let widthStyle = '50%'
   if (images.length === 1) {
     widthStyle = '100%'
   } else if (images.length === 3) {
-    widthStyle = '33.33%'
+    widthStyle = 'calc(100% / 3)'
   }
 
   return (
