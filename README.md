@@ -76,6 +76,7 @@ cli/
     db.ts               # Connexion Drizzle CLI avec closeDb()
     db-utils.ts          # clean/restore DB
     scalingo-backup.ts   # API Scalingo
+    backup-storage.ts    # Dépôt et rétention des backups dans S3
     geocoder.ts          # Géocodage BAN + geo.api.gouv.fr
     matomo.ts            # Service API Matomo
   commands/
@@ -83,6 +84,7 @@ cli/
     backfill-brevo-contacts.ts # Rattrapage des contacts Brevo (étudiants + gestionnaires)
     backfill-geocoding.ts # Recalage des geom aberrantes et des city_id mal résolus
     import-backup.ts     # Import backup Scalingo
+    backup-db.ts         # Externalisation du backup Scalingo vers S3 (cron prod)
     import-arpej-ibail.ts # Import résidences ARPEJ (API iBAIL)
     import-crous.ts       # Import résidences CROUS depuis XLSX
     import-crous-rents.ts # Import loyers min/max CROUS par typologie depuis XLSX
@@ -373,7 +375,54 @@ Options :
 - `--backup-path <path>` : utiliser un fichier backup local au lieu de télécharger
 - `--skip-download` : réutiliser un backup déjà téléchargé dans `/tmp/jde-backup/`
 
-Variables d'env requises : `SCALINGO_API_TOKEN`, `SCALINGO_APP`, `SCALINGO_DB_ADDON_ID`
+Variables d'env requises : `SCALINGO_API_TOKEN`, `SCALINGO_APP`
+
+#### `backup-db` — Externaliser le backup de la base vers S3
+
+```bash
+pnpm cli backup-db --dry-run --verbose   # en local : montre le backup retenu et la clé calculée
+```
+
+Copie le dernier backup PostgreSQL produit par Scalingo dans le bucket `S3_BACKUP_BUCKET`. Piloté par
+un cron quotidien à 5h00 UTC, **en production uniquement** (`cron.json` est commun à toutes les apps
+déployées depuis ce repo : la garde est dans le code, pas dans le planificateur).
+
+On ne produit pas le dump nous-mêmes : `pg_dump` n'existe pas dans un conteneur Node Scalingo, et
+l'addon PostgreSQL fabrique déjà un backup cohérent chaque nuit vers 00h01 UTC. La commande se
+contente de l'externaliser, en streaming (l'archive pèse ~300 Mo, elle ne transite pas par le disque
+ni par un `Buffer`).
+
+**Rétention — le tri se fait à l'écriture, pas à la suppression :**
+
+```
+monlogementetudiant-db-backups/
+  monthly/{app_name}-2026-08-01.tar.gz   ← le 1er du mois, conservé indéfiniment
+  monthly/{app_name}-2026-08-15.tar.gz   ← le 15 du mois, conservé indéfiniment
+  daily/{app_name}-2026-08-18.tar.gz     ← tous les autres jours, supprimé à J+31
+```
+
+La purge ne liste que le préfixe `daily/` : les backups conservés vivent sous `monthly/`,
+physiquement hors de sa portée. Aucune condition n'est écrite pour les épargner, donc aucune
+condition ne peut se tromper. Une clé hors format est ignorée, jamais supprimée.
+
+Ce n'est **pas** un lifecycle S3 : une règle de lifecycle raisonne en âge d'objet (en jours) et non
+en calendrier, elle ne sait pas exclure « le 1er et le 15 » ; et un `PutBucketLifecycleConfiguration`
+remplace la configuration complète du bucket, écrasant silencieusement toute autre règle. La purge
+en TypeScript est versionnée, testable (`cli/lib/__tests__/backup-storage.test.ts`) et visible en
+`--dry-run`.
+
+Garde-fous : la commande refuse un backup Scalingo de plus de 36 h (mieux vaut un cron en échec, qui
+envoie un mail, qu'un doublon déposé silencieusement sous la date du jour), vérifie la taille de
+l'objet déposé avant de purger quoi que ce soit, et ne supprime aucun ancien backup tant que celui
+du jour n'est pas confirmé en place.
+
+Options :
+- `--dry-run` : afficher le backup retenu, la clé calculée et les purges, sans rien écrire
+- `--verbose` : détailler les objets conservés et supprimés
+
+Variables d'env requises : `SCALINGO_API_TOKEN`, `SCALINGO_APP`, `S3_BACKUP_BUCKET`
+
+Pour restaurer : télécharger l'objet depuis le bucket, puis `pnpm cli import-backup --backup-path <fichier>`.
 
 #### `healthcheck` — Vérifier la cohérence des résidences publiées
 
@@ -757,6 +806,7 @@ Les migrations Drizzle sont appliquées au déploiement via le hook `postdeploy`
 | `30 3 * * *` | `purge-contact-requests` | Tous les jours à 3h30 |
 | `*/30 * * * *` | `send-alert-jobs` | Toutes les 30 min |
 | `0 8 * * *` | `detect-alert-jobs ; expire-alerts` | Tous les jours à 8h |
+| `0 5 * * *` | `backup-db` | Tous les jours à 5h (production uniquement) |
 
 Pour vérifier les crons actifs : `scalingo --app <app> cron-tasks`
 Pour voir les logs d'exécution : `scalingo --app <app> logs` (les crons tournent dans des conteneurs `one-off-*`, pas `cron-*`)
@@ -811,9 +861,9 @@ Toutes les variables sont dans `.env.dist`. Celles spécifiques au CLI :
 |----------|-------------|
 | `DATABASE_URL` | Toutes les commandes |
 | `CRON_FAILURE_EMAILS` | Alerte d'échec de tous les jobs planifiés (liste séparée par des virgules, vide = pas d'envoi) |
-| `SCALINGO_API_TOKEN` | `import-backup` |
-| `SCALINGO_APP` | `import-backup` |
-| `SCALINGO_DB_ADDON_ID` | `import-backup` |
+| `SCALINGO_API_TOKEN` | `import-backup`, `backup-db` |
+| `SCALINGO_APP` | `import-backup`, `backup-db` |
+| `S3_BACKUP_BUCKET` | `backup-db` (production uniquement) |
 | `IBAIL_API_HOST` | `import arpej-ibail` |
 | `IBAIL_API_AUTH_KEY` | `import arpej-ibail` |
 | `IBAIL_API_AUTH_SECRET` | `import arpej-ibail` |
