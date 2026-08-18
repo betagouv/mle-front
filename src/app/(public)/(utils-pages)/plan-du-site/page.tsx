@@ -54,8 +54,12 @@ export default async function SiteMap() {
               text: t('links.findAccomodation'),
             },
             {
+              // La page locale a été retirée : les mentions légales vivent désormais sur le site
+              // éditorial, où le pied de page pointe déjà.
               linkProps: {
-                href: '/mentions-legales',
+                href: 'https://info.monlogementetudiant.beta.gouv.fr/mentions-legales/',
+                target: '_blank',
+                rel: 'noopener noreferrer',
               },
               text: t('links.legalMentions'),
             },
