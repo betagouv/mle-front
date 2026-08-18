@@ -2,7 +2,7 @@ import { execSync } from 'child_process'
 import postgres from 'postgres'
 
 export async function cleanDatabase(databaseUrl: string): Promise<void> {
-  const sql = postgres(databaseUrl, { prepare: false })
+  const sql = postgres(databaseUrl, { prepare: false, max: 2, idle_timeout: 10, connection: { application_name: 'mle-cli:db-utils' } })
 
   // Drop all tables in public schema (exclude PostGIS system tables)
   const tables = await sql`
@@ -77,7 +77,7 @@ export async function cleanDatabase(databaseUrl: string): Promise<void> {
 }
 
 export async function ensureExtensions(databaseUrl: string): Promise<void> {
-  const sql = postgres(databaseUrl, { prepare: false })
+  const sql = postgres(databaseUrl, { prepare: false, max: 2, idle_timeout: 10, connection: { application_name: 'mle-cli:db-utils' } })
 
   const extensions = ['postgis', 'postgis_topology', 'postgis_tiger_geocoder', 'unaccent', 'pg_trgm']
   for (const ext of extensions) {
@@ -101,7 +101,7 @@ export async function ensureExtensions(databaseUrl: string): Promise<void> {
  * puis on recrée les index manquants.
  */
 export async function repairUnaccentIndexes(databaseUrl: string): Promise<void> {
-  const sql = postgres(databaseUrl, { prepare: false })
+  const sql = postgres(databaseUrl, { prepare: false, max: 2, idle_timeout: 10, connection: { application_name: 'mle-cli:db-utils' } })
 
   await sql.unsafe(`
     CREATE OR REPLACE FUNCTION public.immutable_unaccent(text)

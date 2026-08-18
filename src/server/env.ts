@@ -14,6 +14,11 @@ const envSchema = z.object({
   AUTH_SECRET: z.string().min(1),
   DATABASE_URL: z.string().min(1),
 
+  // Nombre maximum de connexions ouvertes par process (voir `src/server/db/index.ts`). Laisser vide
+  // pour la valeur par défaut, qui dépend du type de process : le plafond de la base est partagé
+  // entre tous les containers, tous les one-off et toutes les sessions psql.
+  DATABASE_POOL_MAX: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.number().int().positive().optional()),
+
   // Alerting des crons : destinataires du mail envoyé quand un job planifié échoue.
   // Liste séparée par des virgules. Vide (ou absente) = aucun envoi, on se contente d'un
   // log — c'est l'interrupteur de la fonctionnalité, il n'y a pas de garde sur l'APP_ENV.
