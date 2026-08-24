@@ -393,6 +393,13 @@
       "when": 1786954115704,
       "tag": "0055_tracking_event_partial_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1787590844847,
+      "tag": "0056_unaccent_restore_safe",
+      "breakpoints": true
     }
   ]
 }
