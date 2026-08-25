@@ -46,7 +46,10 @@ export default async function PolitiqueDeConfidentialite() {
           <ul className="fr-ml-6w">
             <li>Envoyer des courriels aux personnes concernées qui souhaitent suivre les actualités ;</li>
             <li>Effectuer des simulations ;</li>
-            <li>Permettre aux personnes concernées de contacter la Plateforme.</li>
+            <li>Permettre aux personnes concernées de contacter la Plateforme ;</li>
+            <li>
+              Permettre aux étudiants de transmettre leurs coordonnées aux gestionnaires ayant accepté d'en recevoir pour les recontacter.
+            </li>
           </ul>
 
           <h2 className="fr-mt-6w fr-mb-2w">Quelles données traitons nous ?</h2>
@@ -59,6 +62,18 @@ export default async function PolitiqueDeConfidentialite() {
             <li>
               <strong>Les courriels :</strong> Ces données sont utiles pour contacter les individus en cas de besoin et envoyer des
               Newsletters ;
+            </li>
+            <li>
+              <strong>Les numéros de téléphone :</strong> Ces données permettent aux étudiants de les transmettre aux gestionnaires pour
+              être recontactés ;
+            </li>
+            <li>
+              <strong>Le statut de boursier :</strong> Elles sont collectées à des fins d'analyses interne et pour être transmise aux
+              gestionnaires lorsque l'étudiant demande d'être recontacté pour une résidence.
+            </li>
+            <li>
+              <strong>Le nom, prénom et date de naissance :</strong> Elles ne servent que pour être transmises aux gestionnaires lorsque
+              l'étudiant demande d'être recontacté pour une résidence.
             </li>
             <li>
               <strong>Les données techniques :</strong> Elles permettent d'offrir un affichage et un fonctionnement optimal des sites ainsi
@@ -77,6 +92,8 @@ export default async function PolitiqueDeConfidentialite() {
               Pour l'envoi de courriels et les données techniques : l'intérêt légitime poursuivi par le responsable de traitement autorise
               la collecte des informations nécessaires dans ce sens.
             </li>
+            <li>Pour des analyses interne d'usage.</li>
+            <li>Pour transmettre les coordonnées des étudiants faisant la demande d'être recontacté aux gestionnaires concernés.</li>
           </ul>
 
           <h2 className="fr-mt-6w fr-mb-2w">Quels sont vos droits ?</h2>
