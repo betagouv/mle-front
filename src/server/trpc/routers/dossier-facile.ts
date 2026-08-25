@@ -48,6 +48,22 @@ export const dossierFacileRouter = createTRPCRouter({
       return { authorizationUrl, expiresAt: expiresAt.toISOString() }
     }),
 
+  /**
+   * Délie le compte DossierFacile de l'étudiant.
+   *
+   * La suppression de la ligne locataire emporte, par cascade, ses documents en cache **et** ses
+   * candidatures : c'est le point — retirer son dossier coupe l'accès des gestionnaires dans la
+   * seconde, sans attendre le cron de purge. Idempotent : aucun compte lié n'est pas une erreur.
+   */
+  disconnect: userProcedure.mutation(async ({ ctx }) => {
+    const deleted = await db
+      .delete(dossierFacileTenants)
+      .where(eq(dossierFacileTenants.userId, ctx.session.user.id))
+      .returning({ id: dossierFacileTenants.id })
+
+    return { disconnected: deleted.length > 0 }
+  }),
+
   tenant: userProcedure.query(async ({ ctx }) => {
     const tenant = await db.query.dossierFacileTenants.findFirst({
       where: eq(dossierFacileTenants.userId, ctx.session.user.id),

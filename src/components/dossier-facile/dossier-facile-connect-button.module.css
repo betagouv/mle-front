@@ -1,0 +1,20 @@
+/** Le bouton n'est qu'un cadre autour de l'asset officiel : aucun style propre à part le focus DSFR. */
+.button {
+  display: block;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.image {
+  display: block;
+  /* En deçà de la plus petite déclinaison, on rétrécit plutôt que de déborder. */
+  max-width: 100%;
+  height: auto;
+}

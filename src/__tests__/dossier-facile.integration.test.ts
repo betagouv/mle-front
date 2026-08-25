@@ -8,6 +8,7 @@ import { typologyDraft } from '../server/lib/typologies'
 import {
   createAccommodation,
   createDossierFacileApplication,
+  createDossierFacileDocument,
   createDossierFacileTenant,
   createOwner,
   createUser,
@@ -509,8 +510,9 @@ describe('webhook visibility on the bailleur board', () => {
     await expect(ownerCaller.bailleur.getDocumentSignedUrl({ type: 'tenantUrl', tenantId: tenant.id })).rejects.toThrow()
   })
 
-  it('cuts the tenant documents and dossier links once every candidature is out of retention', async () => {
-    await setupApplication('verified')
+  it('deletes the tenant, its documents and its candidatures once every candidature is out of retention', async () => {
+    const tenant = await setupApplication('verified')
+    await createDossierFacileDocument({ tenantId: tenant.id, url: 'https://df.test/doc.pdf' })
     const board = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
     await getTestDb()
       .update(dossierFacileApplications)
@@ -520,13 +522,85 @@ describe('webhook visibility on the bailleur board', () => {
     const result = await purgeContactRequests()
 
     expect(result.dossiersPurged).toBe(1)
-    const [tenant] = await getTestDb().select().from(dossierFacileTenants).where(eq(dossierFacileTenants.tenantId, 'df-board-1'))
-    expect(tenant!.url).toBeNull()
-    expect(tenant!.pdfUrl).toBeNull()
-    const docs = await getTestDb().select().from(dossierFacileDocuments).where(eq(dossierFacileDocuments.tenantId, tenant!.id))
-    expect(docs).toHaveLength(0)
-    // La candidature, elle, survit : l'historique reste consultable côté administration.
-    const [application] = await getTestDb().select().from(dossierFacileApplications)
-    expect(application).toBeDefined()
+    // La ligne locataire portait le nom et le statut renvoyés par DossierFacile : elle part aussi,
+    // et sa cascade emporte documents et candidatures.
+    const tenants = await getTestDb().select().from(dossierFacileTenants).where(eq(dossierFacileTenants.tenantId, 'df-board-1'))
+    expect(tenants).toHaveLength(0)
+    expect(await getTestDb().select().from(dossierFacileDocuments)).toHaveLength(0)
+    expect(await getTestDb().select().from(dossierFacileApplications)).toHaveLength(0)
+  })
+
+  it('purges a tenant who linked their account but never applied', async () => {
+    const tenant = await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-orphan', name: 'Jamais Candidaté' })
+    await getTestDb()
+      .update(dossierFacileTenants)
+      .set({ createdAt: sql`now() - '31 days'::interval` })
+      .where(eq(dossierFacileTenants.id, tenant.id))
+
+    const result = await purgeContactRequests()
+
+    expect(result.dossiersPurged).toBe(1)
+    expect(await getTestDb().select().from(dossierFacileTenants)).toHaveLength(0)
+  })
+
+  it('leaves a freshly linked tenant alone and stays idempotent', async () => {
+    await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-fresh' })
+
+    expect((await purgeContactRequests()).dossiersPurged).toBe(0)
+    expect((await purgeContactRequests()).dossiersPurged).toBe(0)
+    expect(await getTestDb().select().from(dossierFacileTenants)).toHaveLength(1)
+  })
+
+  it('drops the cached documents as soon as the dossier leaves the verified status', async () => {
+    const tenant = await setupApplication('verified')
+    await getTestDb()
+      .update(dossierFacileTenants)
+      .set({ url: 'https://df.test/dossier', pdfUrl: 'https://df.test/dossier.pdf' })
+      .where(eq(dossierFacileTenants.id, tenant.id))
+    await createDossierFacileDocument({ tenantId: tenant.id, url: 'https://df.test/doc.pdf' })
+
+    await callWebhook({ partnerCallBackType: 'RETURNED_ACCOUNT', onTenantId: 'df-board-1' })
+
+    const [refreshed] = await getTestDb().select().from(dossierFacileTenants).where(eq(dossierFacileTenants.id, tenant.id))
+    expect(refreshed!.status).toBe('incomplete')
+    expect(refreshed!.url).toBeNull()
+    expect(refreshed!.pdfUrl).toBeNull()
+    expect(await getTestDb().select().from(dossierFacileDocuments)).toHaveLength(0)
+    await expect(ownerCaller.bailleur.getDocumentSignedUrl({ type: 'tenantUrl', tenantId: tenant.id })).rejects.toThrow()
+  })
+})
+
+describe('dossierFacile.disconnect', () => {
+  it('removes the tenant, its documents and its candidatures, and cuts the gestionnaire access', async () => {
+    const owner = await createOwner({
+      name: 'Owner Disconnect',
+      slug: 'owner-disconnect',
+      userId: 'test-owner-id',
+      contactMode: EOwnerContactMode.DOSSIER_FACILE,
+    })
+    await createAccommodation({ slug: 'res-disconnect', ownerId: owner!.id }, [typologyDraft('t1', { nbAvailable: 5 })])
+    const tenant = await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-disconnect', status: 'verified' })
+    await createDossierFacileDocument({ tenantId: tenant.id, url: 'https://df.test/doc.pdf' })
+    await createDossierFacileApplication({ tenantId: tenant.id, accommodationSlug: 'res-disconnect', apartmentType: 't1' })
+
+    const board = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-disconnect' })
+    expect(board.items).toHaveLength(1)
+    const candidatureId = board.items[0]!.id
+
+    expect(await authenticatedCaller.dossierFacile.disconnect()).toEqual({ disconnected: true })
+
+    expect(await getTestDb().select().from(dossierFacileTenants)).toHaveLength(0)
+    expect(await getTestDb().select().from(dossierFacileDocuments)).toHaveLength(0)
+    expect(await getTestDb().select().from(dossierFacileApplications)).toHaveLength(0)
+    await expect(ownerCaller.bailleur.getCandidature({ id: candidatureId })).rejects.toThrow('Candidature not found')
+    expect(await authenticatedCaller.dossierFacile.tenant()).toBeNull()
+  })
+
+  it('is a no-op when no account is linked', async () => {
+    expect(await authenticatedCaller.dossierFacile.disconnect()).toEqual({ disconnected: false })
+  })
+
+  it('rejects an anonymous caller', async () => {
+    await expect(caller.dossierFacile.disconnect()).rejects.toThrow()
   })
 })

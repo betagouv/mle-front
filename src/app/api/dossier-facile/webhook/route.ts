@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { and, eq, notInArray } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
+import { DF_TENANT_STATUS_VERIFIED } from '~/enums/dossier-facile-tenant-status'
 import { ZWebhookBodySchema } from '~/schemas/dossier-facile/dossier-facile-webhook'
 import { db } from '~/server/db'
 import { dossierFacileDocuments, dossierFacileTenants } from '~/server/db/schema'
@@ -29,8 +30,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  console.log('[DossierFacile Webhook] Received:', JSON.stringify(body))
-
   const parsed = ZWebhookBodySchema.safeParse(body)
   if (!parsed.success) {
     console.warn('[DossierFacile Webhook] Invalid payload:', parsed.error.issues)
@@ -39,11 +38,14 @@ export async function POST(request: Request) {
 
   const { partnerCallBackType, onTenantId: tenantIdStr } = parsed.data
 
-  // DELETED_ACCOUNT: delete the tenant row entirely
+  // Volontairement sobre : la charge utile porte le nom du locataire, ses garants et les liens vers
+  // ses pièces. La journaliser la ferait survivre hors de toute durée de conservation.
+  console.log(`[DossierFacile Webhook] Received ${partnerCallBackType} for tenant ${tenantIdStr}`)
+
+  // DELETED_ACCOUNT: delete the tenant row entirely (cascade: documents et candidatures)
   if (partnerCallBackType === 'DELETED_ACCOUNT') {
-    console.log(`[DossierFacile Webhook] DELETED_ACCOUNT for tenant ${tenantIdStr}`)
     await db.delete(dossierFacileTenants).where(eq(dossierFacileTenants.tenantId, tenantIdStr))
-    console.log(`[DossierFacile Webhook] Tenant ${tenantIdStr} deleted successfully`)
+    console.log(`[DossierFacile Webhook] Tenant ${tenantIdStr} deleted`)
     return NextResponse.json({ ok: true })
   }
 
@@ -63,12 +65,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true })
     }
 
+    // Hors `verified`, plus aucun gestionnaire n'a le droit d'ouvrir une pièce : on ne se contente
+    // pas de bloquer la lecture, on vide le cache. Une revalidation par DossierFacile le repeuple.
+    const isVerified = data.status === DF_TENANT_STATUS_VERIFIED
+
     await db
       .update(dossierFacileTenants)
       .set({
         status: data.status,
-        url: data.url,
-        pdfUrl: data.pdfUrl,
+        url: isVerified ? data.url : null,
+        pdfUrl: isVerified ? data.pdfUrl : null,
         name: data.name,
         guarantorCount: data.guarantorCount,
         updatedAt: now,
@@ -76,7 +82,9 @@ export async function POST(request: Request) {
       })
       .where(eq(dossierFacileTenants.tenantId, tenantIdStr))
 
-    if (data.documents.length > 0) {
+    if (!isVerified) {
+      await db.delete(dossierFacileDocuments).where(eq(dossierFacileDocuments.tenantId, existingTenant.id))
+    } else if (data.documents.length > 0) {
       const upsertedIds: string[] = []
       for (const doc of data.documents) {
         const [upserted] = await db

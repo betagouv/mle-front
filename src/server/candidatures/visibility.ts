@@ -1,12 +1,18 @@
 import { and, eq, gte, isNotNull, or, type SQL } from 'drizzle-orm'
 import { CONTACT_RETENTION_DAYS } from '~/enums/contact-status'
-import { DF_TENANT_STATUS_VERIFIED } from '~/enums/dossier-facile-tenant-status'
+import { DF_RETENTION_DAYS, DF_TENANT_STATUS_VERIFIED } from '~/enums/dossier-facile-tenant-status'
 import { db } from '~/server/db'
 import { contactRequests, dossierFacileApplications, dossierFacileTenants } from '~/server/db/schema'
 import { DAY_MS } from '~/utils/time'
 
-/** Début de la fenêtre de rétention : les candidatures antérieures ne sont plus restituées. */
+/** Début de la fenêtre de rétention : les demandes de contact antérieures ne sont plus restituées. */
 export const contactRetentionCutoff = () => new Date(Date.now() - CONTACT_RETENTION_DAYS * DAY_MS)
+
+/**
+ * Idem pour DossierFacile. Fenêtre distincte de celle des contacts, même si les deux durées
+ * coïncident aujourd'hui — cf. `DF_RETENTION_DAYS`.
+ */
+export const dossierFacileRetentionCutoff = () => new Date(Date.now() - DF_RETENTION_DAYS * DAY_MS)
 
 /**
  * Ce que « visible du gestionnaire » veut dire, pour les deux canaux de candidature.
@@ -37,7 +43,7 @@ export const visibleContactRequest = (): SQL | undefined =>
  * Suppose que `dossier_facile_tenant` est joint à la requête.
  */
 export const visibleDossierFacileApplication = (): SQL | undefined =>
-  and(gte(dossierFacileApplications.createdAt, contactRetentionCutoff()), eq(dossierFacileTenants.status, DF_TENANT_STATUS_VERIFIED))
+  and(gte(dossierFacileApplications.createdAt, dossierFacileRetentionCutoff()), eq(dossierFacileTenants.status, DF_TENANT_STATUS_VERIFIED))
 
 /** La demande de contact désignée, si elle est visible du gestionnaire — `null` sinon. */
 export const findVisibleContactRequest = async (id: string) => {
@@ -56,7 +62,7 @@ export const findVisibleContactRequest = async (id: string) => {
  */
 export const findVisibleApplication = async (id: string) => {
   const application = await db.query.dossierFacileApplications.findFirst({
-    where: and(eq(dossierFacileApplications.id, id), gte(dossierFacileApplications.createdAt, contactRetentionCutoff())),
+    where: and(eq(dossierFacileApplications.id, id), gte(dossierFacileApplications.createdAt, dossierFacileRetentionCutoff())),
     with: { tenant: { with: { documents: true } } },
   })
   if (!application || application.tenant.status !== DF_TENANT_STATUS_VERIFIED) return null
@@ -71,7 +77,7 @@ export const findVisibleApplication = async (id: string) => {
  */
 export const findVisibleApplicationForTenant = async (tenantId: string) => {
   const application = await db.query.dossierFacileApplications.findFirst({
-    where: and(eq(dossierFacileApplications.tenantId, tenantId), gte(dossierFacileApplications.createdAt, contactRetentionCutoff())),
+    where: and(eq(dossierFacileApplications.tenantId, tenantId), gte(dossierFacileApplications.createdAt, dossierFacileRetentionCutoff())),
     columns: { accommodationSlug: true },
     with: { tenant: { columns: { status: true } } },
   })
