@@ -28,7 +28,7 @@ export async function purgeContactRequests(options: PurgeContactRequestsOptions)
 
     console.log(`${prefix} ${deleted} demande(s) visiteur non confirmée(s) depuis ${UNCONFIRMED_CONTACT_RETENTION_DAYS} j supprimée(s)`)
     console.log(`${prefix} ${anonymized} demande(s) de plus de ${CONTACT_RETENTION_DAYS} j anonymisée(s)`)
-    console.log(`${prefix} ${dossiersPurged} dossier(s) DossierFacile rendu(s) inaccessible(s) (documents et liens effacés)`)
+    console.log(`${prefix} ${dossiersPurged} dossier(s) DossierFacile supprimé(s) (documents et candidatures emportés)`)
 
     if (jobId !== null) {
       await db

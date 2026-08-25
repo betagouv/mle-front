@@ -254,8 +254,8 @@
       "buttons": {
         "consult": "Consulter l'offre du gestionnaire",
         "dossierFacile": "Candidater avec Dossier Facile",
-        "dossierFacileConnect": "Lier mon compte Dossier Facile",
-        "dossierFacileConnectDescription": "Lier votre dossier facile certifié",
+        "dossierFacileConnect": "Connexion DossierFacile",
+        "dossierFacileConnectDescription": "DossierFacile est le dossier de location numérique de l'Etat. Entièrement gratuit, conforme et sécurisé, il protège les locataires et rassure les propriétaires.",
         "dossierFacilePending": "Dossier en cours de vérification",
         "dossierFacileIncomplete": "Complétez votre DossierFacile",
         "dossierFacileDenied": "Votre DossierFacile a été refusé",
@@ -1255,6 +1255,25 @@
         "favoriteAlert": "Je souhaite des alertes de disponibilité dans mes résidences favorites",
         "similarAlertDescription": "Recevoir un courriel lorsque des logements similaires à vos favoris sont disponibles",
         "favoriteAlertDescription": "Recevoir un courriel lorsqu’un de vos favoris redevient disponible"
+      },
+      "dossierFacile": {
+        "title": "Mon compte DossierFacile",
+        "description": "Votre dossier de location numérique est lié à votre compte. Les gestionnaires auxquels vous candidatez n'accèdent à vos pièces justificatives que si votre dossier est validé par DossierFacile.",
+        "status": {
+          "verified": "Dossier validé",
+          "to_process": "Dossier en cours de vérification",
+          "incomplete": "Dossier incomplet",
+          "denied": "Dossier refusé",
+          "active": "Dossier actif",
+          "inactive": "Dossier archivé",
+          "access_revoked": "Accès révoqué"
+        },
+        "disconnect": "Déconnecter mon compte DossierFacile",
+        "confirmTitle": "Déconnecter mon compte DossierFacile",
+        "confirmBody": "Votre dossier ne sera plus lié à votre compte Mon Logement Étudiant. Vos pièces justificatives restent hébergées par DossierFacile.",
+        "confirmWarning": "Vos candidatures en cours seront retirées et les gestionnaires perdront immédiatement l'accès à votre dossier. Cette action est irréversible.",
+        "cancel": "Annuler",
+        "confirm": "Déconnecter"
       }
     },
     "alerts": {

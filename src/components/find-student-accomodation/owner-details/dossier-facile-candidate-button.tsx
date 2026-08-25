@@ -12,6 +12,7 @@ import type { ReactNode } from 'react'
 import { useMemo, useState } from 'react'
 import { type UseFormReturn, useForm } from 'react-hook-form'
 import z from 'zod'
+import { DossierFacileConnectButton } from '~/components/dossier-facile/dossier-facile-connect-button'
 import { CompleteProfileModal, completeProfileModal } from '~/components/student-space/profile/complete-profile-modal'
 import { createToast } from '~/components/ui/createToast'
 import { ModalPortal } from '~/components/ui/modal-portal'
@@ -326,24 +327,12 @@ const DossierFacileApplyButton = ({
     )
   }
 
-  if (!tenant) {
+  // Pas encore de dossier lié, ou accès perdu : dans les deux cas c'est le CTA officiel de connexion.
+  if (!tenant || tenant.status === 'access_revoked' || tenant.status === 'inactive') {
     return (
       <div className="fr-flex fr-direction-column fr-align-items-center fr-mt-2w fr-width-full">
-        <Button onClick={handleConnect} priority="primary" className="fr-width-full fr-flex fr-justify-content-center">
-          {t('sidebar.buttons.dossierFacileConnect')}
-        </Button>
-        <span className="fr-text--xs fr-mb-0">{t('sidebar.buttons.dossierFacileConnectDescription')}</span>
-      </div>
-    )
-  }
-
-  if (tenant.status === 'access_revoked' || tenant.status === 'inactive') {
-    return (
-      <div className="fr-flex fr-direction-column fr-align-items-center fr-mt-2w fr-width-full">
-        <Button onClick={handleConnect} priority="primary" className="fr-width-full fr-flex fr-justify-content-center">
-          {t('sidebar.buttons.dossierFacileConnect')}
-        </Button>
-        <span className="fr-text--xs fr-mb-0">{t('sidebar.buttons.dossierFacileConnectDescription')}</span>
+        <DossierFacileConnectButton onClick={handleConnect} />
+        <span className="fr-text--xs fr-mt-1w fr-mb-0">{t('sidebar.buttons.dossierFacileConnectDescription')}</span>
       </div>
     )
   }

@@ -254,8 +254,8 @@
       "buttons": {
         "consult": "View the manager's offer",
         "dossierFacile": "Apply with Dossier Facile",
-        "dossierFacileConnect": "Link my Dossier Facile account",
-        "dossierFacileConnectDescription": "Link your certified DossierFacile file",
+        "dossierFacileConnect": "Connexion DossierFacile",
+        "dossierFacileConnectDescription": "DossierFacile is the French State's digital rental application. Entirely free, compliant and secure, it protects tenants and reassures landlords.",
         "dossierFacilePending": "File being verified",
         "dossierFacileIncomplete": "Complete your DossierFacile",
         "dossierFacileDenied": "Your DossierFacile was rejected",
@@ -1255,6 +1255,25 @@
         "favoriteAlert": "I want availability alerts for my favorite residences",
         "similarAlertDescription": "Receive an email when accommodation similar to your favorites becomes available",
         "favoriteAlertDescription": "Receive an email when one of your favorites becomes available again"
+      },
+      "dossierFacile": {
+        "title": "My DossierFacile account",
+        "description": "Your digital rental application is linked to your account. Property managers you apply to can only access your supporting documents once DossierFacile has validated your application.",
+        "status": {
+          "verified": "Application validated",
+          "to_process": "Application under review",
+          "incomplete": "Incomplete application",
+          "denied": "Application rejected",
+          "active": "Active application",
+          "inactive": "Archived application",
+          "access_revoked": "Access revoked"
+        },
+        "disconnect": "Disconnect my DossierFacile account",
+        "confirmTitle": "Disconnect my DossierFacile account",
+        "confirmBody": "Your application will no longer be linked to your Mon Logement Étudiant account. Your supporting documents remain hosted by DossierFacile.",
+        "confirmWarning": "Your pending applications will be withdrawn and property managers will immediately lose access to your application. This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Disconnect"
       }
     },
     "alerts": {

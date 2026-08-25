@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
+import { DossierFacileConnection } from '~/components/student-space/informations/dossier-facile-connection'
 import { NotificationSettings } from '~/components/student-space/informations/notification-settings'
 import { StudentProfileForm } from '~/components/student-space/informations/student-profile-form'
 import { getStudentProfile } from '~/server/student/get-profile'
@@ -41,6 +42,7 @@ export default async function StudentPersonalInformationsPage() {
             initialFavoriteAlert={profile.favoriteAlertsEnabled}
           />
         </div>
+        <DossierFacileConnection />
       </div>
     </>
   )

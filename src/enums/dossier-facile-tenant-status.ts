@@ -20,3 +20,13 @@ export const DF_TENANT_STATUS_VERIFIED: DFTenantStatus = 'verified'
  * la candidature : elle restera masquée du board tant que le dossier n'est pas `verified`.
  */
 export const DF_TENANT_STATUSES_BLOCKING_APPLICATION: readonly DFTenantStatus[] = ['access_revoked', 'inactive']
+
+/**
+ * Durée de conservation des données issues de DossierFacile Connect, en jours.
+ *
+ * Volontairement distincte de `CONTACT_RETENTION_DAYS` bien que les deux valent 30 : les deux
+ * canaux relèvent d'obligations différentes, et un futur ajustement des demandes de contact ne doit
+ * pas s'appliquer en silence à DossierFacile. La charte partenaire plafonne à 3 mois ; DossierFacile
+ * vise 45 jours pour lui-même.
+ */
+export const DF_RETENTION_DAYS = 30

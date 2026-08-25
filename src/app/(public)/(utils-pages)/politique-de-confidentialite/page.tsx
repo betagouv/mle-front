@@ -23,7 +23,7 @@ export default async function PolitiqueDeConfidentialite() {
       <div className={styles.borderBottom}>
         <h1>Politique de confidentialité</h1>
         <p>
-          Mis à jour le <span className="fr-text--bold">30/06/25</span>
+          Mis à jour le <span className="fr-text--bold">25/08/26</span>
         </p>
       </div>
       <div className="fr-py-3w">
@@ -79,7 +79,20 @@ export default async function PolitiqueDeConfidentialite() {
               <strong>Les données techniques :</strong> Elles permettent d'offrir un affichage et un fonctionnement optimal des sites ainsi
               que d'établir les statistiques.
             </li>
+            <li>
+              <strong>Les données issues de DossierFacile :</strong> Lorsqu'un étudiant choisit de connecter son compte DossierFacile pour
+              candidater à une résidence, la plateforme reçoit son identité, le statut de son dossier de location, la liste de ses pièces
+              justificatives et de celles de ses garants, ainsi que des liens d'accès à ces pièces. Les pièces elles-mêmes restent hébergées
+              par DossierFacile : la plateforme n'en conserve que des métadonnées et des liens, et les documents consultés portent le
+              filigrane « Documents exclusivement destinés à la location immobilière ».
+            </li>
           </ul>
+          <p>
+            La connexion à DossierFacile est <strong>facultative</strong>. Les gestionnaires n'accèdent aux pièces d'un candidat que si son
+            dossier a été validé par DossierFacile ; si le dossier redevient incomplet, est remis en instruction ou est refusé, l'accès leur
+            est retiré immédiatement. L'étudiant peut déconnecter son compte DossierFacile à tout moment depuis son espace personnel, ce qui
+            retire ses candidatures et met fin à l'accès des gestionnaires.
+          </p>
 
           <h2 className="fr-mt-6w fr-mb-2w">Sur quelle base traitons-nous vos données ?</h2>
           <p>Les traitements sont justifiés car :</p>
@@ -94,6 +107,10 @@ export default async function PolitiqueDeConfidentialite() {
             </li>
             <li>Pour des analyses interne d'usage.</li>
             <li>Pour transmettre les coordonnées des étudiants faisant la demande d'être recontacté aux gestionnaires concernés.</li>
+            <li>
+              Pour les données issues de DossierFacile : le consentement de la personne concernée (article 6.1.a du RGPD), donné lors de la
+              connexion du compte DossierFacile et révocable à tout moment depuis l'espace personnel.
+            </li>
           </ul>
 
           <h2 className="fr-mt-6w fr-mb-2w">Quels sont vos droits ?</h2>
@@ -166,6 +183,16 @@ export default async function PolitiqueDeConfidentialite() {
                 </>,
                 '13 mois',
               ],
+              [
+                <>
+                  Données issues de DossierFacile Connect
+                  <ul className="fr-ml-2w fr-mb-0">
+                    <li>identité et statut du dossier</li>
+                    <li>pièces justificatives et liens d'accès</li>
+                  </ul>
+                </>,
+                '30 jours à compter de la dernière candidature, puis effacement des pièces, des liens et du dossier locataire',
+              ],
             ]}
             className="fr-mb-4w"
           />
@@ -200,6 +227,20 @@ export default async function PolitiqueDeConfidentialite() {
                 'Emailing',
                 <a href="https://www.brevo.com/fr/legal/privacypolicy/" target="_blank" rel="noopener noreferrer" className="fr-link">
                   https://www.brevo.com/fr/legal/privacypolicy/
+                  <NewWindowHint />
+                </a>,
+              ],
+              [
+                'DossierFacile',
+                'France',
+                "Dossier de location numérique de l'État",
+                <a
+                  href="https://www.dossierfacile.logement.gouv.fr/politique-de-confidentialite"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="fr-link"
+                >
+                  https://www.dossierfacile.logement.gouv.fr/politique-de-confidentialite
                   <NewWindowHint />
                 </a>,
               ],
