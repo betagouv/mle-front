@@ -1,7 +1,7 @@
 'use client'
 
 import Button from '@codegouvfr/react-dsfr/Button'
-import DOMPurify from 'dompurify'
+import DOMPurify from 'isomorphic-dompurify'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import styles from './logement.module.css'
@@ -44,6 +44,8 @@ function ensureIframeTitle(html: string, fallbackTitle: string): string {
 
 const IframeEmbed = ({ html }: { html: string }) => {
   const t = useTranslations('accomodation')
+  // `isomorphic-dompurify` et non `dompurify` : ce composant est `'use client'` mais Next le rend aussi
+  // côté serveur, où le `dompurify` nu n'expose pas `sanitize` (`isSupported: false`) et fait planter le SSR.
   const sanitized = DOMPurify.sanitize(html, {
     ALLOWED_TAGS: ['iframe'],
     ALLOWED_ATTR: ['src', 'width', 'height', 'title', 'frameborder', 'allow', 'allowfullscreen', 'referrerpolicy'],
