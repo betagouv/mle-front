@@ -4,8 +4,10 @@ import { SignJWT } from 'jose'
 import { cookies } from 'next/headers'
 import { z } from 'zod'
 import { APARTMENT_TYPES } from '~/enums/apartment-type'
+import { DF_TENANT_STATUSES_BLOCKING_APPLICATION, type DFTenantStatus } from '~/enums/dossier-facile-tenant-status'
 import { db } from '~/server/db'
 import { accommodations, accommodationTypologies, dossierFacileApplications, dossierFacileTenants } from '~/server/db/schema'
+import { ensureFavorite } from '~/server/favorites/ensure-favorite'
 import { buildDossierFacileAuthorizationUrl, validateDossierFacileConfig } from '~/server/services/dossier-facile/sync'
 import { getJwtSecret } from '~/server/utils/jwt-secret'
 import { createTRPCRouter, userProcedure } from '../init'
@@ -46,6 +48,22 @@ export const dossierFacileRouter = createTRPCRouter({
       return { authorizationUrl, expiresAt: expiresAt.toISOString() }
     }),
 
+  /**
+   * Délie le compte DossierFacile de l'étudiant.
+   *
+   * La suppression de la ligne locataire emporte, par cascade, ses documents en cache **et** ses
+   * candidatures : c'est le point — retirer son dossier coupe l'accès des gestionnaires dans la
+   * seconde, sans attendre le cron de purge. Idempotent : aucun compte lié n'est pas une erreur.
+   */
+  disconnect: userProcedure.mutation(async ({ ctx }) => {
+    const deleted = await db
+      .delete(dossierFacileTenants)
+      .where(eq(dossierFacileTenants.userId, ctx.session.user.id))
+      .returning({ id: dossierFacileTenants.id })
+
+    return { disconnected: deleted.length > 0 }
+  }),
+
   tenant: userProcedure.query(async ({ ctx }) => {
     const tenant = await db.query.dossierFacileTenants.findFirst({
       where: eq(dossierFacileTenants.userId, ctx.session.user.id),
@@ -82,8 +100,10 @@ export const dossierFacileRouter = createTRPCRouter({
       if (!tenant) {
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'No DossierFacile tenant linked' })
       }
-      if (tenant.status !== 'verified') {
-        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Tenant dossier is not verified' })
+      // Le dossier n'a pas besoin d'être validé pour candidater : la candidature reste masquée
+      // du board gestionnaire tant que DossierFacile ne l'a pas validée (cf. bailleur router).
+      if (DF_TENANT_STATUSES_BLOCKING_APPLICATION.includes(tenant.status as DFTenantStatus)) {
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'DossierFacile access is revoked' })
       }
 
       const accommodation = await db.query.accommodations.findFirst({
@@ -112,6 +132,9 @@ export const dossierFacileRouter = createTRPCRouter({
         })
         .onConflictDoNothing()
         .returning()
+
+      // Candidater vaut suivi : la résidence rejoint les favoris, où la candidature est restituée.
+      await ensureFavorite(ctx.session.user.id, accommodation.id)
 
       return application ?? null
     }),

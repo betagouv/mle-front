@@ -1,4 +1,3 @@
-import { fr } from '@codegouvfr/react-dsfr'
 import { Breadcrumb } from '@codegouvfr/react-dsfr/Breadcrumb'
 import { Summary } from '@codegouvfr/react-dsfr/Summary'
 import { Metadata } from 'next'
@@ -24,10 +23,10 @@ export default async function SiteMap() {
       <div className={styles.borderBottom}>
         <h1>{t('title')}</h1>
         <p>
-          Mis à jour le <span className={fr.cx('fr-text--bold')}>01/01/25</span>
+          Mis à jour le <span className="fr-text--bold">01/01/25</span>
         </p>
       </div>
-      <div className={fr.cx('fr-py-3w')}>
+      <div className="fr-py-3w">
         <Summary
           links={[
             {
@@ -55,26 +54,12 @@ export default async function SiteMap() {
               text: t('links.findAccomodation'),
             },
             {
+              // La page locale a été retirée : les mentions légales vivent désormais sur le site
+              // éditorial, où le pied de page pointe déjà.
               linkProps: {
-                href: '/gestion-des-cookies',
-              },
-              text: t('links.cookies'),
-            },
-            {
-              linkProps: {
-                href: '/donnees-personnelles',
-              },
-              text: t('links.personalData'),
-            },
-            {
-              linkProps: {
-                href: '/accessibilite',
-              },
-              text: t('links.accessibilite'),
-            },
-            {
-              linkProps: {
-                href: '/mentions-legales',
+                href: 'https://info.monlogementetudiant.beta.gouv.fr/mentions-legales/',
+                target: '_blank',
+                rel: 'noopener noreferrer',
               },
               text: t('links.legalMentions'),
             },

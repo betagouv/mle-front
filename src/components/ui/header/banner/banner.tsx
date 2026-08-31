@@ -1,12 +1,12 @@
 'use client'
 
-import { colors, fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 import { z } from 'zod'
+import { NewWindowHint } from '~/components/ui/new-window'
 import { trackEvent } from '~/lib/tracking'
 import styles from './banner.module.css'
 
@@ -32,28 +32,23 @@ export const Banner = () => {
 
   if (!isVisible || pathname.includes('landing')) return null
   return (
-    <div
-      className={clsx(styles.bannerContainer, fr.cx('fr-py-1w'))}
-      style={{
-        backgroundColor: colors.decisions.background.alt.blueFrance.default,
-        color: colors.decisions.text.default.info.default,
-      }}
-    >
-      <div className={clsx(fr.cx('fr-container'), styles.bannerContent)}>
+    <div className={clsx(styles.bannerContainer, 'fr-py-1w')}>
+      <div className={clsx('fr-container', styles.bannerContent)}>
         <p className={styles.bannerText}>
-          <span className={fr.cx('fr-text--bold', 'ri-sparkling-line')}>{t('title')}</span>
+          <span className="fr-text--bold ri-sparkling-line">{t('title')}</span>
           &nbsp;
           <span>
             {t.rich('description', {
               link: (chunks) => (
                 <a
-                  className={fr.cx('fr-link')}
+                  className="fr-link"
                   href={tallyUrl}
                   target="_blank"
                   rel="noreferrer"
                   onClick={() => trackEvent({ category: 'Navigation', action: 'clic banner enquete', name: tallyUrl })}
                 >
                   {chunks}
+                  <NewWindowHint />
                 </a>
               ),
             })}

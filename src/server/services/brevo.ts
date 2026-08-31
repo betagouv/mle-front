@@ -1,5 +1,7 @@
 import { env } from '~/server/env'
 
+const SENDER_EMAIL = 'no-reply@monlogementetudiant.beta.gouv.fr'
+
 const brevoHeaders = {
   'api-key': env.BREVO_API_KEY,
   'Content-Type': 'application/json',
@@ -21,7 +23,7 @@ export async function sendTemplateEmail({ to, templateId, params }: TemplateEmai
     body: JSON.stringify({
       to: [{ email: to }],
       templateId,
-      replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      replyTo: { email: SENDER_EMAIL },
       ...(params && { params }),
     }),
   })
@@ -29,6 +31,39 @@ export async function sendTemplateEmail({ to, templateId, params }: TemplateEmai
   if (!response.ok) {
     const error = await response.text()
     throw new Error(`Brevo email failed: ${response.status} ${error}`)
+  }
+}
+
+interface RawEmailParams {
+  to: string[]
+  subject: string
+  textContent: string
+  /** Coupe l'appel au-delà du délai : un Brevo bloqué ne doit pas faire traîner un conteneur cron. */
+  timeoutMs?: number
+}
+
+/**
+ * Envoi en texte libre (sans template Brevo), réservé aux mails internes d'exploitation dont
+ * le contenu est trop variable pour un template (message d'erreur, stack). Contrairement aux
+ * envois par template, l'expéditeur doit être fourni explicitement.
+ */
+export async function sendRawEmail({ to, subject, textContent, timeoutMs = 10_000 }: RawEmailParams): Promise<void> {
+  const response = await fetch(env.BREVO_API_URL, {
+    method: 'POST',
+    headers: brevoHeaders,
+    signal: AbortSignal.timeout(timeoutMs),
+    body: JSON.stringify({
+      sender: { email: SENDER_EMAIL, name: 'MLE Crons' },
+      to: to.map((email) => ({ email })),
+      replyTo: { email: SENDER_EMAIL },
+      subject,
+      textContent,
+    }),
+  })
+
+  if (!response.ok) {
+    const error = await response.text()
+    throw new Error(`Brevo raw email failed: ${response.status} ${error}`)
   }
 }
 
@@ -53,6 +88,21 @@ export async function sendMagicLinkEmail(email: string, url: string): Promise<vo
     to: email,
     templateId: env.BREVO_TEMPLATE_MAGIC_LINK,
     params: { MAGIC_LINK: url },
+  })
+}
+
+/**
+ * Double opt-in d'une demande de contact laissée en visiteur : tant que ce lien n'est pas cliqué,
+ * les coordonnées ne sont pas transmises au gestionnaire.
+ */
+export async function sendContactRequestConfirmationEmail(
+  email: string,
+  params: { url: string; accommodationName: string },
+): Promise<void> {
+  await sendTemplateEmail({
+    to: email,
+    templateId: env.BREVO_TEMPLATE_CONTACT_CONFIRMATION,
+    params: { CONFIRMATION_LINK: params.url, ACCOMMODATION_NAME: params.accommodationName },
   })
 }
 
@@ -108,6 +158,32 @@ export async function sendAlertCreationConfirmationEmail(
   }
 }
 
+export async function sendAlertExpiryReminderEmail(email: string, params: { alertName: string; alertsUrl: string }): Promise<void> {
+  if (env.NEXT_PUBLIC_APP_ENV !== 'production') {
+    console.info(`[${env.NEXT_PUBLIC_APP_ENV}] relance de péremption non envoyée à ${email}`)
+    return
+  }
+
+  await sendTemplateEmail({
+    to: email,
+    templateId: env.BREVO_TEMPLATE_ALERT_EXPIRY_REMINDER,
+    params: { alertName: params.alertName, alertsUrl: params.alertsUrl },
+  })
+}
+
+export async function sendAlertDeactivationEmail(email: string, params: { alertName: string; alertsUrl: string }): Promise<void> {
+  if (env.NEXT_PUBLIC_APP_ENV !== 'production') {
+    console.info(`[${env.NEXT_PUBLIC_APP_ENV}] désactivation d'alerte non envoyée à ${email}`)
+    return
+  }
+
+  await sendTemplateEmail({
+    to: email,
+    templateId: env.BREVO_TEMPLATE_ALERT_DEACTIVATION,
+    params: { alertName: params.alertName, alertsUrl: params.alertsUrl },
+  })
+}
+
 export async function sendStudentAlertEmail(
   email: string,
   params: { firstName: string; alertName?: string; accommodations: { nom: string; url: string }[] },
@@ -125,7 +201,7 @@ export async function sendStudentAlertEmail(
     body: JSON.stringify({
       to: [{ email }],
       templateId: env.BREVO_TEMPLATE_STUDENT_ALERT,
-      replyTo: { email: 'no-reply@monlogementetudiant.beta.gouv.fr' },
+      replyTo: { email: SENDER_EMAIL },
       params,
     }),
   })

@@ -1,11 +1,12 @@
 'use client'
 
-import { SegmentedControl } from '@codegouvfr/react-dsfr/SegmentedControl'
+import { RadioButtons } from '@codegouvfr/react-dsfr/RadioButtons'
 import { useTranslations } from 'next-intl'
 import { parseAsBoolean, parseAsInteger, useQueryStates } from 'nuqs'
 import { FC } from 'react'
 import { useAccomodations } from '~/hooks/use-accomodations'
 import { trackEvent } from '~/lib/tracking'
+import styles from './find-student-accommodation-crous-filter.module.css'
 
 export const FindStudentAccommodationCrousFilter: FC = () => {
   const t = useTranslations('findAccomodation.header')
@@ -17,28 +18,30 @@ export const FindStudentAccommodationCrousFilter: FC = () => {
   })
 
   return (
-    <SegmentedControl
+    <RadioButtons
+      className={styles.filter}
       legend={t('accommodations')}
-      segments={[
+      orientation="horizontal"
+      options={[
         {
+          label: counts ? `${t('crous')} (${counts.crous})` : t('crous'),
           nativeInputProps: {
+            checked: !!queryStates.crous,
             onChange: () => {
               trackEvent({ category: 'Recherche', action: 'filtre crous', name: 'active' })
               setQueryStates({ crous: true, page: 1 }, { shallow: false })
             },
-            checked: !!queryStates.crous,
           },
-          label: counts ? `${t('crous')} (${counts.crous})` : t('crous'),
         },
         {
+          label: counts ? `${t('others')} (${counts.others})` : t('others'),
           nativeInputProps: {
+            checked: queryStates.crous === false || queryStates.crous === null,
             onChange: () => {
               trackEvent({ category: 'Recherche', action: 'filtre crous', name: 'inactive' })
               setQueryStates({ crous: false, page: 1 }, { shallow: false })
             },
-            checked: queryStates.crous === false || queryStates.crous === null,
           },
-          label: counts ? `${t('others')} (${counts.others})` : t('others'),
         },
       ]}
     />

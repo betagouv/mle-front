@@ -13,6 +13,7 @@ export type MatomoEventCategory =
   | 'Navigation'
   | 'Engagement'
   | 'Dossier Facile'
+  | 'Contacts'
 
 type TrackEventParams = {
   category: MatomoEventCategory

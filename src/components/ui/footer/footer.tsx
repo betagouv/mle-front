@@ -22,7 +22,7 @@ export const CommonFooter = async () => {
         linkProps: {
           href: `/trouver-un-logement-etudiant/ville/${city.name}?vue=carte&bbox=${city.expandedBbox.west},${city.expandedBbox.south},${city.expandedBbox.east},${city.expandedBbox.north}`,
         },
-        text: `Logements étudiants ${city.name}`,
+        text: t('footer.cityLink', { city: city.name }),
       })),
     },
     {
@@ -30,7 +30,7 @@ export const CommonFooter = async () => {
         linkProps: {
           href: `/trouver-un-logement-etudiant/ville/${city.name}?vue=carte&bbox=${city.expandedBbox.west},${city.expandedBbox.south},${city.expandedBbox.east},${city.expandedBbox.north}`,
         },
-        text: `Logements étudiants ${city.name}`,
+        text: t('footer.cityLink', { city: city.name }),
       })),
     },
     {
@@ -38,7 +38,7 @@ export const CommonFooter = async () => {
         linkProps: {
           href: `/trouver-un-logement-etudiant/ville/${city.name}?vue=carte&bbox=${city.expandedBbox.west},${city.expandedBbox.south},${city.expandedBbox.east},${city.expandedBbox.north}`,
         },
-        text: `Logements étudiants ${city.name}`,
+        text: t('footer.cityLink', { city: city.name }),
       })),
     },
     {
@@ -46,45 +46,39 @@ export const CommonFooter = async () => {
         linkProps: {
           href: `/trouver-un-logement-etudiant/ville/${city.name}?vue=carte&bbox=${city.expandedBbox.west},${city.expandedBbox.south},${city.expandedBbox.east},${city.expandedBbox.north}`,
         },
-        text: `Logements étudiants ${city.name}`,
+        text: t('footer.cityLink', { city: city.name }),
       })),
     },
   ]
 
+  // Pas d'attribut title dupliquant l'intitulé du lien (RGAA 6.1) ; il n'est conservé que
+  // pour signaler l'ouverture d'une nouvelle fenêtre (RGAA 13.2), que le DSFR applique
+  // automatiquement aux liens externes.
   const bottomItems: FooterProps['bottomItems'] = [
     {
-      linkProps: {
-        href: '/politique-de-confidentialite',
-        title: 'Politique de confidentialité',
-      },
-      text: 'Politique de confidentialité',
+      linkProps: { href: '/politique-de-confidentialite' },
+      text: t('footer.bottom.privacy'),
     },
     {
-      linkProps: {
-        href: '/budget',
-        title: 'Budget Mon Logement Étudiant',
-      },
-      text: 'Budget Mon Logement Étudiant',
+      linkProps: { href: '/budget' },
+      text: t('footer.bottom.budget'),
     },
     {
-      linkProps: {
-        href: '/simuler-budget',
-        title: 'Calculatrice de budget étudiant',
-      },
-      text: 'Calculatrice de budget étudiant',
+      linkProps: { href: '/simuler-budget' },
+      text: t('footer.bottom.budgetCalculator'),
     },
     {
       linkProps: {
         href: 'https://info.monlogementetudiant.beta.gouv.fr/conditions-generales-dutilisation/',
-        title: "Conditions générales d'utilisation",
+        title: t('accessibility.linkNewWindow', { label: t('footer.bottom.terms') }),
       },
-      text: "Conditions générales d'utilisation",
+      text: t('footer.bottom.terms'),
     },
   ]
 
   const linkListTitle = (
     <span className="fr-text--bold fr-text--xs fr-m-0" style={{ paddingBottom: '12px', display: 'inline-block', fontSize: '12px' }}>
-      Villes étudiantes
+      {t('footer.linkList.citiesCategoryName')}
     </span>
   )
   return (
@@ -103,7 +97,7 @@ export const CommonFooter = async () => {
       }}
       contentDescription={
         <>
-          <span style={{ fontWeight: 'bold' }}>Mon Logement Étudiant</span>
+          <span style={{ fontWeight: 'bold' }}>{t('footer.brand')}</span>
           <br />
           {t('header.description')}
         </>
@@ -113,6 +107,7 @@ export const CommonFooter = async () => {
         href: 'https://info.monlogementetudiant.beta.gouv.fr/mentions-legales/',
         target: '_blank',
         rel: 'noopener noreferrer',
+        title: t('accessibility.linkNewWindow', { label: t('footer.legalNotice') }),
       }}
       websiteMapLinkProps={{
         href: '/plan-du-site',

@@ -4,11 +4,10 @@ import Badge from '@codegouvfr/react-dsfr/Badge'
 import Card from '@codegouvfr/react-dsfr/Card'
 import Tag from '@codegouvfr/react-dsfr/Tag'
 import clsx from 'clsx'
-import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { FC } from 'react'
 import { tss } from 'tss-react'
-import { FAVORITE_BUTTON_TITLES, SaveAccommodationFavoriteButton } from '~/components/favorites/save-accommodation-favorite-button'
+import { SaveAccommodationFavoriteButton } from '~/components/favorites/save-accommodation-favorite-button'
 import {
   FindStudentAccommodationImageCard,
   FindStudentAccommodationPlaceholderImageCard,
@@ -17,15 +16,18 @@ import { AvailabilityBadge } from '~/components/shared/availability-badge'
 import { TooltipHoverOnly } from '~/components/tooltip-hover-only'
 import { TUser } from '~/lib/types'
 import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
+import type { TFavoriteApplicationKind } from '~/server/trpc/routers/favorites'
 import { calculateAvailability } from '~/utils/calculateAvailability'
+import { ApplicationStatus } from './application-status'
 
 type StudentAccommodationFavoriteProps = {
   accomodation: TAccomodationCard
   user?: TUser
+  /** Candidature déjà déposée sur cette résidence, le cas échéant. */
+  application?: TFavoriteApplicationKind | null
 }
-export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps> = ({ accomodation, user }) => {
+export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps> = ({ accomodation, user, application }) => {
   const t = useTranslations('findAccomodation.card')
-  const router = useRouter()
   const { classes } = useStyles()
   const { city, imagesUrls, name, nbTotalApartments, postalCode, priceMin } = accomodation
   const nbAvailable = calculateAvailability(accomodation.typologies)
@@ -33,18 +35,10 @@ export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps>
     <AvailabilityBadge nbAvailable={nbAvailable} noAvailabilityText={t('noAvailability')} availabilityText={t('availability')} as="span" />
   )
 
-  const handleCardClick = (event: React.MouseEvent) => {
-    const target = event.target as HTMLElement
-    if (target.closest(`button[title="${FAVORITE_BUTTON_TITLES.ADD}"], button[title="${FAVORITE_BUTTON_TITLES.REMOVE}"]`)) {
-      return
-    }
-    router.push(redirectUri)
-  }
-
   const accommodationsTypes = accomodation.nbColivingApartments ? [t('individual'), t('colocation')] : [t('individual')]
   const imageProps =
     imagesUrls && imagesUrls.length > 0
-      ? { imageComponent: <FindStudentAccommodationImageCard image={imagesUrls[0]} name={name} /> }
+      ? { imageComponent: <FindStudentAccommodationImageCard image={imagesUrls[0]} /> }
       : {
           imageComponent: <FindStudentAccommodationPlaceholderImageCard id={accomodation.id} />,
         }
@@ -61,13 +55,16 @@ export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps>
       {...badgeProps}
       {...imageProps}
       classes={{
+        footer: classes.footer,
         header: classes.header,
         root: classes.hover,
+        start: classes.start,
       }}
       id={`accomodation-${accomodation.id}`}
       background
       border
-      nativeDivProps={{ onClick: handleCardClick }}
+      enlargeLink
+      linkProps={{ href: redirectUri }}
       desc={
         <>
           <span className={clsx('ri-group-line', classes.description)}>{accommodationsTypes.join(' • ')}</span>
@@ -102,6 +99,7 @@ export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps>
           <SaveAccommodationFavoriteButton slug={accomodation.slug} user={user} />
         </div>
       }
+      footer={application ? <ApplicationStatus kind={application} /> : undefined}
       size="small"
       title={name}
       titleAs="h2"
@@ -110,6 +108,14 @@ export const StudentAccommodationFavorite: FC<StudentAccommodationFavoriteProps>
 }
 
 export const useStyles = tss.create({
+  start: {
+    position: 'relative',
+    zIndex: 1,
+  },
+  footer: {
+    paddingLeft: '0 !important',
+    paddingRight: '0 !important',
+  },
   header: {
     overflow: 'hidden',
   },

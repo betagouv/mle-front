@@ -1,7 +1,6 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
-import Button from '@codegouvfr/react-dsfr/Button'
+import { SegmentedControl } from '@codegouvfr/react-dsfr/SegmentedControl'
 import { useTranslations } from 'next-intl'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { FC } from 'react'
@@ -35,43 +34,43 @@ export const FindStudentAccomodationSortView: FC<FindStudentAccomodationSortView
       : `${t('accommodations')}${sPluriel(accommodations?.count ?? 0)}`
   return (
     <div className={classes.headerContainer}>
-      {accommodations && accommodations.count > 0 && (
-        <h2 className="h4">
-          {accommodations.count} {title}
-        </h2>
-      )}
+      <div role="status" aria-live="polite">
+        {accommodations && accommodations.count > 0 && (
+          <h2 className="h4">
+            {accommodations.count} {title}
+          </h2>
+        )}
+      </div>
       <div className={classes.container}>
-        {/* Implement it as soon as we have differents sorting strategies */}
-        {/* <Select label="" nativeSelectProps={{}}>
-          <option disabled hidden defaultValue={t('sortByPrice')} selected>
-            {t('sortByPrice')}
-          </option>
-        </Select> */}
-        <div className={fr.cx('fr-hidden', 'fr-unhidden-md')}>
-          <div>
-            <Button
-              iconId="ri-layout-grid-2-line"
-              priority={queryStates.vue === 'grille' ? 'secondary' : 'tertiary'}
-              className={classes.button}
-              onClick={() => {
-                trackEvent({ category: 'Recherche', action: 'changement vue', name: 'grille' })
-                setQueryStates({ vue: 'grille' })
-              }}
-            >
-              {t('grid')}
-            </Button>
-            <Button
-              iconId="ri-road-map-fill"
-              priority={queryStates.vue === 'carte' ? 'secondary' : 'tertiary'}
-              className={classes.button}
-              onClick={() => {
-                trackEvent({ category: 'Recherche', action: 'changement vue', name: 'carte' })
-                setQueryStates({ vue: 'carte' })
-              }}
-            >
-              {t('map')}
-            </Button>
-          </div>
+        <div className="fr-hidden fr-unhidden-md">
+          <SegmentedControl
+            hideLegend
+            legend={t('view')}
+            segments={[
+              {
+                label: t('grid'),
+                iconId: 'ri-layout-grid-2-line',
+                nativeInputProps: {
+                  checked: queryStates.vue === 'grille',
+                  onChange: () => {
+                    trackEvent({ category: 'Recherche', action: 'changement vue', name: 'grille' })
+                    setQueryStates({ vue: 'grille' })
+                  },
+                },
+              },
+              {
+                label: t('map'),
+                iconId: 'ri-road-map-fill',
+                nativeInputProps: {
+                  checked: queryStates.vue === 'carte',
+                  onChange: () => {
+                    trackEvent({ category: 'Recherche', action: 'changement vue', name: 'carte' })
+                    setQueryStates({ vue: 'carte' })
+                  },
+                },
+              },
+            ]}
+          />
         </div>
       </div>
     </div>
@@ -87,9 +86,6 @@ const useStyles = tss.withParams<{ hasResults?: boolean }>().create(({ hasResult
       opacity: 0.5,
     },
   },
-  button: {
-    borderRadius: '0.25rem',
-  },
   container: {
     display: 'flex',
     gap: '1rem',
@@ -97,6 +93,7 @@ const useStyles = tss.withParams<{ hasResults?: boolean }>().create(({ hasResult
   headerContainer: {
     display: 'flex',
     justifyContent: hasResults ? 'space-between' : 'flex-end',
+    alignItems: 'start',
   },
   title: {
     animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',

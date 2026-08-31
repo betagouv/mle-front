@@ -337,6 +337,69 @@
       "when": 1784531850693,
       "tag": "0047_housing_aid_simulation",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1784535647304,
+      "tag": "0048_contacts_space",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1785153643630,
+      "tag": "0049_contact_request_guest_details",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1785154311854,
+      "tag": "0050_contact_request_rate_limit",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1785157372640,
+      "tag": "0051_contact_request_optin_retention",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1785315205667,
+      "tag": "0052_student_alert_expiration",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1786374768600,
+      "tag": "0053_owner_update_tracking",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1786375356022,
+      "tag": "0054_owner_updated_at_default_null",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1786954115704,
+      "tag": "0055_tracking_event_partial_indexes",
+      "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1787590844847,
+      "tag": "0056_unaccent_restore_safe",
+      "breakpoints": true
     }
   ]
 }

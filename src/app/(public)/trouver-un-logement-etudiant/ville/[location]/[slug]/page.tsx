@@ -21,7 +21,9 @@ import { NearbyAccommodations } from '~/components/accommodation/nearby-accommod
 import { SaveAccommodationFavoriteButton } from '~/components/favorites/save-accommodation-favorite-button'
 import { OwnerDetails } from '~/components/find-student-accomodation/owner-details/owner-details'
 import { JsonLd } from '~/components/seo/json-ld'
+import { NewWindowHint } from '~/components/ui/new-window'
 import { getAvailableApartmentTypes } from '~/enums/apartment-type'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { EResidenceType, RESIDENCE_TYPE_LABELS } from '~/enums/residence-type'
 import { getCanonicalUrl } from '~/utils/canonical'
 import { formatCityWithA } from '~/utils/french-contraction'
@@ -168,6 +170,7 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
                     manager: (chunks) => (
                       <a href={ownerLandingUrl} target="_blank" rel="noopener noreferrer">
                         {chunks}
+                        <NewWindowHint />
                       </a>
                     ),
                   })}
@@ -197,7 +200,7 @@ export default async function AccommodationPage({ params }: { params: Promise<{ 
               isAuthenticated={!!user}
               accommodationSlug={slug}
               availableApartmentTypes={getAvailableApartmentTypes(accommodation.typologies)}
-              acceptDossierFacile={owner?.acceptDossierFacileApplications ?? false}
+              contactMode={owner?.contactMode ?? EOwnerContactMode.NONE}
             />
             <NearbyAccommodations nearbyAccommodations={nearbyAccommodations} accommodation={accommodation} />
           </div>

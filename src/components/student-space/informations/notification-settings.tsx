@@ -1,8 +1,8 @@
 'use client'
 
-import ToggleSwitch from '@codegouvfr/react-dsfr/ToggleSwitch'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
+import { ToggleSwitch } from '~/components/ui/toggle-switch'
 import { useUpdateNotificationPreferences } from '~/hooks/use-update-notification-preferences'
 
 type NotificationSettingsProps = {
@@ -31,6 +31,7 @@ export const NotificationSettings = ({ initialSimilarAlert, initialFavoriteAlert
       <ToggleSwitch
         label={t('similarAlert')}
         inputTitle="notif-similar-alert"
+        description={t('similarAlertDescription')}
         checked={similarAlert}
         onChange={handleSimilarAlertChange}
         showCheckedHint={false}
@@ -39,6 +40,7 @@ export const NotificationSettings = ({ initialSimilarAlert, initialFavoriteAlert
       <ToggleSwitch
         label={t('favoriteAlert')}
         inputTitle="notif-favorite-alert"
+        description={t('favoriteAlertDescription')}
         checked={favoriteAlert}
         onChange={handleFavoriteAlertChange}
         showCheckedHint={false}

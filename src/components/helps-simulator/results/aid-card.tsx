@@ -3,6 +3,7 @@
 import Button from '@codegouvfr/react-dsfr/Button'
 import clsx from 'clsx'
 import Image from 'next/image'
+import { useTranslations } from 'next-intl'
 import { FC } from 'react'
 import { type AidResult } from './aid-calculator'
 import styles from './aid-card.module.css'
@@ -37,6 +38,7 @@ interface AidCardProps {
 }
 
 export const AidCard: FC<AidCardProps> = ({ aid }) => {
+  const tA11y = useTranslations('accessibility')
   const logo = AID_LOGOS[aid.id]
   const link = AID_LINKS[aid.id]
   const linkLabel = AID_LINK_LABELS[aid.id]
@@ -89,7 +91,14 @@ export const AidCard: FC<AidCardProps> = ({ aid }) => {
             priority="secondary"
             iconId="ri-external-link-line"
             iconPosition="right"
-            linkProps={{ href: link, target: '_blank', rel: 'noopener noreferrer' }}
+            linkProps={{
+              href: link,
+              target: '_blank',
+              rel: 'noopener noreferrer',
+              'aria-label': tA11y('linkNewWindow', {
+                label: `${linkLabel ?? (aid.isEligible ? "Demander l'aide" : 'En savoir plus')} : ${aid.name}`,
+              }),
+            }}
           >
             {linkLabel ?? (aid.isEligible ? "Demander l'aide" : 'En savoir plus')}
           </Button>

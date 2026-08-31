@@ -1,18 +1,41 @@
 import { z } from 'zod'
 
 const isProd = process.env.NEXT_PUBLIC_APP_ENV === 'production' || process.env.NEXT_PUBLIC_APP_ENV === 'staging'
-// const isProdOnly = process.env.NEXT_PUBLIC_APP_ENV === 'production'
+const isProdOnly = process.env.NEXT_PUBLIC_APP_ENV === 'production'
 
 const optionalUrl = z.preprocess((v) => (v === '' ? undefined : v), z.url().optional())
 const requiredInProdUrl = isProd ? z.url() : optionalUrl
 // const requiredInProdOnlyUrl = isProdOnly ? z.url() : optionalUrl
 const requiredInProd = isProd ? z.string().min(1) : z.string().optional()
+/** Requis en production seulement — staging n'a pas l'équivalent (backups, par exemple). */
+const requiredInProdOnly = isProdOnly ? z.string().min(1) : z.string().optional()
 
 const envSchema = z.object({
   // Core
   BASE_URL: z.url(),
   AUTH_SECRET: z.string().min(1),
   DATABASE_URL: z.string().min(1),
+
+  // Nombre maximum de connexions ouvertes par process (voir `src/server/db/index.ts`). Laisser vide
+  // pour la valeur par défaut, qui dépend du type de process : le plafond de la base est partagé
+  // entre tous les containers, tous les one-off et toutes les sessions psql.
+  DATABASE_POOL_MAX: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.number().int().positive().optional()),
+
+  // Alerting des crons : destinataires du mail envoyé quand un job planifié échoue.
+  // Liste séparée par des virgules. Vide (ou absente) = aucun envoi, on se contente d'un
+  // log — c'est l'interrupteur de la fonctionnalité, il n'y a pas de garde sur l'APP_ENV.
+  CRON_FAILURE_EMAILS: z
+    .string()
+    .optional()
+    .transform((v) =>
+      v
+        ? v
+            .split(',')
+            .map((email) => email.trim())
+            .filter(Boolean)
+        : [],
+    )
+    .pipe(z.array(z.email({ message: 'CRON_FAILURE_EMAILS doit contenir des adresses email séparées par des virgules' }))),
 
   // Brevo (email)
   BREVO_API_KEY: z.string().min(1, 'BREVO_API_KEY is required'),
@@ -26,6 +49,9 @@ const envSchema = z.object({
   BREVO_TEMPLATE_ADMIN_RESET_PASSWORD: z.coerce.number().int().positive(),
   BREVO_TEMPLATE_STUDENT_ALERT: z.coerce.number().int().positive(),
   BREVO_TEMPLATE_ALERT_CREATION: z.coerce.number().int().positive(),
+  BREVO_TEMPLATE_ALERT_EXPIRY_REMINDER: z.coerce.number().int().positive(),
+  BREVO_TEMPLATE_ALERT_DEACTIVATION: z.coerce.number().int().positive(),
+  BREVO_TEMPLATE_CONTACT_CONFIRMATION: z.coerce.number().int().positive(),
 
   // S3
   S3_ENDPOINT: z.url(),
@@ -33,7 +59,19 @@ const envSchema = z.object({
   S3_BUCKET: z.string().min(1),
   S3_ACCESS_KEY_ID: z.string().min(1),
   S3_SECRET_ACCESS_KEY: z.string().min(1),
-  S3_SUFFIX_DIR: z.string().default(''),
+  /**
+   * Bucket dédié aux backups de la base, distinct du bucket applicatif : un dump contient
+   * toute la PII, il n'a rien à faire dans le bucket qui sert les médias en `public-read`.
+   * Mêmes identifiants et même endpoint que `S3_BUCKET` (même compte OVH).
+   *
+   * Production seulement : on ne sauvegarde pas la base de staging.
+   */
+  S3_BACKUP_BUCKET: requiredInProdOnly,
+
+  // Taille du cache d'images en mémoire de chaque container, en Mo. Lu directement par
+  // cache-handler.mjs, qui tourne hors du graphe de modules de l'app : déclaré ici pour
+  // rester documenté et validé au démarrage, pas pour y être importé.
+  IMAGE_CACHE_MEMORY_MB: z.coerce.number().int().positive().default(128),
 
   // Geocoding
   GEOCODING_API_URL: z.url().default('https://data.geopf.fr/geocodage/search'),
@@ -68,10 +106,11 @@ const envSchema = z.object({
   MATOMO_TOKEN: requiredInProd,
   MATOMO_ID_SITE: requiredInProd,
 
-  // CLI : Scalingo backup -- Local env only
+  // CLI : API Scalingo — `import-backup` en local, et le cron `backup-db` en production.
+  // Laissées optionnelles : les rendre requises ferait échouer le boot de l'app web, alors
+  // que `ScalingoBackupService` lève déjà une erreur explicite qui déclenche le mail d'échec.
   SCALINGO_API_TOKEN: z.string().optional(),
   SCALINGO_APP: z.string().optional(),
-  SCALINGO_DB_ADDON_ID: z.string().optional(),
   SCALINGO_REGION: z.string().default('osc-secnum-fr1'),
 
   // CLI : FacHabitat SFTP

@@ -81,6 +81,33 @@ beforeEach(() => {
 })
 
 describe('import-fac-habitat integration', () => {
+  it('resolves the owner by slug even when it was renamed (chemin des crons)', async () => {
+    const db = getTestDb()
+
+    const owner = await createOwner({ name: 'FAC HABITAT (renommé)', slug: 'fac-habitat' })
+
+    const filePath = writeTmpJson([makeResidence()])
+    mockGeocoder()
+
+    const result = await command.execute({ file: filePath, ownerSlug: 'fac-habitat', verbose: true })
+
+    expect(result.errors).toHaveLength(0)
+    expect(result.ownerId).toBe(owner.id)
+    expect(result.ownerName).toBe('FAC HABITAT (renommé)')
+
+    // Le nom codé en dur dans la commande ne doit pas créer de second bailleur.
+    expect(await db.select().from(owners).where(eq(owners.name, 'Fac-Habitat'))).toHaveLength(0)
+  })
+
+  it('fails when the owner slug is unknown', async () => {
+    const filePath = writeTmpJson([makeResidence()])
+    mockGeocoder()
+
+    await expect(command.execute({ file: filePath, ownerSlug: 'bailleur-inexistant' })).rejects.toThrow(
+      'Bailleur introuvable : slug=bailleur-inexistant',
+    )
+  })
+
   it('creates accommodation and external source from JSON file', async () => {
     const db = getTestDb()
 

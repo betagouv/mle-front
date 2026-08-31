@@ -16,16 +16,11 @@ export const CitiesAutocompleteResults: FC<AutocompleteResultsProps> = ({ data }
     <div className={classes.container}>
       <ul className={classes.list}>
         {data.map((item: TCity) => (
-          <Link
-            key={item.id}
-            href={{
-              pathname: `/preparer-sa-vie-etudiante/${item.name}`,
-            }}
-          >
-            <li className={classes.item} key={item.id}>
+          <li className={classes.item} key={item.id}>
+            <Link className={classes.itemLink} href={{ pathname: `/preparer-sa-vie-etudiante/${item.name}` }}>
               {item.name}
-            </li>
-          </Link>
+            </Link>
+          </li>
         ))}
       </ul>
     </div>
@@ -49,7 +44,14 @@ const useStyles = tss.create({
     borderBottom: '1px solid #e0e0e0',
     borderTop: '1px solid #e0e0e0',
     cursor: 'pointer',
+  },
+  itemLink: {
+    backgroundImage: 'none',
+    color: 'inherit',
+    display: 'block',
     padding: '8px',
+    textDecoration: 'none',
+    width: '100%',
   },
   list: {
     backgroundColor: 'white',

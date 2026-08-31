@@ -1,61 +1,29 @@
 'use client'
 
-import Breadcrumb from '@codegouvfr/react-dsfr/Breadcrumb'
-import Button from '@codegouvfr/react-dsfr/Button'
-import { Tabs } from '@codegouvfr/react-dsfr/Tabs'
 import { useQuery } from '@tanstack/react-query'
-import { notFound, useSearchParams } from 'next/navigation'
-import { type ReactNode } from 'react'
-import { CandidatureDetailAccommodation } from '~/components/bailleur/candidatures/candidature-detail-accommodation'
-import { CandidatureDetailDossier } from '~/components/bailleur/candidatures/candidature-detail-dossier'
-import { CandidatureDetailSuivi } from '~/components/bailleur/candidatures/candidature-detail-suivi'
-import { useSignedDocumentUrl } from '~/hooks/use-signed-document-url'
-import { TAccomodationCard } from '~/schemas/accommodations/accommodations'
+import { notFound } from 'next/navigation'
+import { useTranslations } from 'next-intl'
+import { ContactDetailAbout } from '~/components/bailleur/contacts/contact-detail-about'
+import { ContactDetailActions } from '~/components/bailleur/contacts/contact-detail-actions'
+import { ContactDetailDossierFacile } from '~/components/bailleur/contacts/contact-detail-dossier-facile'
+import { ContactDetailLayout } from '~/components/bailleur/contacts/contact-detail-layout'
+import { EContactSource } from '~/enums/contact-source'
 import { useTRPC } from '~/server/trpc/client'
-import { buildHref } from '~/utils/preserve-query-params'
-
-type DocumentItem = { id: string; documentCategory: string; documentSubCategory: string | null }
-
-const TabLayout = ({
-  children,
-  dfTenantId,
-  hasPdfUrl,
-  documents,
-  accommodation,
-}: {
-  dfTenantId: string
-  hasPdfUrl: boolean
-  documents: { tenant: DocumentItem[]; guarantor: DocumentItem[] }
-  accommodation: TAccomodationCard
-  children: ReactNode
-}) => (
-  <div className="fr-grid-row fr-grid-row--gutters">
-    <div className="fr-col-12 fr-col-md-7">{children}</div>
-    <div className="fr-col-12 fr-col-md-5">
-      <CandidatureDetailAccommodation
-        accommodationCard={accommodation}
-        dfTenantId={dfTenantId}
-        hasPdfUrl={hasPdfUrl}
-        documents={documents}
-      />
-    </div>
-  </div>
-)
 
 interface CandidatureDetailProps {
   id: string
+  slug: string
 }
 
-export const CandidatureDetail = ({ id }: CandidatureDetailProps) => {
+export const CandidatureDetail = ({ id, slug }: CandidatureDetailProps) => {
+  const t = useTranslations('bailleur.contacts')
   const trpc = useTRPC()
-  const searchParams = useSearchParams()
   const { data: candidature, isLoading } = useQuery(trpc.bailleur.getCandidature.queryOptions({ id }))
-  const { openDocument, isLoading: isOpeningDocument } = useSignedDocumentUrl()
 
   if (isLoading) {
     return (
       <div className="fr-container fr-pb-12w">
-        <p>Chargement...</p>
+        <p>{t('loading')}</p>
       </div>
     )
   }
@@ -63,61 +31,14 @@ export const CandidatureDetail = ({ id }: CandidatureDetailProps) => {
   if (!candidature) return notFound()
 
   return (
-    <div className="fr-container fr-pb-12w">
-      <Breadcrumb
-        currentPageLabel={candidature.studentName ?? 'Candidat'}
-        segments={[
-          { label: 'Tableau de bord', linkProps: { href: buildHref('/bailleur/tableau-de-bord', searchParams) } },
-          { label: 'Gestions de candidatures', linkProps: { href: buildHref('/bailleur/candidatures', searchParams) } },
-        ]}
-        classes={{ root: 'fr-mt-0 fr-mb-2w fr-pt-4w' }}
-      />
+    <ContactDetailLayout
+      contact={candidature}
+      slug={slug}
+      actions={<ContactDetailActions contact={candidature} source={EContactSource.DOSSIER_FACILE} dfTenantId={candidature.dfTenantId} />}
+    >
+      <ContactDetailAbout contact={candidature} />
 
-      <div className="fr-flex fr-justify-content-space-between fr-align-items-center fr-mb-4w">
-        <h1 className="fr-h2 fr-mb-0">Candidature de {candidature.studentName ?? 'Candidat'}</h1>
-        {candidature.hasTenantUrl && (
-          <Button
-            priority="primary"
-            iconId="ri-external-link-line"
-            iconPosition="right"
-            onClick={() => openDocument('tenantUrl', candidature.dfTenantId)}
-            disabled={isOpeningDocument}
-          >
-            {isOpeningDocument ? 'Ouverture...' : 'Consulter le DossierFacile'}
-          </Button>
-        )}
-      </div>
-
-      <hr className="fr-mt-0 fr-mb-0" />
-
-      <Tabs
-        tabs={[
-          {
-            label: 'Dossier',
-            content: (
-              <TabLayout
-                accommodation={candidature.accommodation}
-                dfTenantId={candidature.dfTenantId}
-                hasPdfUrl={candidature.hasPdfUrl}
-                documents={candidature.documents}
-                children={<CandidatureDetailDossier apartmentType={candidature.apartmentType} />}
-              />
-            ),
-          },
-          {
-            label: 'Suivi',
-            content: (
-              <TabLayout
-                accommodation={candidature.accommodation}
-                dfTenantId={candidature.dfTenantId}
-                hasPdfUrl={candidature.hasPdfUrl}
-                documents={candidature.documents}
-                children={<CandidatureDetailSuivi status={candidature.status} />}
-              />
-            ),
-          },
-        ]}
-      />
-    </div>
+      <ContactDetailDossierFacile candidature={candidature} />
+    </ContactDetailLayout>
   )
 }

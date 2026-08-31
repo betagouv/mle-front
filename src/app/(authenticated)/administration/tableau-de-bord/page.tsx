@@ -81,6 +81,8 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      <ScholarshipBreakdown data={data} isLoading={isLoading} />
+
       <KeyFigures data={data} isLoading={isLoading} />
 
       <MyLinkedOwners />
@@ -284,6 +286,37 @@ function LinkSelfToOwnerDialog({ userId }: { userId: string }) {
   )
 }
 
+function ScholarshipBreakdown({ data, isLoading }: { data: ReturnType<typeof useAdminStats>['data']; isLoading: boolean }) {
+  const fmt = (n: number) => n.toLocaleString('fr-FR')
+
+  const lines = [
+    { label: 'Boursiers', value: data?.users.boursiers ?? 0 },
+    { label: 'Non-boursiers', value: data?.users.nonBoursiers ?? 0 },
+    { label: 'Non renseigné', value: data?.users.bourseNonRenseignee ?? 0 },
+  ]
+
+  return (
+    <div className="fr-mb-3w">
+      <div className={styles.card}>
+        <div className={styles.cardHeader}>
+          <span className={styles.cardTitle}>
+            <span className="fr-icon-award-line fr-icon--sm fr-mr-1w" aria-hidden="true" />
+            Bourses des étudiants inscrits
+          </span>
+        </div>
+        <div className={styles.kpiRow}>
+          {lines.map((line) => (
+            <div key={line.label} className={styles.kpiItem}>
+              <div className={styles.kpiValue}>{isLoading ? '-' : fmt(line.value)}</div>
+              <div className={styles.kpiLabel}>{line.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function KeyFigures({ data, isLoading }: { data: ReturnType<typeof useAdminStats>['data']; isLoading: boolean }) {
   const fmt = (n: number) => n.toLocaleString('fr-FR')
 
@@ -305,9 +338,13 @@ function KeyFigures({ data, isLoading }: { data: ReturnType<typeof useAdminStats
   ]
 
   const dispoLines = [
-    { label: 'Avec dispo', value: data?.disponibilite.avecDispo ?? 0 },
-    { label: '0 logement dispo', value: data?.disponibilite.sansDispo ?? 0 },
-    { label: 'Non renseignée', value: data?.disponibilite.nonRenseignee ?? 0 },
+    {
+      label: 'Résidences avec dispo',
+      value: data?.disponibilite.avecDispo ?? 0,
+      sub: `${fmt(data?.disponibilite.logementsDisponibles ?? 0)} logements disponibles`,
+    },
+    { label: 'Sans logement disponible', value: data?.disponibilite.sansDispo ?? 0, sub: null },
+    { label: 'Non renseignée', value: data?.disponibilite.nonRenseignee ?? 0, sub: null },
   ]
 
   return (
@@ -351,6 +388,7 @@ function KeyFigures({ data, isLoading }: { data: ReturnType<typeof useAdminStats
               <div key={line.label} className={styles.kpiItem}>
                 <div className={styles.kpiValue}>{isLoading ? '-' : fmt(line.value)}</div>
                 <div className={styles.kpiLabel}>{line.label}</div>
+                {line.sub && <div className={styles.kpiSubValue}>{isLoading ? '' : line.sub}</div>}
               </div>
             ))}
           </div>

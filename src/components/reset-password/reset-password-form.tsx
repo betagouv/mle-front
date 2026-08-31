@@ -1,16 +1,16 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import Alert from '@codegouvfr/react-dsfr/Alert'
 import Button from '@codegouvfr/react-dsfr/Button'
-import Input from '@codegouvfr/react-dsfr/Input'
+import { PasswordInput } from '@codegouvfr/react-dsfr/blocks/PasswordInput'
 import { zodResolver } from '@hookform/resolvers/zod'
-import clsx from 'clsx'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { FC, useState } from 'react'
+import { FC } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { tss } from 'tss-react'
+import { RequiredLabel } from '~/components/ui/required-mark'
+import { usePasswordRuleMessages } from '~/hooks/use-password-rule-messages'
 import { useResetPassword } from '~/hooks/use-reset-password'
 import { trackEvent } from '~/lib/tracking'
 import { ZResetPasswordForm } from '~/schemas/reset-password/reset-password'
@@ -19,7 +19,6 @@ export const ResetPasswordForm: FC = () => {
   const searchParams = useSearchParams()
   const token = searchParams.get('token')
 
-  const [passwordState, setPasswordState] = useState({ password: false, confirmPassword: false })
   const t = useTranslations('resetPassword')
   const { classes } = useStyles()
   const { mutateAsync, isLoading, isSuccess } = useResetPassword()
@@ -54,58 +53,26 @@ export const ResetPasswordForm: FC = () => {
 
   const { errors } = resetPasswordForm.formState
   const { password, confirmPassword } = errors || {}
+  const passwordRules = usePasswordRuleMessages(!!password)
   return (
     <FormProvider {...resetPasswordForm}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className={classes.formContainer}>
           <div className={classes.inputContainer}>
-            <Input
-              addon={
-                <Button
-                  iconId="ri-eye-line"
-                  priority="tertiary"
-                  type="button"
-                  title="Afficher le mot de passe"
-                  nativeButtonProps={{ onClick: () => setPasswordState({ ...passwordState, password: !passwordState.password }) }}
-                />
-              }
-              state={password ? 'error' : undefined}
-              stateRelatedMessage={password?.message}
-              hintText={t('labels.newPasswordDescription')}
-              label={
-                <>
-                  {t('labels.newPassword')}
-                  &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-                </>
-              }
+            <PasswordInput
+              label={<RequiredLabel>{t('labels.newPassword')}</RequiredLabel>}
+              messagesHint={passwordRules.messagesHint}
+              messages={passwordRules.messages}
               nativeInputProps={{
                 ...register('password'),
-                type: passwordState.password ? 'text' : 'password',
               }}
             />
-            <Input
-              addon={
-                <Button
-                  iconId="ri-eye-line"
-                  priority="tertiary"
-                  type="button"
-                  title="Afficher le mot de passe"
-                  nativeButtonProps={{
-                    onClick: () => setPasswordState({ ...passwordState, confirmPassword: !passwordState.confirmPassword }),
-                  }}
-                />
-              }
-              state={confirmPassword ? 'error' : undefined}
-              stateRelatedMessage={confirmPassword?.message}
-              label={
-                <>
-                  {t('labels.confirmPassword')}
-                  &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-                </>
-              }
+            <PasswordInput
+              label={<RequiredLabel>{t('labels.confirmPassword')}</RequiredLabel>}
+              messagesHint=""
+              messages={confirmPassword ? [{ severity: 'error', message: confirmPassword.message ?? '' }] : []}
               nativeInputProps={{
                 ...register('confirmPassword'),
-                type: passwordState.confirmPassword ? 'text' : 'password',
               }}
             />
           </div>
@@ -131,8 +98,5 @@ const useStyles = tss.create({
     display: 'flex',
     flexDirection: 'column',
     gap: '2rem',
-  },
-  required: {
-    color: 'red',
   },
 })

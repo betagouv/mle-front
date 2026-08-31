@@ -1,11 +1,17 @@
 import clsx from 'clsx'
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { CreateStudentAlert } from '~/components/student-space/alerts/create-student-alert'
 import { StudentAlerts } from '~/components/student-space/alerts/student-alerts'
-import { StudentAlertsNotificationToggle } from '~/components/student-space/alerts/student-alerts-notification-toggle'
+import { NotificationToggle } from '~/components/student-space/notification-toggle'
 import { getNotificationPreferences } from '~/server/student/get-notification-preferences'
 import { getServerSession } from '~/services/better-auth'
 import styles from '../mon-espace.module.css'
+
+export const generateMetadata = async () => {
+  const t = await getTranslations('breadcrumbs.student')
+  return { title: t('alerts.title') }
+}
 
 export default async function StudentAlertsPage() {
   const auth = await getServerSession()
@@ -26,7 +32,13 @@ export default async function StudentAlertsPage() {
         )}
       >
         <div className="fr-width-full fr-px-2w">
-          <StudentAlertsNotificationToggle email={auth.user.email} initialChecked={notifPrefs.similarAccommodationAlertsEnabled} />
+          <NotificationToggle
+            email={auth.user.email}
+            initialChecked={notifPrefs.similarAccommodationAlertsEnabled}
+            preference="similarAccommodationAlertsEnabled"
+            translationNamespace="student.alerts"
+            inputTitle="notif-similar-alert"
+          />
         </div>
         <StudentAlerts />
         <CreateStudentAlert />

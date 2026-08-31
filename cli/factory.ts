@@ -3,6 +3,7 @@ import type { TImportJobType } from '~/schemas/import-jobs'
 import { closeDb, db } from '~/server/db'
 import { accommodations, importJobs } from '~/server/db/schema'
 import { detectAlertJobs } from '~/server/services/alert-detector'
+import { CronPartialFailure } from './cron-failure'
 import { captureCliException } from './sentry'
 import type { ImportCommand, ImportOptions, ImportResult, SyncCommand, SyncOptions, SyncResult } from './types'
 
@@ -49,6 +50,9 @@ export async function runImport(type: string, options: ImportOptions): Promise<v
   if (options.dryRun) console.log('  (mode dry-run)')
 
   let jobId: number | null = null
+  // Échec partiel : levé après le `finally`, pour ne pas repasser par le `catch` ci-dessous
+  // qui écraserait le statut `done` et son résumé détaillé.
+  let partialFailure: CronPartialFailure | null = null
 
   if (!options.dryRun) {
     const [job] = await db
@@ -100,6 +104,12 @@ export async function runImport(type: string, options: ImportOptions): Promise<v
         await captureCliException(error)
       }
     }
+
+    // Le run a abouti et le job est marqué `done`, mais des éléments sont passés à la trappe :
+    // on sort quand même en échec pour que le cron le signale (mail + Sentry + Scalingo).
+    if (result.errors.length > 0) {
+      partialFailure = new CronPartialFailure(`Import ${type} : ${result.errors.length} erreur(s) sur des éléments`, result.errors)
+    }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
     console.error(`\n❌ Import échoué : ${msg}`)
@@ -113,6 +123,8 @@ export async function runImport(type: string, options: ImportOptions): Promise<v
   } finally {
     await closeDb()
   }
+
+  if (partialFailure) throw partialFailure
 }
 
 export async function runSync(type: string, options: SyncOptions): Promise<void> {
@@ -128,6 +140,8 @@ export async function runSync(type: string, options: SyncOptions): Promise<void>
 
   const jobType = `sync-${type}` as TImportJobType
   let jobId: number | null = null
+  // Voir `runImport` : levé après le `finally` pour préserver le statut `done`.
+  let partialFailure: CronPartialFailure | null = null
 
   if (!options.dryRun) {
     const [job] = await db
@@ -163,6 +177,10 @@ export async function runSync(type: string, options: SyncOptions): Promise<void>
         })
         .where(eq(importJobs.id, jobId))
     }
+
+    if (result.errors.length > 0) {
+      partialFailure = new CronPartialFailure(`Sync ${type} : ${result.errors.length} erreur(s) sur des éléments`, result.errors)
+    }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error)
     console.error(`\n❌ Sync échouée : ${msg}`)
@@ -176,4 +194,6 @@ export async function runSync(type: string, options: SyncOptions): Promise<void>
   } finally {
     await closeDb()
   }
+
+  if (partialFailure) throw partialFailure
 }

@@ -10,13 +10,19 @@ export const ZImportJobType = z.enum([
   'sync-students',
   'sync-stats',
   'alert-detection',
+  'alert-expiration',
+  'purge-contacts',
+  'purge-logs',
+  'backup-db',
 ])
 export type TImportJobType = z.infer<typeof ZImportJobType>
 
-// Tout ce qui ne contient pas "sync" est un import (vs. job de synchro/cron).
-// La détection d'alertes n'est ni un import ni une synchro de données → traitée comme un cron.
+// Crons qui ne touchent pas aux résidences : ni import, ni synchro de données.
+const MAINTENANCE_JOB_TYPES: string[] = ['alert-detection', 'alert-expiration', 'purge-contacts', 'purge-logs', 'backup-db']
+
+// Tout ce qui ne contient pas "sync" et n'est pas un job de maintenance est un import.
 export function isImportJob(type: string): boolean {
-  return !type.includes('sync') && type !== 'alert-detection'
+  return !type.includes('sync') && !MAINTENANCE_JOB_TYPES.includes(type)
 }
 
 export const IMPORT_JOB_TYPES = ZImportJobType.options.filter(isImportJob)
@@ -41,5 +47,9 @@ export const ZImportJobSummary = z.object({
   ownerName: z.string().optional(),
   residences: z.array(ZImportJobResidence).optional(),
   context: z.record(z.string(), z.unknown()).optional(),
+  // Purge RGPD des candidatures (`purge-contacts`)
+  deleted: z.number().optional(),
+  anonymized: z.number().optional(),
+  dossiersPurged: z.number().optional(),
 })
 export type TImportJobSummary = z.infer<typeof ZImportJobSummary>

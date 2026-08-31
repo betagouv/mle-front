@@ -1,0 +1,47 @@
+/* Liseré bas coloré par statut (couleur posée en inline style) + affordance de drag. */
+.card {
+  position: relative;
+  border-bottom-width: 0.25rem;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.card[aria-pressed="true"],
+.card:active {
+  cursor: grabbing;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 18, 0.16);
+}
+
+.overlay {
+  box-shadow: 0 8px 24px rgba(0, 0, 18, 0.24);
+  cursor: grabbing;
+}
+
+.nameActive {
+  color: var(--text-active-blue-france);
+}
+
+.cardLink {
+  --icon-size: 1rem;
+  --hover: transparent;
+  --active: transparent;
+
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-color: transparent;
+}
+
+.cardLink:hover,
+.cardLink:active {
+  background-color: transparent;
+}
+
+.cardLink::before {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+}

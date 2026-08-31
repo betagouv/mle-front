@@ -1,6 +1,7 @@
 import { TRPCError } from '@trpc/server'
 import { and, eq, notInArray, type SQL, sql } from 'drizzle-orm'
 import { z } from 'zod'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { EXPANDED_SEARCH_PAGE_SIZE, EXPANDED_SEARCH_RADIUS_KM } from '~/lib/accommodations-expanded-search'
 import type { TAccomodation } from '~/schemas/accommodations/accommodations'
 import {
@@ -200,7 +201,7 @@ export const accommodationsRouter = createTRPCRouter({
         ownerUrl: owners.url,
         ownerLandingUrl: owners.landingUrl,
         ownerImage: owners.image,
-        ownerAcceptDossierFacile: owners.acceptDossierFacileApplications,
+        ownerContactMode: owners.contactMode,
         citySlug: cities.slug,
         cityBbox: bboxSelect(cities),
         departmentCode: departments.code,
@@ -295,7 +296,7 @@ export const accommodationsRouter = createTRPCRouter({
             url: row.ownerUrl ?? '',
             landingUrl: row.ownerLandingUrl ?? null,
             imageBase64: row.ownerImage ? `data:image/jpeg;base64,${Buffer.from(row.ownerImage).toString('base64')}` : null,
-            acceptDossierFacileApplications: row.ownerAcceptDossierFacile ?? false,
+            contactMode: row.ownerContactMode ?? EOwnerContactMode.NONE,
           }
         : null,
       citySlug: row.citySlug,

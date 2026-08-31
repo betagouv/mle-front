@@ -1,0 +1,13 @@
+.banner {
+  background-color: var(--background-alt-blue-france);
+  color: var(--text-default-info);
+}
+
+.bannerTitle::before {
+  --icon-size: 1.25rem;
+}
+
+/* .fr-link force --text-action-high-blue-france : on reprend la couleur du bandeau. */
+.bannerLink {
+  color: inherit !important;
+}

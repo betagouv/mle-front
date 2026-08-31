@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server'
 import { and, between, count, desc, eq, ilike, inArray, isNull, or, sql } from 'drizzle-orm'
 import { getTranslations } from 'next-intl/server'
 import { z } from 'zod'
+import { ZOwnerContactMode } from '~/enums/owner-contact-mode'
 import { FEATURES } from '~/lib/features'
 import { IMPORT_JOB_TYPES, ZImportJobType } from '~/schemas/import-jobs'
 import { BAILLEUR_PERMISSIONS, BAILLEUR_ROLES } from '~/server/bailleur/permissions'
@@ -22,6 +23,7 @@ import { sendAdminResetPasswordEmail, sendOwnerWelcomeEmail } from '~/server/ser
 import { generateSlug } from '~/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '~/server/utils/slug'
 import { adminProcedure, createTRPCRouter } from '../init'
+import { adminCandidaturesRouter } from './admin-candidatures'
 import { consumersRouter } from './admin-consumers'
 
 const PAGE_SIZE = 20
@@ -412,9 +414,22 @@ const ownersRouter = createTRPCRouter({
       throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('ownerNotFound') })
     }
 
+    // Requête séparée plutôt qu'une relation : `owner` a déjà une relation `users` vers `user`
+    // (via user.owner_id), en ajouter une seconde obligerait à nommer les deux.
+    let updatedByName: string | null = null
+    if (result.updatedBy) {
+      const [author] = await db
+        .select({ email: user.email, name: user.name, firstname: user.firstname, lastname: user.lastname })
+        .from(user)
+        .where(eq(user.id, result.updatedBy))
+        .limit(1)
+      if (author) updatedByName = `${author.firstname} ${author.lastname}`.trim() || author.name || author.email
+    }
+
     const { image, ...rest } = result
     return {
       ...rest,
+      updatedByName,
       imageBase64: image ? `data:image/jpeg;base64,${Buffer.from(image).toString('base64')}` : null,
     }
   }),
@@ -451,19 +466,19 @@ const ownersRouter = createTRPCRouter({
         name: z.string().min(1).optional(),
         url: z.string().url().nullable().optional(),
         landingUrl: z.string().url().nullable().optional(),
-        acceptDossierFacileApplications: z.boolean().optional(),
+        contactMode: ZOwnerContactMode.optional(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { id, ...fields } = input
-      const updateData: Record<string, unknown> = {}
+      const updateData: Record<string, unknown> = { updatedBy: ctx.session.user.id }
 
       if (fields.name !== undefined) updateData.name = fields.name
       if (fields.url !== undefined) updateData.url = fields.url
       if (fields.landingUrl !== undefined) updateData.landingUrl = fields.landingUrl
-      if (fields.acceptDossierFacileApplications !== undefined)
-        updateData.acceptDossierFacileApplications = fields.acceptDossierFacileApplications
+      if (fields.contactMode !== undefined) updateData.contactMode = fields.contactMode
 
+      // `updatedAt` est tamponné automatiquement par le `$onUpdate` de la colonne.
       const [updated] = await db.update(owners).set(updateData).where(eq(owners.id, id)).returning()
       if (!updated) {
         throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('ownerNotFound') })
@@ -480,14 +495,18 @@ const ownersRouter = createTRPCRouter({
         image: z.string().nullable(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       let imageBuffer: Buffer | null = null
       if (input.image) {
         const base64Data = input.image.replace(/^data:image\/\w+;base64,/, '')
         imageBuffer = Buffer.from(base64Data, 'base64')
       }
 
-      const [updated] = await db.update(owners).set({ image: imageBuffer }).where(eq(owners.id, input.id)).returning()
+      const [updated] = await db
+        .update(owners)
+        .set({ image: imageBuffer, updatedBy: ctx.session.user.id })
+        .where(eq(owners.id, input.id))
+        .returning()
 
       if (!updated) {
         throw new TRPCError({ code: 'NOT_FOUND', message: (await getAdminErrorTranslations())('ownerNotFound') })
@@ -670,6 +689,12 @@ const statsRouter = createTRPCRouter({
             admins: sql<number>`count(*) filter (where role = 'admin')`.mapWith(Number),
             ownerUsers: sql<number>`count(*) filter (where role = 'owner')`.mapWith(Number),
             students: sql<number>`count(*) filter (where role = 'user')`.mapWith(Number),
+            boursiers: sql<number>`count(*) filter (where role = 'user' and scholarship_status = 'yes')`.mapWith(Number),
+            nonBoursiers: sql<number>`count(*) filter (where role = 'user' and scholarship_status = 'no')`.mapWith(Number),
+            bourseNonRenseignee:
+              sql<number>`count(*) filter (where role = 'user' and (scholarship_status = 'unknown' or scholarship_status is null))`.mapWith(
+                Number,
+              ),
           })
           .from(user),
         db.select({ count: count() }).from(owners),
@@ -697,6 +722,10 @@ const statsRouter = createTRPCRouter({
             avecDispo: sql<number>`count(*) filter (where ${isAvailable} and not ${isCrous})`.mapWith(Number),
             sansDispo: sql<number>`count(*) filter (where not ${isAvailable} and not ${isUnknown} and not ${isCrous})`.mapWith(Number),
             nonRenseignee: sql<number>`count(*) filter (where ${isUnknown} and not ${isCrous})`.mapWith(Number),
+            // Nombre de logements (et non de résidences) disponibles chez les bailleurs hors-CROUS.
+            logementsDisponibles: sql<number>`coalesce(sum(${nbAvailableApartmentsSum}) filter (where not ${isCrous}), 0)::int`.mapWith(
+              Number,
+            ),
           })
           .from(accommodations),
       ])
@@ -710,6 +739,9 @@ const statsRouter = createTRPCRouter({
         admins: usersCount[0]?.admins ?? 0,
         owners: usersCount[0]?.ownerUsers ?? 0,
         students: usersCount[0]?.students ?? 0,
+        boursiers: usersCount[0]?.boursiers ?? 0,
+        nonBoursiers: usersCount[0]?.nonBoursiers ?? 0,
+        bourseNonRenseignee: usersCount[0]?.bourseNonRenseignee ?? 0,
       },
       owners: ownersCount[0]?.count ?? 0,
       accommodations: accommodationsCount[0]?.count ?? 0,
@@ -733,6 +765,7 @@ const statsRouter = createTRPCRouter({
         avecDispo: availabilityBreakdown[0]?.avecDispo ?? 0,
         sansDispo: availabilityBreakdown[0]?.sansDispo ?? 0,
         nonRenseignee: availabilityBreakdown[0]?.nonRenseignee ?? 0,
+        logementsDisponibles: availabilityBreakdown[0]?.logementsDisponibles ?? 0,
       },
     }
   }),
@@ -1075,8 +1108,9 @@ const importsRouter = createTRPCRouter({
     return db.select().from(importJobs).where(inArray(importJobs.type, IMPORT_JOB_TYPES)).orderBy(desc(importJobs.createdAt)).limit(50)
   }),
 
+  // Pas de garde `FEATURES.csvImport` ici : ce détail sert aussi les tâches planifiées, qui ne
+  // dépendent pas du flag d'import CSV.
   getById: adminProcedure.input(z.object({ id: z.number() })).query(async ({ input }) => {
-    if (!FEATURES.csvImport) throw new TRPCError({ code: 'NOT_FOUND' })
     const [job] = await db.select().from(importJobs).where(eq(importJobs.id, input.id)).limit(1)
     if (!job) throw new TRPCError({ code: 'NOT_FOUND' })
     return job
@@ -1209,4 +1243,5 @@ export const adminRouter = createTRPCRouter({
   imports: importsRouter,
   feedback: feedbackRouter,
   consumers: consumersRouter,
+  candidatures: adminCandidaturesRouter,
 })

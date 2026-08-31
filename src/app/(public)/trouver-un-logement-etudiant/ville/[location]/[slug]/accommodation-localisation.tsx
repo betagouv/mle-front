@@ -23,7 +23,7 @@ export const AccommodationLocalisation = async ({ addresses, positions }: Accomm
   return (
     <div className={styles.locationContent}>
       <div className={styles.locationInfo}>
-        <h4>{t('location.title')}</h4>
+        <h3 className="fr-h4">{t('location.title')}</h3>
         {sorted.map((a, i) => (
           <div key={`${a.address}-${a.postalCode}-${i}`} className="fr-flex fr-direction-column">
             {a.address && <span>{a.address}</span>}

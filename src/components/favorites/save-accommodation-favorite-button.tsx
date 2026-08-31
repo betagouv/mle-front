@@ -1,7 +1,9 @@
 'use client'
 
 import Button from '@codegouvfr/react-dsfr/Button'
+import { useState } from 'react'
 import { loginRequiredFavoritesModal } from '~/components/auth/login-required-modal'
+import { LiveRegion } from '~/components/ui/live-region'
 import { useCreateFavorite } from '~/hooks/use-create-favorite'
 import { useDeleteFavorite } from '~/hooks/use-delete-favorite'
 import { useFavorites } from '~/hooks/use-favorites'
@@ -15,6 +17,7 @@ export const FAVORITE_BUTTON_TITLES = {
 
 export const SaveAccommodationFavoriteButton = ({ slug, withLabel = false, user }: { slug: string; withLabel?: boolean; user?: TUser }) => {
   const { data: favorites } = useFavorites(user)
+  const [announcement, setAnnouncement] = useState('')
 
   const { mutateAsync, isLoading } = useCreateFavorite()
   const { mutateAsync: mutationDelete, isLoading: isLoadingDelete } = useDeleteFavorite()
@@ -25,66 +28,47 @@ export const SaveAccommodationFavoriteButton = ({ slug, withLabel = false, user 
       return
     }
     await mutateAsync({ accommodationSlug: slug })
+    setAnnouncement('Résidence ajoutée à vos favoris')
     trackEvent({ category: 'Favoris', action: 'ajout favori', name: slug })
   }
   const handleDelete = async () => {
     await mutationDelete({ slug })
+    setAnnouncement('Résidence retirée de vos favoris')
     trackEvent({ category: 'Favoris', action: 'suppression favori', name: slug })
   }
 
-  if (favorites?.find((favorite) => favorite.accommodation.slug === slug)) {
-    if (withLabel) {
-      return (
-        <Button
-          priority="secondary"
-          title={FAVORITE_BUTTON_TITLES.REMOVE}
-          iconId="ri-heart-fill"
-          size="small"
-          disabled={isLoadingDelete}
-          nativeButtonProps={{
-            onClick: handleDelete,
-          }}
-        >
-          Retirer des favoris
-        </Button>
-      )
-    }
-    return (
-      <Button
-        priority="tertiary"
-        title={FAVORITE_BUTTON_TITLES.REMOVE}
-        iconId="ri-heart-fill"
-        size="small"
-        disabled={isLoadingDelete}
-        nativeButtonProps={{
-          onClick: handleDelete,
-        }}
-      />
-    )
-  }
+  const isFavorite = Boolean(favorites?.find((favorite) => favorite.accommodation.slug === slug && favorite.isFavorite))
+  // `favorites` liste aussi les résidences suivies via une candidature sans favori : sans le test
+  // sur `isFavorite`, leur cœur s'afficherait plein à tort partout sur le site.
+  const buttonProps = isFavorite
+    ? {
+        title: FAVORITE_BUTTON_TITLES.REMOVE,
+        iconId: 'ri-heart-fill' as const,
+        disabled: isLoadingDelete,
+        nativeButtonProps: { onClick: handleDelete, 'aria-pressed': true },
+        label: 'Retirer des favoris',
+      }
+    : {
+        title: FAVORITE_BUTTON_TITLES.ADD,
+        iconId: 'ri-heart-line' as const,
+        disabled: isLoading,
+        nativeButtonProps: { onClick: handleSave, 'aria-pressed': false },
+        label: 'Ajouter en favoris',
+      }
 
-  if (withLabel) {
-    return (
-      <Button
-        priority="secondary"
-        title={FAVORITE_BUTTON_TITLES.ADD}
-        iconId="ri-heart-line"
-        size="small"
-        disabled={isLoading}
-        nativeButtonProps={{ onClick: handleSave }}
-      >
-        Ajouter en favoris
-      </Button>
-    )
-  }
   return (
-    <Button
-      priority="secondary"
-      title={FAVORITE_BUTTON_TITLES.ADD}
-      iconId="ri-heart-line"
-      size="small"
-      disabled={isLoading}
-      nativeButtonProps={{ onClick: handleSave }}
-    />
+    <>
+      <Button
+        priority={withLabel || !isFavorite ? 'secondary' : 'tertiary'}
+        title={buttonProps.title}
+        iconId={buttonProps.iconId}
+        size="small"
+        disabled={buttonProps.disabled}
+        nativeButtonProps={buttonProps.nativeButtonProps}
+      >
+        {withLabel ? buttonProps.label : undefined}
+      </Button>
+      <LiveRegion message={announcement} />
+    </>
   )
 }

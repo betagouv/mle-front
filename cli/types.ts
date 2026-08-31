@@ -10,6 +10,9 @@ export interface ImportOptions {
   limit?: number
   file?: string
   source?: string
+  /** Identifiants stables du bailleur, prioritaires sur le nom codé en dur dans la commande. */
+  ownerId?: number
+  ownerSlug?: string
 }
 
 export interface ImportResultResidence {

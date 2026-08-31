@@ -6,12 +6,12 @@ import SftpClient from 'ssh2-sftp-client'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, geocodeAddressVerified } from '~/server/lib/import/geocoder'
+import { resolveImportOwner } from '~/server/lib/import/resolve-owner'
 import { syncTypologies, type TypologyDraft, typologyAggregates, typologyDraft } from '~/server/lib/typologies'
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
 import { generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '../../src/server/utils/slug'
 import type { ImportCommand, ImportOptions, ImportResult } from '../types'
-import { getOrCreateOwner } from '../utils/get-or-create-owner'
 import { pushResidenceEntry } from './import-utils'
 
 const SOURCE = 'fac-habitat'
@@ -252,10 +252,11 @@ const command: ImportCommand = {
   async execute(options: ImportOptions): Promise<ImportResult> {
     const result: ImportResult = { created: 0, updated: 0, skipped: 0, errors: [], residences: [] }
 
-    const ownerId = await getOrCreateOwner(OWNER_NAME)
-    result.ownerName = OWNER_NAME
+    const owner = await resolveImportOwner({ id: options.ownerId, slug: options.ownerSlug, name: OWNER_NAME })
+    const ownerId = owner.id
+    result.ownerName = owner.name
     result.ownerId = ownerId
-    if (options.verbose) console.log(`  Owner FAC HABITAT id=${ownerId}`)
+    if (options.verbose) console.log(`  Owner ${owner.name} id=${ownerId}`)
 
     const residences = await loadResidences(options)
     console.log(`  ${residences.length} résidences chargées`)

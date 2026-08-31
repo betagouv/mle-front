@@ -1,0 +1,20 @@
+/* Le bouton ne doit rien changer visuellement : il n'existe que pour rendre la vignette
+   activable au clavier. Le focus reste visible (aucun outline supprimé).
+
+   Pas de `height: 100%` : le bouton s'intercale entre la case de grille et l'<img>, et une
+   hauteur en pourcentage l'étirerait au-delà de l'image, qui se retrouverait cadrée en haut
+   d'une case trop haute. C'est l'image qui porte le ratio (cf. accommodation-images.module.css) ;
+   le bouton se contente d'épouser sa taille. */
+.trigger {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* Sans `block`, l'image reste sur la ligne de base du bouton et laisse un liseré sous elle. */
+.trigger img {
+  display: block;
+}

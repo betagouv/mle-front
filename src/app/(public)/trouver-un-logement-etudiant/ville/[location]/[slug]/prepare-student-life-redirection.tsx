@@ -9,7 +9,7 @@ export const PrepareStudentLifeRedirection = ({ city }: { city: string }) => {
   const titleFormatted = formatCityWithA(city)
   return (
     <div className={clsx(styles.section, styles.prepareStudentLifeSection)}>
-      <h4 style={{ margin: 0 }}>{t('title', { titleFormatted })}</h4>
+      <h3 className="fr-h4 fr-m-0">{t('title', { titleFormatted })}</h3>
       <Button priority="tertiary" size="small" linkProps={{ href: `/preparer-sa-vie-etudiante/${city}` }}>
         {t('discoverCta', { title: city })}
       </Button>

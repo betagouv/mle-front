@@ -5,10 +5,12 @@ import type L from 'leaflet'
 import { FC, useEffect, useMemo } from 'react'
 import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
 import { tss } from 'tss-react'
+import { MapAccessibleName } from '~/components/map/map-accessible-name'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css'
 import 'leaflet-defaulticon-compatibility'
 import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { parseAsBoolean, parseAsString, useQueryState, useQueryStates } from 'nuqs'
 import { useAccomodations } from '~/hooks/use-accomodations'
 import { useTRPC } from '~/server/trpc/client'
@@ -55,6 +57,7 @@ const BoundsHandler: FC<{ markerPositions: L.LatLngTuple[]; cityBounds?: L.LatLn
 }
 
 const CustomZoomControls: FC = () => {
+  const t = useTranslations('map')
   const map = useMap()
   const [, setQueryStates] = useQueryStates({
     bbox: parseAsString,
@@ -96,7 +99,8 @@ const CustomZoomControls: FC = () => {
       <button
         className="leaflet-control-zoom-in"
         type="button"
-        title="Zoom in"
+        title={t('zoomIn')}
+        aria-label={t('zoomInLabel')}
         onClick={handleZoomIn}
         style={{
           width: '30px',
@@ -112,7 +116,8 @@ const CustomZoomControls: FC = () => {
       <button
         className="leaflet-control-zoom-out"
         type="button"
-        title="Zoom out"
+        title={t('zoomOut')}
+        aria-label={t('zoomOutLabel')}
         onClick={handleZoomOut}
         style={{
           width: '30px',
@@ -130,6 +135,7 @@ const CustomZoomControls: FC = () => {
 }
 
 export const AccomodationsMap: FC = () => {
+  const t = useTranslations('map')
   const { classes } = useStyles()
   const [queryStates, setQueryStates] = useQueryStates({
     bbox: parseAsString,
@@ -181,6 +187,8 @@ export const AccomodationsMap: FC = () => {
         }}
         key={accommodation.id}
         position={markerPositions[i]}
+        title={accommodation.name}
+        alt={accommodation.name}
       />
     ))
   }, [accommodationsData, markerPositions, setQueryStates])
@@ -188,6 +196,7 @@ export const AccomodationsMap: FC = () => {
   const memoizedMap = useMemo(() => {
     return (
       <MapContainer center={[46.5, 2.4]} zoom={6} className={classes.mapContainer} scrollWheelZoom={false} zoomControl={false}>
+        <MapAccessibleName label={t('resultsLabel')} />
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

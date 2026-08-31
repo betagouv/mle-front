@@ -1,6 +1,5 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import { useQuery } from '@tanstack/react-query'
 import clsx from 'clsx'
 import { useTranslations } from 'next-intl'
@@ -8,6 +7,7 @@ import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 import { FC, useEffect, useMemo } from 'react'
 import { AccomodationCard } from '~/components/find-student-accomodation/card/find-student-accomodation-card'
 import { FindStudentAccomodationNeighborsResults } from '~/components/find-student-accomodation/results/find-student-accomodation-neighbors-results'
+import { NewWindowHint } from '~/components/ui/new-window'
 import { Pagination } from '~/components/ui/pagination'
 import { CardSkeleton } from '~/components/ui/skeleton/card-skeleton'
 import { useAccomodations } from '~/hooks/use-accomodations'
@@ -84,9 +84,9 @@ export const WidgetAccommodationGrid: FC<WidgetAccommodationGridProps> = ({ terr
         {!accommodations?.results?.length && isLoading && Array.from({ length: 6 }).map((_, index) => <CardSkeleton key={index} />)}
       </div>
       {!isLoading && accommodations?.count === 0 && (
-        <div className={fr.cx('fr-col-md-11')}>
+        <div className="fr-col-md-11">
           <h3>{t('noResult')}</h3>
-          <p className={fr.cx('fr-mb-0')}>{t('description')}</p>
+          <p className="fr-mb-0">{t('description')}</p>
           <p>{t('description2')}</p>
         </div>
       )}
@@ -138,6 +138,7 @@ export const WidgetAccommodationGrid: FC<WidgetAccommodationGridProps> = ({ terr
           onClick={() => trackEvent({ category: 'Widget', action: 'clic vers site principal' })}
         >
           MonLogementEtudiant.beta.gouv.fr
+          <NewWindowHint />
         </a>
       </footer>
     </div>

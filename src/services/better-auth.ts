@@ -8,7 +8,9 @@ import { magicLink } from 'better-auth/plugins'
 import { and, eq } from 'drizzle-orm'
 import { headers } from 'next/headers'
 import { cache } from 'react'
+import type { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { verifyDjangoPassword } from '~/lib/django-password'
+import { linkGuestContactRequestsSafely } from '~/server/contacts/link-guest-requests'
 import { db } from '~/server/db'
 import * as schema from '~/server/db/schema'
 import { adminOwnerLinks } from '~/server/db/schema/admin-owner-links'
@@ -16,6 +18,13 @@ import { env } from '~/server/env'
 import { sendMagicLinkEmail, sendResetPasswordEmail, sendVerificationEmail } from '~/server/services/brevo'
 
 export const oneDay = 24 * 60 * 60
+
+const shouldLogAuthLinks = env.NEXT_PUBLIC_APP_ENV === 'development' && ['localhost', '127.0.0.1'].includes(new URL(env.BASE_URL).hostname)
+
+function logLocalAuthLink(kind: 'activation' | 'connexion' | 'reset-password', email: string, url: string) {
+  if (!shouldLogAuthLinks) return
+  console.log(`[better-auth:${kind}] ${email} -> ${url}`)
+}
 
 export const auth = betterAuth({
   secret: env.AUTH_SECRET,
@@ -36,6 +45,7 @@ export const auth = betterAuth({
     minPasswordLength: 12,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
+      logLocalAuthLink('reset-password', user.email, url)
       await sendResetPasswordEmail(user.email, url)
     },
     password: {
@@ -64,12 +74,18 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
+      logLocalAuthLink('activation', user.email, url)
       await sendVerificationEmail(user.email, url)
     },
     sendOnSignUp: true,
     // Ne pas connecter automatiquement après activation : l'étudiant atterrit sur
     // la page de connexion (réassurance) et se connecte avec le mot de passe créé.
     autoSignInAfterVerification: false,
+    // L'adresse vient d'être prouvée : on peut rattacher au compte les demandes de contact
+    // laissées en visiteur avec cette même adresse.
+    afterEmailVerification: async (user) => {
+      await linkGuestContactRequestsSafely(user.id, user.email)
+    },
   },
   plugins: [
     magicLink({
@@ -87,6 +103,7 @@ export const auth = betterAuth({
         // déclenche la vérification qu'en JavaScript (voir /connexion/verification).
         const buffer = new URL('/connexion/verification', env.BASE_URL)
         buffer.searchParams.set('url', url)
+        logLocalAuthLink('connexion', email, buffer.toString())
         await sendMagicLinkEmail(email, buffer.toString())
       },
     }),
@@ -103,10 +120,29 @@ export const auth = betterAuth({
     }),
     nextCookies(),
   ],
+  databaseHooks: {
+    session: {
+      create: {
+        // Filet de sécurité : couvre l'étudiant qui avait déjà un compte et a laissé ses coordonnées
+        // en étant déconnecté (le hook de vérification d'e-mail, lui, ne joue qu'à l'inscription).
+        after: async (createdSession) => {
+          const usr = await db.query.user.findFirst({
+            where: eq(schema.user.id, createdSession.userId),
+            columns: { email: true, emailVerified: true, role: true },
+          })
+          if (!usr?.emailVerified || usr.role !== 'user') return
+          await linkGuestContactRequestsSafely(createdSession.userId, usr.email)
+        },
+      },
+    },
+  },
   user: {
     additionalFields: {
       firstname: { type: 'string', defaultValue: '', input: true },
       lastname: { type: 'string', defaultValue: '', input: true },
+      phone: { type: 'string', defaultValue: null, input: true },
+      birthdate: { type: 'string', defaultValue: null, input: true },
+      scholarshipStatus: { type: 'string', defaultValue: null, input: true },
       role: { type: 'string', defaultValue: 'user', input: false },
       legacyUser: { type: 'boolean', defaultValue: false, input: false },
       bailleurRole: { type: 'string', defaultValue: null, input: false },
@@ -144,7 +180,7 @@ export const getServerSession = cache(async () => {
     with: { owner: true },
   })
 
-  let adminOwners: Array<{ id: number; name: string; slug: string; url: string | null; acceptDossierFacileApplications: boolean }> = []
+  let adminOwners: Array<{ id: number; name: string; slug: string; url: string | null; contactMode: EOwnerContactMode }> = []
 
   if (usr?.role === 'admin') {
     const links = await db.query.adminOwnerLinks.findMany({
@@ -156,7 +192,7 @@ export const getServerSession = cache(async () => {
       name: l.owner.name,
       slug: l.owner.slug,
       url: l.owner.url,
-      acceptDossierFacileApplications: l.owner.acceptDossierFacileApplications,
+      contactMode: l.owner.contactMode,
     }))
   }
 

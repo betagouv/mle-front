@@ -1,9 +1,10 @@
 import { fr } from '@codegouvfr/react-dsfr'
-import clsx from 'clsx'
+import { getTranslations } from 'next-intl/server'
 import { TPrepareStudentLifeAccommodationResidence } from '~/schemas/accommodations/accommodations'
 import styles from './prepare-student-life-accommodation-residence.module.css'
 
 export const PrepareStudentLifeAccommodationResidence = async ({ typologies, location }: TPrepareStudentLifeAccommodationResidence) => {
+  const t = await getTranslations('prepareStudentLife.residence')
   const studioPriceTiles = [
     { type: 'T1', enabled: !!typologies.t1 },
     { type: 'T1bis', enabled: !!typologies.t1_bis },
@@ -19,18 +20,18 @@ export const PrepareStudentLifeAccommodationResidence = async ({ typologies, loc
 
   return (
     <div className={styles.priceContainer}>
-      <h3 style={{ margin: 0 }}>Prix moyen des loyers étudiants à {location}</h3>
+      <h3 style={{ margin: 0 }}>{t('title', { location })}</h3>
       <div className={styles.accommodationsContainer}>
         <div className={styles.studioColocBorderBottom}>
           <div className={styles.mainContainer}>
-            <div className={clsx(styles.studioContainer)}>
-              <span className={fr.cx('ri-user-line', 'fr-text--bold')} style={{ color: fr.colors.decisions.text.mention.grey.default }}>
-                STUDIO (
-                {studioPriceTiles
-                  .filter((tile) => tile.enabled)
-                  .map((tile) => tile.type)
-                  .join(' • ')}
-                )
+            <div className={styles.studioContainer}>
+              <span className="ri-user-line fr-text--bold" style={{ color: fr.colors.decisions.text.mention.grey.default }}>
+                {t('studio', {
+                  types: studioPriceTiles
+                    .filter((tile) => tile.enabled)
+                    .map((tile) => tile.type)
+                    .join(' • '),
+                })}
               </span>
               <div className={styles.pricesTiles}>
                 {studioPriceTiles
@@ -44,7 +45,7 @@ export const PrepareStudentLifeAccommodationResidence = async ({ typologies, loc
                         color: fr.colors.options.yellowTournesol.sun407moon922.default,
                         padding: '0 0.5rem',
                       }}
-                      className={fr.cx('fr-text--bold')}
+                      className="fr-text--bold"
                     >
                       {tile.type}
                     </span>
@@ -53,13 +54,13 @@ export const PrepareStudentLifeAccommodationResidence = async ({ typologies, loc
             </div>
 
             <div className={styles.appartmentsContainer}>
-              <span className={fr.cx('ri-user-line', 'fr-text--bold')} style={{ color: fr.colors.decisions.text.mention.grey.default }}>
-                Appartements (
-                {priceTiles
-                  .filter((tile) => tile.enabled)
-                  .map((tile) => tile.type)
-                  .join(' • ')}
-                )
+              <span className="ri-user-line fr-text--bold" style={{ color: fr.colors.decisions.text.mention.grey.default }}>
+                {t('apartments', {
+                  types: priceTiles
+                    .filter((tile) => tile.enabled)
+                    .map((tile) => tile.type)
+                    .join(' • '),
+                })}
               </span>
               <div className={styles.pricesTiles}>
                 {priceTiles
@@ -72,7 +73,7 @@ export const PrepareStudentLifeAccommodationResidence = async ({ typologies, loc
                         color: fr.colors.options.yellowTournesol.sun407moon922.default,
                         padding: '0 0.5rem',
                       }}
-                      className={fr.cx('fr-text--bold')}
+                      className="fr-text--bold"
                       key={tile.type}
                     >
                       {tile.type}
@@ -83,12 +84,12 @@ export const PrepareStudentLifeAccommodationResidence = async ({ typologies, loc
           </div>
         </div>
         <div className={styles.warrantyContainer}>
-          <span className={fr.cx('ri-information-line')}>Prévoir un dépôt de garantie ainsi que le versement d&apos;un premier loyer</span>
+          <span className="ri-information-line">{t('deposit')}</span>
         </div>
       </div>
       <p style={{ margin: 0 }}>
-        <span className={fr.cx('ri-thumb-up-line')}>
-          Un <span className={fr.cx('fr-text--bold')}>plafonnement des loyers est en vigueur à {location}</span> afin de limiter les abus
+        <span className="ri-thumb-up-line">
+          {t.rich('rentCap', { location, b: (chunks) => <span className="fr-text--bold">{chunks}</span> })}
         </span>
       </p>
     </div>

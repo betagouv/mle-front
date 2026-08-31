@@ -38,7 +38,7 @@ export const AccommodationEquipments = ({ accommodation }: AccommodationEquipmen
   return (
     <div className={styles.section}>
       <div className="fr-flex fr-direction-column fr-flex-gap-2v fr-direction-sm-row fr-justify-content-md-space-between fr-align-items-md-center fr-mb-4w">
-        <h4 className="fr-mb-0">{t('equipments.title')}</h4>
+        <h3 className="fr-mb-0 fr-h4">{t('equipments.title')}</h3>
         <div className={toggleStyles.equipmentsToggle}>
           {categories
             .filter((c) => c.visible)

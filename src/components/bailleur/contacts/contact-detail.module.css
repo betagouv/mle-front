@@ -1,0 +1,30 @@
+.detailGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(18rem, 1fr);
+  gap: 1rem;
+}
+
+.actionsPanel {
+  border-top: 5px solid var(--border-plain-blue-france);
+}
+
+.actionsIcon {
+  --icon-size: 2rem;
+
+  margin: 0 auto 1rem;
+}
+
+.document {
+  border-bottom: 1px solid var(--border-default-grey);
+  padding: 0.75rem 0;
+}
+
+.document:last-child {
+  border-bottom: none;
+}
+
+@media (max-width: 48em) {
+  .detailGrid {
+    grid-template-columns: 1fr;
+  }
+}

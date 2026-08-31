@@ -1,0 +1,9 @@
+/* Le déclencheur d'infobulle est un bouton pour être atteignable au clavier ; il ne doit
+   pour autant rien changer visuellement. Le style de focus reste celui du DSFR. */
+.tooltipTrigger {
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 1;
+  cursor: help;
+}

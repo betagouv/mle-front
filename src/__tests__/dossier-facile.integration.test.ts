@@ -1,8 +1,18 @@
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { dossierFacileApplications, dossierFacileTenants } from '../server/db/schema'
+import { EContactStatus } from '~/enums/contact-status'
+import { EOwnerContactMode } from '~/enums/owner-contact-mode'
+import { purgeContactRequests } from '~/server/contacts/purge'
+import { dossierFacileApplications, dossierFacileDocuments, dossierFacileTenants } from '../server/db/schema'
 import { typologyDraft } from '../server/lib/typologies'
-import { createAccommodation, createDossierFacileApplication, createDossierFacileTenant, createUser } from './fixtures/factories'
+import {
+  createAccommodation,
+  createDossierFacileApplication,
+  createDossierFacileDocument,
+  createDossierFacileTenant,
+  createOwner,
+  createUser,
+} from './fixtures/factories'
 import './helpers/setup-integration'
 import { authenticatedCaller, caller, ownerCaller } from './helpers/test-caller'
 import { getTestDb } from './helpers/test-db'
@@ -346,13 +356,21 @@ describe('DossierFacile tRPC', () => {
       )
     })
 
-    it('rejects when tenant is not verified', async () => {
-      await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-app-1', status: 'pending' })
+    it('allows applying while the dossier is still being reviewed', async () => {
+      await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-app-1', status: 'to_process' })
       await createAccommodation({ slug: 'res-unverified' }, [typologyDraft('t1', { nbAvailable: 5 })])
 
+      const result = await authenticatedCaller.dossierFacile.application({ accommodationSlug: 'res-unverified', apartmentType: 't1' })
+      expect(result?.accommodationSlug).toBe('res-unverified')
+    })
+
+    it('rejects when DossierFacile access is revoked', async () => {
+      await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-app-1b', status: 'access_revoked' })
+      await createAccommodation({ slug: 'res-revoked' }, [typologyDraft('t1', { nbAvailable: 5 })])
+
       await expect(
-        authenticatedCaller.dossierFacile.application({ accommodationSlug: 'res-unverified', apartmentType: 't1' }),
-      ).rejects.toThrow('Tenant dossier is not verified')
+        authenticatedCaller.dossierFacile.application({ accommodationSlug: 'res-revoked', apartmentType: 't1' }),
+      ).rejects.toThrow('DossierFacile access is revoked')
     })
 
     it('rejects when accommodation does not exist', async () => {
@@ -396,5 +414,193 @@ describe('DossierFacile tRPC', () => {
       })
       expect(second).toBeNull()
     })
+  })
+})
+
+// ─── Webhook → board du gestionnaire ─────────────────────────────────────────
+
+describe('webhook visibility on the bailleur board', () => {
+  async function setupApplication(tenantStatus: string) {
+    const owner = await createOwner({
+      name: 'Owner Board',
+      slug: 'owner-board',
+      userId: 'test-owner-id',
+      contactMode: EOwnerContactMode.DOSSIER_FACILE,
+    })
+    await createAccommodation({ slug: 'res-board', ownerId: owner!.id }, [typologyDraft('t1', { nbAvailable: 5 })])
+    const tenant = await createDossierFacileTenant({
+      userId: 'test-user-id',
+      tenantId: 'df-board-1',
+      status: tenantStatus,
+      name: 'Nom Périmé',
+    })
+    await createDossierFacileApplication({
+      tenantId: tenant.id,
+      accommodationSlug: 'res-board',
+      apartmentType: 't1',
+      status: EContactStatus.A_CONTACTER,
+    })
+    return tenant
+  }
+
+  it('hides the application while the dossier is not verified', async () => {
+    await setupApplication('to_process')
+
+    const board = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    expect(board.items).toHaveLength(0)
+
+    const residences = await ownerCaller.bailleur.listResidencesWithContactCounts({})
+    expect(residences.residences.find((r) => r.slug === 'res-board')?.aRappelerCount).toBe(0)
+  })
+
+  it('reveals the application as a card once the webhook validates the dossier', async () => {
+    await setupApplication('to_process')
+
+    const res = await callWebhook({
+      partnerCallBackType: 'VERIFIED_ACCOUNT',
+      onTenantId: 'df-board-1',
+      tenants: [{ firstName: 'Kevin', lastName: 'Gallet', documents: [], guarantors: [] }],
+    })
+    expect(res.status).toBe(200)
+
+    const board = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    expect(board.mode).toBe('dossier_facile')
+    expect(board.items).toHaveLength(1)
+    // Le nom affiché sur la carte vient du payload fraîchement persisté.
+    expect(board.items[0]!.studentName).toBe('Kevin Gallet')
+    expect(board.items[0]!.source).toBe('dossier_facile')
+
+    const residences = await ownerCaller.bailleur.listResidencesWithContactCounts({})
+    expect(residences.residences.find((r) => r.slug === 'res-board')?.aRappelerCount).toBe(1)
+  })
+
+  it('hides the card again when the dossier is denied', async () => {
+    await setupApplication('verified')
+
+    const before = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    expect(before.items).toHaveLength(1)
+    const candidatureId = before.items[0]!.id
+
+    await callWebhook({ partnerCallBackType: 'DENIED_ACCOUNT', onTenantId: 'df-board-1' })
+
+    const after = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    expect(after.items).toHaveLength(0)
+    await expect(ownerCaller.bailleur.getCandidature({ id: candidatureId })).rejects.toThrow('Candidature not found')
+  })
+
+  it('hides the candidature past the retention window and cuts document access', async () => {
+    const tenant = await setupApplication('verified')
+
+    const before = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    const candidatureId = before.items[0]!.id
+
+    await getTestDb()
+      .update(dossierFacileApplications)
+      .set({ createdAt: sql`now() - '31 days'::interval` })
+      .where(eq(dossierFacileApplications.id, candidatureId))
+
+    const after = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    expect(after.items).toHaveLength(0)
+
+    const residences = await ownerCaller.bailleur.listResidencesWithContactCounts({})
+    expect(residences.residences.find((r) => r.slug === 'res-board')?.aRappelerCount).toBe(0)
+
+    await expect(ownerCaller.bailleur.getCandidature({ id: candidatureId })).rejects.toThrow('Candidature not found')
+    // Le lien signé vers le dossier doit tomber en même temps que la fiche.
+    await expect(ownerCaller.bailleur.getDocumentSignedUrl({ type: 'tenantUrl', tenantId: tenant.id })).rejects.toThrow()
+  })
+
+  it('deletes the tenant, its documents and its candidatures once every candidature is out of retention', async () => {
+    const tenant = await setupApplication('verified')
+    await createDossierFacileDocument({ tenantId: tenant.id, url: 'https://df.test/doc.pdf' })
+    const board = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-board' })
+    await getTestDb()
+      .update(dossierFacileApplications)
+      .set({ createdAt: sql`now() - '31 days'::interval` })
+      .where(eq(dossierFacileApplications.id, board.items[0]!.id))
+
+    const result = await purgeContactRequests()
+
+    expect(result.dossiersPurged).toBe(1)
+    // La ligne locataire portait le nom et le statut renvoyés par DossierFacile : elle part aussi,
+    // et sa cascade emporte documents et candidatures.
+    const tenants = await getTestDb().select().from(dossierFacileTenants).where(eq(dossierFacileTenants.tenantId, 'df-board-1'))
+    expect(tenants).toHaveLength(0)
+    expect(await getTestDb().select().from(dossierFacileDocuments)).toHaveLength(0)
+    expect(await getTestDb().select().from(dossierFacileApplications)).toHaveLength(0)
+  })
+
+  it('purges a tenant who linked their account but never applied', async () => {
+    const tenant = await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-orphan', name: 'Jamais Candidaté' })
+    await getTestDb()
+      .update(dossierFacileTenants)
+      .set({ createdAt: sql`now() - '31 days'::interval` })
+      .where(eq(dossierFacileTenants.id, tenant.id))
+
+    const result = await purgeContactRequests()
+
+    expect(result.dossiersPurged).toBe(1)
+    expect(await getTestDb().select().from(dossierFacileTenants)).toHaveLength(0)
+  })
+
+  it('leaves a freshly linked tenant alone and stays idempotent', async () => {
+    await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-fresh' })
+
+    expect((await purgeContactRequests()).dossiersPurged).toBe(0)
+    expect((await purgeContactRequests()).dossiersPurged).toBe(0)
+    expect(await getTestDb().select().from(dossierFacileTenants)).toHaveLength(1)
+  })
+
+  it('drops the cached documents as soon as the dossier leaves the verified status', async () => {
+    const tenant = await setupApplication('verified')
+    await getTestDb()
+      .update(dossierFacileTenants)
+      .set({ url: 'https://df.test/dossier', pdfUrl: 'https://df.test/dossier.pdf' })
+      .where(eq(dossierFacileTenants.id, tenant.id))
+    await createDossierFacileDocument({ tenantId: tenant.id, url: 'https://df.test/doc.pdf' })
+
+    await callWebhook({ partnerCallBackType: 'RETURNED_ACCOUNT', onTenantId: 'df-board-1' })
+
+    const [refreshed] = await getTestDb().select().from(dossierFacileTenants).where(eq(dossierFacileTenants.id, tenant.id))
+    expect(refreshed!.status).toBe('incomplete')
+    expect(refreshed!.url).toBeNull()
+    expect(refreshed!.pdfUrl).toBeNull()
+    expect(await getTestDb().select().from(dossierFacileDocuments)).toHaveLength(0)
+    await expect(ownerCaller.bailleur.getDocumentSignedUrl({ type: 'tenantUrl', tenantId: tenant.id })).rejects.toThrow()
+  })
+})
+
+describe('dossierFacile.disconnect', () => {
+  it('removes the tenant, its documents and its candidatures, and cuts the gestionnaire access', async () => {
+    const owner = await createOwner({
+      name: 'Owner Disconnect',
+      slug: 'owner-disconnect',
+      userId: 'test-owner-id',
+      contactMode: EOwnerContactMode.DOSSIER_FACILE,
+    })
+    await createAccommodation({ slug: 'res-disconnect', ownerId: owner!.id }, [typologyDraft('t1', { nbAvailable: 5 })])
+    const tenant = await createDossierFacileTenant({ userId: 'test-user-id', tenantId: 'df-disconnect', status: 'verified' })
+    await createDossierFacileDocument({ tenantId: tenant.id, url: 'https://df.test/doc.pdf' })
+    await createDossierFacileApplication({ tenantId: tenant.id, accommodationSlug: 'res-disconnect', apartmentType: 't1' })
+
+    const board = await ownerCaller.bailleur.listContactsByResidence({ slug: 'res-disconnect' })
+    expect(board.items).toHaveLength(1)
+    const candidatureId = board.items[0]!.id
+
+    expect(await authenticatedCaller.dossierFacile.disconnect()).toEqual({ disconnected: true })
+
+    expect(await getTestDb().select().from(dossierFacileTenants)).toHaveLength(0)
+    expect(await getTestDb().select().from(dossierFacileDocuments)).toHaveLength(0)
+    expect(await getTestDb().select().from(dossierFacileApplications)).toHaveLength(0)
+    await expect(ownerCaller.bailleur.getCandidature({ id: candidatureId })).rejects.toThrow('Candidature not found')
+    expect(await authenticatedCaller.dossierFacile.tenant()).toBeNull()
+  })
+
+  it('is a no-op when no account is linked', async () => {
+    expect(await authenticatedCaller.dossierFacile.disconnect()).toEqual({ disconnected: false })
+  })
+
+  it('rejects an anonymous caller', async () => {
+    await expect(caller.dossierFacile.disconnect()).rejects.toThrow()
   })
 })

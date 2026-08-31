@@ -1,6 +1,5 @@
 import { closeDb } from '~/server/db'
 import { seedAvailabilitySnapshot } from '~/server/services/alert-detector'
-import { captureCliException } from '../sentry'
 
 interface SeedAlertSnapshotOptions {
   dryRun?: boolean
@@ -26,7 +25,6 @@ export async function seedAlertSnapshotCommand(options: SeedAlertSnapshotOptions
     console.log(`\n  ✅ ${seeded} résidence(s) enregistrées dans le snapshot`)
   } catch (error) {
     console.error(`\n❌ Amorçage échoué : ${error instanceof Error ? error.message : String(error)}`)
-    await captureCliException(error)
     throw error
   } finally {
     await closeDb()

@@ -4,12 +4,14 @@ import MainNavigation, { MainNavigationProps } from '@codegouvfr/react-dsfr/Main
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { FC } from 'react'
+import type { EOwnerContactMode } from '~/enums/owner-contact-mode'
 import { buildHref } from '~/utils/preserve-query-params'
 import styles from './navigation.module.css'
 
-export const WorkspaceHeaderNavigation: FC<{ acceptDossierFacile: boolean; canManageUsers?: boolean }> = ({
-  acceptDossierFacile,
+export const WorkspaceHeaderNavigation: FC<{ contactMode: EOwnerContactMode; canManageUsers?: boolean; isAdmin?: boolean }> = ({
+  contactMode,
   canManageUsers = false,
+  isAdmin = false,
 }) => {
   const t = useTranslations('navigation.workspace')
   const pathname = usePathname()
@@ -32,15 +34,16 @@ export const WorkspaceHeaderNavigation: FC<{ acceptDossierFacile: boolean; canMa
       },
       text: t('residences'),
     },
-    ...(acceptDossierFacile
+    // Les admins plateforme accèdent toujours aux Contacts (même si l'owner n'a pas encore choisi de mode).
+    ...(contactMode !== 'none' || isAdmin
       ? [
           {
-            isActive: pathname === '/bailleur/candidatures',
+            isActive: pathname.startsWith('/bailleur/contacts'),
             linkProps: {
-              href: buildHref('/bailleur/candidatures', searchParams),
+              href: buildHref('/bailleur/contacts', searchParams),
               target: '_self' as const,
             },
-            text: t('candidates'),
+            text: t('contacts'),
           },
         ]
       : []),

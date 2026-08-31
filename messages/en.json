@@ -1,1370 +1,1728 @@
 {
+  "accessibility": {
+    "skipLinks": {
+      "content": "Content",
+      "navigation": "Menu",
+      "footer": "Footer"
+    },
+    "newWindow": "new window",
+    "linkNewWindow": "{label} (new window)",
+    "required": "(required)",
+    "requiredFieldsNotice": "Fields marked with an asterisk (*) are required.",
+    "suggestionsAvailable": "{count} suggestion{pluralize} available"
+  },
+  "passwordInput": {
+    "hint": "Your password must contain:",
+    "rule12": "At least 12 characters",
+    "ruleLetter": "At least 1 letter",
+    "ruleDigit": "At least 1 digit",
+    "ruleSpecial": "At least 1 special character"
+  },
   "breadcrumbs": {
-    "home": "Simulez mes aides au logement",
-    "findAccomodation": "Trouver un logement étudiant",
-    "findAccomodationWithLocation": "Trouver un logement étudiant {locationFormatted}",
-    "accommodationTitle": "Logement étudiant {name} {cityFormatted}",
-    "prepareBudget": "Préparer mon budget étudiant",
-    "prepareStudentLife": "Préparer sa vie étudiante",
-    "prepareStudentLifeTitle": "Préparer sa vie étudiante {titleFormatted}",
-    "faq": "Foire aux questions",
-    "accessibilite": "Accessibilité",
-    "legalMentions": "Mentions légales",
-    "personalData": "Données personnelles",
-    "cookies": "Gestion des cookies",
-    "sitemap": "Plan du site",
-    "notFound": "Page non trouvée",
-    "budget": "Budget Mon Logement Étudiant",
-    "privacyPolicy": "Politique de confidentialité",
-    "budgetSimulator": "Simulateur de budget étudiant",
+    "home": "Simulate my housing aid",
+    "findAccomodation": "Find student accommodation",
+    "findAccomodationWithLocation": "Find student accommodation {locationFormatted}",
+    "accommodationTitle": "Student accommodation {name} {cityFormatted}",
+    "prepareBudget": "Prepare my student budget",
+    "prepareStudentLife": "Prepare for student life",
+    "prepareStudentLifeTitle": "Prepare for student life {titleFormatted}",
+    "faq": "Frequently asked questions",
+    "accessibilite": "Accessibility",
+    "legalMentions": "Legal notice",
+    "personalData": "Personal data",
+    "cookies": "Cookie management",
+    "sitemap": "Sitemap",
+    "notFound": "Page not found",
+    "budget": "Mon Logement Étudiant Budget",
+    "privacyPolicy": "Privacy policy",
+    "budgetSimulator": "Student budget simulator",
     "student": {
-      "title": "Mon espace connecté",
+      "title": "My logged-in area",
       "dashboard": {
-        "title": "Tableau de bord"
+        "title": "Dashboard"
       },
       "todo": {
-        "title": "Mes priorités"
+        "title": "My priorities"
       },
       "housingAid": {
-        "title": "Mes aides au logement"
+        "title": "My housing aid"
       },
       "favorites": {
-        "title": "Mes favoris"
+        "title": "Favorites and applications"
       },
       "alerts": {
-        "title": "Alertes logements"
+        "title": "Housing alerts"
+      },
+      "personalInformations": {
+        "title": "Personal information"
       }
     }
   },
   "loading": {
-    "card": "Chargement de la carte..."
+    "card": "Loading map..."
   },
   "metadata": {
     "home": {
-      "title": "Mon Logement Étudiant - Comparez les offres de logements étudiants",
-      "description": "Mon Logement Étudiant vous aide à trouver rapidement un logement adapté à votre budget : studios, colocations, résidences étudiantes partout en France."
+      "title": "Mon Logement Étudiant - Compare student housing offers",
+      "description": "Mon Logement Étudiant helps you quickly find accommodation suited to your budget: studios, shared flats and student residences throughout France."
     },
     "search": {
-      "title": "Trouver votre prochain logement étudiant",
-      "description": "Trouvez facilement votre logement étudiant : studio, colocation, résidence. Comparez les offres de logements près de votre campus"
+      "title": "Find your next student accommodation",
+      "description": "Easily find your student accommodation: studio, shared flat, residence. Compare housing offers near your campus"
     },
     "searchDetails": {
-      "title": "Trouver votre prochain logement étudiant {locationFormatted}",
-      "description": "Trouvez facilement votre logement étudiant à {locationFormatted} : studio, colocation, résidence. Comparez les offres de logements près de votre campus"
+      "title": "Find your next student accommodation {locationFormatted}",
+      "description": "Easily find your student accommodation in {locationFormatted}: studio, shared flat, residence. Compare housing offers near your campus"
     },
     "accommodation": {
-      "title": "Logement étudiant {name} {cityFormatted}",
-      "description": "Trouvez votre logement étudiant dans la résidence {name} {cityFormatted}"
+      "title": "Student accommodation {name} {cityFormatted}",
+      "description": "Find your student accommodation in the {name} residence {cityFormatted}"
     },
     "prepareBudget": {
-      "title": "Calculer son budget étudiant",
-      "description": "Gérez vos finances facilement et visualisez votre budget mensuel en temps réel"
+      "title": "Preparing your student budget: practical advice",
+      "description": "Manage your finances easily and view your monthly budget in real time"
     },
     "simulateAids": {
-      "title": "Simuler mes aides au logement étudiant",
-      "description": "Calculez vos aides au logement (APL, ALS, ALF) en quelques clics. Estimez le montant de vos aides pour votre logement étudiant."
+      "title": "Simulate my student housing aid",
+      "description": "Calculate your housing aid (APL, ALS, ALF) in a few clicks. Estimate the amount of aid for your student accommodation."
     },
     "budgetSimulator": {
-      "title": "Simulateur de budget étudiant",
-      "description": "Simulez votre budget étudiant mensuel. Calculez vos dépenses et revenus pour mieux gérer vos finances."
+      "title": "Student budget simulator",
+      "description": "Simulate your monthly student budget. Calculate your expenses and income to better manage your finances."
     },
     "title": "Mon Logement Étudiant",
-    "description": "Mon Logement Étudiant - Votre guide à l'accès au logement étudiant",
+    "description": "Mon Logement Étudiant - Your guide to accessing student accommodation",
     "workspace": {
-      "description": "Votre espace gestionnaire",
-      "title": "Espace gestionnaire - Gestion de vos résidences"
+      "description": "Your manager area",
+      "title": "Manager area - Manage your residences"
     },
     "student": {
       "workspace": {
-        "title": "Espace étudiant - Gestion de votre espace",
-        "description": "Votre espace étudiant"
+        "title": "Student area - Manage your space",
+        "shortTitle": "Student area",
+        "description": "Your student area"
       }
     },
     "landing": {
-      "title": "Trouver un logement étudiant en France",
-      "description": "Découvrez Mon Logement Étudiant, la plateforme officielle pour trouver un logement étudiant, simuler vos aides au logement et préparer votre budget."
+      "title": "Find student accommodation in France",
+      "description": "Discover Mon Logement Étudiant, the official platform for finding student accommodation, simulating your housing aid and preparing your budget."
     },
     "privacyPolicy": {
-      "title": "Politique de confidentialité",
-      "description": "Politique de confidentialité de Mon Logement Étudiant : données collectées, droits des utilisateurs et sous-traitants."
+      "title": "Privacy policy",
+      "description": "Mon Logement Étudiant privacy policy: data collected, user rights and processors."
     },
     "signUp": {
-      "title": "Création de compte",
-      "description": "Créez votre compte étudiant sur Mon Logement Étudiant pour accéder à nos services personnalisés."
+      "title": "Create an account",
+      "description": "Create your student account on Mon Logement Étudiant to access our personalized services."
     },
     "loginStudent": {
-      "title": "Se connecter à mon espace étudiant",
-      "description": "Connectez-vous à votre espace étudiant Mon Logement Étudiant pour gérer votre profil et vos alertes."
+      "title": "Sign in to my student area",
+      "description": "Sign in to your Mon Logement Étudiant student area to manage your profile and alerts."
     },
     "loginOwner": {
-      "title": "Se connecter à mon espace gestionnaire",
-      "description": "Connectez-vous à votre espace gestionnaire pour administrer vos résidences étudiantes sur Mon Logement Étudiant."
+      "title": "Sign in to my manager area",
+      "description": "Sign in to your manager area to administer your student residences on Mon Logement Étudiant."
     },
     "budget": {
-      "title": "Budget Mon Logement Étudiant",
-      "description": "Consultez le budget alloué au projet Mon Logement Étudiant par phase (investigation, construction)."
+      "title": "Mon Logement Étudiant Budget",
+      "description": "View the budget allocated to the Mon Logement Étudiant project by phase (investigation, build)."
     },
     "legalMentions": {
-      "title": "Mentions légales",
-      "description": "Mentions légales de Mon Logement Étudiant : éditeur, directeur de publication, hébergeur et conditions d'utilisation."
+      "title": "Legal notice",
+      "description": "Legal notice for Mon Logement Étudiant: publisher, publication director, host and terms of use."
     },
     "siteMap": {
-      "title": "Plan du site",
-      "description": "Plan du site Mon Logement Étudiant : retrouvez l'ensemble des pages disponibles sur la plateforme."
+      "title": "Sitemap",
+      "description": "Mon Logement Étudiant sitemap: find all pages available on the platform."
     },
     "verificationError": {
-      "title": "Erreur de vérification",
-      "description": "Une erreur est survenue lors de la vérification de votre compte. Veuillez réessayer ou contacter le support."
+      "title": "Verification error",
+      "description": "An error occurred while verifying your account. Please try again or contact support."
     },
     "verificationBuffer": {
-      "title": "Vérification du lien de connexion",
-      "description": "Vérification de votre lien de connexion en cours, vous allez être redirigé automatiquement."
+      "title": "Verifying sign-in link",
+      "description": "Your sign-in link is being verified. You will be redirected automatically."
     },
     "accessibility": {
-      "title": "Accessibilité",
-      "description": "Déclaration d'accessibilité de Mon Logement Étudiant : notre engagement pour rendre la plateforme accessible à tous."
+      "title": "Accessibility",
+      "description": "Mon Logement Étudiant accessibility statement: our commitment to making the platform accessible to everyone."
     },
     "personalData": {
-      "title": "Données personnelles",
-      "description": "Informations sur la gestion de vos données personnelles sur Mon Logement Étudiant."
+      "title": "Personal data",
+      "description": "Information about how your personal data is managed on Mon Logement Étudiant."
     },
     "cookieManagement": {
-      "title": "Gestion des cookies",
-      "description": "Gérez vos préférences de cookies sur Mon Logement Étudiant."
+      "title": "Cookie management",
+      "description": "Manage your cookie preferences on Mon Logement Étudiant."
     }
   },
   "header": {
     "title": "Mon Logement Étudiant",
-    "description": "Faciliter l'accès au logement social pour les étudiants",
-    "alerts": "Alertes logements",
-    "login": "Se connecter",
-    "tally": "Donnez votre avis",
+    "description": "Making access to social housing easier for students",
+    "alerts": "Housing alerts",
+    "login": "Sign in",
+    "tally": "Give your feedback",
     "banner": {
-      "title": "Lancement de la plateforme :",
-      "description": "site en phase d'expérimentation, n'hésitez pas à <link>donner votre avis</link> pour nous aider à améliorer le service.",
-      "close": "Fermer"
+      "title": "Platform launch:",
+      "description": "the site is in an experimental phase. Feel free to <link>give your feedback</link> to help us improve the service.",
+      "close": "Close"
     },
     "notifications": "Notifications"
   },
   "footer": {
     "linkList": {
-      "departmentsCategoryName": "Départements",
-      "citiesCategoryName": "Villes étudiantes"
+      "departmentsCategoryName": "Departments",
+      "citiesCategoryName": "Student cities"
+    },
+    "cityLink": "Student accommodation in {city}",
+    "legalNotice": "Legal notice",
+    "brand": "Mon Logement Étudiant",
+    "bottom": {
+      "privacy": "Privacy policy",
+      "budget": "Mon Logement Étudiant budget",
+      "budgetCalculator": "Student budget calculator",
+      "terms": "Terms and conditions"
     }
   },
   "languages": {
-    "title": "Sélectionner la langue",
-    "fr": "Français",
-    "en": "Anglais"
+    "title": "Select language",
+    "fr": "French",
+    "en": "English"
   },
   "navigation": {
-    "home": "Identifier les aides au logement",
+    "home": "Identify housing aid",
     "prepareBudget": {
-      "title": "Préparer mon budget",
-      "hints": "Consulter les conseils pratiques",
-      "calculator": "Calculer mon budget étudiant",
-      "anticipate": "Anticiper mon budget",
-      "studentCities": "S'informer sur les villes étudiantes",
-      "moreCities": "Plus de villes ›"
+      "title": "Prepare my budget",
+      "hints": "View practical advice",
+      "calculator": "Calculate my student budget",
+      "anticipate": "Plan my budget",
+      "studentCities": "Learn about student cities",
+      "moreCities": "More cities ›"
     },
-    "prepareStudentLife": "Préparer sa vie étudiante",
-    "findAccommodation": "Trouver un logement",
-    "byAcademies": "Par académies",
-    "faq": "Foire aux questions",
+    "prepareStudentLife": "Prepare for student life",
+    "findAccommodation": "Find accommodation",
+    "byAcademies": "By academies",
+    "faq": "Frequently asked questions",
     "workspace": {
-      "dashboard": "Tableau de bord",
-      "helpCenter": "Centre d'aide",
-      "residences": "Résidences",
-      "candidates": "Candidatures",
-      "users": "Utilisateurs"
-    }
+      "dashboard": "Dashboard",
+      "helpCenter": "Help center",
+      "residences": "Residences",
+      "candidates": "Applications",
+      "contacts": "Contacts",
+      "users": "Users"
+    },
+    "mainMenuLabel": "Main menu",
+    "close": "Close"
   },
   "accomodation": {
     "availability": {
-      "noAvailabilityTitle": "Aucune disponibilité pour le moment",
-      "noAvailabilityDescription": "Les logements sont actuellement complets, mais de nouvelles places peuvent se libérer à tout moment.",
-      "maximiseChancesTitle": "Augmentez vos chances d’avoir un logement",
-      "maximiseChancesDescription": "Cette résidence n’a pas communiqué de disponibilités pour le moment. Nous vous invitons à consulter l'offre et à déposer votre dossier sur le site du gestionnaire, afin qu’il soit examiné dès qu’un logement se libère."
+      "noAvailabilityTitle": "No availability at the moment",
+      "noAvailabilityDescription": "The accommodation is currently full, but new places may become available at any time.",
+      "maximiseChancesTitle": "Increase your chances of getting accommodation",
+      "maximiseChancesDescription": "This residence has not shared any availability for the moment. We invite you to view the offer and submit your application on the manager's website so it can be reviewed as soon as accommodation becomes available."
     },
     "equipments": {
-      "title": "Équipements"
+      "title": "Facilities"
     },
-    "socialHousingRequired": "Une <bold>demande de logement social</bold> est nécessaire pour intégrer la résidence.",
-    "socialHousingRequiredLink": "Faire une demande de logement social.",
-    "descriptionTitle": "À propos du logement étudiant {title}",
-    "title": "Logement étudiant {title} {cityFormatted}",
-    "managedBy": "Résidence étudiante gérée par le gestionnaire <manager>{managerName}</manager>",
+    "socialHousingRequired": "A <bold>social housing application</bold> is required to join the residence.",
+    "socialHousingRequiredLink": "Apply for social housing.",
+    "descriptionTitle": "About student accommodation {title}",
+    "title": "Student accommodation {title} {cityFormatted}",
+    "managedBy": "Student residence managed by <manager>{managerName}</manager>",
     "tags": {
       "studio": "Studio",
-      "shared": "Colocation",
+      "shared": "Shared flat",
       "accessible": "Accessible",
-      "priceFrom": "À partir de {price} €"
+      "priceFrom": "From {price} €"
     },
-    "charges": "Charges comprises",
-    "perPerson": "Par personne",
-    "rentalChargesDetails": "Ce qui est compris dans les charges locatives",
-    "availableAccommodations": "Logements de la résidence étudiante",
-    "availableAccommodationsCount": "{count} logements dans la résidence étudiante",
+    "charges": "Charges included",
+    "perPerson": "Per person",
+    "rentalChargesDetails": "What is included in the rental charges",
+    "availableAccommodations": "Accommodation in the student residence",
+    "availableAccommodationsCount": "{count} accommodations in the student residence",
     "location": {
-      "title": "Localisation"
+      "title": "Location"
     },
     "sidebar": {
-      "updatedAt": "Mis à jour le {date}",
-      "proposedBy": "proposé par",
-      "accommodationsCount": "{count} logements",
-      "accommodationsNoCount": "Logements disponibles",
-      "share": "Partager le logement",
-      "emailSubject": "Logement étudiant {title} {locationFormatted}",
-      "emailBody": "Venez découvrir le logement étudiant {title}, situé {locationFormatted}.\n\n🔗 {url}\n📍 {location}\n\nCordialement,\nMon Logement Étudiant",
+      "updatedAt": "Updated on {date}",
+      "proposedBy": "offered by",
+      "accommodationsCount": "{count} accommodations",
+      "accommodationsNoCount": "Available accommodation",
+      "share": "Share accommodation",
+      "emailSubject": "Student accommodation {title} {locationFormatted}",
+      "emailBody": "Come and discover the student accommodation {title}, located {locationFormatted}.\n\n🔗 {url}\n📍 {location}\n\nKind regards,\nMon Logement Étudiant",
       "buttons": {
-        "consult": "Consulter l'offre du gestionnaire",
-        "dossierFacile": "Candidater avec Dossier Facile",
-        "dossierFacileConnect": "Lier mon compte Dossier Facile",
-        "dossierFacileConnectDescription": "Lier votre dossier facile certifié",
-        "dossierFacilePending": "Dossier en cours de vérification",
-        "dossierFacileIncomplete": "Complétez votre DossierFacile",
-        "dossierFacileDenied": "Votre DossierFacile a été refusé",
-        "dossierFacileApply": "Candidater avec DossierFacile",
-        "dossierFacileApplied": "Candidature envoyée",
-        "dossierFacileSelectType": "Type de logement",
-        "consultDescription": "Vous serez redirigé vers le site du gestionnaire",
-        "dossierFacileDescription": "Dossier de location numérique certifié",
-        "link": "Copier le lien",
-        "email": "Envoyer par email",
-        "print": "Imprimer"
+        "consult": "View the manager's offer",
+        "dossierFacile": "Apply with Dossier Facile",
+        "dossierFacileConnect": "Connexion DossierFacile",
+        "dossierFacileConnectDescription": "DossierFacile is the French State's digital rental application. Entirely free, compliant and secure, it protects tenants and reassures landlords.",
+        "dossierFacilePending": "File being verified",
+        "dossierFacileIncomplete": "Complete your DossierFacile",
+        "dossierFacileDenied": "Your DossierFacile was rejected",
+        "dossierFacileApply": "Apply with DossierFacile",
+        "dossierFacileApplied": "Application sent",
+        "dossierFacileSelectType": "Accommodation type",
+        "consultDescription": "You will be redirected to the manager's website",
+        "dossierFacileDescription": "Certified digital rental file",
+        "link": "Copy link",
+        "email": "Send by email",
+        "print": "Print",
+        "dossierFacileLoading": "Loading",
+        "contactRequestLoading": "Loading",
+        "contactRequestSent": "Contact details shared",
+        "contactRequest": "Request a callback",
+        "contactRequestDescription": "Leave your contact details and the manager will contact you by email or phone.",
+        "contactRequestSuccess": "Your contact details have been shared with the manager.",
+        "contactRequestError": "An error occurred. Please try again."
+      },
+      "contactRequestModal": {
+        "title": "Request a callback",
+        "description": "You can share your contact details with the manager to possibly be contacted depending on the residence's availability.",
+        "firstname": "First name",
+        "lastname": "Last name",
+        "email": "Email",
+        "phone": "Phone",
+        "consentStart": "I agree to share this information so I can be contacted according to the",
+        "privacyPolicy": "privacy policy",
+        "consentEnd": "of Mon Logement Étudiant",
+        "cancel": "Cancel",
+        "submit": "Share my contact details",
+        "submitting": "Sending...",
+        "successTitle": "Contact details shared",
+        "successDescriptionAuthenticated": "Your contact details have been made available to the manager so you may be contacted depending on the residence's availability.",
+        "successDescriptionGuest": "Check your inbox: you will receive an email to confirm your request. Your contact details will only be shared with the manager once confirmed. You can also create an account to make your housing search easier.",
+        "createAccount": "Create an account",
+        "prefilledFromAccount": "Your account details are pre-filled. To change them, go to your personal information."
       },
       "alert": {
-        "title": "Restez alerté des disponibilités",
-        "description": "Créez une alerte personnalisée pour être notifié dès qu'un logement se libère.",
-        "cta": "Configurer une alerte"
+        "title": "Stay alerted about availability",
+        "description": "Create a personalized alert to be notified as soon as accommodation becomes available.",
+        "cta": "Set up an alert"
       }
     },
     "nearby": {
-      "title": "Autres logements à proximité",
+      "title": "Other nearby accommodation",
       "buttons": {
-        "previous": "Précédent",
-        "next": "Suivant"
+        "previous": "Previous",
+        "next": "Next"
       },
-      "count": "{count} logements"
+      "count": "{count} accommodations"
     },
     "nearbyEtablissements": {
-      "title": "Établissements à proximité de la résidence",
+      "title": "Institutions near the residence",
       "distance": "{distance} km",
-      "showMore": "Plus d'établissements",
-      "showLess": "Voir moins"
+      "showMore": "More institutions",
+      "showLess": "Show less"
     },
     "studio": "Studio {type}",
-    "colocation": "Colocation",
-    "appartement": "Appartement {type}",
-    "simulator": "Des aides au logement peuvent diminuer le coût du logement.",
-    "simulatorDescription": "Effectuez une simulation pour savoir si vous êtes éligible.",
-    "simulatorButton": "Simulateur",
-    "fjtRsjaNoticeText": "Les Foyers de Jeunes Travailleurs (FJT) et les Résidences Sociales Jeunes Actifs (RSJA) n'ont pas vocation à accueillir prioritairement des étudiants,",
-    "fjtRsjaNoticeDescription": "mais des jeunes actifs en situation appelant des réponses davantage sociales (de façon privilégiée de 16 à 25 ans pour les FJT, de 18 à 30 ans pour les RSJA).",
-    "fjtRsjaLearnMore": "En savoir plus",
-    "fjtRsjaModalTitle": "FJT et RSJA",
-    "fjtRsjaModalParagraph1": "Cependant, en fonction des places disponibles, il est possible pour des étudiants d'y être acceptés. Les étudiants alternants et salariés peuvent être considérés comme des jeunes actifs.",
-    "fjtRsjaModalParagraph2": "En tout état de cause, au-delà du public-socle des FJT, la circulaire CNAF du 14 octobre 2020 précise que les jeunes âgés de 26 à 30 ans, les jeunes étudiants non-salariés ou les jeunes scolarisés (notamment les lycéens) et les apprentis de moins de 16 ans devront représenter globalement, au maximum, 35 % du public logé en FJT au cours de l'année.",
-    "fjtRsjaModalClose": "J'ai compris",
-    "diffusMixteNoticeTitle": "Ces logements étudiants sont situés dans une ou plusieurs résidences de logement social où vivent aussi des familles.",
-    "diffusMixteNoticeDescription": "Il ne s'agit pas de résidences étudiantes dédiées : seuls certains logements peuvent être attribués à des étudiants.",
-    "diffusEtudiantsNoticeTitle": "Ces logements étudiants sont situés dans une ou plusieurs résidences de logement social dédiées uniquement aux étudiants.",
+    "colocation": "Shared flat",
+    "appartement": "Apartment {type}",
+    "simulator": "Housing aid may reduce the cost of accommodation.",
+    "simulatorDescription": "Run a simulation to find out if you are eligible.",
+    "simulatorButton": "Simulator",
+    "fjtRsjaNoticeText": "Young Workers' Hostels (FJT) and Social Residences for Young Workers (RSJA) are not primarily intended to host students,",
+    "fjtRsjaNoticeDescription": "but rather young workers in situations requiring more social support (preferably ages 16 to 25 for FJT and 18 to 30 for RSJA).",
+    "fjtRsjaLearnMore": "Learn more",
+    "fjtRsjaModalTitle": "FJT and RSJA",
+    "fjtRsjaModalParagraph1": "However, depending on available places, students may be accepted. Work-study students and salaried students may be considered young workers.",
+    "fjtRsjaModalParagraph2": "In any case, beyond the core FJT audience, the CNAF circular of October 14, 2020 specifies that young people aged 26 to 30, non-salaried students or pupils (especially high school students), and apprentices under 16 must represent no more than 35% overall of residents housed in FJT during the year.",
+    "fjtRsjaModalClose": "Got it",
+    "diffusMixteNoticeTitle": "This student accommodation is located in one or more social housing residences where families also live.",
+    "diffusMixteNoticeDescription": "These are not dedicated student residences: only some units may be allocated to students.",
+    "diffusEtudiantsNoticeTitle": "This student accommodation is located in one or more social housing residences dedicated exclusively to students.",
     "card": {
-      "availability": "Disponibilité",
-      "noAvailability": "Aucune disponibilité",
-      "unknownAvailability": "Disponibilité non renseignée"
+      "availability": "Availability",
+      "noAvailability": "No availability",
+      "unknownAvailability": "Availability not provided"
     },
-    "waitingList": "Dépôt de dossier possible",
-    "unknownAvailability": "Disponibilités non renseignées",
-    "unknownAvailabilityTooltip": "Le gestionnaire ne nous a pas transmis les disponibilités de cette résidence.",
+    "waitingList": "Applications can be submitted",
+    "unknownAvailability": "Availability not provided",
+    "unknownAvailabilityTooltip": "The manager has not sent us the availability for this residence.",
     "tooltip": {
-      "t1": "T1 : Une seule pièce + coin cuisine ouvert ou cuisine fermée + salle de bain.",
-      "t1bis": "T1bis : Grande pièce unique avec coin nuit semi-séparé et kitchenette ou cuisine séparée + salle de bain.",
-      "t2": "T2 : Séjour + cuisine (ouverte/fermée) + vraie chambre séparée + salle de bain.",
-      "t3": "T3 : Séjour + 2 chambres séparées + cuisine (ouverte/fermée) + salle de bain.",
-      "t4": "T4 : Séjour + 3 chambres séparées + cuisine (ouverte/fermée) + salle de bain.",
-      "t5": "T5 : Séjour + 4 chambres séparées + cuisine (ouverte/fermée) + plusieurs salles de bain possibles.",
-      "t6": "T6 : Séjour + 5 chambres séparées + cuisine (ouverte/fermée) + généralement 2 salles de bain minimum.",
-      "t7": "T7 : Séjour + 6 chambres séparées + cuisine (ouverte/fermée) + 2 à 3 salles de bain."
+      "t1": "T1: One single room + open kitchenette or separate kitchen + bathroom.",
+      "t1bis": "T1bis: Large single room with semi-separated sleeping area and kitchenette or separate kitchen + bathroom.",
+      "t2": "T2: Living room + kitchen (open/separate) + real separate bedroom + bathroom.",
+      "t3": "T3: Living room + 2 separate bedrooms + kitchen (open/separate) + bathroom.",
+      "t4": "T4: Living room + 3 separate bedrooms + kitchen (open/separate) + bathroom.",
+      "t5": "T5: Living room + 4 separate bedrooms + kitchen (open/separate) + possibly several bathrooms.",
+      "t6": "T6: Living room + 5 separate bedrooms + kitchen (open/separate) + usually at least 2 bathrooms.",
+      "t7": "T7: Living room + 6 separate bedrooms + kitchen (open/separate) + 2 to 3 bathrooms."
+    },
+    "virtualTour": {
+      "title": "Visite virtuelle",
+      "frameTitle": "Virtual tour of the residence",
+      "openLink": "Accéder à la visite virtuelle"
     }
   },
   "findAccomodation": {
     "banner": {
       "title": {
-        "city": "De nouveaux logements arrivent bientôt {locationFormatted}.",
-        "academy": "De nouveaux logements arrivent bientôt dans l'académie de {location}.",
-        "department": "De nouveaux logements arrivent bientôt dans le département {location}."
+        "city": "New accommodation is coming soon {locationFormatted}.",
+        "academy": "New accommodation is coming soon in the {location} academy.",
+        "department": "New accommodation is coming soon in the {location} department."
       },
-      "description": "Nous sommes en cours d'intégration de nouvelles résidences. Activez <link>l'alerte</link> pour être notifié dès que de nouveaux logements seront disponibles."
+      "description": "We are currently integrating new residences. Activate <link>the alert</link> to be notified as soon as new accommodation becomes available."
     },
     "faq": {
-      "title": "Parmi les questions fréquentes sur les logements étudiants",
-      "cta": "Foire aux questions"
+      "title": "Common questions about student accommodation",
+      "cta": "Frequently asked questions"
     },
     "autocomplete": {
+      "suggestionsLabel": "Suggestions de recherche",
+      "suggestionsCount": "Search results - {count, plural, one {# suggestion disponible} other {# suggestions disponibles}}",
       "categories": {
-        "academies": "Académies",
-        "cities": "Villes",
-        "departments": "Départements"
+        "academies": "Academies",
+        "cities": "Cities",
+        "departments": "Departments"
       }
     },
-    "title": "Trouver un logement social étudiant",
-    "titleWithLocation": "Trouver un logement social étudiant {locationFormatted}",
+    "title": "Find student social housing",
+    "titleWithLocation": "Find student social housing {locationFormatted}",
     "header": {
-      "inputLabel": "Ville, académie ou département",
-      "shared": "Colocation",
+      "inputLabel": "City, academy or department",
+      "shared": "Shared flat",
       "tooltip": {
-        "accessible": "Etablissements en capacité d'accueillir des personnes en situation de handicap"
+        "accessible": "Institutions able to accommodate people with disabilities"
       },
-      "rangeLabel": "Budget maximum",
-      "filtersCta": "Filtres",
-      "accessbility": "Adapté PMR",
-      "accommodations": "Résidences",
-      "availability": "Logements disponibles",
-      "availabilityLegend": "Disponibilités",
-      "advancedFiltersToggle": "Afficher plus de filtres",
-      "advancedFiltersShow": "Plus de filtres",
-      "advancedFiltersHide": "Fermer",
-      "applyFilters": "Appliquer",
-      "priceChip": "Moins de {prix}€",
-      "priceAll": "Tous",
-      "removeFilter": "Retirer le filtre {filter}",
+      "rangeLabel": "Maximum budget",
+      "filtersCta": "Filters",
+      "accessbility": "Wheelchair accessible",
+      "accommodations": "Residences",
+      "availability": "Available accommodation",
+      "availabilityLegend": "Availability",
+      "advancedFiltersToggle": "Show more filters",
+      "advancedFiltersShow": "More filters",
+      "advancedFiltersHide": "Close",
+      "applyFilters": "Apply",
+      "priceChip": "Less than {prix}€",
+      "priceAll": "All",
+      "removeFilter": "Remove filter {filter}",
       "crous": "Crous",
-      "others": "Autres résidences"
+      "others": "Other residences",
+      "availabilityDescription": "Only show residences with at least one available accommodation",
+      "sharedDescription": "Only show residences offering shared flats"
     },
     "filters": {
-      "accommodations": "résidence",
-      "accommodationsWithLocation": "résidence{pluralize} {locationFormatted}",
-      "grid": "Liste",
-      "map": "Carte",
-      "sortByPrice": "Triés par prix"
+      "accommodations": "residence",
+      "accommodationsWithLocation": "residence{pluralize} {locationFormatted}",
+      "grid": "List",
+      "map": "Map",
+      "sortByPrice": "Sorted by price",
+      "view": "Results display"
     },
     "card": {
-      "priceFrom": "À partir de",
-      "individual": "Individuel",
-      "colocation": "Colocation",
-      "availability": "Disponibilité",
-      "unknownAvailability": "Disponibilités non renseignées",
-      "unknownAvailabilityTooltip": "Le gestionnaire ne nous a pas transmis les disponibilités de cette résidence.",
-      "noAvailability": "Aucune disponibilité",
-      "waitingList": "Dépôt de dossier possible"
+      "priceFrom": "From",
+      "individual": "Individual",
+      "colocation": "Shared flat",
+      "availability": "Availability",
+      "unknownAvailability": "Availability not provided",
+      "unknownAvailabilityTooltip": "The manager has not sent us the availability for this residence.",
+      "noAvailability": "No availability",
+      "waitingList": "Applications can be submitted"
     },
     "results": {
-      "noResult": "Aucun résultat pour votre recherche",
-      "description": "Cela ne veut pas dire que l’offre n’existe pas, mais peut-être qu’elle n’est pas encore recensée sur ce site.",
-      "description2": "Vous pouvez modifier votre recherche ou consulter les questions fréquemment posées sur la page d'informations.",
-      "expandedTitle": "Plus de résultats autour {city}",
-      "expandedDescription": "Nous élargissons automatiquement la recherche autour de la ville (+10 km) et du budget (+25 %).",
-      "expandedNoResult": "Aucun résultat supplémentaire avec cette recherche élargie."
+      "noResult": "No results for your search",
+      "description": "This does not mean the offer does not exist, but it may not yet be listed on this site.",
+      "description2": "You can change your search or view the frequently asked questions on the information page.",
+      "expandedTitle": "More results around {city}",
+      "expandedDescription": "We automatically expand the search around the city (+10 km) and budget (+25%).",
+      "expandedNoResult": "No additional results with this expanded search."
     }
   },
   "prepareStudentLife": {
-    "titlePart1": "Le guide pratique",
-    "titlePart2": "pour bien préparer",
-    "titlePart3": "sa vie étudiante",
-    "department": "Département",
-    "discoverCta": "Tout savoir sur {title}",
-    "city": "Ville",
-    "searchTitlePart": "Tout ce qu'il faut savoir sur sa prochaine ville étudiante",
-    "popularCities": "Villes étudiantes populaires",
-    "title": "Préparer sa vie étudiante {titleFormatted}",
-    "subTitle": "Être étudiant {titleFormatted}",
-    "nearbyCities": "Villes à proximité {titleFormattedDe}",
-    "noResultTitle": "Aucun logement étudiant répertorié pour le moment",
-    "noResultDescription": "Il n'y a pas de logements pour les villes de ce département. Nous vous invitons à réessayer plus tard, de nouvelles résidences sont ajoutées régulièrement."
+    "titlePart1": "The practical guide",
+    "titlePart2": "to properly prepare",
+    "titlePart3": "for student life",
+    "department": "Department",
+    "discoverCta": "Learn all about {title}",
+    "city": "City",
+    "searchTitlePart": "Everything you need to know about your next student city",
+    "popularCities": "Popular student cities",
+    "title": "Prepare for student life {titleFormatted}",
+    "subTitle": "Being a student {titleFormatted}",
+    "nearbyCities": "Cities near {titleFormattedDe}",
+    "noResultTitle": "No student accommodation listed at the moment",
+    "noResultDescription": "There is no accommodation for the cities in this department. Please try again later; new residences are added regularly.",
+    "residence": {
+      "title": "Average student rent in {location}",
+      "studio": "STUDIO ({types})",
+      "apartments": "Apartments ({types})",
+      "deposit": "Plan for a security deposit as well as the first month of rent",
+      "rentCap": "A <b>rent cap is in force in {location}</b> to limit excesses"
+    },
+    "stats": {
+      "housingCount": "{count} student homes <br></br> in the city of {location}",
+      "housingShare": "that is 7% of the homes in the city",
+      "socialLandlords": "3 social landlords in {location}",
+      "crousAlt": "Crous",
+      "gaugeAlt": "Gauge",
+      "easeTitle": "How easy it is to find accommodation",
+      "easeLevel": "Easy",
+      "easeDetail": "<b>3 weeks</b> on average to find student accommodation in {location}",
+      "tenantsBudgetTitle": "Tenants’ budget",
+      "tenantsBudgetLevel": "Balanced",
+      "tenantsBudgetDetail": "The budget of student tenants in {location} is balanced.",
+      "aidsTitle": "17 forms of support available to students living in {location}",
+      "aids": {
+        "national": "National support",
+        "regional": "Regional support",
+        "departmental": "Departmental support",
+        "city": "City support"
+      },
+      "simulateAidsCta": "Simulate my housing aid",
+      "costTitle": "The cost of student <br></br> life in {location}",
+      "costIntro": "A general estimate of the main areas of spending for a student in {location}. Costs may vary depending on lifestyle, the support received and personal choices.",
+      "minimalBudgetTitle": "Minimum budget",
+      "minimalBudgetDescription": "Crous residence, university canteen meals and few outings.",
+      "comfortableBudgetTitle": "Comfortable budget",
+      "comfortableBudgetDescription": "Private accommodation and various activities.",
+      "budgetRange": "Between {min} and {max} €",
+      "unknownBudget": "Unknown",
+      "cost": {
+        "housingTitle": "Accommodation",
+        "pricePerSquareMeter": "<b>Average price per m²</b>: {price} €.",
+        "rentFor20": "<b>Average rent for a 20 m² home</b>: {price} € per month.",
+        "transportTitle": "Transport",
+        "transportPass": "<b>Navigo Imagine'R</b> (student travel pass): about 38 € per month (after housing aid).",
+        "transportOccasional": "<b>Occasional costs</b> (car sharing, taxis, etc.): 10-30 € per month.",
+        "foodTitle": "Food",
+        "foodGroceries": "<b>Groceries</b>: 150-200 € per month (after housing aid).",
+        "foodUniversity": "<b>University meals (Crous)</b>: about 3.30 € per meal (when eaten at the canteen).",
+        "foodOneEuro": "<b>Meals at 1 € for students on a grant and in financial hardship.</b>",
+        "universityTitle": "University fees",
+        "universityTuition": "<b>Annual registration fees</b>: <br></br>Bachelor’s: 170 € / Master’s: 243 €.",
+        "universityHealth": "<b>Health insurance</b>: 10-40 € per month (depending on needs and status).",
+        "leisureTitle": "Leisure and going out",
+        "leisureOutings": "<b>Going out</b> (cinema, bars, restaurants): 50-100 € per month.",
+        "leisureActivities": "<b>Sports or cultural activities</b>: 20-50 € per month.",
+        "otherTitle": "Other expenses",
+        "otherInternet": "<b>Internet and phone</b>: 20-40 € per month.",
+        "otherSupplies": "<b>School supplies</b>: 20-30 € per month.",
+        "otherInsurance": "<b>Home insurance</b>: 10-20 € per month."
+      }
+    }
   },
   "prepareBudget": {
-    "title": "Préparer mon budget étudiant",
+    "title": "Prepare my student budget",
     "sideMenu": {
-      "title": "Conseils pratiques",
+      "title": "Practical advice",
       "items": {
-        "monthlyResources": "1. Définir vos ressources mensuelles",
-        "fixedCharges": "2. Identifier vos charges fixes",
-        "variableExpenses": "3. Estimer vos dépenses variables",
-        "exceptionalExpenses": "4. Anticiper les dépenses exceptionnelles",
-        "aids": "5. Les aides à ne pas oublier"
+        "monthlyResources": "1. Define your monthly resources",
+        "fixedCharges": "2. Identify your fixed costs",
+        "variableExpenses": "3. Estimate your variable expenses",
+        "exceptionalExpenses": "4. Plan for exceptional expenses",
+        "aids": "5. Aid not to forget"
       },
-      "calculator": "Calculer son budget étudiant"
+      "calculator": "Calculate your student budget"
     },
     "content": {
-      "subtitle": "Fiche pratique",
-      "mainTitlePart1": "Préparer votre budget étudiant :",
-      "mainTitlePart2": "les clés pour bien commencer",
+      "subtitle": "Practical guide",
+      "mainTitlePart1": "Prepare your student budget:",
+      "mainTitlePart2": "the keys to getting started well",
       "header": {
-        "title": "Pourquoi établir un budget ?",
-        "description": "Pour beaucoup, devenir étudiant marque le début de l’autonomie et la nécessité d’apprendre à planifier son budget. Entre le loyer, les frais de scolarité, les courses ou encore les sorties, il est important d’avoir de la visibilité. Un budget bien préparé vous permet de :",
+        "title": "Why create a budget?",
+        "description": "For many people, becoming a student marks the beginning of independence and the need to learn how to plan a budget. Between rent, tuition fees, groceries and outings, it is important to have visibility. A well-prepared budget allows you to:",
         "list": {
-          "item1": "Suivre vos dépenses",
-          "item2": "Éviter les découverts",
-          "item3": "Anticiper les imprévus",
-          "item4": "Mieux planifier vos projets (voyage, permis, matériel...)",
-          "item5": "Garder l'esprit tranquille pour vos études",
-          "item6": " Bon à savoir : votre établissement d’enseignement supérieur, ainsi que les Crous peuvent vous accompagner. D’autres services (CAF, ADIL, centre communal d’action sociale…) peuvent aussi vous aider au besoin."
+          "item1": "Track your expenses",
+          "item2": "Avoid overdrafts",
+          "item3": "Plan for unexpected costs",
+          "item4": "Better plan your projects (travel, driving license, equipment...)",
+          "item5": "Keep peace of mind for your studies",
+          "item6": " Good to know: your higher education institution, as well as the Crous, can support you. Other services (CAF, ADIL, local social services center...) can also help you if needed."
         }
       },
       "item1": {
-        "title": "1. Définir vos ressources mensuelles",
-        "description": "Commencez par faire le point sur vos revenus fixes et ponctuels. Cela vous permettra de déterminer combien vous pouvez dépenser chaque mois.",
+        "title": "1. Define your monthly resources",
+        "description": "Start by reviewing your fixed and occasional income. This will help you determine how much you can spend each month.",
         "simulationCard": {
-          "title": "Simulez le montant de vos aides étudiantes",
-          "cta": "Simuler mes aides"
+          "title": "Simulate the amount of your student aid",
+          "cta": "Simulate my aid"
         },
         "list": {
-          "title": "Ressources possibles :",
-          "item1": "Soutien familial",
-          "item2": "Bourse sur critères sociaux (Crous)",
-          "item3": "Aides au logement (APL ou ALS via la CAF)",
-          "item4": "Salaire d'un job étudiant",
-          "item5": "Stages ou alternance rémunérés",
-          "item6": "Aides régionales, départementales ou municipales",
-          "item7": "Aides spécifiques (rupture familiale, situation de handicap...)",
-          "item8": "Prêt étudiant garanti par l’État"
+          "title": "Possible resources:",
+          "item1": "Family support",
+          "item2": "Need-based scholarship (Crous)",
+          "item3": "Housing aid (APL or ALS via CAF)",
+          "item4": "Income from a student job",
+          "item5": "Paid internships or work-study programs",
+          "item6": "Regional, departmental or municipal aid",
+          "item7": "Specific aid (family breakdown, disability...)",
+          "item8": "Student loan guaranteed by the French State"
         }
       },
       "item2": {
-        "title": "2. Identifier vos charges fixes",
-        "description": "Il est important de bien identifier les différentes dépenses et d’avoir une fourchette de coût estimative. Certaines de ces dépenses peuvent varier en fonction des territoires, c’est le cas des dépenses de loyer, de transports ou d’alimentation. Il est également important de distinguer les dépenses récurrentes et obligatoires, qui reviennent généralement chaque mois et les dépenses variables. <br /><br />Les charges fixes sont les dépenses récurrentes, souvent incontournables. Elles varient selon votre situation (ville, logement, transport…).",
+        "title": "2. Identify your fixed costs",
+        "description": "It is important to properly identify the different expenses and have an estimated cost range. Some of these expenses may vary depending on the area, such as rent, transport or food. It is also important to distinguish recurring and mandatory expenses, which generally come back every month, from variable expenses. <br /><br />Fixed costs are recurring expenses, often unavoidable. They vary depending on your situation (city, accommodation, transport...).",
         "list": {
-          "title": "Exemples de charges fixes :",
-          "item1": "Loyer + charges",
-          "item2": "Courses alimentaires",
-          "item3": "Abonnement Internet et mobile",
-          "item4": "Transports en commun ou frais de carburant",
-          "item5": "Assurance habitation, santé, responsabilité civile",
-          "item6": "Frais de scolarité ou d'inscription"
+          "title": "Examples of fixed costs:",
+          "item1": "Rent + charges",
+          "item2": "Groceries",
+          "item3": "Internet and mobile subscription",
+          "item4": "Public transport or fuel costs",
+          "item5": "Home, health and civil liability insurance",
+          "item6": "Tuition or registration fees"
         },
-        "descriptionSubList": "Ces estimations ont été faites en s’appuyant sur les réponses des étudiants « décohabitants » et « indépendants » de l’enquête Repère Condition de Vie - 2023 de l’OVE."
+        "descriptionSubList": "These estimates are based on responses from students living away from home and independent students in the OVE 2023 Student Living Conditions survey."
       },
       "item3": {
-        "title": "3. Estimer vos dépenses variables",
-        "description": "Ce sont celles qui changent chaque mois et que vous pouvez ajuster.",
+        "title": "3. Estimate your variable expenses",
+        "description": "These are expenses that change each month and that you can adjust.",
         "list": {
-          "title": "Incluez notamment :",
-          "item1": "Abonnements divers (streaming, sport, presse...)",
-          "item2": "Sorties, loisirs, activités sportives",
+          "title": "Include in particular:",
+          "item1": "Various subscriptions (streaming, sports, press...)",
+          "item2": "Outings, leisure activities, sports activities",
           "item3": "Restaurants, cafés",
-          "item4": "Petits achats (vêtements, livres, fournitures)",
-          "item5": "Dépenses imprévues"
+          "item4": "Small purchases (clothes, books, supplies)",
+          "item5": "Unexpected expenses"
         }
       },
       "item4": {
-        "title": "4. Anticiper les dépenses exceptionnelles",
-        "description": "Même avec un bon budget, certaines dépenses arrivent moins souvent mais peuvent coûter cher :",
+        "title": "4. Plan for exceptional expenses",
+        "description": "Even with a good budget, some expenses occur less often but can be costly:",
         "list": {
-          "item1": "Déménagement ou rentrée universitaire",
-          "item2": "Achat d’un ordinateur ou matériel spécialisé",
-          "item3": "Dépenses médicales non prises en charge",
-          "item4": "Billets de train pour rentrer chez vous",
-          "item5": "Caution ou frais d’agence pour un logement"
+          "item1": "Moving or university start-of-year costs",
+          "item2": "Buying a computer or specialized equipment",
+          "item3": "Medical expenses not covered",
+          "item4": "Train tickets to go home",
+          "item5": "Deposit or agency fees for accommodation"
         }
       },
       "item5": {
-        "title": "5. Les aides à ne pas oublier",
-        "description": "Voici quelques dispositifs valables sur tout le territoire :",
+        "title": "5. Aid not to forget",
+        "description": "Here are some schemes available throughout the country:",
         "table": {
+          "caption": "Housing and student life aid depending on the situation",
           "header": {
-            "column1": "Aides",
+            "column1": "Aid",
             "column2": "Description",
-            "column3": "Où s'informer ?"
+            "column3": "Where to get information?"
           },
           "row1": {
-            "column1": "Bourse CROUS",
-            "column2": "Selon les revenus familiaux",
+            "column1": "CROUS scholarship",
+            "column2": "Based on family income",
             "column3": "lescrous.fr"
           },
           "row2": {
             "column1": "APL / ALS",
-            "column2": "Aide au logement par la CAF",
+            "column2": "Housing aid from CAF",
             "column3": "caf.fr"
           },
           "row3": {
             "column1": "Visale",
-            "column2": "Garantie de loyer gratuite",
+            "column2": "Free rent guarantee",
             "column3": "visale.fr"
           },
           "row4": {
-            "column1": "Aide au mérite / mobilité",
-            "column2": "Complément pour les boursiers",
+            "column1": "Merit / mobility aid",
+            "column2": "Additional aid for scholarship students",
             "column3": "etudiant.gouv.fr"
           },
           "row5": {
-            "column1": "Complémentaire santé solidaire",
-            "column2": "Aide à la mutuelle santé",
+            "column1": "Solidarity complementary health insurance",
+            "column2": "Aid for complementary health insurance",
             "column3": "ameli.fr"
           },
           "row6": {
-            "column1": "Aides locales",
-            "column2": "Villes, départements, régions",
-            "column3": "Mairie ou site régional"
+            "column1": "Local aid",
+            "column2": "Cities, departments, regions",
+            "column3": "Town hall or regional website"
           }
         }
       },
       "redirectionCard": {
-        "title": "A la recherche d’un logement en résidence étudiante ?",
-        "description": "Mon Logement Etudiant facilite l'accès au logement et aux droits pour les étudiants.",
-        "cta": "Trouver un logement étudiant",
-        "ctaDisclaimer": "Plus de 1500 résidences partout en France"
+        "title": "Looking for accommodation in a student residence?",
+        "description": "Mon Logement Etudiant makes access to housing and rights easier for students.",
+        "cta": "Find student accommodation",
+        "ctaDisclaimer": "More than 1,300 residences throughout France"
       }
     }
   },
   "faq": {
-    "title": "Foire aux questions",
-    "subTitle": "Vous avez des questions ? Nous avons des réponses ! Cette section est dédiée à vous fournir les informations les plus complètes et précises pour vous aider à bien préparer votre vie étudiante. Nous avons regroupé les questions les plus fréquemment posées pour faciliter votre recherche.",
-    "popularQuestions": "Questions populaires"
+    "title": "Frequently asked questions",
+    "subTitle": "Do you have questions? We have answers. This section is designed to provide the most complete and accurate information to help you prepare for student life. We have grouped the most frequently asked questions to make your search easier.",
+    "popularQuestions": "Popular questions"
   },
   "siteMap": {
-    "title": "Plan du site",
+    "title": "Sitemap",
     "links": {
-      "home": "Accueil",
-      "simulation": "Simuler mes aides au logement",
-      "findAccomodation": "Trouver un logement étudiant",
-      "prepareStudentLife": "Préparer sa vie étudiante",
-      "faq": "Foire aux questions",
-      "accessibilite": "Accessibilité",
-      "legalMentions": "Mentions légales",
-      "personalData": "Données personnelles",
-      "cookies": "Gestion des cookies",
+      "home": "Home",
+      "simulation": "Simulate my housing aid",
+      "findAccomodation": "Find student accommodation",
+      "prepareStudentLife": "Prepare for student life",
+      "faq": "Frequently asked questions",
+      "accessibilite": "Accessibility",
+      "legalMentions": "Legal notice",
+      "personalData": "Personal data",
+      "cookies": "Cookie management",
       "landing": "Landing - Mon Logement Étudiant"
     }
   },
   "accessibilite": {
-    "title": "Accessibilité"
+    "title": "Accessibility"
   },
   "legalMentions": {
-    "title": "Mentions légales"
+    "title": "Legal notice"
   },
   "personalData": {
-    "title": "Données personnelles"
+    "title": "Personal data"
   },
   "cookies": {
-    "title": "Gestion des cookies"
+    "title": "Cookie management"
   },
   "landing": {
     "hero": {
-      "title": "Connectons les acteurs du",
-      "highlight": "logement étudiant",
-      "description": " centralise les offres de logements sociaux des différents bailleurs. La plateforme intègre également un simulateur d'aides financières, permettant à chaque étudiant d'estimer son futur budget selon son prochain lieu de vie.",
+      "title": "Connecting stakeholders in",
+      "highlight": "student housing",
+      "description": " centralizes social housing offers from different landlords. The platform also includes a financial aid simulator, allowing each student to estimate their future budget according to their next place of residence.",
       "contact": {
-        "name": "Cécilia et Yasmine",
-        "role": "Chargées de déploiement - Mon Logement Etudiant",
-        "button": "En savoir plus"
+        "name": "Cécilia and Yasmine",
+        "role": "Deployment managers - Mon Logement Etudiant",
+        "button": "Learn more"
       }
     },
     "partners": {
-      "title": "Parmi les partenaires de",
+      "title": "Among the partners of",
       "mle": "Mon Logement Étudiant"
     },
     "features": {
-      "mainTitle": "Accéder à un logement ne devrait jamais être un obstacle à la réussite.",
+      "mainTitle": "Access to housing should never be an obstacle to success.",
       "visibility": {
-        "title": "Gagnez en visibilité",
-        "description": "Centralisez vos offres sur une plateforme officielle, soutenue par des relais de communication ciblés pour toucher un maximum d'étudiants. Une intégration rapide de vos données, permettant de rediriger les étudiants directement sur votre site. ",
-        "free": "Et c'est gratuit."
+        "title": "Gain visibility",
+        "description": "Centralize your offers on an official platform, supported by targeted communication channels to reach as many students as possible. Fast integration of your data, allowing students to be redirected directly to your website. ",
+        "free": "And it is free."
       },
       "priority": {
-        "title": "Notre priorité, les étudiants boursiers.",
-        "description": "La plateforme accompagne les étudiants à identifier les aides disponibles et à évaluer le coût de la vie des différentes villes étudiantes. Le service simplifie également la recherche de studios ou colocations disponibles."
+        "title": "Our priority: scholarship students.",
+        "description": "The platform helps students identify available aid and assess the cost of living in different student cities. The service also simplifies the search for available studios or shared flats."
       },
       "impact": {
-        "title": "Impact social renforcé",
-        "description": "En rejoignant ce projet, vous affirmez votre engagement pour faciliter l'accès au logement et soutenir les étudiants précaires dans leur parcours."
+        "title": "Greater social impact",
+        "description": "By joining this project, you affirm your commitment to facilitating access to housing and supporting students in precarious situations throughout their journey."
       },
       "initiative": {
-        "title": "Une initiative soutenue et encouragée",
-        "description": "Mon Logement Etudiant est déployé dans le cadre de la lutte contre la précarité étudiante."
+        "title": "A supported and encouraged initiative",
+        "description": "Mon Logement Etudiant is being deployed as part of the fight against student precarity."
       }
     },
     "mission": {
       "title": {
-        "part1": "Notre mission:",
-        "part2": "faciliter la recherche",
-        "part3": "de logement d'un étudiant"
+        "part1": "Our mission:",
+        "part2": "make it easier",
+        "part3": "for students to find housing"
       }
     },
     "steps": {
       "step1": {
-        "badge": "Étape 1",
-        "title": "Je simule mes aides au logement",
-        "description": "En quelques clics, l'étudiant identifie ses droits aux différentes aides disponibles et obtient des informations claires sur les démarches à réaliser.",
-        "organismsCount": "Plus de 50 organismes"
+        "badge": "Step 1",
+        "title": "I simulate my housing aid",
+        "description": "In a few clicks, students identify their rights to the different available types of aid and get clear information on the steps to take.",
+        "organismsCount": "More than 50 organizations"
       },
       "step2": {
-        "badge": "Étape 2",
-        "title": "Je prépare ma vie étudiante",
-        "description": "Tout ce qu'il faut savoir sur sa prochaine ville étudiante et son marché locatif.",
+        "badge": "Step 2",
+        "title": "I prepare for student life",
+        "description": "Everything you need to know about your next student city and its rental market.",
         "features": {
-          "info": "Informations pratiques",
-          "pressure": "Pression locative",
-          "price": "Prix moyen des loyers",
-          "cost": "Coût de la vie étudiante"
+          "info": "Practical information",
+          "pressure": "Rental pressure",
+          "price": "Average rent prices",
+          "cost": "Cost of student life"
         }
       },
       "step3": {
-        "badge": "Étape 3",
-        "title": "Je trouve un logement étudiant",
-        "description": "Une recherche efficace grâce aux filtres personnalisés (localisation, budget, type de logement, accès PMR, etc.). La fiche détaillée présente la résidence en détails en incitant à consulter la page de destination de votre choix."
+        "badge": "Step 3",
+        "title": "I find student accommodation",
+        "description": "An efficient search thanks to personalized filters (location, budget, accommodation type, wheelchair access, etc.). The detailed page presents the residence in detail and encourages visitors to consult the destination page of your choice."
       }
     },
     "callToAction": {
       "title": {
-        "part1": "C'est aussi simple que ça.",
-        "part2": "On vous intègre ?"
+        "part1": "It is that simple.",
+        "part2": "Shall we onboard you?"
       },
-      "button": "Prendre rendez-vous",
+      "button": "Book an appointment",
       "contact": {
-        "name": "Cécilia et Yasmine",
-        "role": "Chargées de déploiement"
+        "name": "Cécilia and Yasmine",
+        "role": "Deployment managers"
       }
     }
   },
   "home": {
     "alert": {
-      "title": "Réalisez votre Dossier Social Étudiant (DSE) sur <underline>messervices.étudiant.gouv.fr</underline> avant le 31 mai 2026",
-      "description": "Cela permet un traitement optimal de votre dossier et vous assure, si vous êtes éligible, le versement de votre bourse dès la rentrée de septembre. Par ailleurs, les dossiers complétés et validés avant cette date sont prioritaires pour l'attribution d'un logement Crous."
+      "title": "Complete your Student Social File (DSE) on <underline>messervices.étudiant.gouv.fr</underline> before May 31, 2026",
+      "description": "This allows optimal processing of your file and ensures, if you are eligible, payment of your scholarship from the start of the September academic year. In addition, files completed and validated before this date are prioritized for the allocation of Crous accommodation."
     },
     "crousAlert": {
-      "title": "Faites votre demande de logement Crous",
-      "description": "Les demandes de logement Crous ne se font pas sur Mon Logement Étudiant mais sur <link>trouverunlogement.lescrous.fr</link>."
+      "title": "Apply for Crous accommodation",
+      "description": "Applications for Crous accommodation are not made on Mon Logement Étudiant but on <link>trouverunlogement.lescrous.fr</link>."
     },
     "header": {
-      "rangeLabel": "Budget maximum"
+      "rangeLabel": "Maximum budget"
     },
     "hero": {
-      "title": "Trouvez votre prochain",
-      "titleHighlight": "logement social étudiant",
-      "counter": "Plus de <strong>60 000 logements</strong> déjà référencés",
-      "illustrationAlt": "Étudiant travaillant sur son ordinateur"
+      "title": "Find your next",
+      "titleHighlight": "student social housing",
+      "counter": "More than <strong>60,000 accommodations</strong> already listed"
     },
-    "cta": "Rechercher un logement",
-    "title": "Plus de 1300 résidences étudiantes",
-    "description": "référencées partout en France",
+    "cta": "Search for accommodation",
+    "title": "More than 1,300 student residences",
+    "description": "listed throughout France",
     "mainSection": {
-      "title": "Tout savoir pour bien se loger",
-      "description": "<part1>Estimation, fiches pratiques et aperçu des logements, tout est là pour</part1><part2>vous guider pas à pas vers votre prochaine vie étudiante.</part2>"
+      "title": "Everything you need to know to find good accommodation",
+      "description": "<part1>Estimates, practical guides and accommodation previews: everything is here to</part1><part2>guide you step by step toward your next student life.</part2>"
     },
     "features": {
       "simulateAids": {
-        "badge": "RECOMMANDÉ",
-        "title": "Simulez vos aides au logement",
-        "description": "6 questions pour estimer vos droits au logement et faciliter vos recherches ",
-        "button": "Simuler mes aides"
+        "badge": "RECOMMENDED",
+        "title": "Simulate your housing aid",
+        "description": "6 questions to estimate your housing rights and make your search easier ",
+        "button": "Simulate my aid"
       },
       "calculateBudget": {
-        "badge": "PRATIQUE",
-        "title": "Calculez votre futur budget étudiant",
-        "description": "Gérez vos finances facilement et visualisez votre budget mensuel en temps réel",
-        "button": "Calculer mon budget"
+        "badge": "PRACTICAL",
+        "title": "Calculate your future student budget",
+        "description": "Manage your finances easily and view your monthly budget in real time",
+        "button": "Calculate my budget"
       },
       "prepareBudget": {
-        "title": "Préparer son budget étudiant",
-        "description": "Gérer son budget est l'un des premiers défis de la vie étudiante. Entre le loyer, l'alimentation, les transports et les loisirs, il peut être difficile de s'y retrouver et de faire les bons choix financiers. Pourtant, avec quelques repères et de bons outils, il est tout à fait possible de garder le contrôle et d'éviter les mauvaises surprises.",
-        "button": "Tout savoir"
+        "title": "Prepare your student budget",
+        "description": "Managing your budget is one of the first challenges of student life. Between rent, food, transport and leisure, it can be difficult to find your way and make the right financial choices. Yet with a few reference points and the right tools, it is entirely possible to stay in control and avoid unpleasant surprises.",
+        "button": "Learn all about it"
       },
       "exploreCities": {
-        "title": "Explorer les villes étudiantes",
-        "moreButton": "Plus de villes"
+        "title": "Explore student cities",
+        "moreButton": "More cities"
       },
       "findAccommodation": {
-        "title": "Trouver son prochain logement étudiant",
-        "locationInput": "Etablissement, académie, ville ou département",
-        "searchButton": "Rechercher"
+        "title": "Find your next student accommodation",
+        "locationInput": "Institution, academy, city or department",
+        "searchButton": "Search"
       }
     },
     "cities": {
-      "title": "Explorez les villes étudiantes",
-      "moreButton": "Plus de villes",
-      "illustrationAlt": "Étudiante sur canapé avec laptop"
+      "title": "Explore student cities",
+      "moreButton": "More cities"
     },
     "facilitate": {
-      "title": "Tout pour faciliter ma",
-      "titleHighlight": "recherche de logement",
+      "title": "Everything to make my",
+      "titleHighlight": "housing search easier",
       "items": {
-        "offers": "Offres de logement",
-        "offersDescription": "Plus de 600 résidences étudiantes disponibles",
-        "simulator": "Simulateur d'aides au logement",
-        "simulatorDescription": "Plus de 6 organismes d'aides référencés",
-        "calculator": "Calculatrice de budget étudiant",
-        "calculatorDescription": "Quelques clics pour tout maîtriser",
-        "alerts": "Alertes logement",
-        "alertsDescription": "Notifications en temps réel des disponibilités",
-        "account": "Espace connecté Étudiant",
-        "accountDescription": "Favoris, alertes, to-do list et bien plus."
+        "offers": "Housing offers",
+        "offersDescription": "More than 600 student residences available",
+        "simulator": "Housing aid simulator",
+        "simulatorDescription": "More than 6 aid organizations listed",
+        "calculator": "Student budget calculator",
+        "calculatorDescription": "A few clicks to stay in control",
+        "alerts": "Housing alerts",
+        "alertsDescription": "Real-time notifications about availability",
+        "account": "Connected student area",
+        "accountDescription": "Favorites, alerts, to-do list and much more."
       },
-      "button": "Créer un compte"
+      "button": "Create an account"
     },
     "news": {
-      "title": "À la Une de Mon Logement Étudiant",
-      "description": "Retrouvez nos dernières actualités et conseils pour bien préparer votre vie étudiante",
-      "moreButton": "Plus d'actualités",
+      "title": "Headlines from Mon Logement Étudiant",
+      "description": "Find our latest news and advice to properly prepare for student life",
+      "moreButton": "More news",
       "articles": {
         "budget": {
-          "title": "Comment bien préparer son budget étudiant ?",
-          "description": "Découvrez nos conseils pour gérer vos finances pendant vos études.",
-          "imageAlt": "Préparer son budget"
+          "title": "How to prepare your student budget well?",
+          "description": "Discover our advice for managing your finances during your studies.",
+          "imageAlt": "Preparing your budget"
         },
         "cities": {
-          "title": "Les meilleures villes étudiantes en 2025",
-          "description": "Notre classement des villes les plus attractives pour les étudiants.",
-          "imageAlt": "Villes étudiantes"
+          "title": "The best student cities in 2025",
+          "description": "Our ranking of the most attractive cities for students.",
+          "imageAlt": "Student cities"
         },
         "aids": {
-          "title": "Toutes les aides au logement étudiant",
-          "description": "APL, ALS, Visale... découvrez toutes les aides disponibles.",
-          "imageAlt": "Aides au logement"
+          "title": "All student housing aid",
+          "description": "APL, ALS, Visale... discover all available aid.",
+          "imageAlt": "Housing aid"
         }
       }
     },
     "partners": {
-      "title": "Gestionnaires, rejoignez la plateforme nationale du",
-      "titleHighlight": "logement social étudiant",
-      "description": "Nous centralisons l'ensemble de l'offre de résidences à vocation sociale pour fluidifier le parcours d'accès au logement des étudiants et futurs étudiants",
-      "button": "En savoir plus"
+      "title": "Managers, join the national platform for",
+      "titleHighlight": "student social housing",
+      "description": "We centralize the full offer of social-purpose residences to make the housing access journey smoother for students and future students",
+      "button": "Learn more",
+      "buttonLabel": "Learn more about our social landlord partners"
     },
     "institutionalPartners": {
-      "label": "Parmi les partenaires de <bold>Mon Logement Étudiant</bold>"
+      "label": "Among the partners of <bold>Mon Logement Étudiant</bold>"
     },
     "social": {
-      "titlePart1": "Bailleurs sociaux, rejoignez la plateforme nationale du",
-      "titlePart2": "logement étudiant",
-      "description": "Nous centralisons l'ensemble de l'offre de résidences à vocation sociale pour fluidifier le parcours d'accès au logement des étudiants et futurs étudiants"
+      "titlePart1": "Social landlords, join the national platform for",
+      "titlePart2": "student housing",
+      "description": "We centralize the full offer of social-purpose residences to make the housing access journey smoother for students and future students"
     },
     "faq": {
-      "title": "Parmi les questions fréquentes",
+      "title": "Common questions",
       "tabs": {
-        "tab1": "Onglet 1",
-        "tab2": "Onglet 2"
+        "tab1": "Tab 1",
+        "tab2": "Tab 2"
       },
-      "button": "Foire aux questions"
+      "button": "Frequently asked questions"
     }
   },
   "notFound": {
-    "title": "Page introuvable",
-    "errorCode": "Erreur 404",
-    "description": "La page que vous cherchez est introuvable. Excusez-nous pour la gêne occasionnée.",
-    "description2": "Si vous avez tapé l'adresse web dans le navigateur, vérifiez qu'elle est correcte.",
-    "description3": "La page n'est peut-être plus disponible.",
-    "description4": "Dans ce cas, pour continuer votre visite vous pouvez consulter la page d'accueil.",
-    "button": "Page d'accueil"
+    "title": "Page not found",
+    "errorCode": "Error 404",
+    "description": "The page you are looking for cannot be found. Sorry for the inconvenience.",
+    "description2": "If you typed the web address into your browser, check that it is correct.",
+    "description3": "The page may no longer be available.",
+    "description4": "In that case, to continue your visit you can go to the home page.",
+    "button": "Home page"
   },
   "login": {
-    "studentTitle": "Se connecter à mon espace étudiant",
-    "ownerTitle": "Se connecter à mon espace gestionnaire",
-    "subTitlePart1": "Les champs marqués du symbole",
-    "subTitlePart2": "sont obligatoires.",
+    "studentTitle": "Sign in to my student area",
+    "ownerTitle": "Sign in to my manager area",
+    "requiredFieldsNotice": "Unless otherwise stated, all fields are required.",
     "labels": {
       "email": "Email",
-      "password": "Mot de passe",
-      "cta": "Se connecter",
-      "magicLinkCta": "Recevoir un lien de connexion",
-      "forgotPassword": "Mot de passe oublié",
-      "or": "OU"
+      "password": "Password",
+      "cta": "Sign in",
+      "magicLinkCta": "Receive a sign-in link",
+      "forgotPassword": "Forgot password",
+      "or": "OR"
     },
     "firstVisit": {
-      "title": "Première visite ?",
-      "description": "Créez votre compte dès maintenant pour accèder votre espace Mon Logement Etudiant",
-      "cta": "Créer un compte",
-      "ownerTitle": "Vous n'êtes pas encore partenaire ?",
-      "ownerDescription": "Rejoignez le mouvement en échangeant avec notre équipe",
-      "ownerCta": "Prendre rendez-vous"
+      "title": "First visit?",
+      "description": "Create your account now to access your Mon Logement Etudiant area",
+      "cta": "Create an account",
+      "ownerTitle": "Not a partner yet?",
+      "ownerDescription": "Join the movement by talking with our team",
+      "ownerCta": "Book an appointment"
     },
-    "success": "Si un compte est associé à cette adresse e-mail, vous recevrez un lien sur cette adresse.",
-    "activated": "Votre compte a bien été activé, connectez-vous avec votre adresse email et le mot de passe que vous venez de créer.",
+    "success": "If an account is associated with this email address, you will receive a link at that address.",
+    "activated": "Your account has been activated. Sign in with your email address and the password you just created.",
     "unverified": {
-      "title": "Compte non confirmé",
-      "description": "Votre compte n'a pas encore été confirmé par email. Cliquez sur le bouton ci-dessous pour recevoir un nouvel email de confirmation.",
-      "resendCta": "Renvoyer l'email de confirmation",
-      "resending": "Envoi en cours...",
-      "resendSuccess": "Email de confirmation envoyé. Vérifiez votre boîte mail.",
-      "resendError": "Une erreur est survenue lors de l'envoi de l'email."
+      "title": "Account not confirmed",
+      "description": "Your account has not yet been confirmed by email. Click the button below to receive a new confirmation email.",
+      "resendCta": "Resend confirmation email",
+      "resending": "Sending...",
+      "resendSuccess": "Confirmation email sent. Check your inbox.",
+      "resendError": "An error occurred while sending the email."
     }
   },
   "forgotPassword": {
-    "title": "Réinitialiser votre mot de passe",
-    "subTitlePart1": "Les champs marqués du symbole",
-    "subTitlePart2": "sont obligatoires.",
+    "title": "Reset your password",
+    "requiredFieldsNotice": "Unless otherwise stated, all fields are required.",
     "labels": {
       "email": "Email",
-      "cta": "Réinitialiser votre mot de passe",
-      "sending": "Envoi en cours..."
+      "cta": "Reset your password",
+      "sending": "Sending..."
     },
-    "backToLogin": "Retour à la page de connexion",
+    "backToLogin": "Back to sign-in page",
     "success": {
-      "description": "Si cet identifiant correspond bien à votre compte, un e-mail vous a été envoyé pour vous permettre de réinitialiser votre mot de passe. En cas de difficulté veuillez contacter <mailto>contact@monlogementetudiant.beta.gouv.fr</mailto>"
+      "description": "If this identifier matches your account, an email has been sent to allow you to reset your password. If you have difficulty, please contact <mailto>contact@monlogementetudiant.beta.gouv.fr</mailto>"
     }
   },
   "resetPassword": {
-    "title": "Définition du mot de passe",
+    "title": "Set password",
     "labels": {
-      "newPassword": "Nouveau mot de passe",
-      "newPasswordDescription": "12 caractères, composé de chiffres, lettres et caractères spéciaux.",
-      "confirmPassword": "Confirmation du nouveau mot de passe",
-      "cta": "Réinitialiser votre mot de passe",
-      "resetting": "Réinitialisation du mot de passe ..."
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "cta": "Reset your password",
+      "resetting": "Resetting password..."
     },
     "success": {
-      "description": "Votre nouveau mot de passe a bien été enregistré. Vous pouvez retourner à la page de connexion."
+      "description": "Your new password has been saved. You can return to the sign-in page."
     },
-    "backToLogin": "Retour à la page de connexion"
+    "backToLogin": "Back to sign-in page"
   },
   "signUp": {
-    "title": "Création de compte",
-    "subTitlePart1": "Les champs marqués du symbole",
-    "subTitlePart2": "sont obligatoires.",
+    "title": "Create an account",
+    "requiredFieldsNotice": "Unless otherwise stated, all fields are required.",
     "labels": {
-      "firstname": "Prénom",
-      "lastname": "Nom",
+      "firstname": "First name",
+      "lastname": "Last name",
       "email": "Email",
-      "password": "Mot de passe",
-      "passwordHintText": "12 caractères, composé de chiffres, lettres et caractères spéciaux.",
-      "cta": "Créer un compte",
-      "privacyPolicy": "Politique de confidentialité"
+      "password": "Password",
+      "cta": "Create an account",
+      "privacyPolicy": "Privacy policy"
     },
-    "backToLogin": "Retour à la page de connexion"
+    "backToLogin": "Back to sign-in page"
   },
   "budget": {
-    "title": "Budget Mon Logement Étudiant",
-    "lastUpdate": "Mis à jour le",
-    "description": "Le budget de la startup Mon Logement Étudiant est présenté en comité d'investissement tous les 6 mois.",
-    "description2": "Il doit permettre à l'équipe d'atteindre les objectifs fixés dans la feuille de route et de se concentrer sur la satisfaction utilisateur. L'essentiel des dépenses se concentre sur les frais de personnel. Sept indépendants travaillent pour la startup Mon Logement Étudiant, ainsi qu'une chargée de mission \"Logement étudiant\" au MESR.",
-    "repartition": "Répartition des dépenses",
-    "investigationDate": "Octobre à janvier 2024 (investigation)",
-    "constructionDate": "Novembre 2024 à mars 2025 (construction)",
-    "constructionDatePart2": "Avril à septembre 2025 (construction)",
-    "accelerationDate": "Octobre 2025 à mars 2026 (accélération)",
-    "total": "Le total cumulé des dépenses d’octobre 2024 à fin mars 2026 s’élève donc à",
+    "title": "Mon Logement Étudiant Budget",
+    "lastUpdate": "Updated on",
+    "description": "The budget of the Mon Logement Étudiant startup is presented to the investment committee every 6 months.",
+    "description2": "It must allow the team to reach the objectives set in the roadmap and focus on user satisfaction. Most spending is concentrated on personnel costs. Seven freelancers work for the Mon Logement Étudiant startup, as well as a \"Student housing\" project officer at the MESR.",
+    "repartition": "Expense breakdown",
+    "investigationDate": "October to January 2024 (investigation)",
+    "constructionDate": "November 2024 to March 2025 (build)",
+    "constructionDatePart2": "April to September 2025 (build)",
+    "accelerationDate": "October 2025 to March 2026 (acceleration)",
+    "total": "The cumulative total expenses from October 2024 to the end of March 2026 therefore amount to",
     "table": {
       "coaching": "Coaching",
-      "development": "Développement",
+      "development": "Development",
       "design": "Design",
-      "deployment": "Déploiement",
+      "deployment": "Deployment",
       "communication": "Communication",
-      "total": "Total TTC"
+      "total": "Total incl. VAT"
     }
   },
   "simulator": {
-    "titlePart1": "Simulez le montant de vos",
-    "titlePart2": "aides",
-    "titlePart3": "au logement",
-    "descriptionPart1": "6 questions pour estimer vos",
-    "descriptionPart2": "droits et faciliter vos recherches",
+    "titlePart1": "Simulate the amount of your",
+    "titlePart2": "aid",
+    "titlePart3": "for housing",
+    "descriptionPart1": "6 questions to estimate your",
+    "descriptionPart2": "rights and make your search easier",
     "cta": {
-      "titleLine1": "Trouvez votre prochain",
-      "titleLine2": "logement étudiant",
-      "subtitle": "Plus de 1300 résidences étudiantes référencées partout en France",
-      "button": "Trouver un logement"
+      "titleLine1": "Find your next",
+      "titleLine2": "student accommodation",
+      "subtitle": "More than 1,300 student residences listed throughout France",
+      "button": "Find accommodation"
     },
     "results": {
       "localisation": {
-        "label": "Localisation",
-        "localAidsInfo": "<strong>{name}</strong> propose des aides complémentaires pour les étudiants"
+        "label": "Location",
+        "localAidsInfo": "<strong>{name}</strong> offers additional aid for students"
       },
       "aids": {
-        "eligibleCount": "Aides disponibles ({count})",
-        "ineligibleCount": "Aides non disponibles ({count})",
-        "disclaimerTitle": "Important : les montants indiqués sont des estimations.",
-        "disclaimerSubtitle": "Pour connaître vos droits exacts, rendez-vous sur les sites officiels.",
-        "emptyEligible": "Aucune aide disponible selon vos critères.",
-        "emptyIneligible": "Toutes les aides sont disponibles pour vous."
+        "eligibleCount": "Available aid ({count})",
+        "ineligibleCount": "Unavailable aid ({count})",
+        "disclaimerTitle": "Important: the amounts shown are estimates.",
+        "disclaimerSubtitle": "To find out your exact rights, visit the official websites.",
+        "emptyEligible": "No aid available based on your criteria.",
+        "emptyIneligible": "All aid is available to you."
       },
       "saveBanner": {
-        "titleLine1": "Conservez le résultat de cette simulation",
-        "titleLine2": "dans votre espace personnel",
-        "description": "Enregistrez dans votre <strong>espace étudiant</strong> les aides auxquelles vous êtes éligible afin de les garder à portée de main durant vos recherches de logement.",
-        "saveButton": "Conserver cette simulation",
-        "createAccountButton": "Créer un compte",
-        "successToast": "Simulation conservée dans votre espace personnel.",
-        "errorToast": "Une erreur est survenue lors de la sauvegarde de la simulation."
+        "titleLine1": "Keep the result of this simulation",
+        "titleLine2": "in your personal area",
+        "description": "Save the aid for which you are eligible in your <strong>student area</strong> so you can keep it close at hand during your housing search.",
+        "saveButton": "Save this simulation",
+        "createAccountButton": "Create an account",
+        "successToast": "Simulation saved in your personal area.",
+        "errorToast": "An error occurred while saving the simulation."
       }
     }
   },
   "budgetSimulator": {
-    "titlePart1": "Calculez votre",
-    "titlePart2": "budget étudiant",
-    "subtitle": "Gérez vos finances facilement et visualisez votre budget mensuel en temps réel",
+    "titlePart1": "Calculate your",
+    "titlePart2": "student budget",
+    "subtitle": "Manage your finances easily and view your monthly budget in real time",
     "sections": {
       "income": {
-        "title": "Revenus",
-        "subtitle": "Renseignez toutes vos sources de revenus"
+        "title": "Income",
+        "subtitle": "Enter all your sources of income"
       },
       "expenses": {
-        "title": "Dépenses",
-        "subtitle": "Listez toutes vos dépenses régulières"
+        "title": "Expenses",
+        "subtitle": "List all your regular expenses"
       }
     },
     "income": {
-      "sourceLabel": "Source de revenus",
-      "frequencyLabel": "Fréquence",
-      "amountLabel": "Montant",
-      "addIncomeTitle": "Ajouter un revenu",
-      "addIncomeLabel": "Ajouter une source de revenu",
-      "removeIncomeTitle": "Supprimer un revenu",
+      "incomeRowLegend": "Ligne de revenu : {source}",
+      "sourceLabel": "Source of income",
+      "frequencyLabel": "Frequency",
+      "amountLabel": "Amount",
+      "addIncomeTitle": "Add income",
+      "addIncomeLabel": "Add a source of income",
+      "removeIncomeTitle": "Remove income",
       "frequencies": {
-        "monthly": "Mensuelle",
-        "yearly": "Annuelle"
+        "monthly": "Monthly",
+        "yearly": "Yearly"
       },
       "types": {
-        "familyAid": "Aides de ma famille",
-        "scholarships": "Bourses (du Crous ou de la Région)",
-        "cafHousingAid": "Aides au logement de la CAF",
-        "otherPublicAid": "Autres aides publiques",
-        "salary": "Job étudiant",
-        "studentLoan": "Prêt étudiant (ex : prêt étudiant garanti par l'Etat)",
-        "other": "Autres revenus",
-        "savings": "Argent mis de côté"
+        "familyAid": "Aid from my family",
+        "scholarships": "Scholarships (from Crous or the Region)",
+        "cafHousingAid": "CAF housing aid",
+        "otherPublicAid": "Other public aid",
+        "salary": "Student job",
+        "studentLoan": "Student loan (e.g. student loan guaranteed by the French State)",
+        "other": "Other income",
+        "savings": "Money set aside"
       }
     },
     "expenses": {
-      "categoryLabel": "Catégorie",
-      "frequencyLabel": "Fréquence",
-      "amountLabel": "Montant",
-      "amountHint": "Entre {low} € et {high} € en moyenne *",
-      "addExpenseTitle": "Ajouter une dépense",
-      "addExpenseLabel": "Ajouter une dépense",
-      "removeExpenseTitle": "Supprimer une dépense",
-      "cvecHint": "La CVEC est fixée à {amount} € pour 2025-2026",
+      "expenseRowLegend": "Ligne de dépense : {category}",
+      "categoryLabel": "Category",
+      "frequencyLabel": "Frequency",
+      "amountLabel": "Amount",
+      "amountHint": "Between {low} € and {high} € on average *",
+      "addExpenseTitle": "Add an expense",
+      "addExpenseLabel": "Add an expense",
+      "removeExpenseTitle": "Remove an expense",
+      "cvecHint": "The CVEC is set at {amount} € for 2025-2026",
       "frequencies": {
-        "monthly": "Mensuelle",
-        "yearly": "Annuelle"
+        "monthly": "Monthly",
+        "yearly": "Yearly"
       },
       "types": {
-        "housing": "Loyer",
-        "housingCharges": "Charges d'habitation (Assurance, charges, eau, électricité…)",
-        "food": "Alimentation (restauration collective et courses d'alimentation)",
-        "dailyLife": "Vie quotidienne (habillement, produit d'hygiène…)",
-        "communication": "Téléphone et internet",
-        "transport": "Transports (quotidiens et pour rentrer chez moi)",
-        "registrationFees": "Frais d'inscription dans mon établissement d'enseignement",
-        "cvec": "CVEC (Contribution Vie Étudiante et de Campus)",
-        "studyMaterials": "Matériel pour les études (ordinateur, impressions, livres, papier, petit matériel)",
-        "mutuelle": "Mutuelle",
-        "otherHealthcare": "Autres frais de santé",
-        "enjoyment": "Loisirs (activités sportives, culturelles, sorties entre amis)",
-        "childcare": "Garde d'enfant",
-        "other": "Autre",
-        "securityDeposit": "Dépôt de garantie appartement (1 mois de loyer)",
-        "agencyFees": "Frais d'agence immobilière",
-        "apartmentEquipment": "Équipement de base de l'appartement (draps, vaisselle, lampe, etc.)"
+        "housing": "Rent",
+        "housingCharges": "Housing charges (insurance, charges, water, electricity...)",
+        "food": "Food (student dining and groceries)",
+        "dailyLife": "Daily life (clothing, hygiene products...)",
+        "communication": "Phone and internet",
+        "transport": "Transport (daily travel and trips home)",
+        "registrationFees": "Registration fees at my educational institution",
+        "cvec": "CVEC (Student and Campus Life Contribution)",
+        "studyMaterials": "Study materials (computer, printing, books, paper, small supplies)",
+        "mutuelle": "Complementary health insurance",
+        "otherHealthcare": "Other healthcare costs",
+        "enjoyment": "Leisure (sports activities, cultural activities, outings with friends)",
+        "childcare": "Childcare",
+        "other": "Other",
+        "securityDeposit": "Apartment security deposit (1 month's rent)",
+        "agencyFees": "Real estate agency fees",
+        "apartmentEquipment": "Basic apartment equipment (sheets, dishes, lamp, etc.)"
       }
     },
     "summary": {
-      "title": "Résumé du budget",
-      "subtitle": "Résultats de votre simulation en équivalent mensuel",
-      "totalIncome": "Revenus totaux mensualisés",
-      "totalExpenses": "Dépenses totales mensualisées",
-      "remainingBalance": "Solde restant",
-      "savingsRate": "Taux d'épargne : {rate} %",
-      "expensesBreakdown": "Répartition des dépenses",
-      "chartTooltipAmount": "Montant mensuel",
-      "hintsCta": "Conseils pratiques pour son budget",
-      "hintsTitle": "Pour aller plus loin",
-      "annualTotal": "Soit {amount} par an",
-      "schoolYearBudgetTitle": "Budget de rentrée",
-      "schoolYearBudgetDescription": "Pour la rentrée scolaire, vous devez prévoir {firstMonth}, puis {followingMonths} par mois pour les mois suivants."
+      "chartShareHeader": "Part du budget",
+      "announcement": "Revenus mensuels : {incomes}. Dépenses mensuelles : {expenses}. Reste à vivre : {balance}.",
+      "title": "Budget summary",
+      "subtitle": "Results of your simulation as a monthly equivalent",
+      "totalIncome": "Total monthly income",
+      "totalExpenses": "Total monthly expenses",
+      "remainingBalance": "Remaining balance",
+      "savingsRate": "Savings rate: {rate}%",
+      "expensesBreakdown": "Expense breakdown",
+      "chartTooltipAmount": "Monthly amount",
+      "hintsCta": "Practical advice for your budget",
+      "hintsTitle": "Go further",
+      "annualTotal": "That is {amount} per year",
+      "schoolYearBudgetTitle": "Start-of-year budget",
+      "schoolYearBudgetDescription": "For the start of the academic year, you should plan for {firstMonth}, then {followingMonths} per month for the following months."
     }
   },
   "verification": {
     "error": {
-      "title": "Erreur de vérification",
-      "description": "Une erreur est survenue lors de la vérification de votre compte. Le lien de vérification est peut-être expiré ou invalide.",
-      "whatToDo": "Que faire maintenant ?",
+      "title": "Verification error",
+      "description": "An error occurred while verifying your account. The verification link may have expired or be invalid.",
+      "whatToDo": "What should you do now?",
       "instructions": {
-        "checkLink": "Vérifiez que vous avez cliqué sur le bon lien de vérification",
-        "expiration": "Le lien de vérification expire après 5 minutes.",
-        "checkEmail": "Assurez-vous que votre adresse email est correcte"
+        "checkLink": "Check that you clicked the correct verification link",
+        "expiration": "The verification link expires after 5 minutes.",
+        "checkEmail": "Make sure your email address is correct"
       },
       "buttons": {
-        "login": "Se connecter"
+        "login": "Sign in"
       }
     },
     "buffer": {
-      "title": "Vérification du lien de connexion",
-      "description": "Vous allez être redirigé dans quelques instants.",
-      "fallbackText": "Si rien ne se passe, cliquez sur le lien suivant :",
-      "fallbackLink": "Se connecter"
+      "title": "Verifying sign-in link",
+      "description": "You will be redirected in a few moments.",
+      "fallbackText": "If nothing happens, click the following link:",
+      "fallbackLink": "Sign in"
     }
   },
   "shared": {
     "welcome": {
-      "title": "Ravi de vous revoir {firstname} 👋"
+      "title": "Good to see you again {firstname} 👋"
     },
     "testimonial": {
-      "quote": "« Bienvenue sur votre Espace Gestionnaire. Ensemble, nous rendons la recherche de logement étudiant plus simple. 🙂 »",
-      "author": "Cécilia et Yasmine",
-      "organization": "de Mon Logement Etudiant",
-      "altText": "Image de profil de Cécilia et Yasmine Chargées de déploiement"
+      "quote": "“Welcome to your Manager Area. Together, we are making the student housing search simpler. 🙂”",
+      "author": "Cécilia and Yasmine",
+      "organization": "from Mon Logement Etudiant",
+      "altText": "Profile image of Cécilia and Yasmine, Deployment managers"
     }
   },
   "student": {
     "navigation": {
-      "backToHome": "Retour à la recherche",
-      "dashboard": "Tableau de bord",
-      "todoList": "Mes priorités ({done}/{total})",
-      "housingAid": "Aides au logement",
-      "favorites": "Favoris",
-      "alerts": "Alertes logements",
-      "personalInformations": "Informations personnelles"
+      "backToHome": "Back to search",
+      "dashboard": "Dashboard",
+      "todoList": "My priorities ({done}/{total})",
+      "housingAid": "Housing aid",
+      "favorites": "Favorites and applications",
+      "alerts": "Housing alerts",
+      "personalInformations": "Personal information",
+      "menuTitle": "My area"
     },
     "welcome": {
-      "subtitle": "Bienvenue dans votre espace personnel"
+      "subtitle": "Welcome to your personal area",
+      "greeting": "Ravi de vous revoir {firstname}"
     },
     "summary": {
-      "title": "En résumé",
-      "favorites": "{count} favoris",
-      "applications": "{count} candidature",
-      "alerts": "{count} alertes"
+      "title": "Summary",
+      "favorites": "{count} favorites",
+      "applications": "{count} application",
+      "alerts": "{count} alerts"
     },
     "maximizeChances": {
-      "title": "Mettez toutes les chances de votre côté",
+      "title": "Give yourself the best chance",
       "completeTodoList": {
-        "title": "Complétez votre liste de priorités",
-        "cta": "Mes priorités"
+        "title": "Complete your priority list",
+        "cta": "My priorities"
       },
       "estimateAid": {
-        "title": "Estimez vos aides au logement",
-        "cta": "Mes aides"
+        "title": "Estimate your housing aid",
+        "cta": "My aid"
       },
       "createAlerts": {
-        "title": "Créez vous des alertes logements",
-        "cta": "Mes alertes"
+        "title": "Create housing alerts",
+        "cta": "My alerts"
       },
-      "todoListButton": "Mes priorités",
-      "myAidButton": "Mes aides",
-      "myAlertsButton": "Mes alertes"
+      "todoListButton": "My priorities",
+      "myAidButton": "My aid",
+      "myAlertsButton": "My alerts"
     },
     "news": {
-      "title": "À la une",
+      "title": "Headlines",
       "testimonial": {
-        "quote": "« Bienvenue sur votre Espace Gestionnaire. Ensemble, nous rendons la recherche de logement étudiant plus simple. 🙂 »"
+        "quote": "“Welcome to your Manager Area. Together, we are making the student housing search simpler. 🙂”"
       }
     },
     "informations": {
-      "title": "S'informer pour bien se loger"
+      "title": "Get informed to find good accommodation"
     },
     "todo": {
-      "title": "Ma liste de priorités",
-      "description": "Complétez votre liste de priorités pour mettre toutes les chances de votre côté"
+      "title": "My priority list",
+      "description": "Complete your priority list to give yourself the best chance",
+      "sectionTodo": "À faire",
+      "sectionDone": "Terminé",
+      "markDone": "Marquer comme terminé",
+      "markTodo": "Remettre à faire",
+      "items": {
+        "simulateHousingAid": {
+          "label": "Simuler mes aides au logement",
+          "description": "Everything you need to estimate your entitlements",
+          "cta": "Accéder au simulateur",
+          "ctaLabel": "Accéder au simulateur d’aides au logement",
+          "duration": "5 minutes"
+        },
+        "anticipateStudentBudget": {
+          "label": "Anticiper mon budget étudiant",
+          "description": "For the cities where I might settle",
+          "cta": "Guide pratique",
+          "ctaLabel": "Guide pratique pour anticiper mon budget étudiant",
+          "duration": "5 minutes"
+        },
+        "submitApplications": {
+          "label": "Apply to at least 3 student residences",
+          "description": "Give yourself the best possible chance",
+          "cta": "Explore accommodation",
+          "ctaLabel": "Explore accommodation to submit an application",
+          "duration": ""
+        },
+        "createHousingAlert": {
+          "label": "Créer sa première alerte logement",
+          "description": "New accommodation offers in real time",
+          "cta": "Mes alertes",
+          "ctaLabel": "Accéder à mes alertes logement",
+          "duration": "1 minute"
+        }
+      }
     },
     "housingAid": {
-      "title": "Mes aides au logement",
-      "description": "Retrouvez les aides auxquelles vous êtes éligible d'après votre dernière simulation",
-      "emptyState": "Vous n'avez pas encore conservé de simulation d'aides au logement.",
-      "emptyCta": "Simuler mes aides",
-      "restartCta": "Recommencer la simulation d'aides"
+      "title": "My housing aid",
+      "description": "Find the aid you are eligible for based on your latest simulation",
+      "emptyState": "You have not saved a housing aid simulation yet.",
+      "emptyCta": "Simulate my aid",
+      "restartCta": "Restart the aid simulation"
     },
     "personalInformations": {
-      "title": "Informations personnelles",
-      "subtitle": "Suivez vos résidences coup de cœur et tenez à jour vos candidatures",
+      "title": "Personal information",
+      "subtitle": "Track your favorite residences and keep your applications up to date",
       "form": {
-        "lastname": "Nom",
-        "firstname": "Prénom",
-        "email": "E-mail",
-        "phone": "Téléphone portable",
+        "lastname": "Last name",
+        "firstname": "First name",
+        "email": "Email",
+        "phone": "Mobile phone",
         "phonePlaceholder": "0612345678",
-        "birthdate": "Date de naissance",
-        "birthdateHint": "Format jj/mm/aaaa",
-        "scholarshipQuestion": "Êtes-vous boursier ?",
-        "scholarshipYes": "Oui",
-        "scholarshipNo": "Non",
-        "scholarshipUnknown": "Je ne sais pas",
-        "currentPassword": "Mot de passe actuel",
-        "newPassword": "Nouveau mot de passe",
-        "confirmPassword": "Confirmation du nouveau mot de passe",
-        "passwordHint": "12 caractères, composé de chiffres, lettres et caractères spéciaux",
-        "showPassword": "Afficher le mot de passe",
-        "hidePassword": "Masquer le mot de passe",
-        "submit": "Enregistrer",
-        "submitting": "Enregistrement...",
-        "passwordError": "Une erreur est survenue, le mot de passe actuel est erroné.",
-        "scholarshipType": "Précision sur la bourse",
-        "scholarshipTypePlaceholder": "Sélectionnez une option",
+        "birthdate": "Date of birth",
+        "birthdateHint": "Format dd/mm/yyyy",
+        "scholarshipQuestion": "Do you have a scholarship?",
+        "scholarshipYes": "Yes",
+        "scholarshipNo": "No",
+        "scholarshipUnknown": "I do not know",
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password",
+        "passwordHint": "12 characters, made up of digits, letters and special characters",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password",
+        "submit": "Save",
+        "submitting": "Saving...",
+        "passwordError": "An error occurred; the current password is incorrect.",
+        "scholarshipType": "Scholarship details",
+        "scholarshipTypePlaceholder": "Select an option",
         "scholarshipTypes": {
-          "crous_social": "Bourse sur critères sociaux du Crous",
-          "crous_annual_specific": "Aide spécifique annuelle du Crous",
-          "french_government": "Bourse du gouvernement Français",
-          "health_social_training": "Bourse Formation Sanitaire et Sociale",
-          "other": "Autre"
+          "crous_social": "Crous need-based scholarship",
+          "crous_annual_specific": "Crous annual specific aid",
+          "french_government": "French government scholarship",
+          "health_social_training": "Health and social training scholarship",
+          "other": "Other"
         }
       },
       "notifications": {
-        "title": "Paramètres des notifications",
-        "similarAlert": "Je souhaite augmenter la distance (+10 km) et le budget (+25 %) autour de mes villes de recherche.",
-        "favoriteAlert": "Je souhaite des alertes de disponibilité dans mes résidences favorites"
+        "title": "Notification settings",
+        "similarAlert": "I want to increase the distance (+10 km) and budget (+25%) around my search cities.",
+        "favoriteAlert": "I want availability alerts for my favorite residences",
+        "similarAlertDescription": "Receive an email when accommodation similar to your favorites becomes available",
+        "favoriteAlertDescription": "Receive an email when one of your favorites becomes available again"
+      },
+      "dossierFacile": {
+        "title": "My DossierFacile account",
+        "description": "Your digital rental application is linked to your account. Property managers you apply to can only access your supporting documents once DossierFacile has validated your application.",
+        "status": {
+          "verified": "Application validated",
+          "to_process": "Application under review",
+          "incomplete": "Incomplete application",
+          "denied": "Application rejected",
+          "active": "Active application",
+          "inactive": "Archived application",
+          "access_revoked": "Access revoked"
+        },
+        "disconnect": "Disconnect my DossierFacile account",
+        "confirmTitle": "Disconnect my DossierFacile account",
+        "confirmBody": "Your application will no longer be linked to your Mon Logement Étudiant account. Your supporting documents remain hosted by DossierFacile.",
+        "confirmWarning": "Your pending applications will be withdrawn and property managers will immediately lose access to your application. This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Disconnect"
       }
     },
     "alerts": {
-      "notificationToggle": "Je souhaite augmenter la distance (+10 km) et le budget (+25 %) autour de mes villes de recherche.",
-      "notificationEmailPrefix": "Vous recevez les notifications sur votre adresse e-mail"
+      "notificationToggle": "I want to increase the distance (+10 km) and budget (+25%) around my search cities.",
+      "notificationEmailPrefix": "You receive notifications at your email address",
+      "nameLabel": "Nom de l'alerte",
+      "maxPriceLabel": "Budget maximum",
+      "colivingLabel": "En colocation",
+      "colivingDescription": "Only be alerted about residences offering shared flats",
+      "accessibleLabel": "Adapté PMR",
+      "accessibleDescription": "Only be alerted about residences adapted for people with reduced mobility",
+      "locationLabel": "Ville, département ou académie",
+      "locationHint": "Enter the name of a city, department or academy",
+      "notificationsLabel": "Receive email alerts",
+      "notificationsDescription": "Receive an email when new accommodation matches the “{name}” alert",
+      "countLabel": "{count} residence{pluralize}",
+      "countButtonLabel": "View the {count} residence{pluralize} in this alert",
+      "edit": "Éditer",
+      "save": "Enregistrer",
+      "saving": "Enregistrement...",
+      "cancel": "Annuler"
+    },
+    "favorites": {
+      "notificationToggle": "I want availability alerts for my favorite residences",
+      "notificationEmailPrefix": "You receive notifications at your email address",
+      "application": {
+        "sent": "Application sent",
+        "withDossierFacile": "With <b>DossierFacile</b>",
+        "contactShared": "Contact details shared with managers"
+      }
+    },
+    "profile": {
+      "modalTitle": "Complete your profile",
+      "modalIntro": "To finalize your account, please provide the following information.",
+      "later": "Later",
+      "save": "Save",
+      "saving": "Saving...",
+      "saveError": "An error occurred. Please try again.",
+      "saveSuccess": "Your information has been saved.",
+      "phone": "Mobile phone",
+      "birthdate": "Date of birth",
+      "birthdateHint": "Format dd/mm/yyyy",
+      "scholarship": "Do you have a scholarship?",
+      "yes": "Yes",
+      "no": "No",
+      "unknown": "I do not know"
     }
   },
   "loginRequiredModal": {
-    "title": "Vous n'êtes pas connecté",
+    "title": "You are not signed in",
     "description": {
-      "favorites": "Pour ajouter une résidence en favoris, il est nécessaire d'être connecté ou de créer un compte sur Mon Logement Étudiant.",
-      "alerts": "Pour recevoir des alertes logements, il est nécessaire d'être connecté ou de créer un compte sur Mon Logement Étudiant."
+      "favorites": "To add a residence to your favorites, you need to sign in or create an account on Mon Logement Étudiant.",
+      "alerts": "To receive housing alerts, you need to sign in or create an account on Mon Logement Étudiant."
     },
-    "login": "Se connecter",
-    "signup": "Créer un compte"
+    "login": "Sign in",
+    "signup": "Create an account"
   },
   "toast": {
-    "residenceCreated": "Résidence créée avec succès",
-    "residenceCreateError": "Erreur lors de la création de la résidence",
-    "residenceUpdated": "Résidence mise à jour avec succès",
-    "residenceUpdateError": "Erreur lors de la mise à jour de la résidence",
-    "imagesUploaded": "Images uploadées avec succès",
-    "imagesUploadError": "Erreur lors de l'upload des images",
-    "imageDeleted": "Image supprimée avec succès",
-    "imageDeleteError": "Erreur lors de la suppression de l'image",
-    "unsupportedFileType": "Type de fichier non supporté: {fileName}. Types acceptés: JPEG, PNG, WebP",
-    "fileTooLarge": "Fichier trop volumineux: {fileName}. Taille maximale: 10MB",
-    "uploadFailed": "Échec de l'upload des images",
-    "userCreated": "Utilisateur créé avec succès",
-    "userCreateError": "Erreur lors de la création de l'utilisateur",
-    "userUpdated": "Utilisateur mis à jour",
-    "userUpdateError": "Erreur lors de la mise à jour de l'utilisateur",
-    "userDeleted": "Utilisateur supprimé",
-    "userDeleteError": "Erreur lors de la suppression de l'utilisateur",
-    "ownerUpdated": "Gestionnaire mis à jour",
-    "ownerUpdateError": "Erreur lors de la mise à jour du gestionnaire",
-    "ownerCreated": "Gestionnaire créé avec succès",
-    "ownerCreateError": "Erreur lors de la création du gestionnaire",
-    "ownerDeleted": "Gestionnaire supprimé",
-    "ownerDeleteError": "Erreur lors de la suppression du gestionnaire",
-    "userActivated": "Compte activé",
-    "userActivateError": "Erreur lors de l'activation du compte",
-    "userDeactivated": "Compte désactivé",
-    "userDeactivateError": "Erreur lors de la désactivation du compte",
-    "userPasswordReset": "Mot de passe réinitialisé",
-    "userPasswordResetError": "Erreur lors de la réinitialisation du mot de passe"
+    "residenceCreated": "Residence created successfully",
+    "residenceCreateError": "Error creating residence",
+    "residenceUpdated": "Residence updated successfully",
+    "residenceUpdateError": "Error updating residence",
+    "imagesUploaded": "Images uploaded successfully",
+    "imagesUploadError": "Error uploading images",
+    "imageDeleted": "Image deleted successfully",
+    "imageDeleteError": "Error deleting image",
+    "unsupportedFileType": "Unsupported file type: {fileName}. Accepted types: JPEG, PNG, WebP",
+    "fileTooLarge": "File too large: {fileName}. Maximum size: 10MB",
+    "uploadFailed": "Image upload failed",
+    "userCreated": "User created successfully",
+    "userCreateError": "Error creating user",
+    "userUpdated": "User updated",
+    "userUpdateError": "Error updating user",
+    "userDeleted": "User deleted",
+    "userDeleteError": "Error deleting user",
+    "ownerUpdated": "Manager updated",
+    "ownerUpdateError": "Error updating manager",
+    "ownerCreated": "Manager created successfully",
+    "ownerCreateError": "Error creating manager",
+    "ownerDeleted": "Manager deleted",
+    "ownerDeleteError": "Error deleting manager",
+    "userActivated": "Account activated",
+    "userActivateError": "Error activating account",
+    "userDeactivated": "Account deactivated",
+    "userDeactivateError": "Error deactivating account",
+    "userPasswordReset": "Password reset",
+    "userPasswordResetError": "Error resetting password"
   },
   "trpc": {
     "admin": {
       "errors": {
-        "userNotFound": "Utilisateur introuvable",
-        "userAlreadyExists": "Un utilisateur avec cet email existe déjà",
-        "ownerNotFound": "Gestionnaire introuvable",
-        "ownerDeleteHasAccommodations": "Ce gestionnaire est lié à des résidences. Vous devez les supprimer, ou les réassigner pour permettre la suppression du gestionnaire."
+        "userNotFound": "User not found",
+        "userAlreadyExists": "A user with this email already exists",
+        "ownerNotFound": "Manager not found",
+        "ownerDeleteHasAccommodations": "This manager is linked to residences. You must delete them or reassign them before the manager can be deleted."
       }
     }
   },
   "bailleur": {
     "users": {
-      "pageTitle": "Gestion des utilisateurs",
-      "newUser": "Nouvel utilisateur",
-      "editUser": "Éditer l'utilisateur",
-      "addUser": "Ajouter un utilisateur",
-      "breadcrumbDashboard": "Tableau de bord",
-      "countOne": "{count} utilisateur",
-      "countOther": "{count} utilisateurs",
-      "searchPlaceholder": "Rechercher",
-      "noUsers": "Aucun utilisateur pour le moment.",
-      "loading": "Chargement...",
-      "notFound": "Utilisateur introuvable",
-      "edit": "Éditer",
-      "delete": "Supprimer",
-      "cancel": "Annuler",
-      "noPermissions": "Aucune permission",
-      "deleteModalTitle": "Confirmer la suppression",
-      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer {firstname} {lastname} ? Cette action est irréversible.",
-      "submitCreate": "Créer l'utilisateur",
-      "submitUpdate": "Mettre à jour",
-      "saving": "Enregistrement...",
+      "pageTitle": "User management",
+      "newUser": "New user",
+      "editUser": "Edit user",
+      "addUser": "Add user",
+      "breadcrumbDashboard": "Dashboard",
+      "countOne": "{count} user",
+      "countOther": "{count} users",
+      "searchPlaceholder": "Search",
+      "noUsers": "No users at the moment.",
+      "loading": "Loading...",
+      "notFound": "User not found",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "noPermissions": "No permission",
+      "deleteModalTitle": "Confirm deletion",
+      "deleteConfirm": "Are you sure you want to delete {firstname} {lastname}? This action cannot be undone.",
+      "submitCreate": "Create user",
+      "submitUpdate": "Update",
+      "saving": "Saving...",
       "form": {
         "email": "Email",
-        "firstname": "Prénom",
-        "lastname": "Nom",
-        "bailleurRole": "Rôle",
-        "bailleurRoleAdminScope": "Rôle dans l'espace bailleur",
+        "firstname": "First name",
+        "lastname": "Last name",
+        "bailleurRole": "Role",
+        "bailleurRoleAdminScope": "Role in the landlord area",
         "permissions": "Permissions",
-        "administratorHint": "Un administrateur dispose automatiquement de toutes les permissions.",
-        "gestionnaireHint": "Sélectionnez les permissions à accorder au gestionnaire.",
+        "administratorHint": "An administrator automatically has all permissions.",
+        "gestionnaireHint": "Select the permissions to grant to the manager.",
         "errors": {
-          "emailInvalid": "Email invalide",
-          "firstnameRequired": "Le prénom est requis",
-          "lastnameRequired": "Le nom est requis"
+          "emailInvalid": "Invalid email",
+          "firstnameRequired": "First name is required",
+          "lastnameRequired": "Last name is required"
         }
       },
       "role": {
-        "administrator": "Administrateur",
-        "gestionnaire": "Gestionnaire"
+        "administrator": "Administrator",
+        "gestionnaire": "Manager"
       },
       "permission": {
-        "manage_users": "Gestion des utilisateurs",
-        "manage_residences": "Gestion des résidences",
-        "manage_availability": "Disponibilités des résidences",
-        "manage_applications": "Dossiers étudiants",
-        "allAsAdministrator": "Toutes (administrateur)"
+        "manage_users": "User management",
+        "manage_residences": "Residence management",
+        "manage_availability": "Residence availability",
+        "manage_applications": "Student files",
+        "allAsAdministrator": "All (administrator)"
       },
       "toast": {
-        "created": "Utilisateur créé. Un email d'invitation a été envoyé.",
-        "createError": "Erreur lors de la création de l'utilisateur",
-        "updated": "Utilisateur mis à jour",
-        "updateError": "Erreur lors de la mise à jour",
-        "deleted": "Utilisateur supprimé",
-        "deleteError": "Erreur lors de la suppression"
+        "created": "User created. An invitation email has been sent.",
+        "createError": "Error creating user",
+        "updated": "User updated",
+        "updateError": "Error updating",
+        "deleted": "User deleted",
+        "deleteError": "Error deleting"
       },
       "adminTable": {
-        "header": "Utilisateur",
-        "roleHeader": "Rôle",
-        "bailleurRoleHeader": "Rôle bailleur",
+        "header": "User",
+        "roleHeader": "Role",
+        "bailleurRoleHeader": "Landlord role",
         "permissionsHeader": "Permissions",
         "actionsHeader": "Actions",
         "emptyRole": "-"
       }
     },
     "header": {
-      "title": "Espace gestionnaire"
+      "title": "Manager area"
     },
     "dashboard": {
       "breadcrumb": {
-        "title": "Espace gestionnaire de {name}"
+        "title": "Manager area for {name}"
       },
       "welcome": {
-        "title": "Ravi de vous revoir {firstname} 👋"
+        "title": "Good to see you again {firstname} 👋"
       },
       "testimonial": {
-        "quote": "« Bienvenue sur votre Espace Gestionnaire. Ensemble, nous rendons la recherche de logement étudiant plus simple. 🙂 »",
-        "author": "Cécilia et Yasmine",
-        "organization": "de Mon Logement Etudiant",
-        "altText": "Image de profil de Cécilia et Yasmine - Chargé de déploiement"
+        "quote": "“Welcome to your Manager Area. Together, we are making the student housing search simpler. 🙂”",
+        "author": "Cécilia and Yasmine",
+        "organization": "from Mon Logement Etudiant",
+        "altText": "Profile image of Cécilia and Yasmine - Deployment manager"
       },
       "helpSection": {
         "faq": {
-          "title": "Questions fréquentes",
-          "link": "Consulter notre FAQ"
+          "title": "Frequently asked questions",
+          "link": "View our FAQ"
         },
         "contact": {
-          "title": "Besoin d'échanger ?",
-          "link": "Prendre rendez-vous"
+          "title": "Need to talk?",
+          "link": "Book an appointment"
         }
       },
       "priorityActions": {
-        "title": "Actions prioritaires",
+        "title": "Priority actions",
         "actions": {
           "charter": {
-            "title": "Valider la charte des bailleurs",
-            "badge": "BON FONCTIONNEMENT",
-            "status": "A valider"
+            "title": "Validate the landlord charter",
+            "badge": "PROPER OPERATION",
+            "status": "To validate"
           },
           "availability": {
-            "title": "Actualiser les disponibilités",
-            "badge": "DISPONIBILITES",
-            "status": "Résidence Ariane"
+            "title": "Update availability",
+            "badge": "AVAILABILITY",
+            "status": "Residence Ariane"
+          },
+          "contactMode": {
+            "title": "Choose the application management mode",
+            "badge": "APPLICATIONS"
           },
           "applications": {
-            "title": "Modérer vos candidatures",
-            "badge": "CANDIDATURES",
-            "status": "3 candidatures ont été deposées"
+            "title": "Moderate your applications",
+            "badge": "APPLICATIONS",
+            "status": "3 applications have been submitted"
           }
         },
-        "viewAll": "Toutes les actions prioritaires"
+        "viewAll": "All priority actions"
       },
       "statistics": {
-        "title": "En quelques chiffres"
+        "title": "Key figures"
       },
       "engagementStatistics": {
-        "title": "À propos des visiteurs sur Mon Logement étudiant",
-        "periodLabel": "Période",
+        "title": "About visitors on Mon Logement étudiant",
+        "periodLabel": "Period",
         "period": {
-          "7d": "7 jours",
-          "30d": "30 jours",
-          "90d": "90 jours"
+          "7d": "7 days",
+          "30d": "30 days",
+          "90d": "90 days"
         },
         "kpi": {
-          "alertsBold": "Étudiants ont activé une alerte",
-          "alertsSuffix": " sur l'une des villes où se situent vos résidences",
-          "favoritesBold": "Étudiants ont mis en favoris",
-          "favoritesSuffix": " une de vos résidences",
-          "consultOfferBold": "Redirections",
-          "consultOfferSuffix": " vers les pages de vos résidences"
+          "alertsBold": "Students activated an alert",
+          "alertsSuffix": " in one of the cities where your residences are located",
+          "favoritesBold": "Students added to favorites",
+          "favoritesSuffix": " one of your residences",
+          "consultOfferBold": "Redirects",
+          "consultOfferSuffix": " to your residence pages"
         },
         "cities": {
-          "title": "Villes où sont situées vos résidences",
-          "searchLabel": "Rechercher une ville",
-          "searchPlaceholder": "Rechercher",
-          "empty": "Aucune ville",
-          "search": "recherche",
-          "alert": "alerte",
-          "sortLabel": "Trier les villes",
-          "sortSearchesDesc": "Plus recherchées",
-          "sortSearchesAsc": "Moins recherchées"
+          "title": "Cities where your residences are located",
+          "searchLabel": "Search for a city",
+          "searchPlaceholder": "Search",
+          "empty": "No city",
+          "search": "search",
+          "alert": "alert",
+          "sortLabel": "Sort cities",
+          "sortSearchesDesc": "Most searched",
+          "sortSearchesAsc": "Least searched"
         },
         "residences": {
-          "title": "Détail par résidence",
-          "searchLabel": "Rechercher une résidence",
-          "searchPlaceholder": "Rechercher",
-          "empty": "Aucune résidence",
-          "unpublished": "(dépubliée)",
-          "view": "visite",
-          "favorite": "favori",
-          "redirection": "redirection",
-          "sortLabel": "Trier les résidences",
-          "sortViewsDesc": "Plus vues",
-          "sortViewsAsc": "Moins vues"
+          "title": "Detail by residence",
+          "searchLabel": "Search for a residence",
+          "searchPlaceholder": "Search",
+          "empty": "No residence",
+          "unpublished": "(unpublished)",
+          "view": "visit",
+          "favorite": "favorite",
+          "redirection": "redirect",
+          "sortLabel": "Sort residences",
+          "sortViewsDesc": "Most viewed",
+          "sortViewsAsc": "Least viewed"
         },
-        "loading": "Chargement…"
+        "loading": "Loading..."
       }
     },
     "residences": {
       "details": {
-        "published": "Publiée",
-        "publishedLegend": "Publication de la résidence",
-        "unpublished": "Dépubliée",
-        "title": "Paramétrage de la résidence",
-        "accommodationName": "Nom de la résidence",
-        "waitingList": "La résidence accepte les candidatures en liste d’attente",
-        "accessible": "Nombre de logements adaptés PMR",
-        "coliving": "Nombre de logements en colocation dans la résidence",
-        "scholarship": "Les étudiants boursiers sont prioritaires dans la résidence",
-        "socialHousing": "Une demande de logement social est nécessaire.",
-        "accommodationType": "Type de résidence",
-        "targetAudience": "Public dans la résidence",
-        "accommodationNameHint": "Le terme « Résidence » n'est conservé que s'il est suivi d'un article ; sinon, il est supprimé.",
-        "selectResidenceType": "Sélectionnez un type",
-        "targetAudienceEtudiantsLabel": "Résidence exclusivement étudiante",
-        "targetAudienceEtudiantsHint": "Étudiants y compris stagiaires, alternants et étudiants salariés.",
-        "targetAudienceMixteLabel": "Résidence pour étudiants et jeunes actifs",
-        "targetAudienceMixteHint": "Étudiants, alternants, stagiaires et jeunes salariés.",
-        "targetAudienceDiffusEtudiantsLabel": "Logements diffus pour étudiants",
-        "targetAudienceDiffusEtudiantsHint": "Logements étudiants au sein d'une résidence de logement social, attribués uniquement à des étudiants.",
-        "targetAudienceDiffusMixteLabel": "Logements diffus pour étudiants et jeunes actifs",
-        "targetAudienceDiffusMixteHint": "Logements étudiants au sein d'une résidence de logement social, pour étudiants et jeunes actifs.",
+        "published": "Published",
+        "publishedLegend": "Residence publication",
+        "unpublished": "Unpublished",
+        "title": "Residence settings",
+        "accommodationName": "Residence name",
+        "waitingList": "The residence accepts waiting-list applications",
+        "accessible": "Number of wheelchair-accessible accommodations",
+        "coliving": "Number of shared accommodations in the residence",
+        "scholarship": "Scholarship students have priority in the residence",
+        "socialHousing": "A social housing application is required.",
+        "accommodationType": "Residence type",
+        "targetAudience": "Audience in the residence",
+        "accommodationNameHint": "The term “Residence” is kept only if it is followed by an article; otherwise, it is removed.",
+        "selectResidenceType": "Select a type",
+        "targetAudienceEtudiantsLabel": "Student-only residence",
+        "targetAudienceEtudiantsHint": "Students including interns, work-study students and salaried students.",
+        "targetAudienceMixteLabel": "Residence for students and young workers",
+        "targetAudienceMixteHint": "Students, work-study students, interns and young employees.",
+        "targetAudienceDiffusEtudiantsLabel": "Scattered accommodation for students",
+        "targetAudienceDiffusEtudiantsHint": "Student accommodation within a social housing residence, allocated only to students.",
+        "targetAudienceDiffusMixteLabel": "Scattered accommodation for students and young workers",
+        "targetAudienceDiffusMixteHint": "Student accommodation within a social housing residence, for students and young workers.",
         "typologyTab": {
-          "housingType": "Type de logement",
-          "selectType": "Sélectionnez un type",
-          "rentPerPerson": "Loyer CC par personne",
-          "rent": "Loyer CC",
+          "housingType": "Accommodation type",
+          "selectType": "Select a type",
+          "rentPerPerson": "Rent incl. charges per person",
+          "rent": "Rent incl. charges",
           "minimum": "Minimum",
           "maximum": "Maximum",
-          "surface": "Surface (m²)",
-          "totalHousing": "Nombre total de logements",
-          "availableHousing": "Logements disponibles",
-          "deleteType": "Supprimer ce type de logement",
-          "tabsHaveErrors": "Certains onglets contiennent des erreurs, veuillez les compléter."
+          "surface": "Surface area (m²)",
+          "totalHousing": "Total number of accommodations",
+          "availableHousing": "Available accommodation",
+          "deleteType": "Delete this accommodation type",
+          "tabsHaveErrors": "Some tabs contain errors; please complete them."
         },
         "location": {
-          "sectionTitle": "Adresse de la résidence",
-          "sectionHint": "Vous pouvez ajouter plusieurs adresses postales si vous gérez plusieurs logements étudiants diffus dans la même ville.",
-          "mainAddressLabel": "Adresse",
-          "additionalAddressLabel": "Adresse n°{index}",
-          "invalidAddress": "Veuillez sélectionner une adresse valide",
-          "removeAddress": "Supprimer cette adresse",
-          "searchPlaceholder": "Rechercher une adresse...",
-          "searching": "Recherche en cours...",
-          "addAddress": "Ajouter une adresse"
+          "sectionTitle": "Residence address",
+          "sectionHint": "You can add several postal addresses if you manage several scattered student accommodations in the same city.",
+          "mainAddressLabel": "Address",
+          "additionalAddressLabel": "Address no. {index}",
+          "invalidAddress": "Please select a valid address",
+          "removeAddress": "Remove this address",
+          "searchPlaceholder": "Search for an address...",
+          "searching": "Searching...",
+          "addAddress": "Add an address"
         }
       }
     },
     "feedback": {
-      "title": "Que pensez-vous de l'espace gestionnaire ?",
-      "ratingQuestion": "Sur une échelle de 1 à 5, quel est votre niveau de satisfaction ?",
-      "commentLabel": "Commentaires, suggestions ou difficultés (facultatif)",
-      "submit": "Envoyer",
-      "close": "Fermer",
-      "ariaBanner": "Donner votre avis sur l'espace gestionnaire",
-      "ariaRating": "Note de satisfaction",
-      "ratingRequired": "Veuillez sélectionner une note.",
-      "successToast": "Merci pour votre retour !",
-      "errorToast": "Erreur lors de l'envoi"
+      "title": "What do you think of the manager area?",
+      "ratingQuestion": "On a scale of 1 to 5, how satisfied are you?",
+      "commentLabel": "Comments, suggestions or difficulties (optional)",
+      "submit": "Send",
+      "close": "Close",
+      "ariaBanner": "Give your feedback on the manager area",
+      "ariaRating": "Satisfaction rating",
+      "ratingRequired": "Please select a rating.",
+      "successToast": "Thank you for your feedback!",
+      "errorToast": "Error sending"
+    },
+    "contacts": {
+      "breadcrumbDashboard": "Dashboard",
+      "breadcrumbContacts": "Contacts",
+      "breadcrumbContactsDossierFacile": "Contacts with DossierFacile",
+      "title": "Contacts",
+      "titleDossierFacile": "Contacts with DossierFacile",
+      "loading": "Loading...",
+      "defaultCandidateName": "Applicant",
+      "searchResidenceLabel": "Search for a residence",
+      "settingsButtonTitle": "Contact mode settings",
+      "noResidence": "No residence.",
+      "toBeCalledBack": "{count} to call back",
+      "residenceTitle": "Residence {name}",
+      "availability": "{count} availability{s}",
+      "editResidence": "Edit residence",
+      "retentionNotice": "Each student contact remains available for {days} days.",
+      "statusChangeError": "Status change failed.",
+      "card": {
+        "postedOn": "Posted on {date}",
+        "scholarship": "Scholarship student",
+        "viewCandidate": "View {name}",
+        "viewCandidateFallback": "the applicant"
+      },
+      "detail": {
+        "title": "Contact from {name}",
+        "aboutTitle": "About the applicant",
+        "age": "{count} years old",
+        "scholarship": "Scholarship student"
+      },
+      "actions": {
+        "statusChangeError": "Status change failed. Please try again.",
+        "contactedTitle": "Contact with the student completed",
+        "contactedRetention": "Contact details will remain available for {days} day{s}.",
+        "rejectedTitle": "Contact not retained",
+        "rejectedDescription": "You will not follow up on this contact request.",
+        "moderateTitle": "Would you like to know more about the request?",
+        "moderateAccess": "Access DossierFacile",
+        "moderateReject": "No",
+        "toContactTitle": "Have you contacted the student?",
+        "toContactConfirm": "Yes, I contacted the student",
+        "toContactRejectDossierFacile": "No, I do not want to retain this application",
+        "toContactRejectContact": "Ignore the request"
+      },
+      "dossierFacile": {
+        "openButton": "DossierFacile",
+        "lockedAlert": "Please moderate the contact request to access the student's DossierFacile",
+        "pdfLink": "DossierFacile file (PDF)",
+        "categories": {
+          "IDENTIFICATION": "Identity document",
+          "RESIDENCY": "Proof of address",
+          "PROFESSIONAL": "Proof of professional status",
+          "FINANCIAL": "Proof of income",
+          "TAX": "Tax notice"
+        },
+        "subCategories": {
+          "FRENCH_IDENTITY_CARD": "Identity card",
+          "FRENCH_PASSPORT": "Passport",
+          "GUEST": "Hosted",
+          "TENANT": "Tenant",
+          "OWNER": "Owner",
+          "OTHER_TAX": "Other tax document",
+          "MY_NAME": "In my name",
+          "LESS_THAN_YEAR": "Less than one year",
+          "NO_INCOME": "No income",
+          "STUDENT": "Student",
+          "CDI": "Permanent contract",
+          "CDD": "Fixed-term contract",
+          "ALTERNATION": "Work-study",
+          "INTERNSHIP": "Internship"
+        }
+      },
+      "landing": {
+        "title": "Easily receive applicant contacts",
+        "subtitle": "Centralize information requests in your manager area by enabling contact requests from students.",
+        "or": "OR",
+        "contactsTitle": "Receive contact details for students to contact back",
+        "contactsDescription": "Access the contact details of applicants interested in accommodation and contact them directly by email or phone.",
+        "contactsCta": "Receive contacts",
+        "dossierFacileLogoAlt": "Dossier Facile Logo",
+        "dossierFacileTitle": "Enable DossierFacile to be more responsive",
+        "dossierFacileDescription": "Receive a complete applicant file: identity document, tax notice, proof of income, etc.",
+        "dossierFacileCta": "Receive files with DossierFacile",
+        "comingSoon": "Coming soon",
+        "activationSuccess": "Application reception mode enabled.",
+        "activationError": "An error occurred during activation."
+      },
+      "settingsModal": {
+        "title": "Application settings",
+        "description": "Change how you centralize student applications in your manager area, via application forms or DossierFacile.",
+        "legend": "Application reception mode",
+        "cancel": "Cancel",
+        "save": "Save",
+        "saving": "Saving...",
+        "success": "Reception mode updated.",
+        "error": "An error occurred.",
+        "contactsLabel": "Receive student contact details",
+        "contactsHint": "Last name, first name, age, email, phone, education level and scholarship status",
+        "dossierFacileLabel": "Enable DossierFacile to be more responsive",
+        "dossierFacileHint": "Receive a complete applicant file: identity document, tax notice, proof of income, etc.",
+        "noneLabel": "Disable applications",
+        "noneHint": "Visitors are redirected to your website",
+        "lockedHint": "{hint} — coming soon"
+      },
+      "promoBanner": {
+        "title": "Easily receive applications",
+        "text": "from students in your area",
+        "link": "Receive applications",
+        "dismiss": "Hide this message"
+      }
+    },
+    "ownerForm": {
+      "name": "Manager name",
+      "url": "Website (optional)",
+      "landingUrl": "Landlord presentation page (optional)",
+      "landingUrlHint": "URL displayed on the accommodation page, under “managed by”",
+      "contactMode": "Application reception mode",
+      "submit": "Save",
+      "submitting": "Saving..."
     }
+  },
+  "map": {
+    "zoomIn": "Zoom in",
+    "zoomInLabel": "Zoom in on the map",
+    "zoomOut": "Zoom out",
+    "zoomOutLabel": "Zoom out on the map",
+    "resultsLabel": "Map of the residences matching your search. The results list, shown next to the map, provides its text equivalent.",
+    "accommodationLabel": "Map showing the location of the residence. The full address appears as text above the map.",
+    "markerLabel": "Location of the residence on the map"
   }
 }

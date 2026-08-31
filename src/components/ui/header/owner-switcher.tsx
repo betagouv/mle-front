@@ -4,6 +4,14 @@ import Select from '@codegouvfr/react-dsfr/Select'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback } from 'react'
 
+import { buildHref } from '~/utils/preserve-query-params'
+
+const OWNER_SCOPED_SECTIONS = ['/bailleur/contacts', '/bailleur/residences', '/bailleur/utilisateurs']
+
+function getTargetPathname(pathname: string) {
+  return OWNER_SCOPED_SECTIONS.find((section) => pathname.startsWith(`${section}/`)) ?? pathname
+}
+
 interface OwnerSwitcherProps {
   owners: Array<{ id: number; name: string; slug: string }>
   defaultOwnerId?: number
@@ -18,16 +26,9 @@ export function OwnerSwitcher({ owners, defaultOwnerId }: OwnerSwitcherProps) {
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
-      const value = e.target.value
-      const params = new URLSearchParams(searchParams.toString())
-      if (value) {
-        params.set('ownerId', value)
-      } else {
-        params.delete('ownerId')
-      }
-      // Reset page when switching owner
-      params.delete('page')
-      router.push(`${pathname}?${params.toString()}`)
+      // buildHref ne conserve que les params persistés : la pagination et les filtres
+      // du bailleur précédent sont automatiquement réinitialisés.
+      router.push(buildHref(getTargetPathname(pathname), searchParams, { ownerId: e.target.value || null }))
     },
     [router, pathname, searchParams],
   )

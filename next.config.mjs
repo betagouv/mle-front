@@ -1,14 +1,24 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { withSentryConfig } from '@sentry/nextjs'
 import createNextIntlPlugin from 'next-intl/plugin'
 
 const withNextIntl = createNextIntlPlugin()
+
+const rootDir = path.dirname(fileURLToPath(import.meta.url))
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   env: {
     ENABLE_PROXY_LOGS: process.env.ENABLE_PROXY_LOGS,
   },
+  // Cache incrémental : les images optimisées vont dans S3 au lieu du disque éphémère du
+  // container, le reste garde le comportement par défaut de Next — cf. cache-handler.mjs.
+  cacheHandler: path.join(rootDir, 'cache-handler.mjs'),
   images: {
+    // Sans ce drapeau, `cacheHandler` ne couvre que le cache incrémental et les images
+    // continuent d'atterrir dans `.next/cache/images`.
+    customCacheHandler: true,
     qualities: [50, 75, 100],
     remotePatterns: [
       {

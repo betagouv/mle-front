@@ -13,7 +13,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export function getTestDb() {
   if (!testDb) {
-    testConn = postgres(DATABASE_URL_TEST, { prepare: false })
+    testConn = postgres(DATABASE_URL_TEST, { prepare: false, max: 5, idle_timeout: 30, connection: { application_name: 'mle-test' } })
     testDb = drizzle(testConn, { schema })
   }
   return testDb

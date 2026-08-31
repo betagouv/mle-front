@@ -3,6 +3,11 @@ import { getTranslations } from 'next-intl/server'
 import { StudentTodoList } from '~/components/student-space/todo/student-todo-list'
 import styles from '../mon-espace.module.css'
 
+export const generateMetadata = async () => {
+  const t = await getTranslations('breadcrumbs.student')
+  return { title: t('todo.title') }
+}
+
 export default async function EtudiantTableauDeBordPage() {
   const t = await getTranslations('student.todo')
 

@@ -1,5 +1,5 @@
 import { TRPCError } from '@trpc/server'
-import { and, desc, eq, inArray, sql } from 'drizzle-orm'
+import { and, eq, inArray, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '~/server/db'
 import { accommodationAddresses } from '~/server/db/schema/accommodation-addresses'
@@ -7,15 +7,64 @@ import { accommodationTypologies } from '~/server/db/schema/accommodation-typolo
 import { accommodations } from '~/server/db/schema/accommodations'
 import { alertJobs } from '~/server/db/schema/alert-jobs'
 import { cities } from '~/server/db/schema/cities'
+import { contactRequests } from '~/server/db/schema/contacts'
+import { dossierFacileApplications, dossierFacileTenants } from '~/server/db/schema/dossier-facile'
 import { favoriteAccommodations } from '~/server/db/schema/favorite-accommodations'
 import { owners } from '~/server/db/schema/owners'
 import { groupTypologiesByAccommodation, typologiesByType } from '~/server/lib/typologies'
 import { createTRPCRouter, userProcedure } from '../init'
 import { priceMaxComputed, toAccommodationDTO } from './accommodations'
 
+/** Candidature de l'étudiant sur une résidence, telle que restituée sur la carte. */
+export type TFavoriteApplicationKind = 'dossier_facile' | 'contact'
+
+interface FavoriteApplication {
+  kind: TFavoriteApplicationKind
+  createdAt: Date
+}
+
+/**
+ * Toutes les candidatures de l'étudiant, indexées par résidence. Une candidature DossierFacile prime
+ * sur un simple partage de coordonnées : c'est la plus engageante des deux.
+ *
+ * Sert à deux choses : afficher le bandeau de statut sur la carte, et faire figurer la résidence
+ * dans l'espace étudiant même si le favori a été retiré depuis.
+ */
+const fetchApplications = async (userId: string): Promise<Map<number, FavoriteApplication>> => {
+  const [contactRows, dossierFacileRows] = await Promise.all([
+    db
+      .select({ accommodationId: contactRequests.accommodationId, createdAt: contactRequests.createdAt })
+      .from(contactRequests)
+      .where(eq(contactRequests.userId, userId)),
+    db
+      .select({ accommodationId: accommodations.id, createdAt: dossierFacileApplications.createdAt })
+      .from(dossierFacileApplications)
+      .innerJoin(dossierFacileTenants, eq(dossierFacileApplications.tenantId, dossierFacileTenants.id))
+      .innerJoin(accommodations, eq(accommodations.slug, dossierFacileApplications.accommodationSlug))
+      .where(eq(dossierFacileTenants.userId, userId)),
+  ])
+
+  const applications = new Map<number, FavoriteApplication>()
+  for (const { accommodationId, createdAt } of contactRows) applications.set(accommodationId, { kind: 'contact', createdAt })
+  for (const { accommodationId, createdAt } of dossierFacileRows) applications.set(accommodationId, { kind: 'dossier_facile', createdAt })
+
+  return applications
+}
+
 export const favoritesRouter = createTRPCRouter({
   list: userProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id
+
+    // Une candidature vaut suivi de la résidence : elle reste listée même si le favori a été retiré
+    // depuis (la carte s'affiche alors avec le cœur vide).
+    const applications = await fetchApplications(userId)
+    const favoriteIds = await db
+      .select({ accommodationId: favoriteAccommodations.accommodationId })
+      .from(favoriteAccommodations)
+      .where(eq(favoriteAccommodations.userId, userId))
+
+    const followedIds = [...new Set([...favoriteIds.map((f) => f.accommodationId), ...applications.keys()])]
+    if (followedIds.length === 0) return []
 
     const results = await db
       .select({
@@ -50,16 +99,18 @@ export const favoritesRouter = createTRPCRouter({
         lat: sql<number>`ST_Y(${accommodationAddresses.geom}::geometry)`,
         lng: sql<number>`ST_X(${accommodationAddresses.geom}::geometry)`,
       })
-      .from(favoriteAccommodations)
-      .innerJoin(accommodations, eq(favoriteAccommodations.accommodationId, accommodations.id))
+      .from(accommodations)
+      .leftJoin(
+        favoriteAccommodations,
+        and(eq(favoriteAccommodations.accommodationId, accommodations.id), eq(favoriteAccommodations.userId, userId)),
+      )
       .innerJoin(
         accommodationAddresses,
         and(eq(accommodationAddresses.accommodationId, accommodations.id), eq(accommodationAddresses.isMain, true)),
       )
       .innerJoin(cities, eq(accommodationAddresses.cityId, cities.id))
       .leftJoin(owners, eq(accommodations.ownerId, owners.id))
-      .where(and(eq(favoriteAccommodations.userId, userId), eq(accommodations.published, true)))
-      .orderBy(desc(favoriteAccommodations.createdAt))
+      .where(and(inArray(accommodations.id, followedIds), eq(accommodations.published, true)))
 
     const accIds = results.map((r) => r.accommodationId)
     const typologyRows =
@@ -68,14 +119,24 @@ export const favoritesRouter = createTRPCRouter({
         : []
     const typologiesByAccommodation = groupTypologiesByAccommodation(typologyRows)
 
-    return results.map((row) => ({
-      id: row.id,
-      accommodation: toAccommodationDTO(
-        { ...row, id: row.accommodationId },
-        typologiesByType(typologiesByAccommodation.get(row.accommodationId) ?? []),
-      ),
-      created_at: row.createdAt,
-    }))
+    return results
+      .map((row) => {
+        const application = applications.get(row.accommodationId) ?? null
+        return {
+          id: row.id,
+          accommodation: toAccommodationDTO(
+            { ...row, id: row.accommodationId },
+            typologiesByType(typologiesByAccommodation.get(row.accommodationId) ?? []),
+          ),
+          /** `false` = résidence suivie via une candidature seule, cœur vide sur la carte. */
+          isFavorite: row.id !== null,
+          application: application?.kind ?? null,
+          // Une résidence suivie sans favori n'a pas de date de mise en favori : on retombe sur la
+          // date de candidature, sinon elle n'aurait pas de rang dans la liste.
+          created_at: row.createdAt ?? application?.createdAt ?? null,
+        }
+      })
+      .sort((a, b) => (b.created_at?.getTime() ?? 0) - (a.created_at?.getTime() ?? 0))
   }),
 
   add: userProcedure.input(z.object({ accommodationSlug: z.string() })).mutation(async ({ ctx, input }) => {

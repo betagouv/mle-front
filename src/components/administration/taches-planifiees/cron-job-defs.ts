@@ -30,6 +30,26 @@ const CRON_JOB_DEF_MAP: Record<CronJobType, Omit<CronJobDef, 'type'>> = {
     description: 'Hausses de disponibilité → jobs d’alerte',
     schedule: 'Tous les jours à 9h00 et 17h00',
   },
+  'alert-expiration': {
+    label: 'Péremption alertes',
+    description: 'Relance à 3 mois (template 46) puis désactivation après 7 jours (template 48)',
+    schedule: 'Tous les jours à 8h00',
+  },
+  'purge-contacts': {
+    label: 'Purge RGPD candidatures',
+    description: 'Demandes non confirmées supprimées, expirées anonymisées',
+    schedule: 'Tous les jours à 3h30',
+  },
+  'purge-logs': {
+    label: 'Purge des logs',
+    description: 'Tables append-only au-delà de leur rétention, archivées dans S3',
+    schedule: 'Le 1er de chaque mois à 5h00',
+  },
+  'backup-db': {
+    label: 'Backup de la base',
+    description: 'Backup Scalingo copié dans S3 — quotidiens gardés 31 jours, le 1er et le 15 indéfiniment',
+    schedule: 'Tous les jours à 5h00',
+  },
 }
 
 export const CRON_JOB_DEFS: CronJobDef[] = CRON_JOB_TYPES.map((type) => ({ type, ...CRON_JOB_DEF_MAP[type] }))

@@ -1,9 +1,11 @@
 'use client'
 
-import MainNavigation, { MainNavigationProps } from '@codegouvfr/react-dsfr/MainNavigation'
 import { usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { FC } from 'react'
+import { MAIN_NAVIGATION_ID } from '~/components/ui/common-skip-links'
+import { MainNavigation } from '~/components/ui/header/main-navigation'
+import type { TMegaMenuCategory } from '~/components/ui/header/mega-menu'
 import styles from './navigation.module.css'
 
 const STUDENT_CITIES = [
@@ -52,7 +54,12 @@ export const HeaderNavigation: FC = () => {
     ],
   ]
 
-  let items: MainNavigationProps.Item[] = [
+  let items: {
+    text: string
+    isActive: boolean
+    linkProps?: { href: string; target: '_self' }
+    megaMenu?: { categories: TMegaMenuCategory[] }
+  }[] = [
     {
       isActive: pathname === '/trouver-un-logement-etudiant',
       linkProps: {
@@ -86,14 +93,12 @@ export const HeaderNavigation: FC = () => {
             categoryMainText: <span className="fr-text--bold"> {t('prepareBudget.studentCities')}</span>,
             links: cityColumns[0],
           },
-          {
-            categoryMainText: '\u00A0',
-            links: cityColumns[1],
-          },
-          {
-            categoryMainText: '\u00A0',
-            links: cityColumns[2],
-          },
+          // Les deux colonnes suivantes prolongent la pr\u00E9c\u00E9dente : elles n'ouvrent pas de
+          // nouvelle section et ne re\u00E7oivent donc pas de titre. Leur alignement vertical est
+          // r\u00E9tabli en CSS \u2014 il passait auparavant par une espace ins\u00E9cable, que le DSFR
+          // rendait en titre de niveau 5 vide (RGAA 9.1).
+          { categoryMainText: undefined, links: cityColumns[1] },
+          { categoryMainText: undefined, links: cityColumns[2] },
         ],
       },
     },
@@ -109,5 +114,18 @@ export const HeaderNavigation: FC = () => {
   if (pathname.includes('landing')) {
     items = []
   }
-  return <MainNavigation classes={{ megaMenuCategory: styles.megaMenuCategory }} items={items} />
+  // id stable : cible du lien d'évitement « Menu » (RGAA 12.7).
+  return (
+    <MainNavigation
+      id={MAIN_NAVIGATION_ID}
+      classes={{ megaMenuCategory: styles.megaMenuCategory, megaMenu: styles.megaMenu }}
+      items={items}
+      // Les intitulés de colonnes sortent du plan de titres : ce sont des groupes de liens dans
+      // un <nav> déjà nommé, pas des sections. Ils ne peuvent donc plus ni créer de saut de
+      // niveau, ni précéder le <h1> de la page (RGAA 9.1).
+      megaMenuCategoryAs="p"
+      ariaLabel={t('mainMenuLabel')}
+      megaMenuCloseLabel={t('close')}
+    />
+  )
 }

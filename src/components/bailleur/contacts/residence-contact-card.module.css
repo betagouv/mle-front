@@ -1,0 +1,26 @@
+/* Liseré bas bleu + hauteur minimale commune aux cartes de la grille. */
+.card {
+  height: 100%;
+  min-height: 13.25rem;
+  border-bottom: 0.25rem solid var(--border-active-blue-france);
+  transition: box-shadow 0.15s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 18, 0.16);
+}
+
+.title {
+  display: flex;
+  min-height: 5.25rem;
+  align-items: center;
+  color: var(--text-active-blue-france);
+}
+
+.location {
+  min-height: 1.5rem;
+}
+
+.badge {
+  margin-top: auto;
+}

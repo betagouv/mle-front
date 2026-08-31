@@ -4,12 +4,13 @@ import Button from '@codegouvfr/react-dsfr/Button'
 import Input from '@codegouvfr/react-dsfr/Input'
 import { createModal } from '@codegouvfr/react-dsfr/Modal'
 import Range from '@codegouvfr/react-dsfr/Range'
-import ToggleSwitch from '@codegouvfr/react-dsfr/ToggleSwitch'
 import { zodResolver } from '@hookform/resolvers/zod'
 import clsx from 'clsx'
+import { useTranslations } from 'next-intl'
 import { useEffect } from 'react'
 import { Controller, FormProvider, useForm } from 'react-hook-form'
 import { StudentAlertLocation } from '~/components/student-space/alerts/student-alert-location'
+import { ToggleSwitch } from '~/components/ui/toggle-switch'
 import { useUpdateAlert } from '~/hooks/use-update-alert'
 import { trackEvent } from '~/lib/tracking'
 import { TAlert } from '~/schemas/alerts/get-alerts'
@@ -17,6 +18,7 @@ import { TUpdateAlertRequest, ZUpdateAlertRequest } from '~/schemas/alerts/updat
 import styles from './student-alerts.module.css'
 
 export const UpdateStudentAlert = ({ alert }: { alert: TAlert }) => {
+  const t = useTranslations('student.alerts')
   const updateStudentAlertModal = createModal({
     id: `update-alert-modal-${alert.id}`,
     isOpenedByDefault: false,
@@ -81,7 +83,7 @@ export const UpdateStudentAlert = ({ alert }: { alert: TAlert }) => {
   const { control } = form
   return (
     <>
-      <Button size="small" iconId="ri-edit-line" priority="tertiary" title="Editer" {...updateStudentAlertModal.buttonProps} />
+      <Button size="small" iconId="ri-edit-line" priority="tertiary" title={t('edit')} {...updateStudentAlertModal.buttonProps} />
 
       <updateStudentAlertModal.Component
         title={
@@ -97,7 +99,7 @@ export const UpdateStudentAlert = ({ alert }: { alert: TAlert }) => {
               Configurez votre alerte personnalisée et soyez notifié dès qu'un logement correspondant à vos critères est disponible.
             </span>
             <Input
-              label="Nom de l'alerte"
+              label={t('nameLabel')}
               iconId="ri-notification-line"
               state={form.formState.errors.name ? 'error' : 'default'}
               stateRelatedMessage={form.formState.errors.name?.message}
@@ -115,7 +117,7 @@ export const UpdateStudentAlert = ({ alert }: { alert: TAlert }) => {
               control={control}
               render={({ field }) => (
                 <Range
-                  label="Budget maximum"
+                  label={t('maxPriceLabel')}
                   max={1000}
                   min={150}
                   hideMinMax
@@ -136,8 +138,9 @@ export const UpdateStudentAlert = ({ alert }: { alert: TAlert }) => {
                   <ToggleSwitch
                     classes={{ label: 'fr-width-full' }}
                     inputTitle="colocation"
+                    description={t('colivingDescription')}
                     showCheckedHint={false}
-                    label="En colocation"
+                    label={t('colivingLabel')}
                     labelPosition="right"
                     checked={field.value}
                     onChange={field.onChange}
@@ -151,8 +154,9 @@ export const UpdateStudentAlert = ({ alert }: { alert: TAlert }) => {
                   <ToggleSwitch
                     classes={{ label: 'fr-width-full' }}
                     inputTitle="accessibility"
+                    description={t('accessibleDescription')}
                     showCheckedHint={false}
-                    label="Adapté PMR"
+                    label={t('accessibleLabel')}
                     labelPosition="right"
                     checked={field.value}
                     onChange={field.onChange}
@@ -162,10 +166,10 @@ export const UpdateStudentAlert = ({ alert }: { alert: TAlert }) => {
             </div>
             <div className="fr-flex fr-justify-content-end fr-flex-gap-2v">
               <Button priority="secondary" type="button" onClick={handleCancel}>
-                Annuler
+                {t('cancel')}
               </Button>
               <Button priority="primary" type="submit" disabled={isLoading}>
-                {isLoading ? 'Enregistrement...' : 'Enregistrer'}
+                {isLoading ? t('saving') : t('save')}
               </Button>
             </div>
           </form>

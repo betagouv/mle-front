@@ -1,10 +1,16 @@
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import { program } from 'commander'
 import { backfillAlertJobsCommand } from './commands/backfill-alert-jobs'
 import { backfillBrevoContacts } from './commands/backfill-brevo-contacts'
 import { backfillBrevoOwners } from './commands/backfill-brevo-owners'
+import { backfillCacheControl } from './commands/backfill-cache-control'
 import { backfillGeocoding } from './commands/backfill-geocoding'
+import { backupDb } from './commands/backup-db'
 import { compareCrous } from './commands/compare-crous'
+import { cronSelftest } from './commands/cron-selftest'
 import { detectAlertJobsCommand } from './commands/detect-alert-jobs'
+import { expireAlertsCommand } from './commands/expire-alerts'
 import { healthcheck, healthcheckCities } from './commands/healthcheck'
 import { importBackup } from './commands/import-backup'
 import { importCrousRents } from './commands/import-crous-rents'
@@ -12,12 +18,16 @@ import { importCrousSurfaces } from './commands/import-crous-surfaces'
 import { importCrousTypologies } from './commands/import-crous-typologies'
 import { migrate } from './commands/migrate'
 import { migrateUsers } from './commands/migrate-users'
+import { purgeContactRequests } from './commands/purge-contact-requests'
+import { purgeLogs } from './commands/purge-logs'
 import { seedAlertSnapshotCommand } from './commands/seed-alert-snapshot'
 import { sendAlertJobs } from './commands/send-alert-jobs'
 import { auditStorage } from './commands/storage/auditStorage'
 import { uploadImages } from './commands/upload-images'
 import { verifyRamsese } from './commands/verify-ramsese'
+import { CRON_COMMANDS, jobNameFromArgv, notifyCronFailure } from './cron-failure'
 import { runImport, runSync } from './factory'
+import { captureCliException } from './sentry'
 
 program.name('mle').description('MLE CLI tools')
 
@@ -51,7 +61,38 @@ program
   .option('--csv <path>', 'Écrire le rapport détaillé dans un CSV')
   .action((opts) => backfillGeocoding({ ...opts, dryRun: !opts.apply }))
 
+program
+  .command('backfill-cache-control')
+  .description("Pose le Cache-Control immuable sur les médias S3 déposés avant l'ajout de l'en-tête à l'upload")
+  .option('--dry-run', 'Lister les objets à corriger sans écrire')
+  .option('--verbose', 'Afficher chaque objet traité')
+  .option('--limit <n>', "Limiter le nombre d'objets", parseInt)
+  .option('--concurrency <n>', 'Nombre de requêtes S3 en parallèle (défaut : 20)', parseInt)
+  .option(
+    '--prefix <prefix>',
+    'Préfixe S3 à traiter, répétable (défaut : tout le bucket, hors image-cache/, purges/ et non-images)',
+    (value: string, previous: string[] | undefined) => [...(previous ?? []), value],
+  )
+  .action((opts) => backfillCacheControl(opts))
+
 program.command('migrate').description('Apply Drizzle migrations').action(migrate)
+
+program
+  .command('purge-logs')
+  .description('Purge les tables append-only au-delà de leur rétention, après archivage NDJSON dans S3')
+  .option('--dry-run', 'Compter sans supprimer')
+  .option('--verbose', 'Afficher le détail par table')
+  .option(
+    '--retention-months <n>',
+    'Forcer la rétention de toutes les tables (défaut : propre à chaque table, voir purge-logs.ts)',
+    parseInt,
+  )
+  .option('--max-rows <n>', 'Plafond de lignes par table et par run (défaut : 2000000)', parseInt)
+  .option('--table <name>', 'Ne purger qu’une table (tracking_event, activity_log, alert_job, import_job)')
+  .option('--no-archive', 'Supprimer sans déposer d’archive dans S3')
+  // Commander expose `--no-archive` sous la forme `archive: false` : on le retraduit en
+  // `noArchive` pour que la commande garde une option positive côté API.
+  .action((opts) => purgeLogs({ ...opts, noArchive: opts.archive === false }))
 
 program
   .command('compare-crous <file>')
@@ -93,6 +134,13 @@ program
   .action((file, opts) => importCrousTypologies(file, opts))
 
 program
+  .command('backup-db')
+  .description('Copie le dernier backup Scalingo de la base dans le bucket S3 de sauvegarde (production uniquement)')
+  .option('--dry-run', 'Afficher le backup retenu, la clé calculée et les purges, sans rien écrire')
+  .option('--verbose', 'Détailler les objets conservés et supprimés')
+  .action((opts) => backupDb(opts))
+
+program
   .command('import-backup')
   .description('Import Scalingo backup into local DB')
   .option('--backup-path <path>', 'Use a local backup file instead of downloading')
@@ -108,6 +156,8 @@ program
   .option('--limit <n>', "Limiter le nombre d'éléments", parseInt)
   .option('--file <path>', 'Chemin vers un fichier JSON local')
   .option('--source <name>', 'Identifiant de la source externe')
+  .option('--owner-id <id>', 'Id du bailleur (prioritaire sur le slug et le nom)', parseInt)
+  .option('--owner-slug <slug>', 'Slug du bailleur (prioritaire sur le nom)')
   .action((type, opts) => runImport(type, opts))
 
 // Sync commands (cities, rents, students, stats)
@@ -180,6 +230,19 @@ program
   .action((opts) => sendAlertJobs(opts))
 
 program
+  .command('expire-alerts')
+  .description('Relance les alertes de plus de 3 mois (template 46) puis désactive celles sans réaction après 7 jours (template 48)')
+  .option('--dry-run', 'Simuler sans envoyer ni modifier la BDD')
+  .option('--verbose', 'Afficher le détail des alertes relancées/désactivées')
+  .action((opts) => expireAlertsCommand(opts))
+
+program
+  .command('purge-contact-requests')
+  .description('Purge RGPD : supprime les demandes visiteur non confirmées, anonymise les demandes expirées')
+  .option('--dry-run', 'Compter sans modifier la BDD')
+  .action((opts) => purgeContactRequests(opts))
+
+program
   .command('verify-ramsese')
   .description('Vérifie la connectivité RAMSESE + le parsing des établissements (à lancer en one-off Scalingo)')
   .option('--cp <codePostal>', 'Code postal à tester', '94000')
@@ -191,8 +254,60 @@ program
   .option('--concurrency <n>', 'Nb de requêtes détail en parallèle (pool borné, défaut 8)', parseInt)
   .option('--no-natures', 'Ne pas filtrer par la liste blanche métier (diagnostic)')
   .option('--national', 'Périmètre national : liste blanche des natures, sans filtre par localisation')
+  .option('--etats <codes>', 'Sonde : envoie un critère `etats` (ex. 1) au filtre RAMSESE — un 400 = critère non supporté')
   .option('--json <fichier>', 'Écrire la liste complète des établissements (non tronquée) dans ce fichier .json')
   .option('--dump', 'Afficher le payload JSON complet du 1er UAI')
   .action((opts) => verifyRamsese(opts))
 
-program.parse()
+program
+  .command('cron-selftest')
+  .description("Lève une erreur volontaire pour valider la chaîne d'alerte des crons (mail + Sentry)")
+  .action(cronSelftest)
+
+/**
+ * Commandes locales, non versionnées (`cli/local/` est dans .gitignore).
+ *
+ * Chaque fichier du dossier exporte par défaut une fonction qui reçoit `program` et y
+ * enregistre ses commandes. Le dossier peut être absent : le CLI reste alors utilisable en
+ * l'état, sans import cassé ni commande fantôme.
+ */
+function registerLocalCommands(): void {
+  if (process.env.SCALINGO_APP || process.env.NEXT_PUBLIC_APP_ENV === 'staging' || process.env.NEXT_PUBLIC_APP_ENV === 'production') {
+    return
+  }
+
+  const localDir = path.join(__dirname, 'local')
+  if (!fs.existsSync(localDir)) return
+
+  for (const file of fs.readdirSync(localDir).sort()) {
+    if (!/\.(ts|js)$/.test(file) || file.endsWith('.d.ts')) continue
+    const module = require(path.join(localDir, file))
+    const register = module.default ?? module.register
+    if (typeof register === 'function') register(program)
+  }
+}
+
+// Doit rester avant le parsing, sinon les commandes locales ne sont pas encore déclarées.
+registerLocalCommands()
+
+// Filet unique pour toutes les commandes : si un job planifié échoue, on remonte l'erreur
+// dans Sentry et par mail avant de sortir en échec. Les commandes lancées à la main ne
+// notifient pas — leur erreur est déjà sous les yeux de qui les a lancées.
+async function main() {
+  const startedAt = new Date()
+  try {
+    await program.parseAsync()
+  } catch (error) {
+    const job = jobNameFromArgv(process.argv)
+    console.error(error)
+
+    if (CRON_COMMANDS.has(job)) {
+      await captureCliException(error)
+      await notifyCronFailure({ job, error, startedAt })
+    }
+
+    process.exitCode = 1
+  }
+}
+
+void main()

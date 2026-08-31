@@ -1,0 +1,30 @@
+/* Évite qu'une colonne large ne déborde de la grille. */
+.column {
+  min-width: 0;
+}
+
+.icon {
+  --icon-size: 1.25rem;
+
+  color: var(--column-icon-color);
+}
+
+.dropzone {
+  min-height: 120px;
+  transition: background-color 0.15s ease;
+}
+
+.dropzoneOver {
+  background-color: var(--background-alt-blue-france);
+  outline: 2px dashed var(--border-active-blue-france);
+  outline-offset: -2px;
+}
+
+/* Placeholder gardant la colonne à la même hauteur qu'une carte quand elle est vide. */
+.emptyCell {
+  min-height: 10.5rem;
+}
+
+.dragging {
+  opacity: 0.4;
+}

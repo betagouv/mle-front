@@ -1,15 +1,14 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import Alert from '@codegouvfr/react-dsfr/Alert'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { Input } from '@codegouvfr/react-dsfr/Input'
 import { zodResolver } from '@hookform/resolvers/zod'
-import clsx from 'clsx'
 import { useTranslations } from 'next-intl'
 import { FC, ReactNode } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { tss } from 'tss-react'
+import { RequiredLabel } from '~/components/ui/required-mark'
 import { useForgotPassword } from '~/hooks/use-forgot-password'
 import { trackEvent } from '~/lib/tracking'
 import { ZForgotPasswordForm } from '~/schemas/forgot-password/forgot-password'
@@ -45,12 +44,7 @@ export const ForgotPasswordForm: FC = () => {
         <div className={classes.formContainer}>
           <div className={classes.inputContainer}>
             <Input
-              label={
-                <>
-                  {t('labels.email')}
-                  &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-                </>
-              }
+              label={<RequiredLabel>{t('labels.email')}</RequiredLabel>}
               nativeInputProps={{
                 ...register('email'),
               }}
@@ -79,8 +73,5 @@ const useStyles = tss.create({
     display: 'flex',
     flexDirection: 'column',
     gap: '2rem',
-  },
-  required: {
-    color: 'red',
   },
 })

@@ -400,6 +400,14 @@
   letter-spacing: 0.03em;
 }
 
+/* Précision sous le libellé d'une tuile KPI (ex. nb de logements sous un nb de résidences). */
+.kpiSubValue {
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-action-high-blue-france);
+}
+
 .pageIcon {
   width: 2.5rem;
   height: 2.5rem;

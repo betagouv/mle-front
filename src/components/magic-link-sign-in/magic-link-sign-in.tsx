@@ -1,16 +1,15 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import Button from '@codegouvfr/react-dsfr/Button'
 import { Input } from '@codegouvfr/react-dsfr/Input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import clsx from 'clsx'
 import { useTranslations } from 'next-intl'
 import { FC } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { tss } from 'tss-react'
 import { createToast } from '~/components/ui/createToast'
+import { RequiredLabel } from '~/components/ui/required-mark'
 import { trackEvent } from '~/lib/tracking'
 import { TMagicLinkSignInForm, ZMagicLinkSignInForm } from '~/schemas/magic-link-sign-in/magic-link-sign-in'
 import { sendMagicLink } from './actions'
@@ -52,12 +51,7 @@ export const MagicLinkSignInForm: FC<{ callbackURL?: string; type?: 'owner' | 'a
         <div className={classes.formContainer}>
           <div className={classes.inputContainer}>
             <Input
-              label={
-                <>
-                  {t('labels.email')}
-                  &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-                </>
-              }
+              label={<RequiredLabel>{t('labels.email')}</RequiredLabel>}
               state={formState.errors.email ? 'error' : undefined}
               stateRelatedMessage={formState.errors.email?.message}
               nativeInputProps={{
@@ -84,8 +78,5 @@ const useStyles = tss.create({
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
-  },
-  required: {
-    color: 'red',
   },
 })

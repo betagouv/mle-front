@@ -6,6 +6,7 @@ import { Select } from '@codegouvfr/react-dsfr/Select'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { useTranslations } from 'next-intl'
+import { NewWindowHint } from '~/components/ui/new-window'
 import { RentSearchModal } from '~/components/ui/rent-search-modal'
 import {
   CVEC_AMOUNT,
@@ -63,7 +64,8 @@ export function ExpenseForm() {
         const yearlyOnly = YEARLY_ONLY_EXPENSE_TYPES.includes(type as (typeof YEARLY_ONLY_EXPENSE_TYPES)[number])
 
         return (
-          <div key={type} className={clsx('fr-flex fr-flex-gap-4v', styles.formRow)}>
+          <fieldset key={type} className={clsx('fr-flex fr-flex-gap-4v', styles.formRow, styles.rowFieldset)}>
+            <legend className="fr-sr-only">{t('expenseRowLegend', { category: t(`types.${type}`) })}</legend>
             <div className={clsx('fr-flex-basis-0 fr-flex-grow-1', styles.sourceSelect)}>
               <Select
                 className={styles.select}
@@ -147,14 +149,14 @@ export function ExpenseForm() {
               {state.activeExpenseTypes.length > 1 && (
                 <Button
                   priority="tertiary"
-                  title={t('removeExpenseTitle')}
+                  title={`${t('removeExpenseTitle')} : ${t(`types.${type}`)}`}
                   iconId="ri-delete-bin-line"
                   size="small"
                   onClick={() => handleRemoveExpenseType(type)}
                 />
               )}
             </div>
-          </div>
+          </fieldset>
         )
       })}
       {canAddMore && (
@@ -173,6 +175,7 @@ export function ExpenseForm() {
               target="_blank"
             >
               Repère 2023 de OVE
+              <NewWindowHint />
             </Link>{' '}
             et retravaillées en fonction des profils “décohabitants” (n’habitant pas chez leurs parents) et “indépendants” (n'étant pas ou
             peu aidés par leurs parents) des étudiants afin de donner des estimations de budget.

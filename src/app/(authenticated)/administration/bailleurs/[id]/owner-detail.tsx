@@ -23,6 +23,7 @@ import { useAdminUpdateOwner } from '~/hooks/use-admin-update-owner'
 import { TOwnerFormData } from '~/schemas/owner-form'
 import { useTRPC, useTRPCClient } from '~/server/trpc/client'
 import { getInitials } from '~/utils/avatar'
+import { formatDateTime } from '~/utils/formatDate'
 import { getFaviconUrl } from '~/utils/get-favicon-url'
 import { sPluriel } from '~/utils/sPluriel'
 import styles from '../../administration.module.css'
@@ -92,7 +93,7 @@ export function OwnerDetail({ id }: { id: string }) {
       name: data.name,
       url: data.url || undefined,
       landingUrl: data.landingUrl || undefined,
-      acceptDossierFacileApplications: data.acceptDossierFacileApplications,
+      contactMode: data.contactMode,
     })
   }
 
@@ -197,7 +198,7 @@ export function OwnerDetail({ id }: { id: string }) {
                       name: ownerData.name,
                       url: ownerData.url ?? '',
                       landingUrl: ownerData.landingUrl ?? '',
-                      acceptDossierFacileApplications: ownerData.acceptDossierFacileApplications,
+                      contactMode: ownerData.contactMode,
                     }}
                     onSubmit={handleSubmit}
                     isPending={updateOwner.isPending}
@@ -205,6 +206,16 @@ export function OwnerDetail({ id }: { id: string }) {
                   />
                 </div>
                 <div className="fr-col-md-4">
+                  <div className={clsx(styles.card, 'fr-p-3w fr-mb-3w')}>
+                    <h3 className="fr-h6 fr-mb-1w">Dernière modification</h3>
+                    {ownerData.updatedAt ? (
+                      <p className="fr-text--sm fr-mb-0">
+                        {formatDateTime(new Date(ownerData.updatedAt))} par {ownerData.updatedByName ?? 'un compte supprimé'}
+                      </p>
+                    ) : (
+                      <p className="fr-text--sm fr-text-mention--grey fr-mb-0">Aucune modification enregistrée</p>
+                    )}
+                  </div>
                   <div className={styles.dangerZone}>
                     <h3 className={clsx('fr-h6 fr-mb-2w', styles.dangerZoneTitle)}>Zone de danger</h3>
                     <Button priority="tertiary" onClick={() => deleteOwnerModal.open()} disabled={deleteOwner.isPending}>
@@ -521,7 +532,7 @@ function StatsTab({ stats }: { stats: StatsData | null }) {
   const maxValue = Math.max(...TYPE_LABELS.map((t) => stats[t.key]), 1)
 
   return (
-    <div className={clsx(styles.card)} style={{ padding: '1.5rem' }}>
+    <div className={styles.card} style={{ padding: '1.5rem' }}>
       <h3 className="fr-h6 fr-mb-3w">Répartition par type</h3>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         {TYPE_LABELS.filter((t) => stats[t.key] > 0).map((t) => (

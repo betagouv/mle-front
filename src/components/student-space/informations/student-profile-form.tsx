@@ -1,15 +1,15 @@
 'use client'
 
 import Button from '@codegouvfr/react-dsfr/Button'
+import { PasswordInput } from '@codegouvfr/react-dsfr/blocks/PasswordInput'
 import { Input } from '@codegouvfr/react-dsfr/Input'
 import { RadioButtons } from '@codegouvfr/react-dsfr/RadioButtons'
 import Select from '@codegouvfr/react-dsfr/Select'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { RequiredLabel } from '~/components/helps-simulator/required-label'
 import { createToast } from '~/components/ui/createToast'
+import { RequiredFieldsNotice, RequiredLabel } from '~/components/ui/required-mark'
 import { useUpdateStudentProfile } from '~/hooks/use-update-student-profile'
 import { SCHOLARSHIP_TYPES, type TUpdateStudentProfileForm, ZUpdateStudentProfileForm } from '~/schemas/student/update-profile'
 import { authClient } from '~/services/better-auth-client'
@@ -29,9 +29,6 @@ type StudentProfileFormProps = {
 export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) => {
   const t = useTranslations('student.personalInformations.form')
   const { mutate: updateProfile, isPending } = useUpdateStudentProfile()
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false)
-  const [showNewPassword, setShowNewPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   const {
     register,
@@ -81,13 +78,14 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="fr-flex fr-direction-column fr-flex-gap-4v">
+      <RequiredFieldsNotice />
       <div className="fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-12 fr-col-md-6">
           <Input
             label={<RequiredLabel>{t('lastname')}</RequiredLabel>}
             state={errors.lastname ? 'error' : undefined}
             stateRelatedMessage={errors.lastname?.message}
-            nativeInputProps={{ ...register('lastname') }}
+            nativeInputProps={{ ...register('lastname'), autoComplete: 'family-name', 'aria-required': true }}
           />
         </div>
         <div className="fr-col-12 fr-col-md-6">
@@ -95,15 +93,11 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
             label={<RequiredLabel>{t('firstname')}</RequiredLabel>}
             state={errors.firstname ? 'error' : undefined}
             stateRelatedMessage={errors.firstname?.message}
-            nativeInputProps={{ ...register('firstname') }}
+            nativeInputProps={{ ...register('firstname'), autoComplete: 'given-name', 'aria-required': true }}
           />
         </div>
         <div className="fr-col-12 fr-col-md-6">
-          <Input
-            label={<RequiredLabel>{t('email')}</RequiredLabel>}
-            disabled
-            nativeInputProps={{ value: initialValues.email, readOnly: true }}
-          />
+          <Input label={t('email')} disabled nativeInputProps={{ value: initialValues.email, readOnly: true, autoComplete: 'email' }} />
         </div>
         <div className="fr-col-12 fr-col-md-6">
           <Input
@@ -117,6 +111,7 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
                 },
               }),
               type: 'tel',
+              autoComplete: 'tel-national',
               placeholder: t('phonePlaceholder'),
               maxLength: 10,
             }}
@@ -128,7 +123,7 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
             hintText={t('birthdateHint')}
             state={errors.birthdate ? 'error' : undefined}
             stateRelatedMessage={errors.birthdate?.message}
-            nativeInputProps={{ ...register('birthdate'), type: 'date' }}
+            nativeInputProps={{ ...register('birthdate'), type: 'date', autoComplete: 'bday' }}
           />
         </div>
       </div>
@@ -194,57 +189,30 @@ export const StudentProfileForm = ({ initialValues }: StudentProfileFormProps) =
 
       <div className="fr-border-top fr-pt-4w fr-mt-2w fr-grid-row fr-grid-row--gutters">
         <div className="fr-col-12 fr-col-md-6">
-          <Input
+          <PasswordInput
             label={t('currentPassword')}
             hintText={t('passwordHint')}
-            state={errors.currentPassword ? 'error' : undefined}
-            stateRelatedMessage={errors.currentPassword?.message}
-            addon={
-              <Button
-                iconId={showCurrentPassword ? 'ri-eye-off-line' : 'ri-eye-line'}
-                priority="tertiary"
-                type="button"
-                title={showCurrentPassword ? t('hidePassword') : t('showPassword')}
-                nativeButtonProps={{ onClick: () => setShowCurrentPassword((v) => !v) }}
-              />
-            }
-            nativeInputProps={{ ...register('currentPassword'), type: showCurrentPassword ? 'text' : 'password' }}
+            messagesHint=""
+            messages={errors.currentPassword ? [{ severity: 'error', message: errors.currentPassword.message ?? '' }] : []}
+            nativeInputProps={{ ...register('currentPassword') }}
           />
         </div>
         <div className="fr-col-12 fr-col-md-6">
-          <Input
+          <PasswordInput
             label={t('newPassword')}
             hintText={t('passwordHint')}
-            state={errors.newPassword ? 'error' : undefined}
-            stateRelatedMessage={errors.newPassword?.message}
-            addon={
-              <Button
-                iconId={showNewPassword ? 'ri-eye-off-line' : 'ri-eye-line'}
-                priority="tertiary"
-                type="button"
-                title={showNewPassword ? t('hidePassword') : t('showPassword')}
-                nativeButtonProps={{ onClick: () => setShowNewPassword((v) => !v) }}
-              />
-            }
-            nativeInputProps={{ ...register('newPassword'), type: showNewPassword ? 'text' : 'password' }}
+            messagesHint=""
+            messages={errors.newPassword ? [{ severity: 'error', message: errors.newPassword.message ?? '' }] : []}
+            nativeInputProps={{ ...register('newPassword') }}
           />
         </div>
         <div className="fr-col-12 fr-col-md-6">
-          <Input
+          <PasswordInput
             label={t('confirmPassword')}
             hintText={t('passwordHint')}
-            state={errors.confirmPassword ? 'error' : undefined}
-            stateRelatedMessage={errors.confirmPassword?.message}
-            addon={
-              <Button
-                iconId={showConfirmPassword ? 'ri-eye-off-line' : 'ri-eye-line'}
-                priority="tertiary"
-                type="button"
-                title={showConfirmPassword ? t('hidePassword') : t('showPassword')}
-                nativeButtonProps={{ onClick: () => setShowConfirmPassword((v) => !v) }}
-              />
-            }
-            nativeInputProps={{ ...register('confirmPassword'), type: showConfirmPassword ? 'text' : 'password' }}
+            messagesHint=""
+            messages={errors.confirmPassword ? [{ severity: 'error', message: errors.confirmPassword.message ?? '' }] : []}
+            nativeInputProps={{ ...register('confirmPassword') }}
           />
         </div>
       </div>

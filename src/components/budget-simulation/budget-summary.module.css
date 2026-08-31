@@ -22,6 +22,15 @@
   border: 1px solid rgba(221, 221, 221, 0.2);
 }
 
+/**
+ * Mention discrète posée sur le panneau bleu nuit. La classe DSFR fr-text-mention--grey
+ * (#666) y tombe à 2,49:1, sous le seuil de 4,5:1 qu'exige le RGAA 3.2 pour un texte de
+ * 12 px. Ce gris clair atteint 5,81:1 sur ce même fond tout en restant en retrait.
+ */
+.annualTotal {
+  color: #a5a5a5;
+}
+
 .totalsContainer {
   width: 100%;
   @media (min-width: 768px) {

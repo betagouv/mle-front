@@ -4,6 +4,7 @@ import { createModal } from '@codegouvfr/react-dsfr/Modal'
 import Select from '@codegouvfr/react-dsfr/Select'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
+import { ModalPortal } from '~/components/ui/modal-portal'
 import { APARTMENT_TYPE_LABELS, type ApartmentType } from '~/enums/apartment-type'
 import { useTRPC, useTRPCClient } from '~/server/trpc/client'
 
@@ -46,53 +47,55 @@ export const CandidatureModal = ({ accommodationSlug, availableApartmentTypes }:
   }
 
   return (
-    <modal.Component
-      title={step === 'form' ? 'Candidater pour ce logement' : 'Candidature envoyée'}
-      buttons={
-        step === 'form'
-          ? [
-              {
-                children: 'Annuler',
-                priority: 'secondary',
-                doClosesModal: true,
-                onClick: handleClose,
-              },
-              {
-                children: 'Candidater',
-                doClosesModal: false,
-                onClick: handleSubmit,
-                disabled: !selectedApartmentType || applyMutation.isPending,
-              },
-            ]
-          : [
-              {
-                children: 'Fermer',
-                doClosesModal: true,
-                onClick: handleClose,
-              },
-            ]
-      }
-    >
-      {step === 'form' ? (
-        <Select
-          label="Type de logement"
-          nativeSelectProps={{
-            value: selectedApartmentType,
-            onChange: (e) => setSelectedApartmentType(e.target.value as ApartmentType),
-          }}
-        >
-          <option value="" disabled hidden>
-            Sélectionnez un type de logement
-          </option>
-          {availableApartmentTypes.map((type) => (
-            <option key={type} value={type}>
-              {APARTMENT_TYPE_LABELS[type]}
+    <ModalPortal>
+      <modal.Component
+        title={step === 'form' ? 'Candidater pour ce logement' : 'Candidature envoyée'}
+        buttons={
+          step === 'form'
+            ? [
+                {
+                  children: 'Annuler',
+                  priority: 'secondary',
+                  doClosesModal: true,
+                  onClick: handleClose,
+                },
+                {
+                  children: 'Candidater',
+                  doClosesModal: false,
+                  onClick: handleSubmit,
+                  disabled: !selectedApartmentType || applyMutation.isPending,
+                },
+              ]
+            : [
+                {
+                  children: 'Fermer',
+                  doClosesModal: true,
+                  onClick: handleClose,
+                },
+              ]
+        }
+      >
+        {step === 'form' ? (
+          <Select
+            label="Type de logement"
+            nativeSelectProps={{
+              value: selectedApartmentType,
+              onChange: (e) => setSelectedApartmentType(e.target.value as ApartmentType),
+            }}
+          >
+            <option value="" disabled hidden>
+              Sélectionnez un type de logement
             </option>
-          ))}
-        </Select>
-      ) : (
-        <p>Votre candidature a bien été envoyée. Le bailleur reviendra vers vous dans les meilleurs délais.</p>
-      )}
-    </modal.Component>
+            {availableApartmentTypes.map((type) => (
+              <option key={type} value={type}>
+                {APARTMENT_TYPE_LABELS[type]}
+              </option>
+            ))}
+          </Select>
+        ) : (
+          <p>Votre candidature a bien été envoyée. Le bailleur reviendra vers vous dans les meilleurs délais.</p>
+        )}
+      </modal.Component>
+    </ModalPortal>
   )
 }

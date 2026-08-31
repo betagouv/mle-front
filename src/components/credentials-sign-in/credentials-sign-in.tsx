@@ -1,12 +1,11 @@
 'use client'
 
-import { fr } from '@codegouvfr/react-dsfr'
 import Alert from '@codegouvfr/react-dsfr/Alert'
 import Button from '@codegouvfr/react-dsfr/Button'
+import { PasswordInput } from '@codegouvfr/react-dsfr/blocks/PasswordInput'
 import { Input } from '@codegouvfr/react-dsfr/Input'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as Sentry from '@sentry/nextjs'
-import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
@@ -15,6 +14,7 @@ import { FormProvider, useForm } from 'react-hook-form'
 import { tss } from 'tss-react'
 import { resendVerificationEmail } from '~/components/credentials-sign-in/actions'
 import { createToast } from '~/components/ui/createToast'
+import { RequiredLabel } from '~/components/ui/required-mark'
 import { trackEvent } from '~/lib/tracking'
 import { ZCredentialsSignInForm } from '~/schemas/credentials-sign-in/credentials-sign-in'
 import { signInCredentials } from '~/services/better-auth-client'
@@ -127,35 +127,24 @@ export const CredentialsSignInForm: FC = () => {
           )}
           <div className={classes.inputContainer}>
             <Input
-              label={
-                <>
-                  {t('labels.email')}
-                  &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-                </>
-              }
+              label={<RequiredLabel>{t('labels.email')}</RequiredLabel>}
               state={formState.errors.email ? 'error' : undefined}
               stateRelatedMessage={formState.errors.email?.message}
               nativeInputProps={{
                 ...register('email'),
               }}
             />
-            <Input
-              label={
-                <>
-                  {t('labels.password')}
-                  &nbsp;<span className={clsx(fr.cx('fr-text--bold'), classes.required)}>*</span>{' '}
-                </>
-              }
-              state={formState.errors.password ? 'error' : undefined}
-              stateRelatedMessage={formState.errors.password?.message}
+            <PasswordInput
+              label={<RequiredLabel>{t('labels.password')}</RequiredLabel>}
+              messagesHint=""
+              messages={formState.errors.password ? [{ severity: 'error', message: formState.errors.password.message ?? '' }] : []}
               nativeInputProps={{
                 ...register('password'),
-                type: 'password',
               }}
             />
           </div>
           <div>
-            <Link className={fr.cx('fr-link')} href="/mot-de-passe-oublie">
+            <Link className="fr-link" href="/mot-de-passe-oublie">
               {t('labels.forgotPassword')}
             </Link>
           </div>
@@ -178,9 +167,6 @@ const useStyles = tss.create({
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
-  },
-  required: {
-    color: 'red',
   },
   alertContent: {
     display: 'flex',

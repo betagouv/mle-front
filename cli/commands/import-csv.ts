@@ -2,6 +2,7 @@ import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { and, eq, sql } from 'drizzle-orm'
 import { z } from 'zod'
+import { ETargetAudience } from '~/enums/target-audience'
 import { db } from '~/server/db'
 import { env } from '~/server/env'
 import { ensureCity, geocodeAddressVerified, geocodeImportRow, reverseGeocode } from '~/server/lib/import/geocoder'
@@ -10,12 +11,12 @@ import { ZUpdateResidence } from '../../src/schemas/accommodations/update-reside
 import { accommodationAddresses, accommodations, externalSources } from '../../src/server/db/schema'
 import type { CsvRow } from '../../src/server/lib/import/csv-parser'
 import { generateSourceId, normalizeEnum, parseCsvContent, toBool, toDigit } from '../../src/server/lib/import/csv-parser'
+import { resolveImportOwner } from '../../src/server/lib/import/resolve-owner'
 import { syncTypologies, typologyAggregates, typologyDraft } from '../../src/server/lib/typologies'
 import { generateAccommodationKey, uploadFile } from '../../src/server/services/s3'
 import { generateSlug } from '../../src/server/trpc/utils/accommodation-helpers'
 import { findAvailableSlug } from '../../src/server/utils/slug'
 import type { ImportCommand, ImportOptions, ImportResult } from '../types'
-import { getOrCreateOwner } from '../utils/get-or-create-owner'
 
 function parseCsv(filePath: string, limit?: number): CsvRow[] {
   const content = fs.readFileSync(filePath, 'utf-8')
@@ -226,17 +227,26 @@ const command: ImportCommand = {
       throw new Error(`Validation Zod échouée (${validationErrors.length} ligne(s)):\n${validationErrors.join('\n')}`)
     }
 
-    // Get or create owner from first row
+    // Bailleur de la première ligne : `owner_id` puis `owner_slug` (identifiants stables) avant le nom.
+    const ownerIdColumn = options.ownerId ?? toDigit(rows[0].owner_id)
+    const ownerSlug = options.ownerSlug ?? rows[0].owner_slug?.trim()
     const ownerName = rows[0].owner_name?.trim()
     const ownerUrl = rows[0].owner_url?.trim()
-    if (!ownerName) {
-      throw new Error('owner_name manquant dans la première ligne')
+    if (ownerIdColumn == null && !ownerSlug && !ownerName) {
+      throw new Error('owner_id, owner_slug ou owner_name manquant dans la première ligne')
     }
 
     let ownerId: number | undefined
     if (!options.dryRun) {
-      ownerId = await getOrCreateOwner(ownerName, ownerUrl)
-      if (options.verbose) console.log(`  Owner "${ownerName}" id=${ownerId}`)
+      const owner = await resolveImportOwner({ id: ownerIdColumn, slug: ownerSlug, name: ownerName, url: ownerUrl })
+      ownerId = owner.id
+      result.ownerId = owner.id
+      result.ownerName = owner.name
+      if (options.verbose) console.log(`  Owner "${owner.name}" id=${ownerId}`)
+    } else if (ownerIdColumn != null || ownerSlug) {
+      // En dry-run on vérifie l'identifiant stable — sans `name`, la résolution ne peut rien créer.
+      const owner = await resolveImportOwner({ id: ownerIdColumn, slug: ownerSlug })
+      if (options.verbose) console.log(`  [dry-run] Owner "${owner.name}" id=${owner.id}`)
     } else if (options.verbose) {
       console.log(`  [dry-run] Owner "${ownerName}"`)
     }
@@ -332,7 +342,7 @@ const command: ImportCommand = {
           name,
           description: row.description?.trim() || null,
           residenceType: normalizeEnum(row.residence_type),
-          target_audience: (normalizeEnum(row.target_audience) ?? 'etudiants') as 'etudiants' | 'mixte-etudiants-jeunes-actifs',
+          targetAudience: (normalizeEnum(row.target_audience) ?? 'etudiants') as ETargetAudience,
           published: true,
           priceMin: derived.priceMin,
           nbTotalApartments: toDigit(row.nb_total_apartments, true) ?? derived.nbTotalApartments,

@@ -29,7 +29,7 @@ export const AidsLocalisationInfo: FC<AidsLocalisationInfoProps> = ({ results })
           <span>
             {t.rich('localAidsInfo', {
               name: results.localAids[0],
-              strong: (chunks) => <strong>{chunks}</strong>,
+              strong: (chunks) => <strong className={styles.localAidName}>{chunks}</strong>,
             })}
           </span>
         </div>
