@@ -1,4 +1,4 @@
-import { and, eq, inArray } from 'drizzle-orm'
+import { and, eq, inArray, sql } from 'drizzle-orm'
 import { NextRequest } from 'next/server'
 import { TYPOLOGIES } from '~/schemas/accommodations/typology'
 import { db } from '~/server/db'
@@ -91,6 +91,35 @@ export async function GET(request: NextRequest) {
     typologiesByAccommodation.set(tRow.accommodationId, list)
   }
 
+  // Dernière mise à jour des disponibilités, par résidence.
+  //
+  // Aucune colonne ne la porte : `accommodation.updated_at` bouge à la moindre modification de la
+  // fiche, et `accommodation_typology` n'est pas horodatée. La seule trace datée est le journal
+  // d'activité, où une mise à jour de dispos apparaît soit sous l'action dédiée, soit dans le diff
+  // d'une modification de fiche (clés `typologies.<type>.nbAvailable`, ou `nb<T>Available` pour les
+  // entrées antérieures au passage aux typologies).
+  //
+  // Une seule requête agrégée plutôt qu'une sous-requête corrélée par résidence : `activity_log`
+  // n'est pas indexée sur `metadata->>'slug'`.
+  const availabilityUpdates = await db.execute<{ slug: string; updatedAt: string; userName: string | null }>(sql`
+    SELECT DISTINCT ON (metadata->>'slug')
+      metadata->>'slug' AS "slug",
+      created_at AS "updatedAt",
+      user_name AS "userName"
+    FROM activity_log
+    WHERE entity_type = 'accommodation'
+      AND metadata->>'slug' IS NOT NULL
+      AND (
+        action = 'accommodation.availability_updated'
+        OR EXISTS (
+          SELECT 1 FROM jsonb_object_keys(metadata->'diff') AS k
+          WHERE k ILIKE '%available%'
+        )
+      )
+    ORDER BY metadata->>'slug', created_at DESC
+  `)
+  const availabilityBySlug = new Map(availabilityUpdates.map((row) => [row.slug, row]))
+
   const enriched = results.map((rawRow) => {
     const byType = typologiesByType(typologiesByAccommodation.get(rawRow.id) ?? [])
     // Flatten typologies back into per-typology columns for the CSV (admins expect flat columns).
@@ -106,13 +135,26 @@ export async function GET(request: NextRequest) {
     }
     const nbLogementsDisponibles = calculateAvailability(byType)
     const region = getRegionByDepartmentCode(rawRow.departmentCode)
-    return { ...rawRow, ...flat, region, disponibiliteRenseignee: nbLogementsDisponibles != null, nbLogementsDisponibles }
+    const lastAvailabilityUpdate = availabilityBySlug.get(rawRow.slug)
+    return {
+      ...rawRow,
+      ...flat,
+      region,
+      disponibiliteRenseignee: nbLogementsDisponibles != null,
+      nbLogementsDisponibles,
+      availabilityUpdatedAt: lastAvailabilityUpdate?.updatedAt ?? null,
+      availabilityUpdatedBy: lastAvailabilityUpdate?.userName ?? null,
+    }
   })
 
-  // region est calculée hors select : on la replace juste après departmentName pour regrouper les colonnes territoire
-  const headers = enriched[0] ? Object.keys(enriched[0]).filter((h) => h !== 'region') : []
+  // Colonnes calculées hors select : on les replace au milieu des colonnes qu'elles complètent
+  // (territoire pour `region`, horodatage pour le suivi des dispos) plutôt qu'en fin de fichier.
+  const REPOSITIONED = ['region', 'availabilityUpdatedAt', 'availabilityUpdatedBy']
+  const headers = enriched[0] ? Object.keys(enriched[0]).filter((h) => !REPOSITIONED.includes(h)) : []
   const deptIndex = headers.indexOf('departmentName')
   if (deptIndex !== -1) headers.splice(deptIndex + 1, 0, 'region')
+  const updatedIndex = headers.indexOf('updatedAt')
+  if (updatedIndex !== -1) headers.splice(updatedIndex + 1, 0, 'availabilityUpdatedAt', 'availabilityUpdatedBy')
   const lines = [
     headers.join(';'),
     ...enriched.map((row) =>
